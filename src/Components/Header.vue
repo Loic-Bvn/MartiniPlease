@@ -2,20 +2,8 @@
   <div class="bg-white shadow-md sticky top-0 z-10">
     <div class="w-full px-3 md:px-4 py-3 md:py-4">
       <div class="flex items-center justify-between mb-3 md:mb-4">
-        <div class="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-          <Wine class="text-blue-600 flex-shrink-0" :size="28" />
-          <div class="min-w-0">
-            <h1 class="text-lg md:text-2xl font-bold text-gray-800 truncate">Mon Home Bar</h1>
-            <p class="text-xs md:text-sm text-gray-500 truncate">
-              <span :class="['font-semibold', appMode === 'bartender' ? 'text-orange-600' : 'text-purple-600']">
-                {{ appMode === 'bartender' ? '🍸 Bartender' : '🍹 Drinker' }}
-              </span>
-              <template v-if="currentProfileData"> • {{ currentProfileData.name }}</template>
-            </p>
-          </div>
-        </div>
+        <!-- ... -->
         <div class="flex items-center gap-1 md:gap-2 flex-shrink-0">
-          <!-- Bouton mode (visible md+) -->
           <button
             @click="toggleMode"
             :class="['hidden sm:flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1 md:py-2 text-white text-sm md:text-base rounded-lg transition-colors', appMode === 'bartender' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-600 hover:bg-orange-700']"
@@ -24,7 +12,7 @@
             <span class="hidden md:inline">Mode {{ appMode === 'bartender' ? 'Drinker' : 'Bartender' }}</span>
             <span class="md:hidden">{{ appMode === 'bartender' ? '🍹' : '🍸' }}</span>
           </button>
-          <!-- File d'attente (mode Bartender) -->
+          
           <button
             v-if="appMode === 'bartender' && orderQueue && orderQueue.length > 0"
             @click="setShowOrderQueueModal(true)"
@@ -37,7 +25,6 @@
             </span>
           </button>
           
-          <!-- Déconnexion -->
           <button
             v-if="currentProfileData"
             @click="logoutProfile"
@@ -48,7 +35,7 @@
           </button>
         </div>
       </div>
-      <!-- Barre de recherche -->
+      
       <div class="relative">
         <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" :size="18" />
         <input
@@ -62,6 +49,7 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { computed } from 'vue';
 import { Wine, Search, ChefHat, Unlock, Lock } from 'lucide-vue-next';
@@ -77,29 +65,36 @@ const props = defineProps({
   searchTerm: String,
   setSearchTerm: Function
 });
+const emit = defineEmits(['set-mode', 'show-profile-modal', 'show-order-queue-modal', 'set-search-term', 'logout']);
 
 const currentProfileData = computed(() =>
   props.profiles && props.profiles.find(p => p.id === props.currentProfile)
 );
 
 function toggleMode() {
-  // On ne peut passer en mode drinker que si un profil drinker est sélectionné
-  const profile = currentProfileData.value;
-  if (props.appMode === 'bartender' && profile && profile.type === 'drinker') {
-    props.setAppMode('drinker');
-  } else if (props.appMode === 'drinker') {
-    props.setAppMode('bartender');
-  }
+  const newMode = props.appMode === 'bartender' ? 'drinker' : 'bartender';
+  emit('set-mode', newMode);
 }
-
-const emits = defineEmits(['logout']);
 
 function logoutProfile() {
-  props.setShowProfileModal(true);
-  props.setAppMode('bartender');
-  emits('logout');
+  emit('show-profile-modal', true);
+  emit('set-mode', 'bartender');
+  emit('logout');
+}
+
+function setSearchTerm(value) {
+  emit('set-search-term', value);
+}
+
+function setShowProfileModal(value) {
+  emit('show-profile-modal', value);
+}
+
+function setShowOrderQueueModal(value) {
+  emit('show-order-queue-modal', value);
 }
 </script>
+
 <style scoped>
 /* Styles conservés depuis le JSX, à compléter si besoin */
 </style>
