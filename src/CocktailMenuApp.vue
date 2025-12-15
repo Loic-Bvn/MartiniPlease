@@ -8,7 +8,7 @@
           <div class="header-brand">
             <Wine class="header-icon" :size="28" />
             <div>
-              <h1 class="header-title">Mon Home Bar</h1>
+              <h1 class="header-title">Martini Please</h1>
               <p class="header-subtitle">
                 <span :class="['mode-badge', appMode === 'bartender' ? 'text-orange-600' : 'text-purple-600']">
                   {{ appMode === 'bartender' ? '🧊 Bartender' : '🍹 Drinker' }}
@@ -42,7 +42,7 @@
               @click="logoutProfile"
               class="btn-logout"
             >
-              Déco
+              Déconnexion
             </button>
 
           </div>
@@ -82,18 +82,31 @@
           </label>
 
           <!-- Famille d'alcool -->
-          <div>
-            <label class="filter-label">Famille d'alcool</label>
-            <select v-model="selectedSpirit" class="filter-select">
-              <option value="all">Tous</option>
-              <option value="whiskey">Whiskey</option>
-              <option value="rum">Rhum</option>
-              <option value="gin">Gin</option>
-              <option value="vodka">Vodka</option>
-              <option value="tequila">Tequila</option>
-              <option value="brandy">Brandy</option>
-            </select>
-          </div>
+            <div>
+        <label class="filter-label">Spiritueux</label>
+        <select v-model="selectedSpirit" class="filter-select">
+            <option v-for="category in spirit_categories" 
+                    :key="category.key" 
+                    :value="category.key">
+                {{ category.value }}
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label class="filter-label">Sous catégorie</label>
+        <select v-model="selectedSubcategory" 
+                class="filter-select"
+                :disabled="!selectedSpirit || filteredSubcategories.length <= 1">
+            <option v-for="spirit in filteredSubcategories" 
+                    :key="spirit.key" 
+                    :value="spirit.key">
+                {{ spirit.value }}
+            </option>
+        </select>
+    </div>
+
+
 
           <!-- Saison -->
           <div>
@@ -152,10 +165,10 @@
                   {{ getMissingIngredientsText(cocktail) }}
                 </p>
                 <div class="cocktail-tags">
-                  <span class="tag tag-spirit">{{ cocktail.spiritType }}</span>
-                  <span class="tag tag-family">{{ cocktail.family }}</span>
-                  <span v-if="cocktail.Season && cocktail.Season !== 'all'" class="tag tag-family">
-                    {{ cocktail.Season }}
+                  <span v-if="cocktail.spiritType" class="tag tag-spirit">{{ cocktail.spiritType }}</span>
+                  <span v-if="cocktail.family" class="tag tag-family">{{ cocktail.family }}</span>
+                  <span v-if="cocktail.Season && cocktail.Season.length > 0" class="tag tag-season">
+                    {{ cocktail.Season.join(', ') }}
                   </span>
                 </div>
               </div>
@@ -177,10 +190,10 @@
               >
                 <span class="recipe-dot"></span>
                 <span>{{ ingredient.Ingredient }}</span>
-                <span v-if="ingredient.Type=== 'bitter'" class="text-gray-400">
+                <span v-if="ingredient.Type === 'bitter'" class="text-gray-400">
                   - {{ ingredient.Oz }}
                 </span>
-                <span v-if="ingredient.Ml!==null" class="text-gray-400">
+                <span v-else-if="ingredient.Ml !== null" class="text-gray-400">
                   - {{ ingredient.Oz }}oz
                 </span>
               </div>
@@ -206,6 +219,7 @@
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- Modals -->
@@ -250,7 +264,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { Wine, Search, User, Filter, ChevronDown } from 'lucide-vue-next';
 import { Storage } from '@/Utils/storage';
-import { sampleData } from '@/Utils/sampleData';
+import { cocktailsData, spirit_categories, spirit_subcategories} from '@/Utils/sampleData';
 
 import ProfileModal from '@/Components/Modals/ProfileModal.vue';
 import PasswordModal from '@/Components/Modals/PasswordModal.vue';
@@ -262,9 +276,7 @@ import OrderQueueModal from '@/Components/Modals/OrderQueueModal.vue';
 const appMode = ref('bartender'); // Mode par défaut
 const currentProfile = ref(null);
 const profiles = ref([]);
-const cocktails = ref([]);
 const searchTerm = ref('');
-const selectedSpirit = ref('all');
 const selectedSeason = ref('all');
 const showAvailableOnly = ref(false);
 const hiddenCocktails = ref(new Set());
@@ -275,6 +287,11 @@ const userRatings = ref({});
 const userNotes = ref({});
 const orderHistory = ref([]);
 const orderQueue = ref([]);
+
+// Gestion de l'affichage des cocktails
+const cocktails = ref([]);
+const selectedSpirit = ref('all');
+const selectedSubcategory = ref('all');
 
 // Variables pour les modales
 const showInventoryModal = ref(false);
@@ -295,6 +312,7 @@ function toggleMode() {
   } else {
     // Si on est en mode bartender, passer directement en mode drinker
     appMode.value = 'drinker';
+    showProfileModal.value = true
   }
 }
 
@@ -377,8 +395,52 @@ function loadProfiles() {
 // Appelle loadProfiles au montage du composant
 loadProfiles();
 
+// ------ END OF PROFILE HANDLER ------
 
+// Filtre les sous-catégories en fonction de la catégorie sélectionnée
+const filteredSubcategories = computed(() => {
+    if (!selectedSpirit.value) return [];
+    return spirit_subcategories[selectedSpirit.value] || [];
+});
+
+// Réinitialiser la sous-catégorie quand on change de catégorie principale
+watch(selectedSpirit, () => {
+    selectedSubcategory.value = '';
+});
+
+// Transformer le JSON en tableau de cocktails
+const allCocktails = computed(() => {
+    let all = [];
+    
+    if (!cocktailsData || typeof cocktailsData !== 'object') {
+        return all;
+    }
+
+    Object.entries(cocktailsData).forEach(([family, spirits]) => {
+        if (!spirits || typeof spirits !== 'object') return;
+        
+        Object.entries(spirits).forEach(([spiritType, cocktailList]) => {
+            if (!Array.isArray(cocktailList)) return;
+            
+            cocktailList.forEach(cocktail => {
+                all.push({
+                    ...cocktail,
+                    family: family,
+                    spiritType: spiritType,
+                    id: `${spiritType}-${cocktail.Name}`
+                });
+            });
+        });
+    });
+
+    return all;
+});
+
+
+// Cocktails disponibles (ceux qu'on peut faire avec l'inventaire)
 const availableCocktailsCount = computed(() => {
+  if (!Array.isArray(cocktails.value)) return 0;
+  
   return cocktails.value.filter(cocktail => {
     if (!Array.isArray(cocktail.Recipe)) return false;
     return cocktail.Recipe.every(ing => 
@@ -387,42 +449,32 @@ const availableCocktailsCount = computed(() => {
   }).length;
 });
 
+// Filtrer les cocktails par spiritueux
 const filteredCocktails = computed(() => {
-  const term = searchTerm.value.toLowerCase();
-  return cocktails.value.filter(cocktail => {
-    // Recherche
-    const matchesSearch = cocktail.Name.toLowerCase().includes(term) ||
-      (Array.isArray(cocktail.Recipe) && cocktail.Recipe.some(ing => 
-        ing.Ingredient.toLowerCase().includes(term)
-      ));
-    
-    if (!matchesSearch) return false;
-    
-    // Mode drinker : masquer les cocktails cachés
-    if (appMode.value === 'drinker' && hiddenCocktails.value.has(cocktail.id)) {
-      return false;
-    }
-    
-    // Filtre famille
-    if (selectedSpirit.value !== 'all' && cocktail.family !== selectedSpirit.value) {
-      return false;
-    }
-    
-    // Filtre saison
-    if (selectedSeason.value !== 'all' && cocktail.Season !== selectedSeason.value && cocktail.Season !== 'all') {
-      return false;
-    }
-    
-    // Disponibles uniquement
-    if (showAvailableOnly.value) {
-      const available = Array.isArray(cocktail.Recipe) && cocktail.Recipe.every(ing => 
-        ing.Type === 'garnish' || barInventory.value.has(ing.Ingredient)
-      );
-      if (!available) return false;
-    }
-    
-    return true;
-  });
+  if (!Array.isArray(cocktails.value)) return [];
+  
+  let filtered = cocktails.value;
+
+  // Filtre par catégorie de spiritueux
+  if (selectedSpirit.value) {
+    filtered = filtered.filter(cocktail => {
+      return cocktail.family === selectedSpirit.value;
+    });
+  }
+
+  // Filtre par sous-catégorie
+  if (selectedSubcategory.value) {
+    filtered = filtered.filter(cocktail => {
+      return cocktail.spiritType === selectedSubcategory.value;
+    });
+  }
+
+  return filtered;
+});
+
+// Réinitialiser la sous-catégorie quand on change de catégorie
+watch(selectedSpirit, () => {
+    selectedSubcategory.value = '';
 });
 
 // Watch pour sauvegarder
@@ -465,22 +517,37 @@ watch(currentProfile, (newProfileId) => {
   }
 });
 
-// Initialisation
-onMounted(() => {
-  profiles.value = Storage.getProfiles();
-  barInventory.value = Storage.getBarInventory();
-  hiddenCocktails.value = Storage.getHiddenCocktails();
-  selectedSeason.value = Storage.getSeasonFilter();
-  orderQueue.value = Storage.getOrderQueue();
 
-  const savedData = Storage.getCocktailData();
-  if (savedData) {
-    loadCocktails(savedData);
-  } else {
-    loadCocktails(sampleData);
-  }
-});
 
+/**
+ * Load cocktail data from an object.
+ *
+ * The object should have the following structure:
+ * {
+ *   family: {
+ *     spiritType: [
+ *       {
+ *         Name: string,
+ *         Profile: string[],
+ *         Creator: string,
+ *         Season: string[],
+ *         Image: string,
+ *         Recipe: [
+ *           {
+ *             Ingredient: string,
+ *             type: string,
+ *             oz: number,
+ *             ml: number
+ *           }
+ *         ]
+ *       }
+ *     ]
+ *   }
+ * }
+ *
+ * @param {Object} data - The cocktail data object.
+ */
+// Fonction pour charger les cocktails
 function loadCocktails(data) {
   const allCocktails = [];
   Object.entries(data).forEach(([family, spirits]) => {
@@ -497,19 +564,18 @@ function loadCocktails(data) {
     });
   });
   cocktails.value = allCocktails;
-
-  const ingredientsSet = new Set();
-  allCocktails.forEach(cocktail => {
-    if (Array.isArray(cocktail.Recipe)) {
-      cocktail.Recipe.forEach(ing => {
-        if (ing.Type !== 'garnish') {
-          ingredientsSet.add(ing.Ingredient);
-        }
-      });
-    }
-  });
-  allIngredients.value = Array.from(ingredientsSet).sort();
 }
+
+// Initialisation
+onMounted(() => {
+  profiles.value = Storage.getProfiles();
+  barInventory.value = Storage.getBarInventory();
+  hiddenCocktails.value = Storage.getHiddenCocktails();
+  selectedSeason.value = Storage.getSeasonFilter();
+  orderQueue.value = Storage.getOrderQueue();
+  // Charger les cocktails au montage du composant
+  loadCocktails(cocktailsData);
+});
 
 function getMissingIngredientsText(cocktail) {
   if (!Array.isArray(cocktail.Recipe)) return 'Recette non disponible';
