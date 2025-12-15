@@ -51,9 +51,10 @@
 
     <!-- Main Content -->
     <div class="main-content">
+
       <!-- Profile Section -->
       <div class="section-card">
-        <div class="section-header">
+        <!-- <div class="section-header">
           <User class="section-icon" :size="20" />
           <h2 class="section-title">Profil</h2>
         </div>
@@ -70,7 +71,31 @@
           <button @click="showProfileModal = true" class="btn-text">
             Changer
           </button>
+        </div> -->
+         
+        <!-- Bouton pour ouvrir la popup si aucun profil sélectionné -->
+        <div v-if="!currentProfile" class="profile-empty">
+          <p class="profile-empty-text">Aucun profil sélectionné</p>
+          <button @click="showProfileModal = true" class="btn-primary">
+            Sélectionner un profil
+          </button>
         </div>
+
+        <!-- Ou un bouton dans ton interface pour ouvrir la modale -->
+        <button @click="showProfileModal = true" class="btn-secondary">
+          Gérer les profils
+        </button>
+
+        <!-- ProfileModal -->
+        <ProfileModal
+          v-if="showProfileModal"
+          :profiles="profiles"
+          :currentProfile="currentProfile"
+          :onClose="closeProfileModal"
+          :onCreate="createProfile"
+          :onSelect="selectProfile"
+          :onDelete="deleteProfile"
+        />
       </div>
 
       <!-- Filters -->
@@ -186,8 +211,11 @@
               >
                 <span class="recipe-dot"></span>
                 <span>{{ ingredient.Ingredient }}</span>
-                <span v-if="ingredient.Quantity" class="text-gray-400">
-                  - {{ ingredient.Quantity }}
+                <span v-if="ingredient.Type=== 'bitter'" class="text-gray-400">
+                  - {{ ingredient.Oz }}
+                </span>
+                <span v-if="ingredient.Ml!==null" class="text-gray-400">
+                  - {{ ingredient.Oz }}oz
                 </span>
               </div>
             </div>
@@ -215,7 +243,7 @@
     </div>
 
     <!-- Modals -->
-    <ProfileModal
+    <!-- <ProfileModal
       v-if="showProfileModal"
       :profiles="profiles"
       :current-profile="currentProfile"
@@ -223,7 +251,7 @@
       @select="selectProfile"
       @delete="deleteProfile"
       @close="showProfileModal = false"
-    />
+    /> -->
 
     <InventoryModal
       v-if="showInventoryModal"
@@ -255,7 +283,7 @@ import InventoryModal from '@/Components/Modals/InventoryModal.vue';
 import OrderQueueModal from '@/Components/Modals/OrderQueueModal.vue';
 
 // States
-const appMode = ref('bartender');
+const appMode = ref('drinker'); // 'bartender' ou 'drinker'
 const currentProfile = ref(null);
 const profiles = ref([]);
 const cocktails = ref([]);
@@ -271,7 +299,7 @@ const userRatings = ref({});
 const userNotes = ref({});
 const orderHistory = ref([]);
 const orderQueue = ref([]);
-const showProfileModal = ref(false);
+// const showProfileModal = ref(false);
 const showInventoryModal = ref(false);
 const showOrderQueueModal = ref(false);
 const expandedCocktail = ref(null);
@@ -280,6 +308,81 @@ const expandedCocktail = ref(null);
 const currentProfileData = computed(() => 
   profiles.value.find(p => p.id === currentProfile.value)
 );
+
+
+// Variable pour contrôler l'affichage de la modale
+const showProfileModal = ref(false);
+
+// Fonction pour fermer la modale
+function closeProfileModal() {
+  showProfileModal.value = false;
+}
+
+// Tes fonctions existantes (légèrement modifiées)
+function createProfile(name) {
+  if (!name.trim()) return;
+  const id = Date.now().toString();
+  const newProfile = { 
+    id, 
+    name: name.trim(), 
+    type: 'drinker',
+    createdAt: new Date().toISOString()
+  };
+  profiles.value.push(newProfile);
+  currentProfile.value = id;
+  appMode.value = 'drinker';
+  showProfileModal.value = false; // Ferme la modale après création
+  
+  // Sauvegarde le nouveau profil
+  saveProfiles();
+}
+
+function deleteProfile(id) {
+  // La confirmation est maintenant gérée dans le ProfileModal
+  // Mais tu peux la laisser ici aussi pour double sécurité
+  profiles.value = profiles.value.filter(p => p.id !== id);
+  
+  localStorage.removeItem(`profile_${id}_favorites`);
+  localStorage.removeItem(`profile_${id}_ratings`);
+  localStorage.removeItem(`profile_${id}_notes`);
+  localStorage.removeItem(`profile_${id}_history`);
+  
+  if (currentProfile.value === id) {
+    currentProfile.value = null;
+    appMode.value = 'bartender';
+  }
+  
+  // Sauvegarde la liste mise à jour
+  saveProfiles();
+}
+
+function selectProfile(id) {
+  currentProfile.value = id;
+  appMode.value = 'drinker';
+  showProfileModal.value = false; // Ferme la modale après sélection
+  
+  favorites.value = Storage.getProfileData(id, 'favorites');
+  userRatings.value = Storage.getProfileData(id, 'ratings');
+  userNotes.value = Storage.getProfileData(id, 'notes');
+  orderHistory.value = Storage.getProfileData(id, 'history');
+}
+
+// Fonction utilitaire pour sauvegarder les profils
+function saveProfiles() {
+  localStorage.setItem('profiles', JSON.stringify(profiles.value));
+}
+
+// Charge les profils au démarrage
+function loadProfiles() {
+  const saved = localStorage.getItem('profiles');
+  if (saved) {
+    profiles.value = JSON.parse(saved);
+  }
+}
+
+// Appelle loadProfiles au montage du composant
+loadProfiles();
+
 
 const availableCocktailsCount = computed(() => {
   return cocktails.value.filter(cocktail => {
@@ -446,48 +549,6 @@ function resetFilters() {
   showAvailableOnly.value = false;
 }
 
-function createProfile(name) {
-  if (!name.trim()) return;
-  const id = Date.now().toString();
-  const newProfile = { 
-    id, 
-    name: name.trim(), 
-    type: 'drinker',
-    createdAt: new Date().toISOString()
-  };
-  profiles.value.push(newProfile);
-  currentProfile.value = id;
-  appMode.value = 'drinker';
-  showProfileModal.value = false;
-}
-
-function deleteProfile(id) {
-  if (!confirm('Supprimer ce profil et toutes ses données ?')) return;
-  
-  profiles.value = profiles.value.filter(p => p.id !== id);
-  
-  localStorage.removeItem(`profile_${id}_favorites`);
-  localStorage.removeItem(`profile_${id}_ratings`);
-  localStorage.removeItem(`profile_${id}_notes`);
-  localStorage.removeItem(`profile_${id}_history`);
-  
-  if (currentProfile.value === id) {
-    currentProfile.value = null;
-    appMode.value = 'bartender';
-  }
-}
-
-function selectProfile(id) {
-  currentProfile.value = id;
-  appMode.value = 'drinker';
-  showProfileModal.value = false;
-  
-  favorites.value = Storage.getProfileData(id, 'favorites');
-  userRatings.value = Storage.getProfileData(id, 'ratings');
-  userNotes.value = Storage.getProfileData(id, 'notes');
-  orderHistory.value = Storage.getProfileData(id, 'history');
-}
-
 function toggleIngredient(ingredient) {
   const newInventory = new Set(barInventory.value);
   if (newInventory.has(ingredient)) {
@@ -550,7 +611,8 @@ function logoutProfile() {
 <style scoped>
 .btn-mode {
   padding: 0.5rem 1rem;
-  color: white;
+  color: rgb(255, 247, 231);
+  background-color: #ffa01c;
   border: none;
   border-radius: 0.5rem;
   font-size: 0.875rem;
@@ -561,8 +623,8 @@ function logoutProfile() {
 
 .btn-logout {
   padding: 0.5rem 0.75rem;
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: #f4938f;
+  color: #ffffff;
   border: none;
   border-radius: 0.5rem;
   font-size: 0.875rem;
@@ -589,4 +651,50 @@ function logoutProfile() {
 .btn-secondary:hover {
   background-color: #e5e7eb;
 }
+
+.profile-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.profile-empty-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* .btn-primary {
+  padding: 0.75rem 1.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+} */
+
+/* .btn-secondary {
+  padding: 0.5rem 1rem;
+  background: #e5e7eb;
+  color: #374151;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #d1d5db;
+} */
 </style>
