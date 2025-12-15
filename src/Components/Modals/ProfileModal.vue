@@ -23,6 +23,7 @@
       <div class="mb-6">
         <div class="flex gap-2">
           <input
+            v-if="!isBartenderMode"
             type="text"
             v-model="newProfileName"
             @keypress.enter="handleCreate"
@@ -30,6 +31,7 @@
             class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
           />
           <button
+            v-if="!isBartenderMode"
             @click="handleCreate"
             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="!newProfileName.trim()"
@@ -62,13 +64,15 @@
             
             <div class="flex gap-2 flex-shrink-0 ml-2">
               <button
-                v-if="currentProfile !== profile.id"
+                v-if="(currentProfile !== profile.id) && !isBartenderMode"
                 @click="() => onSelect(profile.id)"
                 class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors whitespace-nowrap"
               >
                 Sélectionner
               </button>
+              <!-- Bouton de suppression visible uniquement en mode bartender -->
               <button
+                v-if="isBartenderMode"
                 @click="() => handleDelete(profile.id)"
                 class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 :disabled="currentProfile === profile.id"
@@ -83,6 +87,13 @@
         <div v-else class="text-center text-gray-500 text-sm py-8 bg-gray-50 rounded-lg">
           Aucun profil créé. Créez-en un pour commencer !
         </div>
+      </div>
+
+      <!-- Message informatif si pas en mode bartender -->
+      <div v-if="!isBartenderMode && profiles.length > 0" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p class="text-xs text-blue-800">
+          💡 Passez en mode bartender pour supprimer des profils
+        </p>
       </div>
     </div>
   </div>
@@ -100,6 +111,10 @@ const props = defineProps({
   currentProfile: {
     type: [String, Number],
     default: null
+  },
+  isBartenderMode: {
+    type: Boolean,
+    default: false
   },
   onClose: {
     type: Function,

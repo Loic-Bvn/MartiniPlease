@@ -71,10 +71,10 @@ const currentProfileData = computed(() =>
   props.profiles && props.profiles.find(p => p.id === props.currentProfile)
 );
 
-function toggleMode() {
-  const newMode = props.appMode === 'bartender' ? 'drinker' : 'bartender';
-  emit('set-mode', newMode);
-}
+// function toggleMode() {
+//   const newMode = props.appMode === 'bartender' ? 'drinker' : 'bartender';
+//   emit('set-mode', newMode);
+// }
 
 function logoutProfile() {
   emit('show-profile-modal', true);

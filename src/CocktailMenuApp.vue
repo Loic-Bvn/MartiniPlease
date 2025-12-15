@@ -3,6 +3,7 @@
     <!-- Header -->
     <div class="header">
       <div class="header-container">
+
         <div class="header-top">
           <div class="header-brand">
             <Wine class="header-icon" :size="28" />
@@ -17,14 +18,24 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
+
             <!-- Bouton switch mode -->
             <button
+              v-if="!currentProfileData"              
               @click="toggleMode"
               :class="['btn-mode', appMode === 'bartender' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-600 hover:bg-orange-700']"
             >
               {{ appMode === 'bartender' ? 'Mode Drinker' : 'Mode Bartender' }}
             </button>
-            
+
+            <!-- Bouton connexion -->
+            <button 
+              v-if="!currentProfileData"
+              @click="showProfileModal = true" class="btn-mode"
+            >
+              Sélection du profil
+            </button>
+
             <!-- Bouton déconnexion -->
             <button
               v-if="currentProfileData"
@@ -33,6 +44,7 @@
             >
               Déco
             </button>
+
           </div>
         </div>
 
@@ -51,52 +63,6 @@
 
     <!-- Main Content -->
     <div class="main-content">
-
-      <!-- Profile Section -->
-      <div class="section-card">
-        <!-- <div class="section-header">
-          <User class="section-icon" :size="20" />
-          <h2 class="section-title">Profil</h2>
-        </div>
-
-        <div v-if="!currentProfile" class="profile-empty">
-          <p class="profile-empty-text">Aucun profil sélectionné</p>
-          <button @click="showProfileModal = true" class="btn-primary">
-            Sélectionner un profil
-          </button>
-        </div>
-
-        <div v-else class="profile-selected">
-          <span class="profile-name">{{ currentProfileData.name }}</span>
-          <button @click="showProfileModal = true" class="btn-text">
-            Changer
-          </button>
-        </div> -->
-         
-        <!-- Bouton pour ouvrir la popup si aucun profil sélectionné -->
-        <div v-if="!currentProfile" class="profile-empty">
-          <p class="profile-empty-text">Aucun profil sélectionné</p>
-          <button @click="showProfileModal = true" class="btn-primary">
-            Sélectionner un profil
-          </button>
-        </div>
-
-        <!-- Ou un bouton dans ton interface pour ouvrir la modale -->
-        <button @click="showProfileModal = true" class="btn-secondary">
-          Gérer les profils
-        </button>
-
-        <!-- ProfileModal -->
-        <ProfileModal
-          v-if="showProfileModal"
-          :profiles="profiles"
-          :currentProfile="currentProfile"
-          :onClose="closeProfileModal"
-          :onCreate="createProfile"
-          :onSelect="selectProfile"
-          :onDelete="deleteProfile"
-        />
-      </div>
 
       <!-- Filters -->
       <div class="section-card">
@@ -243,15 +209,17 @@
     </div>
 
     <!-- Modals -->
-    <!-- <ProfileModal
+    <ProfileModal
       v-if="showProfileModal"
       :profiles="profiles"
-      :current-profile="currentProfile"
-      @create="createProfile"
-      @select="selectProfile"
-      @delete="deleteProfile"
-      @close="showProfileModal = false"
-    /> -->
+      :currentProfile="currentProfile"
+      :isBartenderMode="appMode === 'bartender'"
+      :isDrinkerMode="appMode === 'drinker'"
+      :onClose="closeProfileModal"
+      :onCreate="createProfile"
+      :onSelect="selectProfile"
+      :onDelete="deleteProfile"
+    />
 
     <InventoryModal
       v-if="showInventoryModal"
@@ -269,6 +237,12 @@
       @complete="completeOrder"
       @close="showOrderQueueModal = false"
     />
+
+    <PasswordModal
+      v-if="showPasswordModal"
+      :onClose="closePasswordModal"
+      :onSuccess="switchToBartenderMode"
+    />
   </div>
 </template>
 
@@ -279,11 +253,13 @@ import { Storage } from '@/Utils/storage';
 import { sampleData } from '@/Utils/sampleData';
 
 import ProfileModal from '@/Components/Modals/ProfileModal.vue';
+import PasswordModal from '@/Components/Modals/PasswordModal.vue';
 import InventoryModal from '@/Components/Modals/InventoryModal.vue';
 import OrderQueueModal from '@/Components/Modals/OrderQueueModal.vue';
 
 // States
-const appMode = ref('drinker'); // 'bartender' ou 'drinker'
+// const appMode = ref('drinker'); // 'bartender' ou 'drinker'
+const appMode = ref('bartender'); // Mode par défaut
 const currentProfile = ref(null);
 const profiles = ref([]);
 const cocktails = ref([]);
@@ -299,16 +275,34 @@ const userRatings = ref({});
 const userNotes = ref({});
 const orderHistory = ref([]);
 const orderQueue = ref([]);
-// const showProfileModal = ref(false);
+
+// Variables pour les modales
 const showInventoryModal = ref(false);
 const showOrderQueueModal = ref(false);
 const expandedCocktail = ref(null);
+const showPasswordModal = ref(false);
 
 // Computed
 const currentProfileData = computed(() => 
   profiles.value.find(p => p.id === currentProfile.value)
 );
 
+// Fonction pour basculer le mode
+function toggleMode() {
+  if (appMode.value === 'drinker') {
+    // Si on est en mode drinker, demander le mot de passe
+    showPasswordModal.value = true;
+  } else {
+    // Si on est en mode bartender, passer directement en mode drinker
+    appMode.value = 'drinker';
+  }
+}
+
+// Fonction appelée après succès du mot de passe
+function switchToBartenderMode() {
+  appMode.value = 'bartender';
+  currentProfile.value = null; // Optionnel : désélectionner le profil
+}
 
 // Variable pour contrôler l'affichage de la modale
 const showProfileModal = ref(false);
@@ -532,16 +526,16 @@ function toggleCocktail(id) {
   expandedCocktail.value = expandedCocktail.value === id ? null : id;
 }
 
-function toggleMode() {
-  const newMode = appMode.value === 'bartender' ? 'drinker' : 'bartender';
+// function toggleMode() {
+//   const newMode = appMode.value === 'bartender' ? 'drinker' : 'bartender';
   
-  if (newMode === 'drinker' && !currentProfile.value) {
-    showProfileModal.value = true;
-    return;
-  }
+//   if (newMode === 'drinker' && !currentProfile.value) {
+//     showProfileModal.value = true;
+//     return;
+//   }
   
-  appMode.value = newMode;
-}
+//   appMode.value = newMode;
+// }
 
 function resetFilters() {
   selectedSpirit.value = 'all';
@@ -603,9 +597,27 @@ function completeOrder(order) {
 
 function logoutProfile() {
   currentProfile.value = null;
-  appMode.value = 'bartender';
+  // appMode.value = 'drinker';
+  // ouvre la vue selection profil automatiquement
   showProfileModal.value = true;
 }
+
+// function loginProfile() {
+//   appMode.value === 'drinker'
+  
+//   currentProfile.value = null;
+//   // appMode.value = 'drinker';
+//   // ouvre la vue selection profil automatiquement
+//   showProfileModal.value = true;
+
+// }
+
+// Fermer les modales
+
+function closePasswordModal() {
+  showPasswordModal.value = false;
+}
+
 </script>
 
 <style scoped>
