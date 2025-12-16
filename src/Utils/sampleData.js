@@ -4,6 +4,7 @@ import cocktailData from '../Utils/cocktail_dump_15_12_2025.json';
 export const cocktailsData = cocktailData;
 
 export const spirit_categories = [
+    { key: '', value: "Tous" },
     { key: 'whiskey', value: "Whisky" },
     { key: 'rum', value: "Rhum" },
     { key: 'gin', value: "Gin" },
@@ -44,3 +45,11 @@ export const spirit_subcategories = {
         { key: 'chartreuse', value: 'Chartreuse' },
     ],
 };
+
+export const seasons = [
+    { key: 'all', value: 'Toutes', icon: '🌍' },
+    { key: 'spring', value: 'Printemps', icon: '🌸' },
+    { key: 'summer', value: 'Été', icon: '☀️' },
+    { key: 'autumn', value: 'Automne', icon: '🍂' },
+    { key: 'winter', value: 'Hiver', icon: '❄️' },
+];

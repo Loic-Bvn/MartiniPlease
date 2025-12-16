@@ -63,60 +63,74 @@
 
     <!-- Main Content -->
     <div class="main-content">
-
-      <!-- Filters -->
       <div class="section-card">
-        <div class="section-header">
-          <Filter class="section-icon" :size="20" />
-          <h2 class="section-title">Filters</h2>
-        </div>
-
-        <div class="filters-content">
-          <!-- Show available only -->
-          <label class="filter-checkbox">
-            <input type="checkbox" v-model="showAvailableOnly" />
-            <span>Cocktails disponibles uniquement</span>
-          </label>
-
-          <!-- Spirit -->
-          <div>
+        <h2 class="section-title">Filtres</h2>
+        <!-- Filters -->
+          <div class="filters-container">
+            <!-- Spiritueux -->
+            <div class="filter-group">
               <label class="filter-label">Spiritueux</label>
-              <select v-model="selectedSpirit" class="filter-select">
-                <option value="">Tous les spiritueux</option>
-                  <option v-for="spiritCategory in spirit_categories" 
-                          :key="spiritCategory.key" 
-                          :value="spiritCategory.key">
-                      {{ spiritCategory.value }}
-                  </option>
-              </select>
+              <div class="chips-container">
+                <button 
+                  v-for="spirit in spirit_categories" 
+                  :key="spirit.key"
+                  @click="toggleFilter(selectedSpirits, spirit.key)"
+                  :class="['chip', { active: selectedSpirits.includes(spirit.key) }]">
+                  {{ spirit.value }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Sous-catégories (conditionnelles) -->
+            <div v-if="filteredSubcategories.length > 1" class="filter-group">
+              <label class="filter-label">Type</label>
+              <div class="chips-container">
+                <button 
+                  v-for="sub in filteredSubcategories" 
+                  :key="sub.key"
+                  @click="toggleFilter(selectedSubcategories, sub.key)"
+                  :class="['chip', { active: selectedSubcategories.includes(sub.key) }]">
+                  {{ sub.value }}
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Saison</label>
+              <div class="chips-container">
+                <button 
+                  v-for="season in seasons" 
+                  :key="season.key"
+                  @click="season.key === 'all' ? selectedSeasons = [] : toggleFilter(selectedSeasons, season.key)"
+                  :class="['chip', { 
+                    active: season.key === 'all' 
+                      ? selectedSeasons.length === 0 
+                      : selectedSeasons.includes(season.key) 
+                  }]">
+                  {{ season.icon }} {{ season.value }}
+                </button>
+              </div>
+            </div>
           </div>
 
-          <!-- Subcategory -->
-          <div>
-            <label class="filter-label">Sous Catégories</label>
-            <select v-model="selectedSubcategory" class="filter-select" :disabled="!selectedSpirit || filteredSubcategories.length <= 1">
-              <option v-for="spirit in filteredSubcategories" :key="spirit.key" :value="spirit.key">
-                {{ spirit.value }}
-              </option>
-            </select>
+          <!-- Filtres actifs -->
+          <div v-if="hasActiveFilters" class="active-filters-bar">
+            <span v-for="spirit in selectedSpirits" :key="spirit" class="filter-tag">
+              {{ getSpiritLabel(spirit) }}
+              <X @click="toggleFilter(selectedSpirits, spirit)" :size="14" />
+            </span>
+            <span v-for="sub in selectedSubcategories" :key="sub" class="filter-tag">
+              {{ getSubcategoryLabel(sub) }}
+              <X @click="toggleFilter(selectedSubcategories, sub)" :size="14" />
+            </span>
+            <span v-for="season in selectedSeasons" :key="season" class="filter-tag">
+              {{ getSeasonLabel(season) }}
+              <X @click="toggleFilter(selectedSeasons, season)" :size="14" />
+            </span>
+            <button @click="clearAllFilters" class="clear-all-btn">
+              Effacer tout
+            </button>
           </div>
-
-          <!-- Season -->
-          <div>
-            <label class="filter-label">Saison</label>
-            <select v-model="selectedSeason" class="filter-select">
-              <option value="all">Toutes les saisons</option>
-              <option value="spring">Printemps</option>
-              <option value="summer">Été</option>
-              <option value="autumn">Automne</option>
-              <option value="winter">Hiver</option>
-            </select>
-          </div>
-
-          <button @click="resetFilters" class="btn-reset">
-            Réinitialiser les filtres
-          </button>
-        </div>
       </div>
 
       <!-- Statistics -->
@@ -255,9 +269,9 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { Wine, Search, User, Filter, ChevronDown } from 'lucide-vue-next';
+import { Wine, Search, User, Filter, ChevronDown, X } from 'lucide-vue-next';
 import { Storage } from '@/Utils/storage';
-import { cocktailsData, spirit_categories, spirit_subcategories} from '@/Utils/sampleData';
+import { cocktailsData, spirit_categories, spirit_subcategories, seasons} from '@/Utils/sampleData';
 
 import ProfileModal from '@/Components/Modals/ProfileModal.vue';
 import PasswordModal from '@/Components/Modals/PasswordModal.vue';
@@ -265,13 +279,10 @@ import InventoryModal from '@/Components/Modals/InventoryModal.vue';
 import OrderQueueModal from '@/Components/Modals/OrderQueueModal.vue';
 
 // States
-// const appMode = ref('drinker'); // 'bartender' ou 'drinker'
-const appMode = ref('bartender'); // Mode par défaut
+const appMode = ref('drinker'); // Mode par défaut
 const currentProfile = ref(null);
 const profiles = ref([]);
 const searchTerm = ref('');
-const selectedSeason = ref('all');
-const showAvailableOnly = ref(false);
 const hiddenCocktails = ref(new Set());
 const barInventory = ref(new Set());
 const allIngredients = ref([]);
@@ -281,10 +292,11 @@ const userNotes = ref({});
 const orderHistory = ref([]);
 const orderQueue = ref([]);
 
-// Gestion de l'affichage des cocktails
+// Gestion de l'affichage des filtres, cocktails
 const cocktails = ref([]);
-const selectedSpirit = ref('');
-const selectedSubcategory = ref('all');
+const selectedSpirits = ref([])
+const selectedSubcategories = ref([])
+const selectedSeasons = ref([])
 
 // Variables pour les modales
 const showInventoryModal = ref(false);
@@ -293,7 +305,7 @@ const expandedCocktail = ref(null);
 const showPasswordModal = ref(false);
 
 
-
+// ------------------------ COCKTAILS FILTERS ---------------------------------
 function loadCocktails(data) {
   const allCocktails = [];
   Object.entries(data).forEach(([family, spirits]) => {
@@ -320,13 +332,35 @@ onMounted(() => {
   profiles.value = Storage.getProfiles();
   barInventory.value = Storage.getBarInventory();
   hiddenCocktails.value = Storage.getHiddenCocktails();
-  selectedSeason.value = Storage.getSeasonFilter();
+
+  // Charger les filtres sauvegardés
+  const savedSeason = Storage.getSeasonFilter();
+  // Si une saison était sauvegardée, l'ajouter au tableau
+  if (savedSeason && savedSeason !== 'all') {
+    selectedSeasons.value = [savedSeason];
+  } else {
+    selectedSeasons.value = [];
+  }
   orderQueue.value = Storage.getOrderQueue();
-  // Charger les cocktails au montage du composant
-  // loadCocktails(cocktailsData);
 });
 
+const toggleFilter = (array, value) => {
+  const index = array.indexOf(value)
+  if (index > -1) {
+    array.splice(index, 1)
+  } else {
+    array.push(value)
+  }
+}
 
+const toggleSeasonFilter = (seasonKey) => {
+  if (seasonKey === 'all') {
+    selectedSeasons.value = [];
+  } else {
+    toggleFilter(selectedSeasons, seasonKey);
+  }
+};
+// ------------------------ END COCKTAILS FILTERS ---------------------------------
 
 // Computed
 const currentProfileData = computed(() => 
@@ -373,7 +407,7 @@ function createProfile(name) {
   currentProfile.value = id;
   appMode.value = 'drinker';
   showProfileModal.value = false; // Ferme la modale après création
-  
+
   // Sauvegarde le nouveau profil
   saveProfiles();
 }
@@ -382,17 +416,17 @@ function deleteProfile(id) {
   // La confirmation est maintenant gérée dans le ProfileModal
   // Mais tu peux la laisser ici aussi pour double sécurité
   profiles.value = profiles.value.filter(p => p.id !== id);
-  
+
   localStorage.removeItem(`profile_${id}_favorites`);
   localStorage.removeItem(`profile_${id}_ratings`);
   localStorage.removeItem(`profile_${id}_notes`);
   localStorage.removeItem(`profile_${id}_history`);
-  
+
   if (currentProfile.value === id) {
     currentProfile.value = null;
     appMode.value = 'bartender';
   }
-  
+
   // Sauvegarde la liste mise à jour
   saveProfiles();
 }
@@ -401,7 +435,7 @@ function selectProfile(id) {
   currentProfile.value = id;
   appMode.value = 'drinker';
   showProfileModal.value = false; // Ferme la modale après sélection
-  
+
   favorites.value = Storage.getProfileData(id, 'favorites');
   userRatings.value = Storage.getProfileData(id, 'ratings');
   userNotes.value = Storage.getProfileData(id, 'notes');
@@ -426,45 +460,71 @@ loadProfiles();
 
 // ------ END OF PROFILE HANDLER ------
 
-// Filtre les sous-catégories en fonction de la catégorie sélectionnée
+// Filtre les sous-catégories en fonction des catégories sélectionnées
 const filteredSubcategories = computed(() => {
-    if (!selectedSpirit.value) return [];
-    return spirit_subcategories[selectedSpirit.value] || [];
+  if (selectedSpirits.value.length === 0) return [];
+
+  // Récupérer toutes les sous-catégories pour tous les spiritueux sélectionnés
+  const allSubcategories = selectedSpirits.value.flatMap(spirit => {
+    return spirit_subcategories[spirit] || [];
+  });
+
+  // Retirer les doublons (si deux spiritueux ont la même sous-catégorie)
+  const uniqueSubcategories = allSubcategories.filter((sub, index, self) => 
+    index === self.findIndex(s => s.key === sub.key)
+  );
+
+  return uniqueSubcategories;
 });
 
-// Réinitialiser la sous-catégorie quand on change de catégorie principale
-watch(selectedSpirit, () => {
-    selectedSubcategory.value = '';
-});
+// Nettoyer les sous-catégories sélectionnées quand on change les spiritueux
+watch(selectedSpirits, (newSpirits) => {
+  // Récupérer toutes les sous-catégories valides pour les spiritueux actuels
+  const validSubcategoryKeys = new Set(
+    newSpirits.flatMap(spirit => 
+      (spirit_subcategories[spirit] || []).map(sub => sub.key)
+    )
+  );
 
-// Transformer le JSON en tableau de cocktails
-const allCocktails = computed(() => {
-    let all = [];
-    
-    if (!cocktailsData || typeof cocktailsData !== 'object') {
-        return all;
-    }
+  // Garder seulement les sous-catégories qui sont encore valides
+  selectedSubcategories.value = selectedSubcategories.value.filter(subKey => 
+    validSubcategoryKeys.has(subKey)
+  );
+}, { deep: true });
 
-    Object.entries(cocktailsData).forEach(([family, spirits]) => {
-        if (!spirits || typeof spirits !== 'object') return;
-        
-        Object.entries(spirits).forEach(([spiritType, cocktailList]) => {
-            if (!Array.isArray(cocktailList)) return;
-            
-            cocktailList.forEach(cocktail => {
-                all.push({
-                    ...cocktail,
-                    family: family,
-                    spiritType: spiritType,
-                    id: `${spiritType}-${cocktail.Name}`
-                });
-            });
-        });
-    });
+// Obtenir le label d'un spiritueux
+function getSpiritLabel(key) {
+  const spirit = spirit_categories.find(s => s.key === key);
+  return spirit ? spirit.value : key;
+}
 
-    return all;
-});
+// Obtenir le label d'une sous-catégorie
+function getSubcategoryLabel(key) {
+  // Parcourir toutes les sous-catégories
+  for (const spirits of Object.values(spirit_subcategories)) {
+    const sub = spirits.find(s => s.key === key);
+    if (sub) return sub.value;
+  }
+  return key;
+}
 
+// Obtenir le label d'une saison
+function getSeasonLabel(key) {
+  const season = seasons.find(s => s.key === key);
+  return season ? `${season.icon} ${season.value}` : key;
+}
+
+const hasActiveFilters = computed(() => 
+  selectedSpirits.value.length > 0 || 
+  selectedSubcategories.value.length > 0 || 
+  selectedSeasons.value.length > 0
+)
+
+const clearAllFilters = () => {
+  selectedSpirits.value = []
+  selectedSubcategories.value = []
+  selectedSeasons.value = []
+}
 
 // Cocktails disponibles (ceux qu'on peut faire avec l'inventaire)
 const availableCocktailsCount = computed(() => {
@@ -478,13 +538,13 @@ const availableCocktailsCount = computed(() => {
   }).length;
 });
 
-// Filtrer les cocktails par spiritueux
+// Filtrer les cocktails
 const filteredCocktails = computed(() => {
   if (!Array.isArray(cocktails.value)) return [];
   
   let filtered = cocktails.value;
 
-    // Filtre par recherche textuelle
+  // Filtre par recherche textuelle
   if (searchTerm.value.trim()) {
     const search = searchTerm.value.toLowerCase().trim();
     filtered = filtered.filter(cocktail => {
@@ -505,39 +565,49 @@ const filteredCocktails = computed(() => {
     });
   }
 
-  // Filtre par catégorie de spiritueux (seulement si une valeur est sélectionnée)
-  if (selectedSpirit.value && selectedSpirit.value !== '') {
+  // Filtre par catégorie de spiritueux (mode OU : au moins un spiritueux sélectionné correspond)
+  if (selectedSpirits.value.length > 0) {
     filtered = filtered.filter(cocktail => {
-      return cocktail.family === selectedSpirit.value;
+      return selectedSpirits.value.includes(cocktail.family);
     });
   }
 
-  // Filtre par sous-catégorie (seulement si une valeur est sélectionnée)
-  if (selectedSubcategory.value && selectedSubcategory.value !== '') {
+  // Filtre par sous-catégorie (mode OU : au moins une sous-catégorie sélectionnée correspond)
+  if (selectedSubcategories.value.length > 0) {
     filtered = filtered.filter(cocktail => {
-      return cocktail.spiritType === selectedSubcategory.value;
+      return selectedSubcategories.value.includes(cocktail.spiritType);
     });
   }
 
-  // Filtre par saison
-  if (selectedSeason.value && selectedSeason.value !== 'all') {
+  // Filtre par saison (mode OU : au moins une saison sélectionnée correspond)
+  if (selectedSeasons.value.length > 0) {
     filtered = filtered.filter(cocktail => {
-      // Vérifier si Season est un tableau et contient la saison sélectionnée
+      // Vérifier si Season est un tableau et contient au moins une des saisons sélectionnées
       if (Array.isArray(cocktail.Season)) {
-        return cocktail.Season.includes(selectedSeason.value);
+        return cocktail.Season.some(season => selectedSeasons.value.includes(season));
       }
-      // Si Season est une string, vérifier l'égalité directe
-      return cocktail.Season === selectedSeason.value;
+      // Si Season est une string, vérifier si elle fait partie des saisons sélectionnées
+      return selectedSeasons.value.includes(cocktail.Season);
     });
   }
 
   return filtered;
 });
 
-// Réinitialiser la sous-catégorie quand on change de catégorie
-watch(selectedSpirit, () => {
-    selectedSubcategory.value = '';
-});
+// Nettoyer les sous-catégories sélectionnées quand on change les spiritueux
+watch(selectedSpirits, (newSpirits) => {
+  // Récupérer toutes les sous-catégories valides pour les spiritueux actuels
+  const validSubcategoryKeys = new Set(
+    newSpirits.flatMap(spirit => 
+      (spirit_subcategories[spirit] || []).map(sub => sub.key)
+    )
+  );
+
+  // Garder seulement les sous-catégories qui sont encore valides
+  selectedSubcategories.value = selectedSubcategories.value.filter(subKey => 
+    validSubcategoryKeys.has(subKey)
+  );
+}, { deep: true });
 
 // Watch pour sauvegarder
 watch(barInventory, (newVal) => {
@@ -579,9 +649,6 @@ watch(currentProfile, (newProfileId) => {
   }
 });
 
-
-
-
 function getMissingIngredientsText(cocktail) {
   if (!Array.isArray(cocktail.Recipe)) return 'Recette non disponible';
   
@@ -595,23 +662,6 @@ function getMissingIngredientsText(cocktail) {
 
 function toggleCocktail(id) {
   expandedCocktail.value = expandedCocktail.value === id ? null : id;
-}
-
-// function toggleMode() {
-//   const newMode = appMode.value === 'bartender' ? 'drinker' : 'bartender';
-  
-//   if (newMode === 'drinker' && !currentProfile.value) {
-//     showProfileModal.value = true;
-//     return;
-//   }
-  
-//   appMode.value = newMode;
-// }
-
-function resetFilters() {
-  selectedSpirit.value = 'all';
-  selectedSeason.value = 'all';
-  showAvailableOnly.value = false;
 }
 
 function toggleIngredient(ingredient) {
@@ -640,15 +690,14 @@ function orderCocktail(cocktail) {
     profileId: currentProfile.value,
     timestamp: new Date().toISOString()
   };
-  
+
   orderQueue.value.push(order);
-  
   orderHistory.value.unshift({
     cocktailId: cocktail.id,
     cocktailName: cocktail.Name,
     timestamp: order.timestamp
   });
-  
+
   alert(`${cocktail.Name} ajouté à la file d'attente !`);
 }
 
@@ -668,27 +717,13 @@ function completeOrder(order) {
 
 function logoutProfile() {
   currentProfile.value = null;
-  // appMode.value = 'drinker';
-  // ouvre la vue selection profil automatiquement
   showProfileModal.value = true;
 }
 
-// function loginProfile() {
-//   appMode.value === 'drinker'
-  
-//   currentProfile.value = null;
-//   // appMode.value = 'drinker';
-//   // ouvre la vue selection profil automatiquement
-//   showProfileModal.value = true;
-
-// }
-
 // Fermer les modales
-
 function closePasswordModal() {
   showPasswordModal.value = false;
 }
-
 </script>
 
 <style scoped>
@@ -751,33 +786,97 @@ function closePasswordModal() {
   font-size: 0.875rem;
 }
 
-/* .btn-primary {
-  padding: 0.75rem 1.5rem;
-  background: #2563eb;
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.chip:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.chip.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.active-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  background: #3b82f6;
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  cursor: default;
+}
+
+.filter-tag svg {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.filter-tag svg:hover {
+  opacity: 1;
+}
+
+.clear-all-btn {
+  padding: 0.375rem 0.75rem;
+  background: #ef4444;
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
   cursor: pointer;
-  font-weight: 500;
   transition: background 0.2s;
 }
 
-.btn-primary:hover {
-  background: #1d4ed8;
-} */
-
-/* .btn-secondary {
-  padding: 0.5rem 1rem;
-  background: #e5e7eb;
-  color: #374151;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s;
+.clear-all-btn:hover {
+  background: #dc2626;
 }
-
-.btn-secondary:hover {
-  background: #d1d5db;
-} */
 </style>
