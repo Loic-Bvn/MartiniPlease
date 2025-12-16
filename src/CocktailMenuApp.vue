@@ -64,12 +64,14 @@
     <!-- Main Content -->
     <div class="main-content">
       <div class="section-card">
+            <div class="filter-group">
         <h2 class="section-title">Filtres</h2>
         <!-- Filters -->
           <div class="filters-container">
             <!-- Spiritueux -->
             <div class="filter-group">
               <label class="filter-label">Spiritueux</label>
+            </div>
               <div class="chips-container">
                 <button 
                   v-for="spirit in spirit_categories" 
