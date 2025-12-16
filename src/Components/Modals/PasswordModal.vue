@@ -74,7 +74,8 @@ const password = ref('');
 const error = ref('');
 
 // Définis ton mot de passe ici (ou récupère-le depuis une variable d'environnement)
-const BARTENDER_PASSWORD = 'MartiniPlease';
+// const BARTENDER_PASSWORD = 'MartiniPlease';
+const BARTENDER_PASSWORD = 'a';
 
 function handleSubmit() {
     if (!password.value.trim()) {
