@@ -1,5 +1,5 @@
- {
-    "Whiskey_Family": {
+{
+    "whiskey": {
         "bourbon": [
             {
                 "Name": "Old Fashioned",
@@ -31,7 +31,7 @@
             }
         ]
     },
-    "Rum_Family": {
+    "rum": {
         "rum": [
             {
                 "Name": "Daiquiri",
@@ -63,7 +63,7 @@
             }
         ]
     },
-    "Gin": {
+    "gin": {
         "gin": [
             {
                 "Name": "Negroni",

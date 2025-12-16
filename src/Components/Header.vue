@@ -36,7 +36,7 @@
         </div>
       </div>
       
-      <div class="relative">
+      <!-- <div class="relative">
         <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" :size="18" />
         <input
           type="text"
@@ -45,7 +45,7 @@
           @input="e => setSearchTerm(e.target.value)"
           class="w-full pl-10 pr-3 py-2 md:py-3 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -62,7 +62,7 @@ const props = defineProps({
   orderQueue: Array,
   setShowProfileModal: Function,
   setShowOrderQueueModal: Function,
-  searchTerm: String,
+  // searchTerm: String,
   setSearchTerm: Function
 });
 const emit = defineEmits(['set-mode', 'show-profile-modal', 'show-order-queue-modal', 'set-search-term', 'logout']);
@@ -82,9 +82,9 @@ function logoutProfile() {
   emit('logout');
 }
 
-function setSearchTerm(value) {
-  emit('set-search-term', value);
-}
+// function setSearchTerm(value) {
+//   emit('set-search-term', value);
+// }
 
 function setShowProfileModal(value) {
   emit('show-profile-modal', value);

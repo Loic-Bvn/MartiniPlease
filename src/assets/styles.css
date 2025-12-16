@@ -431,3 +431,10 @@ body {
 .space-y-6 > * + * {
   margin-top: 1.5rem;
 }
+
+.filter-select:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
