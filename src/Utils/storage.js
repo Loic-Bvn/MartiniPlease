@@ -64,5 +64,14 @@ export const Storage = {
 
   saveOrderQueue: (queue) => {
     localStorage.setItem('order_queue', JSON.stringify(queue));
-  }
+  },
+
+  setBarInventory: function(inventory) {
+    localStorage.setItem('barInventory', JSON.stringify(inventory));
+  },
+
+  getBarInventory: function() {
+    const saved = localStorage.getItem('barInventory');
+    return saved ? JSON.parse(saved) : [];
+  },
 };

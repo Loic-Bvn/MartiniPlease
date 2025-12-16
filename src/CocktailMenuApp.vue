@@ -63,60 +63,86 @@
 
     <!-- Main Content -->
     <div class="main-content">
-
-      <!-- Filters -->
       <div class="section-card">
-        <div class="section-header">
-          <Filter class="section-icon" :size="20" />
-          <h2 class="section-title">Filters</h2>
-        </div>
-
-        <div class="filters-content">
-          <!-- Show available only -->
-          <label class="filter-checkbox">
-            <input type="checkbox" v-model="showAvailableOnly" />
-            <span>Cocktails disponibles uniquement</span>
-          </label>
-
-          <!-- Spirit -->
-          <div>
+        <h2 class="section-title">Filtres</h2>
+        <!-- Filters -->
+          <div class="filters-container">
+            <!-- Spiritueux -->
+            <div class="filter-group">
               <label class="filter-label">Spiritueux</label>
-              <select v-model="selectedSpirit" class="filter-select">
-                <option value="">Tous les spiritueux</option>
-                  <option v-for="spiritCategory in spirit_categories" 
-                          :key="spiritCategory.key" 
-                          :value="spiritCategory.key">
-                      {{ spiritCategory.value }}
-                  </option>
-              </select>
+              <div class="chips-container">
+                <button 
+                  v-for="spirit in spirit_categories" 
+                  :key="spirit.key"
+                  @click="toggleFilter(selectedSpirits, spirit.key)"
+                  :class="['chip', { active: selectedSpirits.includes(spirit.key) }]">
+                  {{ spirit.value }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Sous-catégories (conditionnelles) -->
+            <div v-if="filteredSubcategories.length > 1" class="filter-group">
+              <label class="filter-label">Type</label>
+              <div class="chips-container">
+                <button 
+                  v-for="sub in filteredSubcategories" 
+                  :key="sub.key"
+                  @click="toggleFilter(selectedSubcategories, sub.key)"
+                  :class="['chip', { active: selectedSubcategories.includes(sub.key) }]">
+                  {{ sub.value }}
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Saison</label>
+              <div class="chips-container">
+                <button 
+                  v-for="season in seasons" 
+                  :key="season.key"
+                  @click="season.key === 'all' ? selectedSeasons = [] : toggleFilter(selectedSeasons, season.key)"
+                  :class="['chip', { 
+                    active: season.key === 'all' 
+                      ? selectedSeasons.length === 0 
+                      : selectedSeasons.includes(season.key) 
+                  }]">
+                  {{ season.icon }} {{ season.value }}
+                </button>
+              </div>
+            </div>
           </div>
 
-          <!-- Subcategory -->
-          <div>
-            <label class="filter-label">Sous Catégories</label>
-            <select v-model="selectedSubcategory" class="filter-select" :disabled="!selectedSpirit || filteredSubcategories.length <= 1">
-              <option v-for="spirit in filteredSubcategories" :key="spirit.key" :value="spirit.key">
-                {{ spirit.value }}
-              </option>
-            </select>
+          <!-- Dans tes filtres existants, ajouter : -->
+          <div class="filter-group">
+            <label class="filter-label">Disponibilité</label>
+            <div class="chips-container">
+              <button 
+                @click="showOnlyAvailable = !showOnlyAvailable"
+                :class="['chip', { active: showOnlyAvailable }]">
+                🍸 Cocktails réalisables
+              </button>
+            </div>
           </div>
 
-          <!-- Season -->
-          <div>
-            <label class="filter-label">Saison</label>
-            <select v-model="selectedSeason" class="filter-select">
-              <option value="all">Toutes les saisons</option>
-              <option value="spring">Printemps</option>
-              <option value="summer">Été</option>
-              <option value="autumn">Automne</option>
-              <option value="winter">Hiver</option>
-            </select>
+          <!-- Filtres actifs -->
+          <div v-if="hasActiveFilters" class="active-filters-bar">
+            <span v-for="spirit in selectedSpirits" :key="spirit" class="filter-tag">
+              {{ getSpiritLabel(spirit) }}
+              <X @click="toggleFilter(selectedSpirits, spirit)" :size="14" />
+            </span>
+            <span v-for="sub in selectedSubcategories" :key="sub" class="filter-tag">
+              {{ getSubcategoryLabel(sub) }}
+              <X @click="toggleFilter(selectedSubcategories, sub)" :size="14" />
+            </span>
+            <span v-for="season in selectedSeasons" :key="season" class="filter-tag">
+              {{ getSeasonLabel(season) }}
+              <X @click="toggleFilter(selectedSeasons, season)" :size="14" />
+            </span>
+            <button @click="clearAllFilters" class="clear-all-btn">
+              Effacer tout
+            </button>
           </div>
-
-          <button @click="resetFilters" class="btn-reset">
-            Réinitialiser les filtres
-          </button>
-        </div>
       </div>
 
       <!-- Statistics -->
@@ -135,6 +161,34 @@
             <span class="stat-label">Affichés:</span>
             <span class="stat-value">{{ filteredCocktails.length }}</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Mode Bartender -->
+      <div v-if="mode === 'bartender'" class="bartender-mode">
+        <h2>Gérer l'inventaire du bar</h2>
+        
+        <div class="inventory-controls">
+          <button @click="selectAllIngredients" class="btn-secondary">
+            Tout sélectionner
+          </button>
+          <button @click="clearAllIngredients" class="btn-secondary">
+            Tout désélectionner
+          </button>
+        </div>
+
+        <div class="ingredients-grid">
+          <label 
+            v-for="ingredient in allIngredients" 
+            :key="ingredient"
+            class="ingredient-checkbox">
+            <input 
+              type="checkbox"
+              :checked="barInventory.has(ingredient)"
+              @change="toggleIngredient(ingredient)"
+            />
+            <span>{{ ingredient }}</span>
+          </label>
         </div>
       </div>
 
@@ -273,8 +327,8 @@ const searchTerm = ref('');
 const selectedSeason = ref('all');
 const showAvailableOnly = ref(false);
 const hiddenCocktails = ref(new Set());
-const barInventory = ref(new Set());
-const allIngredients = ref([]);
+const barInventory = ref(new Set()); // Set d'ingrédients disponibles
+// const allIngredients = ref([]);
 const favorites = ref(new Set());
 const userRatings = ref({});
 const userNotes = ref({});
@@ -292,8 +346,59 @@ const showOrderQueueModal = ref(false);
 const expandedCocktail = ref(null);
 const showPasswordModal = ref(false);
 
+// ------------------------ BARTENDER MODE ------------------------
+const showOnlyAvailable = ref(false);
+
+// Vérifier si un cocktail est réalisable
+const isCocktailAvailable = (cocktail) => {
+  if (!cocktail.Recipe || barInventory.value.size === 0) return true;
+  
+  return cocktail.Recipe.every(item => 
+    barInventory.value.has(item.Ingredient)
+  );
+};
 
 
+// Récupérer tous les ingrédients uniques de tous les cocktails
+const allIngredients = computed(() => {
+  const ingredients = new Set();
+  cocktails.value.forEach(cocktail => {
+    cocktail.Recipe?.forEach(item => {
+      if (item.Ingredient) {
+        ingredients.add(item.Ingredient);
+      }
+    });
+  });
+  return Array.from(ingredients).sort();
+});
+
+// Basculer un ingrédient
+const toggleIngredient = (ingredient) => {
+  if (barInventory.value.has(ingredient)) {
+    barInventory.value.delete(ingredient);
+  } else {
+    barInventory.value.add(ingredient);
+  }
+  // Sauvegarder dans le Storage
+  Storage.setBarInventory(Array.from(barInventory.value));
+};
+
+// Tout sélectionner
+const selectAllIngredients = () => {
+  barInventory.value = new Set(allIngredients.value);
+  Storage.setBarInventory(Array.from(barInventory.value));
+};
+
+// Tout désélectionner
+const clearAllIngredients = () => {
+  barInventory.value = new Set();
+  Storage.setBarInventory([]);
+};
+
+
+// ------------------------ END OF BARTENDER MODE ------------------------
+
+// ------------------------ COCKTAILS FILTERS ---------------------------------
 function loadCocktails(data) {
   const allCocktails = [];
   Object.entries(data).forEach(([family, spirits]) => {
@@ -318,9 +423,29 @@ loadCocktails(cocktailsData);
 // Initialisation
 onMounted(() => {
   profiles.value = Storage.getProfiles();
-  barInventory.value = Storage.getBarInventory();
+  
+  // Charger l'inventaire du bar
+  const savedInventory = Storage.getBarInventory();
+  barInventory.value = new Set(savedInventory);
+  
   hiddenCocktails.value = Storage.getHiddenCocktails();
-  selectedSeason.value = Storage.getSeasonFilter();
+
+  profiles.value = Storage.getProfiles();
+  
+  // Charger l'inventaire du bar
+  const savedInventory = Storage.getBarInventory();
+  barInventory.value = new Set(savedInventory);
+  
+  hiddenCocktails.value = Storage.getHiddenCocktails();
+
+  // Charger les filtres sauvegardés
+  const savedSeason = Storage.getSeasonFilter();
+  // Si une saison était sauvegardée, l'ajouter au tableau
+  if (savedSeason && savedSeason !== 'all') {
+    selectedSeasons.value = [savedSeason];
+  } else {
+    selectedSeasons.value = [];
+  }
   orderQueue.value = Storage.getOrderQueue();
   // Charger les cocktails au montage du composant
   // loadCocktails(cocktailsData);
@@ -531,6 +656,10 @@ const filteredCocktails = computed(() => {
     });
   }
 
+  // Filtre par disponibilité des ingrédients
+  if (showOnlyAvailable.value && barInventory.value.size > 0) {
+    filtered = filtered.filter(cocktail => isCocktailAvailable(cocktail));
+  }
   return filtered;
 });
 
@@ -751,33 +880,159 @@ function closePasswordModal() {
   font-size: 0.875rem;
 }
 
-/* .btn-primary {
-  padding: 0.75rem 1.5rem;
-  background: #2563eb;
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.chip:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.chip.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.active-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  background: #3b82f6;
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  cursor: default;
+}
+
+.filter-tag svg {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.filter-tag svg:hover {
+  opacity: 1;
+}
+
+.clear-all-btn {
+  padding: 0.375rem 0.75rem;
+  background: #ef4444;
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
   cursor: pointer;
-  font-weight: 500;
   transition: background 0.2s;
 }
 
-.btn-primary:hover {
-  background: #1d4ed8;
-} */
-
-/* .btn-secondary {
-  padding: 0.5rem 1rem;
-  background: #e5e7eb;
-  color: #374151;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s;
+.clear-all-btn:hover {
+  background: #dc2626;
+}
+/* Mode Bartender */
+.bartender-mode {
+  padding: 2rem;
 }
 
-.btn-secondary:hover {
-  background: #d1d5db;
-} */
+.inventory-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ingredients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.75rem;
+}
+
+.ingredient-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--surface);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ingredient-checkbox:hover {
+  background: var(--surface-hover);
+}
+
+.ingredient-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Badges de disponibilité */
+.availability-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.badge-available {
+  background: #10b981;
+  color: white;
+}
+
+.badge-unavailable {
+  background: #f59e0b;
+  color: white;
+}
+
+.cocktail-card.unavailable {
+  opacity: 0.6;
+}
 </style>
