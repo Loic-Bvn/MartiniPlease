@@ -4,7 +4,6 @@ import cocktailData from '../Utils/cocktail_dump_15_12_2025.json';
 export const cocktailsData = cocktailData;
 
 export const spirit_categories = [
-    { key: 'all', value: "Tous les spiritueux" },
     { key: 'whiskey', value: "Whisky" },
     { key: 'rum', value: "Rhum" },
     { key: 'gin', value: "Gin" },
