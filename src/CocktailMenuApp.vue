@@ -63,8 +63,10 @@
 
     <!-- Main Content -->
     <div class="main-content">
-      <div class="section-card">
-            <div class="filter-group">
+
+      <!-- Filters Section -->
+      <div class="section-card" v-if="appMode === 'drinker'">
+        <div class="filter-group">
         <h2 class="section-title">Filtres</h2>
         <!-- Filters -->
           <div class="filters-container">
@@ -166,17 +168,58 @@
         </div>
       </div>
 
-      <!-- Mode Bartender -->
-      <!-- Inventory Manager -->
+      <!-- Mode Bartender only -->
       <div v-if="appMode === 'bartender'" class="section-card">
-        <InventoryManager 
-          :barInventory="barInventory"
-          :availableCocktailsCount="availableCocktailsCount"
-          @toggle="toggleIngredient"
+
+        <button 
+          v-if="appMode === 'bartender'"
+          @click="toggleOrderQueue"
+          class="expand-actions-btn"
+        >
+          <ChevronDown 
+            :size="18"
+            :class="{ rotated: showOrderQueueModal }"
+          />
+          <h2 class="section-title">🕔️ Commandes ({{ orders.length }})</h2>
+          <span></span>
+        </button>
+
+        <OrderQueueModal
+          v-if="showOrderQueueModal"
+          :orders="orders"
+          :profiles="profiles"
+          @complete="completeOrder"
+          @close="showOrderQueueModal = false"
         />
       </div>
 
-      <!-- Cocktails List -->
+
+      <!-- Inventory Manager -->
+
+      <div v-if="appMode === 'bartender'" class="section-card">
+        <button 
+          v-if="appMode === 'bartender'"
+          @click="toggleInventoryManager"
+          class="expand-actions-btn"
+        >
+          <ChevronDown 
+            :size="18"
+            :class="{ rotated: showInventoryManager }"
+          />
+          <h2 class="section-title">📦️ Gérer le stock du bar</h2>
+          <span></span>
+        </button>
+        <InventoryManager 
+          v-if="showInventoryManager"
+          :barInventory="barInventory"
+          :availableCocktailsCount="availableCocktailsCount"
+          @toggle="toggleIngredient"
+          @close="showInventoryManager = false"
+        />
+      </div>
+      <!-- End of Mode Bartender only -->
+
+      <!-- Start of Cocktails List -->
       <div>
         <h2 class="cocktails-header">{{ filteredCocktails.length }} cocktails trouvés</h2>
 
@@ -184,80 +227,27 @@
           Aucun cocktail trouvé avec ces critères
         </div>
 
-        <div v-for="cocktail in filteredCocktails" :key="cocktail.id" class="cocktail-card">
-          <div v-if="barInventory.size > 0" class="missing-ingredients">
-            <span v-if="cocktail && isCocktailMakeable(cocktail)">
-              ✅ Réalisable
-            </span>
-            <span v-else class="missing">
-              ❌ {{ getMissingIngredientsCount(cocktail) }} ingrédient(s) manquant(s)
-            </span>
-          </div>
-          <button
-            @click="toggleCocktail(cocktail.id)"
-            class="cocktail-header"
-          >
-            <div class="cocktail-header-content">
-              <div class="cocktail-info">
-                <h3 class="cocktail-name">{{ cocktail.Name }}</h3>
-                <p class="cocktail-missing">
-                  {{ getMissingIngredientsText(cocktail) }}
-                </p>
-                <div class="cocktail-tags">
-                  <span v-if="cocktail.spiritType" class="tag tag-spirit">{{ cocktail.spiritType }}</span>
-                  <span v-if="cocktail.family" class="tag tag-family">{{ cocktail.family }}</span>
-                  <span v-if="cocktail.Season && cocktail.Season.length > 0" class="tag tag-season">
-                    {{ cocktail.Season.join(', ') }}
-                  </span>
-                </div>
-              </div>
-              <ChevronDown
-                :class="['chevron-icon', { expanded: expandedCocktail === cocktail.id }]"
-                :size="20"
-              />
-            </div>
-          </button>
-
-          <!-- Details -->
-          <div v-if="expandedCocktail === cocktail.id" class="cocktail-details">
-            <h4 class="cocktail-details-title">Recette</h4>
-            <div class="recipe-list">
-              <div
-                v-for="(ingredient, idx) in cocktail.Recipe"
-                :key="idx"
-                class="recipe-item"
-              >
-                <span class="recipe-dot"></span>
-                <span>{{ ingredient.Ingredient }}</span>
-                <span v-if="ingredient.Type === 'bitter'" class="text-gray-400">
-                  - {{ ingredient.Oz }}
-                </span>
-                <span v-else-if="ingredient.Ml !== null" class="text-gray-400">
-                  - {{ ingredient.Oz }}oz
-                </span>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="mt-4 flex gap-2">
-              <button
-                v-if="appMode === 'drinker' && currentProfile"
-                @click="orderCocktail(cocktail)"
-                class="btn-primary"
-              >
-                Commander
-              </button>
-              <button
-                v-if="appMode === 'bartender'"
-                @click="toggleHidden(cocktail.id)"
-                class="btn-secondary"
-              >
-                {{ hiddenCocktails.has(cocktail.id) ? 'Afficher' : 'Masquer' }}
-              </button>
-            </div>
-          </div>
+        <!-- Grille de cocktails -->
+        <div class="cocktails-grid">
+          <CocktailCard
+            v-for="cocktail in filteredCocktails"
+              :cocktail="cocktail"
+              :appMode="appMode"
+              :currentProfile="currentProfile"
+              :barInventory="barInventory"
+              :favorites="favorites"
+              :userRatings="userRatings"
+              :userNotes="userNotes"
+              :isHidden="hiddenCocktails.has(cocktail.id)"
+              :onToggleFavorite="toggleFavorite"
+              :onOrder="orderCocktail"
+              :onToggleHidden="toggleHidden"
+          />
         </div>
       </div>
+      <!-- End of Cocktails List -->
+
+
     </div>
 
     <!-- Modals -->
@@ -271,14 +261,6 @@
       :onCreate="createProfile"
       :onSelect="selectProfile"
       :onDelete="deleteProfile"
-    />
-
-    <OrderQueueModal
-      v-if="showOrderQueueModal"
-      :orders="orderQueue"
-      :profiles="profiles"
-      @complete="completeOrder"
-      @close="showOrderQueueModal = false"
     />
 
     <PasswordModal
@@ -300,6 +282,7 @@ import ProfileModal from '@/Components/Modals/ProfileModal.vue';
 import PasswordModal from '@/Components/Modals/PasswordModal.vue';
 import OrderQueueModal from '@/Components/Modals/OrderQueueModal.vue';
 import InventoryManager from '@/Components/Modals/InventoryManager.vue';
+import CocktailCard from '@/Components/CocktailCard.vue';
 
 // States
 const appMode = ref('drinker'); // Mode par défaut
@@ -313,7 +296,7 @@ const favorites = ref(new Set());
 const userRatings = ref({});
 const userNotes = ref({});
 const orderHistory = ref([]);
-const orderQueue = ref([]);
+const orders = ref([]);
 
 // Gestion de l'affichage des filtres, cocktails
 const cocktails = ref([]);
@@ -323,6 +306,7 @@ const selectedSeasons = ref([])
 
 // Variables pour les modales
 const showOrderQueueModal = ref(false);
+const showInventoryManager = ref(false);
 const expandedCocktail = ref(null);
 const showPasswordModal = ref(false);
 
@@ -373,17 +357,25 @@ const allIngredients = computed(() => {
   return Array.from(ingredients).sort();
 });
 
-// Basculer un ingrédient
-const toggleIngredient = (ingredient) => {
-  if (barInventory.value.has(ingredient)) {
-    barInventory.value.delete(ingredient);
+const toggleIngredient = (ingredientKey) => {
+  if (barInventory.value.has(ingredientKey)) {
+    barInventory.value.delete(ingredientKey);
   } else {
-    barInventory.value.add(ingredient);
+    barInventory.value.add(ingredientKey);
   }
-  // Sauvegarder dans le Storage
+  // Forcer la réactivité
+  barInventory.value = new Set(barInventory.value);
+  // Sauvegarder
   Storage.setBarInventory(Array.from(barInventory.value));
 };
 
+const toggleOrderQueue = () => {
+  showOrderQueueModal.value = !showOrderQueueModal.value
+}
+
+const toggleInventoryManager = () => {
+  showInventoryManager.value = !showInventoryManager.value
+}
 
 // ------------------------ END OF BARTENDER MODE ------------------------
 
@@ -427,7 +419,7 @@ onMounted(() => {
   } else {
     selectedSeasons.value = [];
   }
-  orderQueue.value = Storage.getOrderQueue();
+  orders.value = Storage.getOrderQueue();
 });
 
 const toggleFilter = (array, value) => {
@@ -675,6 +667,11 @@ const filteredCocktails = computed(() => {
     filtered = filtered.filter(cocktail => isCocktailMakeable(cocktail));
   }
 
+  // Masquer les cocktails cachés en mode drinker
+  if (appMode.value === 'drinker') {
+    filtered = filtered.filter(cocktail => !hiddenCocktails.value.has(cocktail.id));
+  }
+
   return filtered;
 });
 
@@ -704,7 +701,7 @@ watch(hiddenCocktails, (newVal) => {
   Storage.saveHiddenCocktails(newVal);
 }, { deep: true });
 
-watch(orderQueue, (newVal) => {
+watch(orders, (newVal) => {
   Storage.saveOrderQueue(newVal);
 }, { deep: true });
 
@@ -767,7 +764,7 @@ function orderCocktail(cocktail) {
     timestamp: new Date().toISOString()
   };
 
-  orderQueue.value.push(order);
+  orders.value.push(order);
   orderHistory.value.unshift({
     cocktailId: cocktail.id,
     cocktailName: cocktail.Name,
@@ -787,8 +784,20 @@ function toggleHidden(id) {
   hiddenCocktails.value = newHidden;
 }
 
+function toggleFavorite(cocktailId) {
+  if (!currentProfile.value) return;
+  
+  const newFavorites = new Set(favorites.value);
+  if (newFavorites.has(cocktailId)) {
+    newFavorites.delete(cocktailId);
+  } else {
+    newFavorites.add(cocktailId);
+  }
+  favorites.value = newFavorites;
+}
+
 function completeOrder(order) {
-  orderQueue.value = orderQueue.value.filter(o => o.id !== order.id);
+  orders.value = orders.value.filter(o => o.id !== order.id);
 }
 
 function logoutProfile() {
@@ -1056,6 +1065,20 @@ function closePasswordModal() {
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 600;
+}
+
+.expand-actions-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.expand-actions-btn svg {
+  transition: transform 0.25s ease;
+}
+
+.expand-actions-btn svg.rotated {
+  transform: rotate(180deg);
 }
 
 </style>

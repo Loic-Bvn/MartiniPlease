@@ -1,7 +1,6 @@
 <template>
   <div class="inventory-manager">
     <div class="inventory-header">
-      <h2 class="inventory-title">Gérer l'inventaire du bar</h2>
       <div class="inventory-controls">
         <button @click="selectAll" class="btn-control btn-select-all">
           <CheckSquare :size="16" />

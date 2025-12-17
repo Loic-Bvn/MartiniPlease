@@ -1,126 +1,69 @@
 <template>
-  <div :class="['bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all h-full flex flex-col relative', !available ? 'opacity-60' : '', isHidden ? 'ring-2 ring-red-300' : '']">
+  <div :class="['cocktail-card-compact', !available ? 'opacity-60' : '', isHidden ? 'ring-2 ring-red-300' : '']">
     
-    <!-- Badge de disponibilité (en haut à droite) -->
-    <div v-if="barInventory.size > 0" class="absolute top-2 right-2 z-10">
-      <span v-if="available" class="inline-flex items-center gap-1 px-2 py-1 bg-green-500 text-white text-xs font-semibold rounded-full shadow-md">
-        ✓ Réalisable
-      </span>
-      <span v-else class="inline-flex items-center gap-1 px-2 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full shadow-md">
-        ⚠️ {{ missingIngs.length }} manquant{{ missingIngs.length > 1 ? 's' : '' }}
-      </span>
-    </div>
-
-    <div v-if="cocktail.Image && isExpanded" class="h-32 sm:h-40 md:h-48 overflow-hidden bg-gray-200 flex-shrink-0">
-      <img
-        :src="cocktail.Image"
-        :alt="cocktail.Name"
-        class="w-full h-full object-cover"
-        @error="hideImage"
-      />
-    </div>
-
-    <div class="p-3 md:p-4 flex-1 flex flex-col">
-      <div class="flex justify-between items-start mb-2 md:mb-3">
-        <div class="flex-1">
-          <h3 :class="['text-base md:text-lg font-bold', available ? 'text-gray-800' : 'text-gray-400']">
-            {{ cocktail.Name }}
-          </h3>
-          <!-- Message si cocktail masqué -->
-          <p v-if="isHidden" class="text-xs text-red-600 mt-0.5">
-            Masqué en mode Drinker
-          </p>
-        </div>
+    <!-- Header avec nom et actions -->
+    <div class="card-header">
+      <div class="flex-1">
+        <h3 :class="['cocktail-title', available ? 'text-gray-800' : 'text-gray-400']">
+          {{ cocktail.Name }}
+        </h3>
+        <p class="cocktail-subtitle">{{ cocktail.Profile?.join(', ') || getProfileText() }}</p>
+      </div>
+      
+      <!-- Actions principales à droite -->
+      <div class="header-actions">
         <button
           v-if="currentProfile && appMode === 'drinker'"
           @click="() => onToggleFavorite(cocktail.id)"
-          :class="['p-1.5 md:p-2 rounded-full transition-colors flex-shrink-0', isFavorite ? 'text-yellow-500 bg-yellow-50' : 'text-gray-400 hover:text-yellow-500 hover:bg-gray-50']"
+          :class="['btn-icon', isFavorite ? 'text-yellow-500' : 'text-gray-400']"
+          title="Ajouter aux favoris"
         >
-          <Star :size="18" :fill="isFavorite ? 'currentColor' : 'none'" />
+          <Star :size="20" :fill="isFavorite ? 'currentColor' : 'none'" />
         </button>
-      </div>
+        
 
-      <div class="flex items-center gap-1.5 mb-2 md:mb-3 flex-wrap">
-        <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs md:text-sm rounded-full">
-          {{ cocktail.spiritType }}
-        </span>
-        <span class="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs md:text-sm rounded-full">
-          {{ cocktail.family.replace('_', ' ') }}
-        </span>
-        <span v-if="cocktail.Season" class="px-2 py-0.5 bg-pink-100 text-pink-800 text-xs md:text-sm rounded-full">
-          {{ cocktail.Season }}
-        </span>
-      </div>
-
-      <div v-if="currentProfile && appMode === 'drinker'" class="flex items-center gap-0.5 mb-2 md:mb-3">
+        <!--TODO: condition a completer  && available -->
         <button
-          v-for="star in 5"
-          :key="star"
-          @click="() => onSetRating(cocktail.id, star)"
-          :class="[star <= rating ? 'text-yellow-400' : 'text-gray-300', 'hover:text-yellow-400 transition-colors']"
-        >
-          <Star :size="16" :fill="star <= rating ? 'currentColor' : 'none'" />
-        </button>
-      </div>
-
-      <button
-        v-if="appMode === 'bartender'"
-        @click="() => onToggleHidden(cocktail.id)"
-        :class="['w-full mb-2 py-1.5 md:py-2 rounded-lg font-medium text-xs md:text-sm', isHidden ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200']"
-      >
-        {{ isHidden ? 'Afficher' : 'Masquer' }}
-      </button>
-
-      <button
-        @click="toggleExpanded"
-        class="w-full flex items-center justify-between text-blue-600 hover:text-blue-800 font-medium mb-2 md:mb-3 text-sm"
-      >
-        <span>{{ isExpanded ? '- Recette' : '+ Recette' }}</span>
-        <component :is="isExpanded ? 'ChevronUp' : 'ChevronDown'" :size="18" />
-      </button>
-
-      <div v-if="isExpanded" class="border-t pt-2 md:pt-3 mt-2 md:mt-3 space-y-2 md:space-y-3">
-        <div class="space-y-1">
-          <h4 class="font-semibold text-gray-700 text-sm">Ingrédients:</h4>
-          <div v-for="(ing, idx) in cocktail.Recipe" :key="idx" class="flex justify-between text-xs md:text-sm gap-2">
-            <span :class="ing.Type !== 'garnish' && !barInventory.has(ing.Ingredient) ? 'text-red-500 font-medium' : 'text-gray-700'">
-              <span v-if="ing.Type !== 'garnish' && !barInventory.has(ing.Ingredient)">❌ </span>
-              <span v-else-if="ing.Type !== 'garnish'">✓ </span>
-              {{ ing.Ingredient }}
-            </span>
-            <span class="text-gray-500">
-              <span v-if="ing.Oz">{{ ing.Oz }} oz</span>
-              <span v-if="ing.Ml"> ({{ ing.Ml }} ml)</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- Liste des ingrédients manquants -->
-        <div v-if="!available && missingIngs.length > 0" class="bg-orange-50 border border-orange-200 rounded-lg p-2">
-          <p class="text-xs font-semibold text-orange-800 mb-1">Ingrédients manquants :</p>
-          <ul class="text-xs text-orange-700 space-y-0.5">
-            <li v-for="(ing, idx) in missingIngs" :key="idx">• {{ ing.Ingredient }}</li>
-          </ul>
-        </div>
-
-        <button
-          v-if="appMode === 'drinker' && currentProfile && available"
+          v-if="appMode === 'drinker' && currentProfile"
           @click="() => onOrder(cocktail)"
-          class="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm"
+          class="btn-order-compact"
+          title="Commander"
         >
-          Commander ce cocktail
+          Commander
         </button>
 
-        <div v-if="currentProfile && appMode === 'drinker'" class="space-y-2">
-          <h4 class="font-semibold text-gray-700 text-sm">Notes personnelles:</h4>
-          <textarea
-            :value="note"
-            @input="e => onSaveNote(cocktail.id, e.target.value)"
-            placeholder="Ajoute tes notes..."
-            class="w-full p-2 border rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            rows="2"
-          />
+        <button
+          v-if="appMode === 'bartender'"
+          @click="() => onToggleHidden(cocktail.id)"
+          :class="['btn-toggle', isHidden ? 'btn-hidden' : 'btn-show']"
+        >
+          {{ isHidden ? 'Afficher' : 'Masquer' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Recette visible directement -->
+    <div class="recipe-compact">
+      <div 
+        v-for="(ing, idx) in cocktail.Recipe" 
+        :key="idx" 
+        class="recipe-line"
+      >
+        <div class="ingredient-info">
+          <span v-if="ing.Type !== 'garnish'" :class="[
+            'status-dot',
+            isIngredientAvailable(ing) ? 'status-available' : 'status-missing'
+          ]"></span>
+          <span :class="[
+            'ingredient-name',
+            ing.Type !== 'garnish' && !isIngredientAvailable(ing) ? 'text-red-600' : 'text-gray-700'
+          ]">
+            {{ ing.Ingredient }}
+          </span>
         </div>
+        <span class="ingredient-quantity">
+          <span v-if="ing.Oz">{{ ing.Oz }}oz</span>
+        </span>
       </div>
     </div>
   </div>
@@ -146,17 +89,36 @@ const props = defineProps({
   onToggleHidden: Function
 });
 
-const isExpanded = ref(false);
+const showActions = ref(false);
 const isFavorite = computed(() => props.favorites.has(props.cocktail.id));
-const rating = computed(() => props.userRatings[props.cocktail.id] || 0);
-const note = computed(() => props.userNotes[props.cocktail.id] || '');
+
+// const available = computed(() => 
+//   Array.isArray(props.cocktail.Recipe) && 
+//   props.cocktail.Recipe.every(ing => 
+//     ing.Type === 'garnish' || 
+//     (props.barInventory || new Set()).has(ing.Type)
+//   )
+// );
+
+
+// Vérifier si un ingrédient est disponible dans l'inventaire
+function isIngredientAvailable(ingredient) {
+  // Les garnitures sont toujours disponibles
+  if (ingredient.Type === 'garnish') return true;
+  
+  // Vérifier si la catégorie (Type) est dans l'inventaire
+  // Ex: si "gin" est coché, tous les gins sont disponibles
+  return props.barInventory.has(ingredient.Type);
+}
+
 const available = computed(() => 
   Array.isArray(props.cocktail.Recipe) && 
   props.cocktail.Recipe.every(ing => 
     ing.Type === 'garnish' || 
-    ((props.barInventory || new Set()).has(ing.Ingredient))
+    (props.barInventory || new Set()).has(ing.Type)
   )
 );
+
 const missingIngs = computed(() => 
   Array.isArray(props.cocktail.Recipe) 
     ? props.cocktail.Recipe.filter(ing => 
@@ -166,11 +128,203 @@ const missingIngs = computed(() =>
     : []
 );
 
-function toggleExpanded() {
-  isExpanded.value = !isExpanded.value;
+function getProfileText() {
+  const profiles = props.cocktail.Profile?.filter(p => p) || [];
+  return profiles.join(', ') || props.cocktail.spiritType + ' based';
 }
 
-function hideImage(e) {
-  e.target.style.display = 'none';
-}
+
 </script>
+
+<style scoped>
+.cocktail-card-compact {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.cocktail-card-compact:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cocktail-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.cocktail-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0 0;
+  font-style: italic;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.badge-available {
+  background: #10b981;
+  color: white;
+}
+
+.badge-missing {
+  background: #f59e0b;
+  color: white;
+}
+
+.recipe-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2  rem;
+}
+
+.recipe-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.ingredient-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.status-available {
+  background: #10b981;
+}
+
+.status-missing {
+  background: #ef4444;
+}
+
+.ingredient-name {
+  flex: 1;
+}
+
+.ingredient-quantity {
+  color: #9ca3af;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.card-footer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-icon {
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+}
+
+.btn-icon:hover {
+  background: #f3f4f6;
+}
+
+.btn-order {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-order:hover {
+  background: #059669;
+}
+
+.btn-toggle {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-show {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-show:hover {
+  background: #e5e7eb;
+}
+
+.btn-hidden {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.btn-hidden:hover {
+  background: #fecaca;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-order-compact {
+  padding: 0.5rem 1rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-order-compact:hover {
+  background: #059669;
+}
+</style>

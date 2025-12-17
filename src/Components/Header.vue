@@ -14,14 +14,14 @@
           </button>
           
           <button
-            v-if="appMode === 'bartender' && orderQueue && orderQueue.length > 0"
+            v-if="appMode === 'bartender' && orders && orders.length > 0"
             @click="setShowOrderQueueModal(true)"
             class="relative px-2 md:px-4 py-1 md:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-1 md:gap-2 text-sm md:text-base"
           >
             <ChefHat :size="16" />
             <span class="hidden md:inline">File</span>
             <span class="absolute -top-2 -right-2 bg-yellow-400 text-gray-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-              {{ orderQueue.length }}
+              {{ orders.length }}
             </span>
           </button>
           
@@ -59,7 +59,7 @@ const props = defineProps({
   setAppMode: Function,
   currentProfile: [String, Number],
   profiles: Array,
-  orderQueue: Array,
+  orders: Array,
   setShowProfileModal: Function,
   setShowOrderQueueModal: Function,
   // searchTerm: String,
