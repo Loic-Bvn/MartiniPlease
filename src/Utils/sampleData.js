@@ -74,18 +74,20 @@ export const ingredients = [
     { key: 'whiskey', value: 'Whisky', category: 'spirits' },
     
     // Liqueurs
+    { key: 'allspice', value: 'Allspice', category: 'liqueurs' },
     { key: 'aperol', value: 'Aperol', category: 'liqueurs' },
     { key: 'benedictine', value: 'Bénédictine', category: 'liqueurs' },
     { key: 'campari', value: 'Campari', category: 'liqueurs' },
-    { key: 'chartreuse', value: 'Chartreuse', category: 'liqueurs' },
+    { key: 'chartreuse_yellow', value: 'Chartreuse Jaune', category: 'liqueurs' },
+    { key: 'chartreuse_green', value: 'Chartreuse Verte', category: 'liqueurs' },
     { key: 'cointreau', value: 'Cointreau', category: 'liqueurs' },
     { key: 'curacao', value: 'Curacao', category: 'liqueurs' },
     { key: 'coffee_licor', value: 'Liqueur Café', category: 'liqueurs' },
+    { key: 'licor_43', value: 'Liqueur 43', category: 'liqueurs' },
     { key: 'triple_sec', value: 'Triple sec', category: 'liqueurs' },
     { key: 'sambuca', value: 'Sambuca', category: 'liqueurs' },
     { key: 'baileys', value: 'Baileys', category: 'liqueurs' },
     { key: 'falernum', value: 'Falernum', category: 'liqueurs' },
-    { key: 'allspice', value: 'Allspice', category: 'liqueurs' },
 
     // Modificateurs
     { key: 'dry_vermouth', value: 'Vermouth sec', category: 'modifiers' },
