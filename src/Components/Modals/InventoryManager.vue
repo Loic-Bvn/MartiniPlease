@@ -109,28 +109,14 @@ import { CheckSquare, Square, Search } from 'lucide-vue-next';
 import { ingredients } from '@/Utils/sampleData';
 import { useInventory } from '@/Utils/useInventory';
 
-const { barInventory, toggleIngredient, clearInventory} = useInventory();
+const { barInventory, toggleIngredient: toggleInventoryItem, clearInventory } = useInventory();
 
-// S'assurer que barInventory est toujours défini
-const filteredIngredients = computed(() => {
-  // Vérifier que barInventory.value existe
-  if (!barInventory.value) {
-    barInventory.value = new Set();
-  }
-  
-  // Ton code de filtrage ici
-  return ingredients.filter(ing => {
-    // Ta logique de filtrage
-    return barInventory.value.has(ing.name);
-  });
-});
-
-const emit = defineEmits(['toggle']);
+// Plus besoin de emit
+// const emit = defineEmits(['toggle']);
 
 const searchQuery = ref('');
 
 // Organiser les ingrédients par catégorie
-// Définir les métadonnées des catégories
 const categoryMetadata = {
   spirits: { label: 'Spiritueux', icon: '🥃' },
   liqueurs: { label: 'Liqueurs', icon: '🍷' },
@@ -138,7 +124,8 @@ const categoryMetadata = {
   juices: { label: 'Jus', icon: '🍊' },
   syrups: { label: 'Sirops', icon: '🍯' },
   bitters: { label: 'Bitters', icon: '💧' },
-  mixers: { label: 'Mixers', icon: '🥤' }
+  mixers: { label: 'Mixers', icon: '🥤' },
+  others: { label: 'Autres', icon: '📦' }
 };
 
 // Organiser les ingrédients par catégorie
@@ -193,7 +180,12 @@ function isSelected(ingredientKey) {
   return barInventory.value.has(ingredientKey);
 }
 
-defineExpose({ barInventory });
+// Utiliser directement toggleIngredient du composable
+function toggleIngredient(ingredientKey) {
+  console.log('Toggle ingredient:', ingredientKey); // DEBUG
+  toggleInventoryItem(ingredientKey);
+  console.log('Inventory after toggle:', Array.from(barInventory.value)); // DEBUG
+}
 
 // Nombre sélectionné dans une catégorie
 const getSelectedInCategory = (categoryKey) => {
@@ -217,9 +209,9 @@ const toggleCategory = (categoryKey) => {
   const allSelected = isAllCategorySelected(categoryKey);
   category.ingredients.forEach(ing => {
     if (allSelected && barInventory.value.has(ing.key)) {
-      emit('toggle', ing.key);
+      toggleIngredient(ing.key); // Utiliser la fonction locale qui appelle le composable
     } else if (!allSelected && !barInventory.value.has(ing.key)) {
-      emit('toggle', ing.key);
+      toggleIngredient(ing.key);
     }
   });
 };
@@ -228,19 +220,26 @@ const toggleCategory = (categoryKey) => {
 const selectAll = () => {
   allIngredients.value.forEach(ing => {
     if (!barInventory.value.has(ing.key)) {
-      emit('toggle', ing.key);
+      toggleIngredient(ing.key);
     }
   });
 };
 
 // Tout désélectionner
 const deselectAll = () => {
-  allIngredients.value.forEach(ing => {
-    if (barInventory.value.has(ing.key)) {
-      emit('toggle', ing.key);
-    }
-  });
+  clearInventory(); // Utiliser directement la fonction du composable
 };
+
+// Supprimer le filteredIngredients qui n'est pas utilisé
+// const filteredIngredients = computed(() => { ... });
+
+// Ajouter cette computed pour le nombre de cocktails réalisables
+// Tu devras l'importer de CocktailMenuApp ou le calculer ici
+const availableCocktailsCount = computed(() => {
+  // Cette valeur devrait venir de ton parent ou être calculée ici
+  // Pour l'instant, retourne 0
+  return 0;
+});
 </script>
 
 <style scoped>

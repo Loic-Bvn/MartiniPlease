@@ -1,5 +1,6 @@
 // import cocktailData from '../Utils/cocktail_sample.json';
-import cocktailData from '../Utils/cocktail_dump_15_12_2025.json';
+// import cocktailData from '../Utils/cocktail_dump_15_12_2025.json';
+import cocktailData from '../Utils/cocktail_dump_19_12_2025.json';
 
 export const cocktailsData = cocktailData;
 
@@ -62,36 +63,60 @@ export const ingredients = [
     { key: 'brandy', value: 'Brandy', category: 'spirits' },
     { key: 'cachaca', value: 'Cachaça', category: 'spirits' },
     { key: 'calvados', value: 'Calvados', category: 'spirits' },
-    { key: 'champagne', value: 'Champagne', category: 'spirits' },
     { key: 'cognac', value: 'Cognac', category: 'spirits' },
     { key: 'gin', value: 'Gin', category: 'spirits' },
+    { key: 'islay', value: 'Whisky Islay', category: 'spirits' },
     { key: 'mezcal', value: 'Mezcal', category: 'spirits' },
+    { key: 'pisco', value: 'Pisco', category: 'spirits' },
     { key: 'rum', value: 'Rhum', category: 'spirits' },
     { key: 'rye', value: 'Rye', category: 'spirits' },
     { key: 'scotch', value: 'Scotch', category: 'spirits' },
     { key: 'tequila', value: 'Tequila', category: 'spirits' },
     { key: 'vodka', value: 'Vodka', category: 'spirits' },
-    { key: 'whiskey', value: 'Whisky', category: 'spirits' },
+    { key: 'whiskey', value: 'Whiskey', category: 'spirits' },
     
     // Liqueurs
+    { key: 'amaretto', value: 'Amaretto', category: 'liqueurs' },
+    { key: 'amaro', value: 'Amaro', category: 'liqueurs' },
     { key: 'allspice', value: 'Allspice', category: 'liqueurs' },
     { key: 'aperol', value: 'Aperol', category: 'liqueurs' },
+    { key: 'baileys', value: 'Baileys', category: 'liqueurs' },
     { key: 'benedictine', value: 'Bénédictine', category: 'liqueurs' },
     { key: 'campari', value: 'Campari', category: 'liqueurs' },
     { key: 'chartreuse_yellow', value: 'Chartreuse Jaune', category: 'liqueurs' },
     { key: 'chartreuse_green', value: 'Chartreuse Verte', category: 'liqueurs' },
-    { key: 'cointreau', value: 'Cointreau', category: 'liqueurs' },
+    { key: 'cherry_heering', value: 'Cherry Heering', category: 'liqueurs' },
     { key: 'curacao', value: 'Curacao', category: 'liqueurs' },
-    { key: 'coffee_licor', value: 'Liqueur Café', category: 'liqueurs' },
-    { key: 'licor_43', value: 'Liqueur 43', category: 'liqueurs' },
+    { key: 'cynar', value: 'Cynar', category: 'liqueurs' },
+    { key: 'drambuie', value: 'Drambuie', category: 'liqueurs' },
+    { key: 'falernum', value: 'Falernum', category: 'liqueurs' },
+    { key: 'licor_43', value: 'Licor 43', category: 'liqueurs' },
+    { key: 'maraschino', value: 'Maraschino', category: 'liqueurs' },
     { key: 'triple_sec', value: 'Triple sec', category: 'liqueurs' },
     { key: 'sambuca', value: 'Sambuca', category: 'liqueurs' },
-    { key: 'baileys', value: 'Baileys', category: 'liqueurs' },
-    { key: 'falernum', value: 'Falernum', category: 'liqueurs' },
+    { key: 'suze', value: 'Suze', category: 'liqueurs' },
+    
+    { key: 'licor_banana', value: 'Creme de banane', category: 'liqueurs' },
+    { key: 'licor_apricot', value: 'Liqueur d\'abricot', category: 'liqueurs' },
+    { key: 'licor_blackberry', value: 'Liqueur de mûre', category: 'liqueurs' },
+    { key: 'licor_blackcurrant', value: 'Liqueur de cassis', category: 'liqueurs' },
+    { key: 'licor_cacao', value: 'Liqueur de cacao', category: 'liqueurs' },
+    { key: 'licor_coffee', value: 'Liqueur Café', category: 'liqueurs' },
+    { key: 'licor_mint', value: 'Liqueur de menthe', category: 'liqueurs' },
+    { key: 'licor_peach', value: 'Liqueur de pêche', category: 'liqueurs' },
+    { key: 'licor_violet', value: 'Liqueur de violette', category: 'liqueurs' },
+    { key: 'licor_walnut', value: 'Liqueur de noix', category: 'liqueurs' },
 
     // Modificateurs
+    { key: 'porto', value: 'Porto', category: 'modifiers' },
+    { key: 'sherry_fino', value: 'Xérès Fino', category: 'modifiers' },
+    { key: 'sherry_olorosso', value: 'Xérès Olorosso', category: 'modifiers' },
+    { key: 'sherry_amontillado', value: 'Xérès Amontillado', category: 'modifiers' },
     { key: 'dry_vermouth', value: 'Vermouth sec', category: 'modifiers' },
     { key: 'sweet_vermouth', value: 'Vermouth doux', category: 'modifiers' },
+    { key: 'sparkling_wine', value: 'Vin effervescent', category: 'modifiers' },
+    { key: 'red_wine', value: 'Vin rouge', category: 'modifiers' },
+    { key: 'white_wine', value: 'Vin blanc', category: 'modifiers' },
 
     // Jus
     { key: 'cranberry_juice', value: 'Jus de cranberry', category: 'juices' },
@@ -102,8 +127,9 @@ export const ingredients = [
     { key: 'pineapple_juice', value: 'Jus d\'ananas', category: 'juices' },
 
     // Sirops
+    { key: 'agave_syrup', value: 'Sirop d\'agave', category: 'syrups' },
     { key: 'cinnamon_syrup', value: 'Sirop cannelle', category: 'syrups' },
-    { key: 'coconut_cream', value: 'Crème de coco', category: 'syrups' },
+    { key: 'coconut_syrup', value: 'Sirop de coco', category: 'syrups' },
     { key: 'grenadine', value: 'Grenadine', category: 'syrups' },
     { key: 'honey_syrup', value: 'Sirop de miel', category: 'syrups' },
     { key: 'maple_syrup', value: 'Sirop d\'érable', category: 'syrups' },
@@ -119,8 +145,16 @@ export const ingredients = [
     { key: 'peychaud_bitters', value: 'Peychaud bitters', category: 'bitters' },
 
     // Mixers
+    { key: 'cola', value: 'Cola', category: 'mixers' },
     { key: 'club_soda', value: 'Eau gazeuse', category: 'mixers' },
     { key: 'tonic_water', value: 'Eau tonique', category: 'mixers' },
-    { key: 'cola', value: 'Cola', category: 'mixers' },
     { key: 'ginger_beer', value: 'Ginger beer', category: 'mixers' },
+
+    // Others
+    { key: 'aquafaba', value: 'Aquafaba', category: 'others' },
+    { key: 'coffee', value: 'Café', category: 'others' },
+    { key: 'cream', value: 'Crème', category: 'others' },
+    { key: 'milk', value: 'Lait', category: 'others' },
+    { key: 'whole_egg', value: 'Oeuf', category: 'others' },
+    { key: 'tea', value: 'Thé', category: 'others' },
 ];

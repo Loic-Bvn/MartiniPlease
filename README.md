@@ -1,5 +1,6 @@
 # MartiniPlease - Order a Martini. Get one.
 
 ### TODO: 
-- Update cocktail scrapper so it matches with new bar inventory handling
 - Update UI theme
+- Add database
+- fix chip filters (broken for now)
