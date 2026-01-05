@@ -1,16 +1,16 @@
 <!-- PASSWORD HANDLING FOR SWITCHING TO BARTENDER MODE -->
 <template>
 <div 
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    class="password-modal-overlay"
     @click.self="onClose"
 >
-    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
+    <div class="password-modal-content">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-800">Mode Bartender</h2>
+        <div class="password-modal-header">
+            <h2 class="password-modal-title">Mode Bartender</h2>
             <button 
                 @click="onClose" 
-                class="p-1 hover:bg-gray-100 rounded transition-colors"
+                class="password-modal-close"
                 aria-label="Fermer"
             >
                 <X :size="20" />
@@ -18,34 +18,34 @@
         </div>
 
         <!-- Message -->
-        <p class="text-gray-600 mb-4 text-sm">
+        <p class="password-modal-description">
             Entrez le mot de passe pour accéder au mode bartender
         </p>
 
         <!-- Input mot de passe -->
-        <div class="mb-4">
+        <div class="password-form-group">
             <input
                 type="password"
                 v-model="password"
                 @keypress.enter="handleSubmit"
                 placeholder="Mot de passe..."
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
+                class="password-form-input"
                 autofocus
             />
-            <p v-if="error" class="text-red-600 text-sm mt-2">{{ error }}</p>
+            <p v-if="error" class="password-form-error">{{ error }}</p>
         </div>
 
         <!-- Boutons -->
-        <div class="flex gap-2">
+        <div class="password-modal-buttons">
             <button
                 @click="onClose"
-                class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                class="password-btn-cancel"
             >
                 Annuler
             </button>
             <button
                 @click="handleSubmit"
-                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="password-btn-submit"
                 :disabled="!password.trim()"
             >
                 Valider
@@ -93,3 +93,7 @@ function handleSubmit() {
     }
 }
 </script>
+
+<style scoped>
+/* Tous les styles sont centralisés dans styles.css */
+</style>
