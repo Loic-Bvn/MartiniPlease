@@ -96,5 +96,5 @@ function setShowOrderQueueModal(value) {
 </script>
 
 <style scoped>
-/* Styles conservés depuis le JSX, à compléter si besoin */
+/* Tous les styles sont centralisés dans styles.css */
 </style>

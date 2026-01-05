@@ -91,6 +91,8 @@ function incrementQuantity() {
   quantity.value = quantity.value + 1;
 }
 </script>
+</script>
+
 <style scoped>
-/* À compléter si besoin */
+/* Tous les styles sont centralisés dans styles.css */
 </style>

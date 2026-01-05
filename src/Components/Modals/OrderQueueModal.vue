@@ -133,35 +133,5 @@ const ingredientTypes = (cocktail) => {
 </template>
 
 <style scoped>
-.orderQueue-manager {
-  padding: 1.5rem;
-  background: white;
-  border-radius: 0.5rem;
-}
-
-.orderQueue-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.orderQueue-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1f2937;
-  margin: 0;
-}
-
-.btn-servir {
-  padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+/* Tous les styles sont centralisés dans styles.css */
 </style>

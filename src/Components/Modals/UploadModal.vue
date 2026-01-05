@@ -64,6 +64,7 @@ const props = defineProps({
 
 const fileInputRef = ref(null);
 </script>
+
 <style scoped>
-/* À compléter si besoin */
+/* Tous les styles sont centralisés dans styles.css */
 </style>
