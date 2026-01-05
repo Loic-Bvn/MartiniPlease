@@ -1,5 +1,3 @@
-// import cocktailData from '../Utils/cocktail_sample.json';
-// import cocktailData from '../Utils/cocktail_dump_15_12_2025.json';
 import cocktailData from '../Utils/cocktail_dump_19_12_2025.json';
 
 export const cocktailsData = cocktailData;
