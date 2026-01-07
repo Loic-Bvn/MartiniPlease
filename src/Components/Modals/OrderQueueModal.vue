@@ -1,8 +1,5 @@
 <script setup>
-import { ChefHat, X, User, Clock, Check } from 'lucide-vue-next';
-import { computed } from 'vue';
-
-import CocktailCard from '@/Components/CocktailCard.vue';
+// Dans OrderQueueModal.vue
 
 const props = defineProps({
   orders: Array,
@@ -11,14 +8,21 @@ const props = defineProps({
   profiles: Array
 });
 
-// Grouper par cocktail + profil pour afficher les quantités
+// Adapter les données Supabase
 const groupedOrders = computed(() => {
   const groups = {};
   props.orders.forEach(order => {
-    const key = `${order.cocktailId}-${order.profileId}`;
+    // Les données viennent maintenant de Supabase
+    const key = `${order.cocktail_id || order.cocktailId}-${order.user_id || order.profileId}`;
     if (!groups[key]) {
       groups[key] = {
-        ...order,
+        id: order.id,
+        cocktailId: order.cocktail_id || order.cocktailId,
+        cocktailName: order.cocktail_name || order.cocktailName,
+        cocktail: order.cocktail_data || order.cocktail,
+        profileId: order.user_id || order.profileId,
+        profileName: order.profile_name,
+        timestamp: order.created_at,
         orders: []
       };
     }
@@ -28,31 +32,13 @@ const groupedOrders = computed(() => {
 });
 
 function getProfileName(profileId) {
+  // Utiliser d'abord profile_name de la commande
+  const group = groupedOrders.value.find(g => g.profileId === profileId);
+  if (group?.profileName) return group.profileName;
+  
+  // Fallback sur la liste des profils
   const profile = props.profiles.find(p => p.id === profileId);
   return profile?.name || 'Inconnu';
-}
-
-function formatTime(timestamp) {
-  return new Date(timestamp).toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-function handleComplete(group) {
-  // Compléter toutes les commandes du groupe
-  group.orders.forEach(order => {
-    props.onComplete(order);
-  });
-}
-
-const ingredientTypes = (cocktail) => {
-  if (!cocktail?.Recipe) return ''
-
-  return cocktail.Recipe
-    .map(i => i.Type)
-    .filter(Boolean)
-    .join(' · ')
 }
 
 </script>

@@ -310,6 +310,9 @@ import OrderQueueModal from '@/Components/Modals/OrderQueueModal.vue';
 import InventoryManager from '@/Components/Modals/InventoryManager.vue';
 import CocktailCard from '@/Components/CocktailCard.vue';
 
+import { useOrders } from '@/composables/useOrders'
+import { onUnmounted } from 'vue'
+
 // States
 const appMode = ref('drinker'); // Mode par défaut
 const currentProfile = ref(null);
@@ -337,6 +340,97 @@ const showOrderQueueModal = ref(false);
 const showInventoryManager = ref(false);
 const expandedCocktail = ref(null);
 const showPasswordModal = ref(false);
+
+// ----------------------- COMMAND / DATA BASE --------------------
+const { 
+  orders: dbOrders, 
+  createOrder, 
+  fetchPendingOrders, 
+  completeOrder: completeDbOrder,
+  subscribeToOrders 
+} = useOrders()
+
+let orderChannel = null
+
+// Modifier onMounted
+onMounted(async () => {
+  profiles.value = Storage.getProfiles();
+  
+  const savedInventory = Storage.getBarInventory();
+  barInventory.value = new Set(savedInventory);
+  
+  hiddenCocktails.value = Storage.getHiddenCocktails();
+
+  const savedSeason = Storage.getSeasonFilter();
+  if (savedSeason && savedSeason !== 'all') {
+    selectedSeasons.value = [savedSeason];
+  } else {
+    selectedSeasons.value = [];
+  }
+  
+  // Charger les commandes depuis Supabase
+  await fetchPendingOrders()
+  orders.value = dbOrders.value
+  
+  // S'abonner aux nouvelles commandes en temps réel
+  orderChannel = subscribeToOrders((newOrder) => {
+    // Notification sonore ou visuelle optionnelle
+    console.log('🔔 Nouvelle commande:', newOrder)
+  })
+})
+
+// Nettoyer l'abonnement au démontage
+onUnmounted(() => {
+  if (orderChannel) {
+    orderChannel.unsubscribe()
+  }
+})
+
+// Remplacer ta fonction orderCocktail
+async function orderCocktail(cocktail) {
+  if (!currentProfile.value) {
+    alert('Veuillez sélectionner un profil')
+    return
+  }
+  
+  const profileData = currentProfileData.value
+  
+  const orderData = {
+    cocktailId: cocktail.id,
+    cocktailName: cocktail.Name,
+    cocktail: cocktail,
+    profileId: currentProfile.value,
+    profileName: profileData.name
+  }
+
+  // Enregistrer dans Supabase
+  const result = await createOrder(orderData)
+  
+  if (result.success) {
+    // Ajouter aussi au localStorage pour backup
+    orderHistory.value.unshift({
+      cocktailId: cocktail.id,
+      cocktailName: cocktail.Name,
+      timestamp: result.data.created_at
+    })
+    
+    alert(`✅ ${cocktail.Name} commandé !`)
+  } else {
+    alert(`❌ Erreur lors de la commande: ${result.error.message}`)
+  }
+}
+
+// Modifier completeOrder
+async function completeOrder(order) {
+  const result = await completeDbOrder(order.id)
+  
+  if (result.success) {
+    // Retirer de la liste locale
+    orders.value = orders.value.filter(o => o.id !== order.id)
+  } else {
+    alert(`❌ Erreur: ${result.error.message}`)
+  }
+}
 
 // ------------------------ BARTENDER MODE ------------------------
 // Accéder à l'inventaire
