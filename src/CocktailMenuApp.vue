@@ -7,11 +7,8 @@
         <div class="header-top">
           <!-- Brand -->
           <div class="header-brand">
-            <Wine class="header-icon" :size="22" />
-            <div>
-              <h1 class="header-title">Martini Please</h1>
-              <p class="header-subtitle">🧊 Bartender</p>
-            </div>
+            <img src="/logo.png" alt="Martini Please" class="header-logo" />
+            <h1 class="header-title">Martini Please</h1>
           </div>
 
           <!-- Recherche inline -->
@@ -25,10 +22,22 @@
             />
           </div>
 
-          <!-- Bouton nouveau cocktail -->
-          <button @click="openNewModal" class="btn-new-cocktail">
-            <Plus :size="15" /> Nouveau cocktail
-          </button>
+          <!-- Boutons header -->
+          <div class="flex gap-2 items-center">
+            <!-- Mode toggle -->
+            <button @click="isBartenderMode ? exitBartenderMode() : showPasswordModal = true" :class="['btn-mode', isBartenderMode ? 'btn-mode-active' : 'btn-mode-inactive']">
+              <component :is="isBartenderMode ? 'Unlock' : 'Lock'" :size="15" />
+              {{ isBartenderMode ? 'Mode Drinker' : 'Mode Bartender' }}
+            </button>
+            <template v-if="isBartenderMode">
+              <button @click="openNewCardModal()" class="btn-new-card">
+                <BookOpen :size="15" /> Nouvelle carte
+              </button>
+              <button @click="openNewModal" class="btn-new-cocktail">
+                <Plus :size="15" /> Nouveau cocktail
+              </button>
+            </template>
+          </div>
         </div>
       </div>
     </div>
@@ -37,7 +46,7 @@
     <div class="main-content">
 
       <!-- Inventaire -->
-      <div class="section-card">
+      <div v-if="isBartenderMode" class="section-card">
         <button @click="showInventory = !showInventory" class="expand-actions-btn">
           <ChevronDown :size="18" :class="{ rotated: showInventory }" />
           <h2 class="section-title">
@@ -64,7 +73,7 @@
             <label class="filter-label">Spiritueux</label>
             <div class="chips-container">
               <button
-                v-for="spirit in spiritCategories"
+                v-for="spirit in allSpirits"
                 :key="spirit.key"
                 @click="toggleFilter(selectedSpirits, spirit.key)"
                 :class="['chip', { active: selectedSpirits.includes(spirit.key) }]"
@@ -121,6 +130,49 @@
         </div>
       </div>
 
+      <!-- Cartes custom -->
+      <div class="section-card">
+        <button @click="showCards = !showCards" class="expand-actions-btn">
+          <ChevronDown :size="18" :class="{ rotated: showCards }" />
+          <h2 class="section-title">
+            📜 Cartes
+            <span class="count-badge">{{ menuCards.length }}</span>
+          </h2>
+          <span></span>
+        </button>
+
+        <div v-if="showCards" class="cards-content">
+          <div v-if="menuCards.length === 0" class="cards-empty">
+            Aucune carte créée — crée ta première carte !
+          </div>
+          <div v-else class="cards-grid">
+            <div
+              v-for="card in menuCards"
+              :key="card.id"
+              class="menu-card-item"
+            >
+              <div class="menu-card-info">
+                <span class="menu-card-name">{{ card.name }}</span>
+                <span class="menu-card-count">{{ card.cocktail_ids?.length || 0 }} cocktail{{ (card.cocktail_ids?.length || 0) > 1 ? 's' : '' }}</span>
+              </div>
+              <div class="menu-card-actions">
+                <button @click="viewingCard = card" class="btn-icon text-gray-400 hover:text-amber-500" title="Visualiser">
+                  <Eye :size="16" />
+                </button>
+                <template v-if="isBartenderMode">
+                  <button @click="openEditCardModal(card)" class="btn-icon text-gray-400 hover:text-blue-500" title="Modifier">
+                    <Pencil :size="16" />
+                  </button>
+                  <button @click="handleDeleteCard(card.id)" class="btn-icon text-gray-400 hover:text-red-500" title="Supprimer">
+                    <Trash2 :size="16" />
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Liste cocktails -->
       <div>
         <h2 class="cocktails-header">
@@ -143,6 +195,7 @@
             v-for="cocktail in filteredCocktails"
             :key="cocktail.id"
             :cocktail="cocktail"
+            :isBartenderMode="isBartenderMode"
             @edit="openEditModal"
             @delete="handleDelete"
           />
@@ -150,6 +203,30 @@
       </div>
 
     </div>
+
+    <!-- Modal mot de passe bartender -->
+    <PasswordModal
+      v-if="showPasswordModal"
+      :onClose="() => showPasswordModal = false"
+      :onSuccess="enterBartenderMode"
+    />
+
+    <!-- Vue full screen d'une carte -->
+    <MenuCardView
+      v-if="viewingCard"
+      :card="viewingCard"
+      :cocktails="cocktails"
+      @close="viewingCard = null"
+    />
+
+    <!-- Modal cartes custom -->
+    <MenuCardModal
+      v-if="showCardModal"
+      :card="editingCard"
+      :cocktails="cocktails"
+      @save="handleSaveCard"
+      @close="showCardModal = false"
+    />
 
     <!-- Modal édition / création cocktail -->
     <CocktailModal
@@ -164,23 +241,43 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Wine, Search, ChevronDown, X, Plus } from 'lucide-vue-next'
+import { Search, ChevronDown, X, Plus, BookOpen, Pencil, Trash2, Eye, Lock, Unlock } from 'lucide-vue-next'
 
 import { useCocktails } from '@/composables/useCocktails'
 import { useInventory } from '@/composables/useInventory'
+import { useMenuCards } from '@/composables/useMenuCards'
 
 import CocktailCard from '@/Components/CocktailCard.vue'
 import InventoryManager from '@/Components/Modals/InventoryManager.vue'
 import CocktailModal from '@/Components/Modals/CocktailModal.vue'
+import MenuCardModal from '@/Components/Modals/MenuCardModal.vue'
+import MenuCardView from '@/Components/MenuCardView.vue'
+import PasswordModal from '@/Components/Modals/PasswordModal.vue'
 
 const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, updateCocktail, deleteCocktail } = useCocktails()
 const { barInventory, ingredients, fetchIngredients } = useInventory()
+const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCard } = useMenuCards()
+
+// Mode bartender
+const isBartenderMode   = ref(false)
+const showPasswordModal = ref(false)
+
+function enterBartenderMode() {
+  isBartenderMode.value = true
+}
+function exitBartenderMode() {
+  isBartenderMode.value = false
+}
 
 // UI
-const showInventory   = ref(false)
-const showFilters     = ref(false)
+const showInventory     = ref(false)
+const showFilters       = ref(false)
+const showCards         = ref(false)
 const showCocktailModal = ref(false)
-const editingCocktail = ref(null)
+const showCardModal     = ref(false)
+const editingCocktail   = ref(null)
+const editingCard       = ref(null)
+const viewingCard       = ref(null)
 
 // Filtres
 const searchTerm       = ref('')
@@ -190,16 +287,50 @@ const showOnlyMakeable = ref(false)
 
 // Référentiels filtres
 const spiritCategories = [
-  { key: 'Whiskey_Family', label: '🥃 Whiskey' },
-  { key: 'Rum_Family',     label: '🍹 Rhum' },
-  { key: 'Agave_Family',   label: '🌵 Agave' },
-  { key: 'Gin',            label: '🌿 Gin' },
-  { key: 'Vodka',          label: '❄️ Vodka' },
-  { key: 'Brandy_Family',  label: '🍇 Brandy' },
-  { key: 'Pisco',          label: '🫙 Pisco' },
-  { key: 'Absinthe',       label: '🌱 Absinthe' },
-  { key: 'Other',          label: '✨ Autre' },
+  { key: 'Whiskey_Family', label: '🥃 Whiskey',  members: ['Whiskey_Family', 'whiskey', 'bourbon', 'scotch', 'rye'],
+    spirits: [
+      { key: 'bourbon', label: '🥃 Bourbon' },
+      { key: 'rye',     label: '🌾 Rye' },
+      { key: 'scotch',  label: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotch' },
+      { key: 'whiskey', label: '🥃 Whiskey' },
+    ]},
+  { key: 'Rum_Family',    label: '🍹 Rhum',      members: ['Rum_Family', 'rum', 'cachaca'],
+    spirits: [
+      { key: 'rum',     label: '🍹 Rum' },
+      { key: 'cachaca', label: '🇧🇷 Cachaça' },
+    ]},
+  { key: 'Agave_Family',  label: '🌵 Agave',     members: ['Agave_Family', 'tequila', 'mezcal'],
+    spirits: [
+      { key: 'tequila', label: '🌵 Tequila' },
+      { key: 'mezcal',  label: '🔥 Mezcal' },
+    ]},
+  { key: 'Gin',           label: '🌿 Gin',       members: ['Gin', 'gin'] },
+  { key: 'Vodka',         label: '❄️ Vodka',     members: ['Vodka', 'vodka'] },
+  { key: 'Brandy_Family', label: '🍇 Brandy',    members: ['Brandy_Family', 'brandy', 'cognac', 'calvados'],
+    spirits: [
+      { key: 'cognac',   label: '🇫🇷 Cognac' },
+      { key: 'calvados', label: '🍎 Calvados' },
+      { key: 'brandy',   label: '🍇 Brandy' },
+    ]},
+  { key: 'Pisco',         label: '🫙 Pisco',     members: ['Pisco', 'pisco'] },
+  { key: 'Absinthe',      label: '🌱 Absinthe',  members: ['Absinthe', 'absinthe'] },
+  { key: 'Other',         label: '✨ Autre',      members: ['Other'] },
 ]
+
+// Lookup plat : key → membres qu'il couvre
+const spiritMembersMap = Object.fromEntries(
+  spiritCategories.flatMap(f => [
+    [f.key, f.members],
+    ...(f.spirits || []).map(s => [s.key, [s.key]]),
+  ])
+)
+
+// Liste plate de tous les spirits individuels pour les chips de filtre
+const allSpirits = spiritCategories.flatMap(f =>
+  f.spirits?.length
+    ? f.spirits
+    : [{ key: f.key, label: f.label }]
+)
 
 const seasons = [
   { key: 'all',    icon: '🍸', label: 'Toutes' },
@@ -241,7 +372,10 @@ const filteredCocktails = computed(() => {
 
   // Spiritueux
   if (selectedSpirits.value.length) {
-    list = list.filter(c => selectedSpirits.value.includes(c.category))
+    const allMembers = [...new Set(
+      selectedSpirits.value.flatMap(key => spiritMembersMap[key] || [key])
+    )]
+    list = list.filter(c => allMembers.includes(c.category))
   }
 
   // Saison
@@ -278,12 +412,42 @@ function clearFilters() {
 }
 
 function getSpiritLabel(key) {
-  return spiritCategories.find(s => s.key === key)?.label || key
+  for (const f of spiritCategories) {
+    if (f.key === key) return f.label
+    const s = f.spirits?.find(s => s.key === key)
+    if (s) return s.label
+  }
+  return key
 }
 
 function getSeasonLabel(key) {
   const s = seasons.find(s => s.key === key)
   return s ? `${s.icon} ${s.label}` : key
+}
+
+// CRUD menu cards
+function openNewCardModal() {
+  editingCard.value = null
+  showCardModal.value = true
+}
+
+function openEditCardModal(card) {
+  editingCard.value = card
+  showCardModal.value = true
+}
+
+async function handleSaveCard(data) {
+  if (data.id) {
+    await updateMenuCard(data.id, data)
+  } else {
+    await createMenuCard(data)
+  }
+  showCardModal.value = false
+}
+
+async function handleDeleteCard(id) {
+  if (!confirm('Supprimer cette carte ?')) return
+  await deleteMenuCard(id)
 }
 
 // CRUD cocktails
@@ -312,11 +476,151 @@ async function handleDelete(id) {
 }
 
 onMounted(async () => {
-  await Promise.all([fetchCocktails(), fetchIngredients()])
+  await Promise.all([fetchCocktails(), fetchIngredients(), fetchMenuCards()])
 })
 </script>
 
 <style scoped>
+.spirit-families {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.spirit-family-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chip-family {
+  font-weight: 700;
+}
+
+.chip-member {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  opacity: 0.85;
+  border-style: dashed;
+}
+
+.chip-member.active {
+  opacity: 1;
+  border-style: solid;
+}
+
+.spirit-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding-left: 0.25rem;
+  border-left: 2px solid #e5e7eb;
+  margin-left: 0.25rem;
+}
+
+.btn-mode {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-mode-inactive {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.btn-mode-inactive:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+.btn-mode-active {
+  background: #7c3aed;
+  color: white;
+}
+.btn-mode-active:hover {
+  background: #6d28d9;
+}
+
+.btn-new-card {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  color: #374151;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-new-card:hover {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.cards-content {
+  padding: 1rem;
+}
+
+.cards-empty {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  padding: 1.5rem 0;
+}
+
+.cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-card-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  background: #fafafa;
+  border: 1px solid #f3f4f6;
+  border-radius: 0.6rem;
+  transition: border-color 0.15s;
+}
+
+.menu-card-item:hover {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.menu-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.menu-card-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.menu-card-count {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.menu-card-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
 .count-badge {
   margin-left: 0.5rem;
   padding: 0.1rem 0.6rem;
@@ -325,6 +629,14 @@ onMounted(async () => {
   border-radius: 9999px;
   font-size: 0.8rem;
   font-weight: 600;
+}
+
+.header-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  /* L'image est noire sur fond transparent — on l'inverse si le header est blanc */
+  filter: invert(0);
 }
 
 .expand-actions-btn svg {

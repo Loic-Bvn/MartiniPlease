@@ -19,12 +19,14 @@
 
       <!-- Actions -->
       <div class="header-actions shrink-0">
-        <button @click="$emit('edit', cocktail)" class="btn-icon text-gray-400 hover:text-blue-500">
-          <Pencil :size="18" />
-        </button>
-        <button @click="$emit('delete', cocktail.id)" class="btn-icon text-gray-400 hover:text-red-500">
-          <Trash2 :size="18" />
-        </button>
+        <template v-if="isBartenderMode">
+          <button @click="$emit('edit', cocktail)" class="btn-icon text-gray-400 hover:text-blue-500">
+            <Pencil :size="18" />
+          </button>
+          <button @click="$emit('delete', cocktail.id)" class="btn-icon text-gray-400 hover:text-red-500">
+            <Trash2 :size="18" />
+          </button>
+        </template>
       </div>
     </div>
 
@@ -68,7 +70,8 @@ import { Pencil, Trash2 } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 
 const props = defineProps({
-  cocktail: Object,
+  cocktail:        Object,
+  isBartenderMode: { type: Boolean, default: false },
 })
 
 defineEmits(['edit', 'delete'])
