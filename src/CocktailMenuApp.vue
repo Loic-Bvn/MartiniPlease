@@ -1,3 +1,5 @@
+import ThemeToggle from './Components/ThemeToggle.vue'
+
 <template>
   <div class="min-h-screen menu-app">
 
@@ -23,7 +25,7 @@
           </div>
 
           <!-- Boutons header -->
-          <div class="flex gap-2 items-center">
+          <div class="header-actions">
             <!-- Mode toggle -->
             <button @click="isBartenderMode ? exitBartenderMode() : showPasswordModal = true" :class="['btn-mode', isBartenderMode ? 'btn-mode-active' : 'btn-mode-inactive']">
               <component :is="isBartenderMode ? 'Unlock' : 'Lock'" :size="15" />
@@ -38,6 +40,8 @@
               </button>
             </template>
           </div>
+
+          <ThemeToggle />
         </div>
       </div>
     </div>
@@ -156,14 +160,14 @@
                 <span class="menu-card-count">{{ card.cocktail_ids?.length || 0 }} cocktail{{ (card.cocktail_ids?.length || 0) > 1 ? 's' : '' }}</span>
               </div>
               <div class="menu-card-actions">
-                <button @click="viewingCard = card" class="btn-icon text-gray-400 hover:text-amber-500" title="Visualiser">
+                <button @click="viewingCard = card" class="btn-icon btn-icon--view" title="Visualiser">
                   <Eye :size="16" />
                 </button>
                 <template v-if="isBartenderMode">
-                  <button @click="openEditCardModal(card)" class="btn-icon text-gray-400 hover:text-blue-500" title="Modifier">
+                  <button @click="openEditCardModal(card)" class="btn-icon btn-icon--edit" title="Modifier">
                     <Pencil :size="16" />
                   </button>
-                  <button @click="handleDeleteCard(card.id)" class="btn-icon text-gray-400 hover:text-red-500" title="Supprimer">
+                  <button @click="handleDeleteCard(card.id)" class="btn-icon btn-icon--delete" title="Supprimer">
                     <Trash2 :size="16" />
                   </button>
                 </template>
@@ -177,16 +181,16 @@
       <div>
         <h2 class="cocktails-header">
           {{ filteredCocktails.length }} cocktail{{ filteredCocktails.length > 1 ? 's' : '' }} trouvé{{ filteredCocktails.length > 1 ? 's' : '' }}
-          <span v-if="showOnlyMakeable" class="text-green-600 text-sm font-normal ml-2">
+          <span v-if="showOnlyMakeable" class="cocktails-header-makeable">
             ({{ makeableCount }} réalisables)
           </span>
         </h2>
 
-        <div v-if="cocktailsLoading" class="text-center py-8 text-gray-400">
+        <div v-if="cocktailsLoading" class="loading-state">
           Chargement des cocktails...
         </div>
 
-        <div v-else-if="filteredCocktails.length === 0" class="text-center py-8 text-gray-400">
+        <div v-else-if="filteredCocktails.length === 0" class="empty-state">
           Aucun cocktail trouvé avec ces critères
         </div>
 
@@ -207,8 +211,8 @@
     <!-- Modal mot de passe bartender -->
     <PasswordModal
       v-if="showPasswordModal"
-      :onClose="() => showPasswordModal = false"
-      :onSuccess="enterBartenderMode"
+      @close="showPasswordModal = false"
+      @success="enterBartenderMode"
     />
 
     <!-- Vue full screen d'une carte -->
@@ -479,187 +483,3 @@ onMounted(async () => {
   await Promise.all([fetchCocktails(), fetchIngredients(), fetchMenuCards()])
 })
 </script>
-
-<style scoped>
-.spirit-families {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.spirit-family-block {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.chip-family {
-  font-weight: 700;
-}
-
-.chip-member {
-  font-size: 0.75rem;
-  padding: 0.2rem 0.6rem;
-  opacity: 0.85;
-  border-style: dashed;
-}
-
-.chip-member.active {
-  opacity: 1;
-  border-style: solid;
-}
-
-.spirit-members {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  padding-left: 0.25rem;
-  border-left: 2px solid #e5e7eb;
-  margin-left: 0.25rem;
-}
-
-.btn-mode {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-mode-inactive {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-.btn-mode-inactive:hover {
-  background: #e5e7eb;
-  color: #374151;
-}
-.btn-mode-active {
-  background: #7c3aed;
-  color: white;
-}
-.btn-mode-active:hover {
-  background: #6d28d9;
-}
-
-.btn-new-card {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  background: white;
-  color: #374151;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-new-card:hover {
-  border-color: #f59e0b;
-  color: #f59e0b;
-}
-
-.cards-content {
-  padding: 1rem;
-}
-
-.cards-empty {
-  text-align: center;
-  color: #9ca3af;
-  font-size: 0.875rem;
-  padding: 1.5rem 0;
-}
-
-.cards-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.menu-card-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.65rem 0.85rem;
-  background: #fafafa;
-  border: 1px solid #f3f4f6;
-  border-radius: 0.6rem;
-  transition: border-color 0.15s;
-}
-
-.menu-card-item:hover {
-  border-color: #fde68a;
-  background: #fffbeb;
-}
-
-.menu-card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.menu-card-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.menu-card-count {
-  font-size: 0.75rem;
-  color: #9ca3af;
-}
-
-.menu-card-actions {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.count-badge {
-  margin-left: 0.5rem;
-  padding: 0.1rem 0.6rem;
-  background: #3b82f6;
-  color: white;
-  border-radius: 9999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.header-logo {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-  /* L'image est noire sur fond transparent — on l'inverse si le header est blanc */
-  filter: invert(0);
-}
-
-.expand-actions-btn svg {
-  transition: transform 0.25s ease;
-}
-.expand-actions-btn svg.rotated {
-  transform: rotate(180deg);
-}
-.btn-new-cocktail {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  background: #f59e0b;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-new-cocktail:hover {
-  background: #d97706;
-}
-</style>

@@ -2,12 +2,12 @@
   <div :class="['cocktail-card-compact', !makeable ? 'opacity-60' : '']">
 
     <!-- Header -->
-    <div class="card-header flex items-start w-full">
+    <div class="card-header">
       <div class="min-w-0 flex-1">
-        <h3 :class="['cocktail-title', makeable ? 'text-gray-800' : 'text-gray-400']">
+        <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
           {{ cocktail.name }}
         </h3>
-        <div class="flex items-center justify-between w-full pr-2">
+        <div class="cocktail-meta-row">
           <p class="cocktail-subtitle">
             {{ cocktail.base_spirit }} · {{ seasonLabel }}
           </p>
@@ -20,10 +20,10 @@
       <!-- Actions -->
       <div class="header-actions shrink-0">
         <template v-if="isBartenderMode">
-          <button @click="$emit('edit', cocktail)" class="btn-icon text-gray-400 hover:text-blue-500">
+          <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
             <Pencil :size="18" />
           </button>
-          <button @click="$emit('delete', cocktail.id)" class="btn-icon text-gray-400 hover:text-red-500">
+          <button @click="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
             <Trash2 :size="18" />
           </button>
         </template>
@@ -122,34 +122,3 @@ const seasonLabel = computed(() => {
     : (icons[s] || s)
 })
 </script>
-
-<style scoped>
-.badge-makeable {
-  font-size: 0.75rem;
-  color: #16a34a;
-  font-weight: 500;
-}
-.badge-missing {
-  font-size: 0.75rem;
-  color: #dc2626;
-}
-.badge-method {
-  font-size: 0.7rem;
-  color: #6b7280;
-  background: #f3f4f6;
-  padding: 0.1rem 0.4rem;
-  border-radius: 999px;
-}
-.card-footer {
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.footer-left {
-  display: flex;
-  align-items: center;
-}
-</style>
