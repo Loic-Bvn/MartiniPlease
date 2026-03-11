@@ -22,6 +22,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_KEY }}
+          VITE_BARTENDER_PASSWORD: ${{ secrets.VITE_BARTENDER_PASSWORD }}
         run: |
           npm install
           npm run build
