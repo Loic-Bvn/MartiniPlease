@@ -55,10 +55,15 @@
       </div>
     </div>
 
-    <!-- Badge réalisable -->
+    <!-- Badge réalisable + méthode -->
     <div class="card-footer">
-      <span v-if="makeable" class="badge-makeable">✓ Réalisable</span>
-      <span v-else class="badge-missing">{{ missingCount }} ingrédient{{ missingCount > 1 ? 's' : '' }} manquant{{ missingCount > 1 ? 's' : '' }}</span>
+      <div class="footer-left">
+        <span v-if="makeable" class="badge-makeable">✓ Réalisable</span>
+        <span v-else class="badge-missing">{{ missingCount }} ingrédient{{ missingCount > 1 ? 's' : '' }} manquant{{ missingCount > 1 ? 's' : '' }}</span>
+      </div>
+      <span v-if="cocktail.method" class="badge-method">
+        {{ methodLabel }}
+      </span>
     </div>
 
   </div>
@@ -94,6 +99,21 @@ const missingCount = computed(() =>
   ).length
 )
 
+const METHOD_LABELS = {
+  shake:       '🍸 Shake',
+  regal_shake: '🍸 Regal Shake',
+  stir:        '🥄 Stir',
+  regal_stir:  '🥄 Regal Stir',
+  build:       '🫗 Build',
+  blend:       '🌀 Blend',
+  swizzle:     '🌿 Swizzle',
+  throw:       '🤹 Throw',
+}
+
+const methodLabel = computed(() =>
+  METHOD_LABELS[props.cocktail.method] || props.cocktail.method
+)
+
 const seasonLabel = computed(() => {
   const icons = { spring: '🌸', summer: '☀️', fall: '🍂', winter: '❄️' }
   const s = props.cocktail.season || []
@@ -113,9 +133,23 @@ const seasonLabel = computed(() => {
   font-size: 0.75rem;
   color: #dc2626;
 }
+.badge-method {
+  font-size: 0.7rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+}
 .card-footer {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-left {
+  display: flex;
+  align-items: center;
 }
 </style>
