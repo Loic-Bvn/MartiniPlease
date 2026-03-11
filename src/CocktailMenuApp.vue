@@ -4,15 +4,15 @@
     <!-- Header -->
     <div class="header">
       <div class="header-container">
+        <!-- Ligne 1 : Brand + Recherche + Actions + ThemeToggle -->
         <div class="header-top">
-          <!-- Brand -->
           <div class="header-brand">
             <img src="/logo.png" alt="Martini Please" class="header-logo" />
             <h1 class="header-title">Martini Please</h1>
           </div>
 
-          <!-- Recherche inline -->
-          <div class="search-container">
+          <!-- Recherche (visible sur grand écran) -->
+          <div class="search-container header-search-inline">
             <Search class="search-icon" :size="16" />
             <input
               type="text"
@@ -22,21 +22,36 @@
             />
           </div>
 
-          <!-- Boutons header -->
-          <div class="flex gap-2 items-center">
-            <!-- Mode toggle -->
-            <button @click="isBartenderMode ? exitBartenderMode() : showPasswordModal = true" :class="['btn-mode', isBartenderMode ? 'btn-mode-active' : 'btn-mode-inactive']">
-              <component :is="isBartenderMode ? 'Unlock' : 'Lock'" :size="15" />
-              {{ isBartenderMode ? 'Mode Drinker' : 'Mode Bartender' }}
-            </button>
-            <template v-if="isBartenderMode">
-              <button @click="openNewCardModal()" class="btn-new-card">
-                <BookOpen :size="15" /> Nouvelle carte
+          <div class="header-right">
+            <div class="header-actions">
+              <button @click="isBartenderMode ? exitBartenderMode() : showPasswordModal = true" :class="['btn-mode', isBartenderMode ? 'btn-mode-active' : 'btn-mode-inactive']">
+                <Unlock v-if="isBartenderMode" :size="15" style="display:inline-block;width:15px;height:15px;flex-shrink:0" />
+                <Lock v-else :size="15" style="display:inline-block;width:15px;height:15px;flex-shrink:0" />
+                <span class="btn-mode-label">{{ isBartenderMode ? 'Mode Drinker' : 'Mode Bartender' }}</span>
               </button>
-              <button @click="openNewModal" class="btn-new-cocktail">
-                <Plus :size="15" /> Nouveau cocktail
-              </button>
-            </template>
+              <template v-if="isBartenderMode">
+                <button @click="openNewCardModal()" class="btn-new-card">
+                  <BookOpen :size="15" /><span class="btn-label-hide"> Nouvelle carte</span>
+                </button>
+                <button @click="openNewModal" class="btn-new-cocktail">
+                  <Plus :size="15" /><span class="btn-label-hide"> Nouveau cocktail</span>
+                </button>
+              </template>
+            </div>
+            <ThemeToggle />
+          </div>
+        </div>
+
+        <!-- Ligne 2 : Recherche sur mobile -->
+        <div class="header-search-row">
+          <div class="search-container">
+            <Search class="search-icon" :size="16" />
+            <input
+              type="text"
+              placeholder="Rechercher..."
+              v-model="searchTerm"
+              class="search-input"
+            />
           </div>
         </div>
       </div>
@@ -57,6 +72,9 @@
         </button>
         <InventoryManager v-if="showInventory" />
       </div>
+
+      <!-- Filtres + Cartes côte à côte -->
+      <div class="side-by-side">
 
       <!-- Filtres -->
       <div class="section-card">
@@ -156,14 +174,14 @@
                 <span class="menu-card-count">{{ card.cocktail_ids?.length || 0 }} cocktail{{ (card.cocktail_ids?.length || 0) > 1 ? 's' : '' }}</span>
               </div>
               <div class="menu-card-actions">
-                <button @click="viewingCard = card" class="btn-icon text-gray-400 hover:text-amber-500" title="Visualiser">
+                <button @click="viewingCard = card" class="btn-icon btn-icon--view" title="Visualiser">
                   <Eye :size="16" />
                 </button>
                 <template v-if="isBartenderMode">
-                  <button @click="openEditCardModal(card)" class="btn-icon text-gray-400 hover:text-blue-500" title="Modifier">
+                  <button @click="openEditCardModal(card)" class="btn-icon btn-icon--edit" title="Modifier">
                     <Pencil :size="16" />
                   </button>
-                  <button @click="handleDeleteCard(card.id)" class="btn-icon text-gray-400 hover:text-red-500" title="Supprimer">
+                  <button @click="handleDeleteCard(card.id)" class="btn-icon btn-icon--delete" title="Supprimer">
                     <Trash2 :size="16" />
                   </button>
                 </template>
@@ -173,20 +191,22 @@
         </div>
       </div>
 
+      </div><!-- fin side-by-side -->
+
       <!-- Liste cocktails -->
       <div>
         <h2 class="cocktails-header">
           {{ filteredCocktails.length }} cocktail{{ filteredCocktails.length > 1 ? 's' : '' }} trouvé{{ filteredCocktails.length > 1 ? 's' : '' }}
-          <span v-if="showOnlyMakeable" class="text-green-600 text-sm font-normal ml-2">
+          <span v-if="showOnlyMakeable" class="cocktails-header-makeable">
             ({{ makeableCount }} réalisables)
           </span>
         </h2>
 
-        <div v-if="cocktailsLoading" class="text-center py-8 text-gray-400">
+        <div v-if="cocktailsLoading" class="loading-state">
           Chargement des cocktails...
         </div>
 
-        <div v-else-if="filteredCocktails.length === 0" class="text-center py-8 text-gray-400">
+        <div v-else-if="filteredCocktails.length === 0" class="empty-state">
           Aucun cocktail trouvé avec ces critères
         </div>
 
@@ -207,8 +227,8 @@
     <!-- Modal mot de passe bartender -->
     <PasswordModal
       v-if="showPasswordModal"
-      :onClose="() => showPasswordModal = false"
-      :onSuccess="enterBartenderMode"
+      @close="showPasswordModal = false"
+      @success="enterBartenderMode"
     />
 
     <!-- Vue full screen d'une carte -->
@@ -253,6 +273,7 @@ import CocktailModal from '@/Components/Modals/CocktailModal.vue'
 import MenuCardModal from '@/Components/Modals/MenuCardModal.vue'
 import MenuCardView from '@/Components/MenuCardView.vue'
 import PasswordModal from '@/Components/Modals/PasswordModal.vue'
+import ThemeToggle from '@/Components/ThemeToggle.vue'
 
 const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, updateCocktail, deleteCocktail } = useCocktails()
 const { barInventory, ingredients, fetchIngredients } = useInventory()
@@ -479,187 +500,3 @@ onMounted(async () => {
   await Promise.all([fetchCocktails(), fetchIngredients(), fetchMenuCards()])
 })
 </script>
-
-<style scoped>
-.spirit-families {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.spirit-family-block {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.chip-family {
-  font-weight: 700;
-}
-
-.chip-member {
-  font-size: 0.75rem;
-  padding: 0.2rem 0.6rem;
-  opacity: 0.85;
-  border-style: dashed;
-}
-
-.chip-member.active {
-  opacity: 1;
-  border-style: solid;
-}
-
-.spirit-members {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  padding-left: 0.25rem;
-  border-left: 2px solid #e5e7eb;
-  margin-left: 0.25rem;
-}
-
-.btn-mode {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-mode-inactive {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-.btn-mode-inactive:hover {
-  background: #e5e7eb;
-  color: #374151;
-}
-.btn-mode-active {
-  background: #7c3aed;
-  color: white;
-}
-.btn-mode-active:hover {
-  background: #6d28d9;
-}
-
-.btn-new-card {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  background: white;
-  color: #374151;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-new-card:hover {
-  border-color: #f59e0b;
-  color: #f59e0b;
-}
-
-.cards-content {
-  padding: 1rem;
-}
-
-.cards-empty {
-  text-align: center;
-  color: #9ca3af;
-  font-size: 0.875rem;
-  padding: 1.5rem 0;
-}
-
-.cards-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.menu-card-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.65rem 0.85rem;
-  background: #fafafa;
-  border: 1px solid #f3f4f6;
-  border-radius: 0.6rem;
-  transition: border-color 0.15s;
-}
-
-.menu-card-item:hover {
-  border-color: #fde68a;
-  background: #fffbeb;
-}
-
-.menu-card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.menu-card-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.menu-card-count {
-  font-size: 0.75rem;
-  color: #9ca3af;
-}
-
-.menu-card-actions {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.count-badge {
-  margin-left: 0.5rem;
-  padding: 0.1rem 0.6rem;
-  background: #3b82f6;
-  color: white;
-  border-radius: 9999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.header-logo {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-  /* L'image est noire sur fond transparent — on l'inverse si le header est blanc */
-  filter: invert(0);
-}
-
-.expand-actions-btn svg {
-  transition: transform 0.25s ease;
-}
-.expand-actions-btn svg.rotated {
-  transform: rotate(180deg);
-}
-.btn-new-cocktail {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  background: #f59e0b;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-new-cocktail:hover {
-  background: #d97706;
-}
-</style>

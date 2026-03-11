@@ -32,7 +32,7 @@
       </div>
     </div>
 
-    <div v-if="loading" class="text-center py-6 text-gray-400">
+    <div v-if="loading" class="loading-state">
       Chargement...
     </div>
 
@@ -163,7 +163,3 @@ const searchResults = computed(() => {
   )
 })
 </script>
-
-<style scoped>
-/* Styles centralisés dans styles.css */
-</style>
