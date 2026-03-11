@@ -1,0 +1,50 @@
+name: Run Scraper
+
+on:
+  workflow_dispatch:
+    inputs:
+      seasons:
+        description: 'Saisons à scraper (ex: autumn winter spring summer)'
+        required: false
+        default: 'autumn winter spring summer'
+      no_cache:
+        description: 'Désactiver le cache YouTube'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Run scraper
+        env:
+          YOUTUBE_API_KEY:      ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_CHANNEL_ID:   ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY:         ${{ secrets.SUPABASE_KEY }}
+        run: |
+          ARGS="--seasons ${{ github.event.inputs.seasons }}"
+          if [ "${{ github.event.inputs.no_cache }}" = "true" ]; then
+            ARGS="$ARGS --no-cache"
+          fi
+          python -m scraper.main $ARGS
+
+      - name: Upload JSON output
+        uses: actions/upload-artifact@v4
+        with:
+          name: cocktails-json
+          path: cocktails_*.json
+          retention-days: 30

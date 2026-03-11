@@ -1,19 +1,20 @@
 """
 Import cocktails JSON -> Supabase
-Usage: python import_to_supabase.py
+Usage: python -m scraper.supabase.recipes <fichier.json>
+       ou directement: python scraper/supabase/recipes.py
 """
 
 import json
-import os
+import sys
 from supabase import create_client
+from scraper.config import SUPABASE_URL, SUPABASE_KEY
 
-# ─── Config ───────────────────────────────────────────────
-SUPABASE_URL = "https://weeilvuklsxiqtljnyok.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlZWlsdnVrbHN4aXF0bGpueW9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3OTI0NjcsImV4cCI6MjA4MzM2ODQ2N30.4pd4S_RdcEcyE-D0Mb4Cfr6zm0tTbTXYJOMj6Xzymv4"
-JSON_FILE    = "../cocktails_autumn_winter_spring_summer_10-03-2026.json"
-# ──────────────────────────────────────────────────────────
 
 def import_cocktails(filepath: str):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("❌ SUPABASE_URL et SUPABASE_KEY doivent être définis dans le fichier .env")
+        sys.exit(1)
+
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
     with open(filepath, "r", encoding="utf-8") as f:
@@ -61,4 +62,7 @@ def import_cocktails(filepath: str):
 
 
 if __name__ == "__main__":
-    import_cocktails(JSON_FILE)
+    if len(sys.argv) < 2:
+        print("Usage: python scraper/supabase/recipes.py <fichier.json>")
+        sys.exit(1)
+    import_cocktails(sys.argv[1])

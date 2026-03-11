@@ -1,21 +1,18 @@
 """
 Génère et importe la table `ingredients` depuis les `Type` présents dans les recettes.
-Usage: python generate_ingredients.py
+Usage: python scraper/supabase/ingredients.py
 
 Pour chaque Type unique trouvé dans les recettes, on crée une entrée dans ingredients :
-- type  : clé de matching (ex: "bourbon")
-- name  : nom affiché (ex: "Bourbon")
-- category : groupe (ex: "spirits")
+- type      : clé de matching (ex: "bourbon")
+- name      : nom affiché (ex: "Bourbon")
+- category  : groupe (ex: "spirits")
 - available : false par défaut
 """
 
-# !pip install supabase
+import sys
+from collections import Counter
 from supabase import create_client
-
-# ─── Config ───────────────────────────────────────────────
-SUPABASE_URL = "https://weeilvuklsxiqtljnyok.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlZWlsdnVrbHN4aXF0bGpueW9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3OTI0NjcsImV4cCI6MjA4MzM2ODQ2N30.4pd4S_RdcEcyE-D0Mb4Cfr6zm0tTbTXYJOMj6Xzymv4"
-# ──────────────────────────────────────────────────────────
+from scraper.config import SUPABASE_URL, SUPABASE_KEY
 
 # Mapping type -> (nom affiché, catégorie)
 # Aligné sur INGREDIENT_RULES de detectors.py
@@ -50,27 +47,20 @@ TYPE_METADATA = {
     "aquavit":            ("Aquavit",               "spirits"),
 
     # ── Liqueurs ──────────────────────────────────────────
-    # Amers italiens
     "aperol":             ("Aperol",                "licors"),
     "campari":            ("Campari",               "licors"),
     "cynar":              ("Cynar",                 "licors"),
     "fernet_branca":      ("Fernet Branca",         "licors"),
     "amaro":              ("Amaro",                 "licors"),
-
-    # Herbes / plantes
     "chartreuse_green":   ("Chartreuse Verte",      "licors"),
     "chartreuse_yellow":  ("Chartreuse Jaune",      "licors"),
     "benedictine":        ("Bénédictine",           "licors"),
     "galliano":           ("Galliano",              "licors"),
     "suze":               ("Suze",                  "licors"),
     "allspice":           ("AllSpice Dram",         "licors"),
-
-    # Agrumes
     "triple_sec":         ("Triple Sec",            "licors"),
     "curacao":            ("Curaçao",               "licors"),
     "limoncello":         ("Limoncello",            "licors"),
-
-    # Fruits
     "cherry_heering":     ("Cherry Heering",        "licors"),
     "maraschino":         ("Maraschino",            "licors"),
     "apricot_licor":      ("Liqueur Abricot",       "licors"),
@@ -82,16 +72,12 @@ TYPE_METADATA = {
     "midori":             ("Midori",                "licors"),
     "sloe_gin":           ("Sloe Gin",              "licors"),
     "elderflower_liqueur":("Liqueur de Sureau",     "licors"),
-
-    # Noix / café / crème
     "amaretto":           ("Amaretto",              "licors"),
     "frangelico":         ("Frangelico",            "licors"),
     "coffee_licor":       ("Liqueur de Café",       "licors"),
     "baileys":            ("Baileys",               "licors"),
     "licor_43":           ("Liqueur 43",            "licors"),
     "walnut_licor":       ("Liqueur Noix",          "licors"),
-
-    # Divers
     "sambuca":            ("Sambuca",               "licors"),
     "drambuie":           ("Drambuie",              "licors"),
     "falernum":           ("Falernum",              "licors"),
@@ -189,9 +175,12 @@ TYPE_METADATA = {
 
 
 def generate_ingredients():
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("❌ SUPABASE_URL et SUPABASE_KEY doivent être définis dans le fichier .env")
+        sys.exit(1)
+
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-    # Construire les rows à insérer
     rows = []
     for ing_type in sorted(TYPE_METADATA):
         meta = TYPE_METADATA.get(ing_type)
@@ -209,9 +198,7 @@ def generate_ingredients():
     except Exception as e:
         print(f"❌ Erreur : {e}")
 
-    # Résumé par catégorie
     print("\nRésumé par catégorie :")
-    from collections import Counter
     counter = Counter(r["category"] for r in rows)
     for cat, count in sorted(counter.items()):
         print(f"  {cat:12s} : {count} ingrédients")
