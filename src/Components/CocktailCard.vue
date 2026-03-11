@@ -1,62 +1,50 @@
 <template>
-  <div :class="['cocktail-card-compact', !available ? 'opacity-60' : '', isHidden ? 'ring-2 ring-red-300' : '']">
-    
-    <!-- Header avec nom et actions -->
-    <div class="card-header">
-      <div class="flex-1">
-        <h3 :class="['cocktail-title', available ? 'text-gray-800' : 'text-gray-400']">
-          {{ cocktail.Name }}
+  <div :class="['cocktail-card-compact', !makeable ? 'opacity-60' : '']">
+
+    <!-- Header -->
+    <div class="card-header flex items-start w-full">
+      <div class="min-w-0 flex-1">
+        <h3 :class="['cocktail-title', makeable ? 'text-gray-800' : 'text-gray-400']">
+          {{ cocktail.name }}
         </h3>
-        <p class="cocktail-subtitle">{{ cocktail.Profile?.join(', ') || getProfileText() }}</p>
+        <div class="flex items-center justify-between w-full pr-2">
+          <p class="cocktail-subtitle">
+            {{ cocktail.base_spirit }} · {{ seasonLabel }}
+          </p>
+          <span class="cocktail-subtitle shrink-0">
+            {{ cocktail.abv }}°
+          </span>
+        </div>
       </div>
-      
-      <!-- Actions principales à droite -->
-      <div class="header-actions">
-        <button
-          v-if="currentProfile && appMode === 'drinker'"
-          @click="() => onToggleFavorite(cocktail.id)"
-          :class="['btn-icon', isFavorite ? 'text-yellow-500' : 'text-gray-400']"
-          title="Ajouter aux favoris"
-        >
-          <Star :size="20" :fill="isFavorite ? 'currentColor' : 'none'" />
-        </button>
-        
 
-        <!--TODO: condition a completer  && available -->
-        <button
-          v-if="appMode === 'drinker' && currentProfile"
-          @click="() => onOrder(cocktail)"
-          class="btn-order-compact"
-          title="Commander"
-        >
-          Commander
-        </button>
-
-        <button
-          v-if="appMode === 'bartender'"
-          @click="() => onToggleHidden(cocktail.id)"
-          :class="['btn-toggle', isHidden ? 'btn-hidden' : 'btn-show']"
-        >
-          {{ isHidden ? 'Afficher' : 'Masquer' }}
-        </button>
+      <!-- Actions -->
+      <div class="header-actions shrink-0">
+        <template v-if="isBartenderMode">
+          <button @click="$emit('edit', cocktail)" class="btn-icon text-gray-400 hover:text-blue-500">
+            <Pencil :size="18" />
+          </button>
+          <button @click="$emit('delete', cocktail.id)" class="btn-icon text-gray-400 hover:text-red-500">
+            <Trash2 :size="18" />
+          </button>
+        </template>
       </div>
     </div>
 
-    <!-- Recette visible directement -->
+    <!-- Recette -->
     <div class="recipe-compact">
-      <div 
-        v-for="(ing, idx) in cocktail.Recipe" 
-        :key="idx" 
+      <div
+        v-for="(ing, idx) in cocktail.recipe"
+        :key="idx"
         class="recipe-line"
       >
         <div class="ingredient-info">
-          <span v-if="ing.Type !== 'garnish'" :class="[
-            'status-dot',
-            isIngredientAvailable(ing) ? 'status-available' : 'status-missing'
-          ]"></span>
+          <span
+            v-if="ing.Type !== 'garnish'"
+            :class="['status-dot', isAvailable(ing) ? 'status-available' : 'status-missing']"
+          ></span>
           <span :class="[
             'ingredient-name',
-            ing.Type !== 'garnish' && !isIngredientAvailable(ing) ? 'text-red-600' : 'text-gray-700'
+            ing.Type !== 'garnish' && !isAvailable(ing) ? 'text-red-600' : 'text-gray-700'
           ]">
             {{ ing.Ingredient }}
           </span>
@@ -66,76 +54,68 @@
         </span>
       </div>
     </div>
+
+    <!-- Badge réalisable -->
+    <div class="card-footer">
+      <span v-if="makeable" class="badge-makeable">✓ Réalisable</span>
+      <span v-else class="badge-missing">{{ missingCount }} ingrédient{{ missingCount > 1 ? 's' : '' }} manquant{{ missingCount > 1 ? 's' : '' }}</span>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { Star, ChevronDown, ChevronUp } from 'lucide-vue-next';
+import { computed } from 'vue'
+import { Pencil, Trash2 } from 'lucide-vue-next'
+import { useInventory } from '@/composables/useInventory'
 
 const props = defineProps({
-  cocktail: Object,
-  appMode: String,
-  currentProfile: [String, Number],
-  barInventory: Object,
-  favorites: Object,
-  userRatings: Object,
-  userNotes: Object,
-  isHidden: Boolean,
-  onToggleFavorite: Function,
-  onSetRating: Function,
-  onSaveNote: Function,
-  onOrder: Function,
-  onToggleHidden: Function
-});
+  cocktail:        Object,
+  isBartenderMode: { type: Boolean, default: false },
+})
 
-const showActions = ref(false);
-const isFavorite = computed(() => props.favorites.has(props.cocktail.id));
+defineEmits(['edit', 'delete'])
 
-// const available = computed(() => 
-//   Array.isArray(props.cocktail.Recipe) && 
-//   props.cocktail.Recipe.every(ing => 
-//     ing.Type === 'garnish' || 
-//     (props.barInventory || new Set()).has(ing.Type)
-//   )
-// );
+const { barInventory } = useInventory()
 
-
-// Vérifier si un ingrédient est disponible dans l'inventaire
-function isIngredientAvailable(ingredient) {
-  // Les garnitures sont toujours disponibles
-  if (ingredient.Type === 'garnish') return true;
-  
-  // Vérifier si la catégorie (Type) est dans l'inventaire
-  // Ex: si "gin" est coché, tous les gins sont disponibles
-  return props.barInventory.has(ingredient.Type);
+function isAvailable(ing) {
+  if (ing.Type === 'garnish') return true
+  return barInventory.value.has(ing.Type)
 }
 
-const available = computed(() => 
-  Array.isArray(props.cocktail.Recipe) && 
-  props.cocktail.Recipe.every(ing => 
-    ing.Type === 'garnish' || 
-    (props.barInventory || new Set()).has(ing.Type)
-  )
-);
+const makeable = computed(() => {
+  const recipe = props.cocktail.recipe || []
+  return recipe.length > 0 && recipe.every(ing => isAvailable(ing))
+})
 
-const missingIngs = computed(() => 
-  Array.isArray(props.cocktail.Recipe) 
-    ? props.cocktail.Recipe.filter(ing => 
-        ing.Type !== 'garnish' && 
-        !(props.barInventory || new Set()).has(ing.Ingredient)
-      ) 
-    : []
-);
+const missingCount = computed(() =>
+  (props.cocktail.recipe || []).filter(ing =>
+    ing.Type !== 'garnish' && !barInventory.value.has(ing.Type)
+  ).length
+)
 
-function getProfileText() {
-  const profiles = props.cocktail.Profile?.filter(p => p) || [];
-  return profiles.join(', ') || props.cocktail.spiritType + ' based';
-}
-
-
+const seasonLabel = computed(() => {
+  const icons = { spring: '🌸', summer: '☀️', fall: '🍂', winter: '❄️' }
+  const s = props.cocktail.season || []
+  return Array.isArray(s)
+    ? s.map(k => icons[k] || k).join(' ')
+    : (icons[s] || s)
+})
 </script>
 
 <style scoped>
-/* Tous les styles sont centralisés dans styles.css */
+.badge-makeable {
+  font-size: 0.75rem;
+  color: #16a34a;
+  font-weight: 500;
+}
+.badge-missing {
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+.card-footer {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f3f4f6;
+}
 </style>
