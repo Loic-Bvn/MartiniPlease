@@ -1,20 +1,18 @@
-import ThemeToggle from './Components/ThemeToggle.vue'
-
 <template>
   <div class="min-h-screen menu-app">
 
     <!-- Header -->
     <div class="header">
       <div class="header-container">
+        <!-- Ligne 1 : Brand + Recherche + Actions + ThemeToggle -->
         <div class="header-top">
-          <!-- Brand -->
           <div class="header-brand">
             <img src="/logo.png" alt="Martini Please" class="header-logo" />
             <h1 class="header-title">Martini Please</h1>
           </div>
 
-          <!-- Recherche inline -->
-          <div class="search-container">
+          <!-- Recherche (visible sur grand écran) -->
+          <div class="search-container header-search-inline">
             <Search class="search-icon" :size="16" />
             <input
               type="text"
@@ -24,24 +22,37 @@ import ThemeToggle from './Components/ThemeToggle.vue'
             />
           </div>
 
-          <!-- Boutons header -->
-          <div class="header-actions">
-            <!-- Mode toggle -->
-            <button @click="isBartenderMode ? exitBartenderMode() : showPasswordModal = true" :class="['btn-mode', isBartenderMode ? 'btn-mode-active' : 'btn-mode-inactive']">
-              <component :is="isBartenderMode ? 'Unlock' : 'Lock'" :size="15" />
-              {{ isBartenderMode ? 'Mode Drinker' : 'Mode Bartender' }}
-            </button>
-            <template v-if="isBartenderMode">
-              <button @click="openNewCardModal()" class="btn-new-card">
-                <BookOpen :size="15" /> Nouvelle carte
+          <div class="header-right">
+            <div class="header-actions">
+              <button @click="isBartenderMode ? exitBartenderMode() : showPasswordModal = true" :class="['btn-mode', isBartenderMode ? 'btn-mode-active' : 'btn-mode-inactive']">
+                <Unlock v-if="isBartenderMode" :size="15" style="display:inline-block;width:15px;height:15px;flex-shrink:0" />
+                <Lock v-else :size="15" style="display:inline-block;width:15px;height:15px;flex-shrink:0" />
+                <span class="btn-mode-label">{{ isBartenderMode ? 'Mode Drinker' : 'Mode Bartender' }}</span>
               </button>
-              <button @click="openNewModal" class="btn-new-cocktail">
-                <Plus :size="15" /> Nouveau cocktail
-              </button>
-            </template>
+              <template v-if="isBartenderMode">
+                <button @click="openNewCardModal()" class="btn-new-card">
+                  <BookOpen :size="15" /><span class="btn-label-hide"> Nouvelle carte</span>
+                </button>
+                <button @click="openNewModal" class="btn-new-cocktail">
+                  <Plus :size="15" /><span class="btn-label-hide"> Nouveau cocktail</span>
+                </button>
+              </template>
+            </div>
+            <ThemeToggle />
           </div>
+        </div>
 
-          <ThemeToggle />
+        <!-- Ligne 2 : Recherche sur mobile -->
+        <div class="header-search-row">
+          <div class="search-container">
+            <Search class="search-icon" :size="16" />
+            <input
+              type="text"
+              placeholder="Rechercher..."
+              v-model="searchTerm"
+              class="search-input"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -61,6 +72,9 @@ import ThemeToggle from './Components/ThemeToggle.vue'
         </button>
         <InventoryManager v-if="showInventory" />
       </div>
+
+      <!-- Filtres + Cartes côte à côte -->
+      <div class="side-by-side">
 
       <!-- Filtres -->
       <div class="section-card">
@@ -177,6 +191,8 @@ import ThemeToggle from './Components/ThemeToggle.vue'
         </div>
       </div>
 
+      </div><!-- fin side-by-side -->
+
       <!-- Liste cocktails -->
       <div>
         <h2 class="cocktails-header">
@@ -257,6 +273,7 @@ import CocktailModal from '@/Components/Modals/CocktailModal.vue'
 import MenuCardModal from '@/Components/Modals/MenuCardModal.vue'
 import MenuCardView from '@/Components/MenuCardView.vue'
 import PasswordModal from '@/Components/Modals/PasswordModal.vue'
+import ThemeToggle from '@/Components/ThemeToggle.vue'
 
 const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, updateCocktail, deleteCocktail } = useCocktails()
 const { barInventory, ingredients, fetchIngredients } = useInventory()
