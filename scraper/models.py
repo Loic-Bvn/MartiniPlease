@@ -13,11 +13,13 @@ class Ingredient:
     oz: Optional[float] = None
     ml: Optional[float] = None
     dashes: Optional[int] = None
+    is_garnish: bool = False
 
     def to_dict(self) -> Dict:
         result = {
             'Ingredient': self.ingredient,
-            'Type': self.type
+            'Type': self.type,
+            'IsGarnish': self.is_garnish,
         }
         if self.oz is not None:
             result['Oz'] = self.oz

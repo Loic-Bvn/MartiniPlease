@@ -10,6 +10,9 @@
         <div class="cocktail-meta-row">
           <p class="cocktail-subtitle">
             {{ cocktail.abv > 0 ? baseSpiritLabel : 'Mocktail' }}
+          <span v-if="cocktail.profile?.length" class="profile-tags">
+            - {{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}
+          </span>
           </p>
           <span class="cocktail-subtitle" style="margin-left: auto;">
             {{ cocktail.abv }}°
@@ -40,15 +43,19 @@
         <div class="ingredient-info">
           <span :class="['recipe-bullet', ing.Type === 'garnish' ? 'recipe-bullet--garnish' : isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
           </span>
-          <span :class="[
-            'ingredient-name',
-            ing.Type !== 'garnish' && !isAvailable(ing) ? 'ingredient-name--missing' : ''
-          ]">
-            {{ ing.Ingredient ? getTypeLabel(ing.Type, locale) : ing.Ingredient }}
+            <span :class="[
+              'ingredient-name',
+              ing.IsGarnish ? 'ingredient-name--garnish' : '',
+              !ing.IsGarnish && !isAvailable(ing) ? 'ingredient-name--missing' : ''
+            ]">
+            {{ (ing.Type === 'garnish' && getTypeLabel(ing.Type, locale) === ing.Type)
+            ? ing.Ingredient
+            : getTypeLabel(ing.Type, locale) }}
           </span>
         </div>
         <span class="ingredient-quantity">
           <span v-if="ing.Oz">{{ ing.Oz }}oz</span>
+          <span v-else-if="ing.Dashes">{{ ing.Dashes }} dash{{ ing.Dashes > 1 ? 'es' : '' }}</span>
         </span>
       </div>
     </div>
@@ -71,7 +78,7 @@
 import { computed } from 'vue'
 import { Pencil, Trash2 } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
-import { getTypeLabel } from '../constants/typeLabels.js'
+import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
 
 const props = defineProps({
   cocktail:        Object,

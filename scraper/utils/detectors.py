@@ -25,6 +25,11 @@ INGREDIENT_ABV: dict[str, float] = {
     for ing_type, meta in TYPE_METADATA.items()
 }
 
+GARNISH_TYPES: set[str] = {
+    ing_type
+    for ing_type, meta in TYPE_METADATA.items()
+    if meta[1] == 'garnish'
+}
 
 def detect_ingredient_type(ingredient: str) -> str:
     """Détecte le type d'un ingrédient"""
@@ -192,3 +197,166 @@ def detect_difficulty(cocktail_dict: Dict) -> Optional[str]:
         return 'hard'
     else:
         return 'expert'
+    
+def detect_profile(ingredients: List[Dict]) -> List[str]:
+    """
+    Détecte le profil gustatif d'un cocktail basé sur ses ingrédients.
+    Retourne une liste de tags parmi :
+    - Citrus, Sweet, Bitter, Sour, Smoky, Herbal, Spicy, Fruity,
+      Creamy, Boozy, Floral, Tropical, Nutty, Refreshing, Rich, Dry
+    """
+    types = {ing.get('Type', '') for ing in ingredients}
+    profile = set()
+
+    # ── Citrus ────────────────────────────────────
+    citrus_juices = {'lemon_juice', 'lime_juice', 'grapefruit_juice', 'orange_juice'}
+    if types & citrus_juices:
+        profile.add('Citrus')
+        profile.add('Sour')
+
+    # ── Sweet ─────────────────────────────────────
+    sweet_types = {
+        'simple_syrup', 'rich_simple_syrup', 'semi_simple_syrup',
+        'honey_syrup', 'agave_syrup', 'demerara_syrup', 'maple_syrup',
+        'grenadine', 'orgeat', 'cinnamon_syrup', 'vanilla_syrup',
+        'coconut_syrup', 'passion_fruit_syrup', 'raspberry_syrup',
+        'guava_syrup', 'ginger_syrup', 'hibiscus_syrup', 'redcurrant_syrup',
+        'triple_sec', 'curacao', 'limoncello', 'italicus',
+        'cassis_licor', 'mure_licor', 'elderflower_licor', 'violet_licor',
+        'apricot_licor', 'banana_licor', 'mango_licor', 'peach_licor',
+        'midori', 'pimms', 'pear_licor', 'amaretto', 'frangelico',
+        'baileys', 'licor_43', 'chocolate_licor', 'coffee_licor',
+        'cherry_heering', 'maraschino', 'sloe_gin',
+        'cola', 'pineapple_juice', 'cranberry_juice', 'apple_juice',
+        'passion_juice', 'coconut_cream',
+    }
+    if types & sweet_types:
+        profile.add('Sweet')
+
+    # ── Bitter ────────────────────────────────────
+    bitter_types = {
+        'campari', 'aperol', 'cynar', 'fernet_branca', 'amaro',
+        'suze', 'malort', 'angostura_bitters', 'peychaud_bitters',
+        'orange_bitters', 'chocolate_bitters', 'celery_bitters',
+        'walnut_bitters', 'bitters',
+    }
+    if types & bitter_types:
+        profile.add('Bitter')
+
+    # ── Smoky ─────────────────────────────────────
+    smoky_types = {'mezcal', 'peated_whisky', 'scotch'}
+    if types & smoky_types:
+        profile.add('Smoky')
+
+    # ── Herbal ────────────────────────────────────
+    herbal_types = {
+        'chartreuse_green', 'chartreuse_yellow', 'benedictine',
+        'galliano', 'allspice', 'falernum', 'swedish_punsch',
+        'mint_licor', 'sambuca', 'absinthe', 'pastis', 'aquavit', 'genever',
+        'suze',
+    }
+    if types & herbal_types:
+        profile.add('Herbal')
+    # Menthe fraîche en garnish
+    if any('mint' in ing.get('Ingredient', '').lower() for ing in ingredients):
+        profile.add('Herbal')
+        profile.add('Refreshing')
+
+    # ── Spicy ─────────────────────────────────────
+    spicy_types = {'ginger_syrup', 'ginger_soda', 'hot_sauce'}
+    if types & spicy_types:
+        profile.add('Spicy')
+    if any('ginger' in ing.get('Ingredient', '').lower() for ing in ingredients):
+        profile.add('Spicy')
+    if any('chili' in ing.get('Ingredient', '').lower() or
+           'jalapeño' in ing.get('Ingredient', '').lower() or
+           'pepper' in ing.get('Ingredient', '').lower()
+           for ing in ingredients):
+        profile.add('Spicy')
+
+    # ── Fruity ────────────────────────────────────
+    fruity_types = {
+        'cherry_heering', 'maraschino', 'cassis_licor', 'mure_licor',
+        'sloe_gin', 'apricot_licor', 'banana_licor', 'mango_licor',
+        'peach_licor', 'midori', 'pear_licor', 'elderflower_licor',
+        'pineapple_juice', 'cranberry_juice', 'apple_juice',
+        'passion_juice', 'orange_juice', 'grenadine',
+        'passion_fruit_syrup', 'raspberry_syrup', 'guava_syrup',
+        'hibiscus_syrup', 'redcurrant_syrup',
+    }
+    if types & fruity_types:
+        profile.add('Fruity')
+
+    # ── Tropical ──────────────────────────────────
+    tropical_types = {
+        'rum', 'rum_agricol', 'rum_cuban', 'rum_jamaican', 'rum_overproof',
+        'cachaca', 'coconut_cream', 'coconut_syrup', 'pineapple_juice',
+        'passion_juice', 'guava_syrup', 'mango_licor', 'orgeat', 'falernum',
+    }
+    if types & tropical_types:
+        profile.add('Tropical')
+
+    # ── Creamy ────────────────────────────────────
+    creamy_types = {'heavy_cream', 'milk', 'baileys', 'coconut_cream', 'aquafaba', 'egg', 'butter'}
+    if types & creamy_types:
+        profile.add('Creamy')
+        profile.add('Rich')
+
+    # ── Nutty ─────────────────────────────────────
+    nutty_types = {'amaretto', 'frangelico', 'walnut_licor', 'pit_licor', 'orgeat'}
+    if types & nutty_types:
+        profile.add('Nutty')
+
+    # ── Floral ────────────────────────────────────
+    floral_types = {'elderflower_licor', 'violet_licor', 'italicus', 'lillet', 'cocchi_americano'}
+    if types & floral_types:
+        profile.add('Floral')
+    if any('rose' in ing.get('Ingredient', '').lower() or
+           'lavender' in ing.get('Ingredient', '').lower()
+           for ing in ingredients):
+        profile.add('Floral')
+
+    # ── Rich ──────────────────────────────────────
+    rich_types = {
+        'cognac', 'brandy', 'calvados', 'bourbon', 'rye', 'sweet_vermouth',
+        'porto', 'sherry', 'drambuie', 'chocolate_licor', 'coffee_licor',
+        'walnut_licor', 'maple_syrup', 'demerara_syrup', 'honey_syrup',
+        'rich_simple_syrup', 'cold_brew', 'coffee', 'stout_beer',
+    }
+    if types & rich_types:
+        profile.add('Rich')
+
+    # ── Dry ───────────────────────────────────────
+    dry_types = {
+        'dry_vermouth', 'blanc_vermouth', 'sherry', 'sake',
+        'sparkling_wine', 'dry_white_wine', 'ipa_beer', 'tonic_water',
+    }
+    if types & dry_types:
+        profile.add('Dry')
+
+    # ── Boozy ─────────────────────────────────────
+    # Cocktail fort : peu d'ingrédients non-alcoolisés, ABV estimé élevé
+    non_alcoholic = {'juices', 'syrups', 'mixers', 'garnish', 'others'}
+    alcoholic_ings = [
+        ing for ing in ingredients
+        if TYPE_METADATA.get(ing.get('Type', ''), ('', '', 0.0, None))[2] >= 15.0
+    ]
+    if len(alcoholic_ings) >= 2 and len(ingredients) <= 5:
+        profile.add('Boozy')
+
+    # ── Refreshing ────────────────────────────────
+    refreshing_types = {'club_soda', 'tonic_water', 'ginger_soda', 'cucumber'}
+    if types & refreshing_types:
+        profile.add('Refreshing')
+    if any('cucumber' in ing.get('Ingredient', '').lower() for ing in ingredients):
+        profile.add('Refreshing')
+
+    # ── Priorité et limite à 2 ────────────────────
+    PRIORITY = [
+        'Smoky', 'Bitter', 'Creamy', 'Tropical', 'Floral',
+        'Nutty', 'Spicy', 'Herbal', 'Fruity', 'Citrus',
+        'Sour', 'Dry', 'Boozy', 'Refreshing', 'Rich', 'Sweet',
+    ]
+
+    ordered = [p for p in PRIORITY if p in profile]
+    return ordered[:2]

@@ -182,7 +182,11 @@ TYPE_METADATA = {
     "dried_fruit":        ("Fruits séchés",         "garnish",     0.0,  None),
     "cinnamon_stick":     ("Bâton de cannelle",     "garnish",     0.0,  None),
     "grape":              ("Raisin",                "garnish",     0.0,  None),
-
+    "orange_wheel":       ("Rondelle Orange",       "garnish",     0.0,  None),
+    "lemon_wheel":        ("Rondelle Citron",       "garnish",     0.0,  None),
+    "pineapple":          ("Ananas",                "garnish",     0.0,  None),
+    "pineapple_fronds":   ("Feuilles Ananas",       "garnish",     0.0,  None),
+    
     # ── Autres ────────────────────────────────────
     "aquafaba":           ("Aquafaba",              "others",      0.0,  None),
     "egg":                ("Œuf entier",            "others",      0.0,  None),

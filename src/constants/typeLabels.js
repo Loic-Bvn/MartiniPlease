@@ -135,6 +135,10 @@ export const TYPE_LABELS = {
     orange_swath:         "Swath Orange",
     grapefruit_swath:     "Swath Pamplemousse",
     lime_wheel:           "Rondelle Lime",
+    lemon_wheel:          "Rondelle Citron",
+    orange_wheel:         "Rondelle Orange",
+    pineapple:            "Ananas",
+    pineapple_fronds:     "Feuilles Ananas",
     cocktail_cherry:      "Cerise",
     olive:                "Olive",
     nutmeg:               "Muscade",
@@ -297,6 +301,10 @@ export const TYPE_LABELS = {
     orange_swath:         "Orange Twist",
     grapefruit_swath:     "Grapefruit Twist",
     lime_wheel:           "Lime Wheel",
+    lemon_wheel:          "Lemon Wheel",
+    orange_wheel:         "Orange Wheel",
+    pineapple:            "Pineapple",
+    pineapple_fronds:     "Pineapple Fronds",
     cocktail_cherry:      "Cocktail Cherry",
     olive:                "Olive",
     nutmeg:               "Nutmeg",
@@ -434,4 +442,47 @@ export const FAMILY_LABELS = {
 
 export function getFamilyLabel(key, locale = 'fr') {
   return FAMILY_LABELS[locale]?.[key] ?? key
+}
+
+export const PROFILE_LABELS = {
+  fr: {
+    Smoky:      'Fumé',
+    Bitter:     'Amer',
+    Creamy:     'Crémeux',
+    Tropical:   'Tropical',
+    Floral:     'Floral',
+    Nutty:      'Noisetté',
+    Spicy:      'Épicé',
+    Herbal:     'Herbacé',
+    Fruity:     'Fruité',
+    Citrus:     'Agrume',
+    Sour:       'Acidulé',
+    Dry:        'Sec',
+    Boozy:      'Corsé',
+    Refreshing: 'Frais',
+    Rich:       'Riche',
+    Sweet:      'Sucré',
+  },
+  en: {
+    Smoky:      'Smoky',
+    Bitter:     'Bitter',
+    Creamy:     'Creamy',
+    Tropical:   'Tropical',
+    Floral:     'Floral',
+    Nutty:      'Nutty',
+    Spicy:      'Spicy',
+    Herbal:     'Herbal',
+    Fruity:     'Fruity',
+    Citrus:     'Citrus',
+    Sour:       'Sour',
+    Dry:        'Dry',
+    Boozy:      'Boozy',
+    Refreshing: 'Refreshing',
+    Rich:       'Rich',
+    Sweet:      'Sweet',
+  },
+}
+
+export function getProfileLabel(profile, locale = 'fr') {
+  return PROFILE_LABELS[locale]?.[profile] ?? profile
 }

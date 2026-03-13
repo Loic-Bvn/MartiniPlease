@@ -606,7 +606,6 @@ body {
 
 .recipe-bullet--available { color: var(--text-dim); }
 .recipe-bullet--missing   { color: var(--danger-text); }
-.recipe-bullet--garnish   { color: var(--text-dim); opacity: 0.4; }
 
 .ingredient-name {
   flex: 0 1 auto;
@@ -616,6 +615,16 @@ body {
   white-space: nowrap;
 }
 
+.ingredient-name--garnish {
+  color: var(--text-dim);
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.recipe-bullet--garnish {
+  color: var(--text-dim);
+  opacity: 0.25;
+}
 .ingredient-quantity {
   font-weight: 600;
   color: var(--gold);
@@ -1926,4 +1935,20 @@ body {
   font-weight: 400;
   font-size: 0.68rem;
   margin-left: 0.2rem;
+}
+
+.profile-tags {
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+.profile-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.profile-tag + .profile-tag::before {
+  content: ' · ';
 }
