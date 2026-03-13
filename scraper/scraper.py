@@ -13,7 +13,8 @@ from utils.youtube import YouTubeClient
 from utils.parsers import (
     parse_recipe_blocks,
     extract_quantities,
-    trim_ingredient_name
+    trim_ingredient_name,
+    clean_cocktail_name
 )
 from utils.detectors import (
     detect_ingredient_type,
@@ -22,6 +23,23 @@ from utils.detectors import (
     detect_method,
     detect_difficulty
 )
+
+
+def _recipe_fingerprint(ingredients: List[Ingredient]) -> frozenset:
+    """
+    Génère une empreinte unique d'une recette basée sur ses ingrédients et quantités.
+    Utilisée pour détecter les doublons exacts.
+    """
+    items = []
+    for ing in ingredients:
+        key = (
+            ing.ingredient.lower().strip(),
+            ing.oz,
+            ing.ml,
+            ing.dashes
+        )
+        items.append(key)
+    return frozenset(items)
 
 
 class CocktailScraper:
@@ -45,7 +63,10 @@ class CocktailScraper:
             return None
 
         name_line = block[0]
-        name = name_line[:name_line.find("RECIPE")].strip()
+        raw_name = name_line[:name_line.find("RECIPE")].strip()
+
+        # Nettoyer le nom du cocktail
+        name = clean_cocktail_name(raw_name)
 
         # Filtrer les noms invalides
         if not name or name.startswith('*') or name == "THE":
@@ -85,7 +106,7 @@ class CocktailScraper:
             'Method': method
         }
         
-        # Détecter la difficulté ✨
+        # Détecter la difficulté  
         difficulty = detect_difficulty(temp_cocktail)
 
         # Créer le cocktail
@@ -95,7 +116,7 @@ class CocktailScraper:
             base_spirit=base_spirit,
             category=category,
             glass=None,
-            method=method,  # ✨ Nouveau !
+            method=method,
             difficulty=difficulty,
             abv=abv,
             description=None,
@@ -130,7 +151,6 @@ class CocktailScraper:
         videos = [v for v in all_videos if v['season'] in seasons_filter]
         print(f"✅ Videos after season filter: {len(videos)}")
         
-        # ✨ DEBUG : Afficher la répartition par saison
         from collections import Counter
         season_counts = Counter(v['season'] for v in all_videos)
         print(f"📊 Videos per season (before filter):")
@@ -141,9 +161,13 @@ class CocktailScraper:
         # 3. Parser les recettes
         print(f"\n[2/4] 📝 Parsing recipes...")
         cocktails: List[Cocktail] = []
-        seen_names = set()
         
-        # ✨ DEBUG : Compteurs
+        # Déduplication par nom normalisé ET par empreinte de recette
+        seen_names: set = set()
+        seen_fingerprints: set = set()
+        duplicates_by_name = 0
+        duplicates_by_recipe = 0
+
         videos_with_recipes = 0
         total_blocks_found = 0
 
@@ -161,7 +185,6 @@ class CocktailScraper:
 
             blocks = parse_recipe_blocks(desc)
             
-            # ✨ DEBUG
             if blocks:
                 videos_with_recipes += 1
                 total_blocks_found += len(blocks)
@@ -173,15 +196,33 @@ class CocktailScraper:
                     video['video_id']
                 )
                 
-                if cocktail and cocktail.name not in seen_names:
-                    seen_names.add(cocktail.name)
-                    cocktails.append(cocktail)
+                if not cocktail:
+                    continue
 
-        # ✨ DEBUG : Afficher les statistiques de parsing
+                # Vérifier le doublon par nom
+                normalized_name = cocktail.name.lower().strip()
+                if normalized_name in seen_names:
+                    duplicates_by_name += 1
+                    continue
+
+                #   Vérifier le doublon par recette (même ingrédients + quantités)
+                fingerprint = _recipe_fingerprint(cocktail.recipe)
+                if fingerprint in seen_fingerprints:
+                    duplicates_by_recipe += 1
+                    print(f"  ⚠️  Duplicate recipe (different name): '{cocktail.name}'")
+                    continue
+
+                seen_names.add(normalized_name)
+                seen_fingerprints.add(fingerprint)
+                cocktails.append(cocktail)
+
+        # Stats de parsing
         print(f"\n📊 Parsing statistics:")
         print(f"  - Videos processed: {len(videos)}")
         print(f"  - Videos with recipes: {videos_with_recipes}")
         print(f"  - Total recipe blocks found: {total_blocks_found}")
+        print(f"  - Duplicates removed (same name): {duplicates_by_name}")
+        print(f"  - Duplicates removed (same recipe): {duplicates_by_recipe}")
         print(f"  - Unique cocktails extracted: {len(cocktails)}")
 
         # 4. Statistiques

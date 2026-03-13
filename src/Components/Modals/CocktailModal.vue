@@ -280,7 +280,7 @@ const categories = [
     ]
   },
   {
-    key: 'Other', label: '✨ Autre',
+    key: 'Other', label: '  Autre',
     spirits: []
   },
 ]

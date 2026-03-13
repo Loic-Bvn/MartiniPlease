@@ -133,7 +133,7 @@ def detect_method(ingredients: List[Dict]) -> Optional[str]:
     has_liqueur = False
     has_amaro = False
     has_fresh_fruit = False
-    has_swath = False  # ✨ Nouveau flag
+    has_swath = False
     spirit_count = 0
     
     # ── Analyse des ingrédients ──
@@ -166,7 +166,7 @@ def detect_method(ingredients: List[Dict]) -> Optional[str]:
         if ing_type in amari:
             has_amaro = True
         
-        # ✨ Détection du swath
+        #   Détection du swath
         if ing_type in citrus_zests and 'swath' in ing_name:
             has_swath = True
         
@@ -188,12 +188,12 @@ def detect_method(ingredients: List[Dict]) -> Optional[str]:
     # 3. SHAKE / REGAL SHAKE : Jus OU crème OU œuf OU sirop
     if has_cream or has_juice:
         if has_swath:
-            return 'regal_shake'  # ✨ Regal shake
+            return 'regal_shake'
         return 'shake'
     
     if (has_syrup or 'aquafaba' in [ing.get('Type') for ing in ingredients]) and has_juice:
         if has_swath:
-            return 'regal_shake'  # ✨ Regal shake
+            return 'regal_shake'
         return 'shake'
     
     # 4. SWIZZLE : Rhum + sirop + glace pilée (Queens Park Swizzle)
@@ -207,7 +207,7 @@ def detect_method(ingredients: List[Dict]) -> Optional[str]:
     # 5. STIR / REGAL STIR : Spiritueux + modifiers/liqueurs
     if has_spirit and (has_modifier or has_liqueur or has_amaro) and not has_juice and not has_cream:
         if has_swath:
-            return 'regal_stir'  # ✨ Regal stir
+            return 'regal_stir'
         return 'stir'
     
     # 6. STIR / REGAL STIR : Spirit-forward avec sirop (Old Fashioned, Sazerac)
@@ -218,12 +218,12 @@ def detect_method(ingredients: List[Dict]) -> Optional[str]:
         
         if has_brown and has_bitters:
             if has_swath:
-                return 'regal_stir'  # ✨ Regal stir
+                return 'regal_stir'
             return 'stir'
     
     # 7. DÉFAUT : Shake (la méthode la plus sûre pour l'inconnu)
     if has_swath:
-        return 'regal_shake'  # ✨ Par défaut avec swath
+        return 'regal_shake'
     return 'shake'
 
 def detect_difficulty(cocktail_dict: Dict) -> Optional[str]:

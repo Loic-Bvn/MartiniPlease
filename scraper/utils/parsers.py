@@ -55,6 +55,42 @@ def trim_ingredient_name(ingredient: str) -> str:
     pos = ingredient.find(")")
     return ingredient[pos + 2:].strip() if pos != -1 else ingredient.strip()
 
+def clean_cocktail_name(name: str) -> str:
+    """
+    Nettoie le nom d'un cocktail :
+    - Supprime les numéros de liste en début (ex: "1. ", "12. ")
+    - Supprime les "The/THE/the" en début de nom
+    - Supprime les chiffres isolés en début ou fin
+    - Supprime les caractères spéciaux non pertinents (*, #, emojis...)
+    - Met en title case
+    - Normalise les espaces
+    """
+    # Supprimer les emojis et symboles non-ASCII parasites
+    name = re.sub(r"[^\x00-\x7Féàèùâêîôûäëïöüç''\-& ]", '', name)
+
+    # Supprimer les caractères spéciaux de début (*, #, -, etc.)
+    name = re.sub(r'^[\*#\-–—•]+\s*', '', name)
+
+    #   Supprimer les numéros de liste en début (ex: "1. ", "12) ", "3 - ")
+    name = re.sub(r'^\d+[\.\)]\s*', '', name)
+
+    # Supprimer "The" / "THE" / "the" en début de nom
+    name = re.sub(r'(?i)^the\s+', '', name)
+
+    # Supprimer "Cocktail"
+    name = re.sub(r'(?i)\bcocktail\b\s*', '', name)
+
+    # Supprimer les chiffres isolés en début ou fin de nom
+    name = re.sub(r'^\d+\s+', '', name)
+    name = re.sub(r'\s+\d+$', '', name)
+
+    # Normaliser les espaces multiples
+    name = re.sub(r'\s+', ' ', name).strip()
+
+    #   Title case (ex: "WHISKEY SMASH" → "Whiskey Smash")
+    name = name.title()
+
+    return name
 
 def parse_recipe_blocks(text: str) -> List[List[str]]:
     """Extrait les blocs de recettes d'une description de vidéo"""

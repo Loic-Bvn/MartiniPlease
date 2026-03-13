@@ -108,6 +108,9 @@ body {
   filter: brightness(0.9) sepia(0.3);
 }
 
+.dark .header-logo { filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(5deg);}
+
+
 .header-title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -309,7 +312,7 @@ body {
 }
 
 .expand-actions-btn:hover {
-  background: #2a2620;
+  background: var(--bg-card);
   color: var(--text);
 }
 
@@ -557,6 +560,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  flex: 1;
+  transition: max-height 0.3s ease;
 }
 
 .recipe-line {
@@ -801,7 +806,7 @@ body {
 }
 
 .category-section {
-  background: var(--bg-raised);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -813,7 +818,7 @@ body {
   flex-direction: column;
   gap: 0.625rem;
   padding: 0.875rem 1rem;
-  background: #1e1b16;
+  background: var(--bg-raised);
   border-bottom: 1px solid var(--border);
 }
 
@@ -839,7 +844,7 @@ body {
 .category-count {
   padding: 0.15rem 0.6rem;
   background: transparent;
-  color: var(--text-dim);
+  color: var(--text-muted);
   border: 1px solid var(--border-mid);
   border-radius: 9999px;
   font-size: 0.7rem;
@@ -850,8 +855,8 @@ body {
   align-self: flex-start;
   padding: 0.3rem 0.75rem;
   background: transparent;
-  color: var(--text-dim);
-  border: 1px solid var(--border);
+  color: var(--gold-dim);
+  border: 1px solid var(--border-mid);
   border-radius: var(--radius-sm);
   font-size: 0.7rem;
   font-weight: 600;
@@ -878,7 +883,7 @@ body {
   align-items: center;
   gap: 0.6rem;
   padding: 0.6rem 0.75rem;
-  background: var(--bg-card);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   cursor: pointer;

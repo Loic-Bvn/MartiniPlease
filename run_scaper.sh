@@ -59,27 +59,6 @@ export YOUTUBE_API_KEY=$(gh secret list --repo "$REPO" | grep -q "YOUTUBE_API_KE
 if [ -n "$YOUTUBE_API_KEY" ] && [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_KEY" ]; then
   echo "✅ Variables d'environnement détectées dans le shell."
 
-# ── Méthode B : macOS Keychain ────────────────────────────
-elif command -v security &> /dev/null; then
-  echo "🔐 Lecture depuis le macOS Keychain..."
-  export YOUTUBE_API_KEY=$(security find-generic-password -a "$USER" -s "MARTINI_YOUTUBE_API_KEY" -w 2>/dev/null || echo "")
-  export YOUTUBE_CHANNEL_ID=$(security find-generic-password -a "$USER" -s "MARTINI_YOUTUBE_CHANNEL_ID" -w 2>/dev/null || echo "UCEK-PgJHg4Jupi7k7re0qGg")
-  export SUPABASE_URL=$(security find-generic-password -a "$USER" -s "MARTINI_SUPABASE_URL" -w 2>/dev/null || echo "")
-  export SUPABASE_KEY=$(security find-generic-password -a "$USER" -s "MARTINI_SUPABASE_KEY" -w 2>/dev/null || echo "")
-
-  if [ -z "$YOUTUBE_API_KEY" ] || [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
-    echo ""
-    echo "❌ Secrets introuvables dans le Keychain."
-    echo ""
-    echo "   Pour les enregistrer (une seule fois) :"
-    echo "   security add-generic-password -a \"\$USER\" -s MARTINI_YOUTUBE_API_KEY   -w 'ta_clé'"
-    echo "   security add-generic-password -a \"\$USER\" -s MARTINI_YOUTUBE_CHANNEL_ID -w 'UCEK-PgJHg4Jupi7k7re0qGg'"
-    echo "   security add-generic-password -a \"\$USER\" -s MARTINI_SUPABASE_URL       -w 'https://xxx.supabase.co'"
-    echo "   security add-generic-password -a \"\$USER\" -s MARTINI_SUPABASE_KEY       -w 'ta_clé_supabase'"
-    echo ""
-    exit 1
-  fi
-  echo "✅ Secrets chargés depuis le macOS Keychain."
 
 # ── Méthode C : Linux secret-tool (GNOME Keyring) ─────────
 elif command -v secret-tool &> /dev/null; then

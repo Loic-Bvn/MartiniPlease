@@ -14,12 +14,20 @@ class YouTubeClient:
     """Client pour interagir avec l'API YouTube"""
     
     def __init__(self, api_key: str, channel_id: str, use_cache: bool = True):
-        self.api_key = api_key
-        self.channel_id = channel_id
-        self.youtube = build('youtube', 'v3', developerKey=api_key)
-        self.use_cache = use_cache
-        self.cache = VideoCache() if use_cache else None
-        self.api_calls = 0  # ✨ Compteur d'appels API
+            self.api_key = api_key
+            self.channel_id = channel_id
+            #   Utiliser AnonymousCredentials pour éviter l'erreur ADC
+            # quand on utilise uniquement une developerKey (pas d'OAuth)
+            from google.auth.credentials import AnonymousCredentials
+            self.youtube = build(
+                'youtube', 'v3',
+                developerKey=api_key,
+                credentials=AnonymousCredentials(),
+                cache_discovery=False
+            )
+            self.use_cache = use_cache
+            self.cache = VideoCache() if use_cache else None
+            self.api_calls = 0
     
     def fetch_videos(self, max_videos: int = 500) -> List[Dict]:
         """
@@ -61,7 +69,7 @@ class YouTubeClient:
         Récupère la description complète d'une vidéo
         Utilise le cache si disponible
         """
-        # ✨ Vérifier le cache d'abord
+        #   Vérifier le cache d'abord
         if self.use_cache and self.cache.has(video_id):
             return self.cache.get(video_id)
         
@@ -71,7 +79,7 @@ class YouTubeClient:
             resp = self.youtube.videos().list(part="snippet", id=video_id).execute()
             description = resp['items'][0]['snippet']['description'] if resp['items'] else ""
             
-            # ✨ Stocker dans le cache
+            #   Stocker dans le cache
             if self.use_cache and description:
                 self.cache.set(video_id, description, title, published_at)
             

@@ -71,7 +71,7 @@ TYPE_METADATA = {
     "chocolate_licor":    ("Liqueur Chocolat",      "licors"),
     "midori":             ("Midori",                "licors"),
     "sloe_gin":           ("Sloe Gin",              "licors"),
-    "elderflower_liqueur":("Liqueur de Sureau",     "licors"),
+    "elderflower_licor":  ("Liqueur de Sureau",     "licors"),
     "amaretto":           ("Amaretto",              "licors"),
     "frangelico":         ("Frangelico",            "licors"),
     "coffee_licor":       ("Liqueur de Café",       "licors"),

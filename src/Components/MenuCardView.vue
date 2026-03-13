@@ -105,7 +105,7 @@ const CATEGORY_ORDER = [
   { key: 'Pisco',          label: 'Pisco',    icon: '🫙' },
   { key: 'Absinthe',       label: 'Absinthe', icon: '🌱' },
   { key: 'Chartreuse',     label: 'Chartreuse', icon: '💚' },
-  { key: null,             label: 'Autres',   icon: '✨' },
+  { key: null,             label: 'Autres',   icon: ' ' },
 ]
 
 const cardCocktails = computed(() =>

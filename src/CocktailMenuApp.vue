@@ -7,7 +7,7 @@
         <!-- Ligne 1 : Brand + Recherche + Actions + ThemeToggle -->
         <div class="header-top">
           <div class="header-brand">
-            <img src="/logo.png" alt="Martini Please" class="header-logo" />
+            <img src="/logo_square.png" alt="Martini Please" class="header-logo" />
             <h1 class="header-title">Martini Please</h1>
           </div>
 

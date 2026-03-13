@@ -16,7 +16,7 @@ from .detectors import (
     detect_difficulty
 )
 from .youtube import YouTubeClient
-from .cache import VideoCache  # ✨ Nouveau
+from .cache import VideoCache
 
 __all__ = [
     'get_season',
@@ -30,5 +30,5 @@ __all__ = [
     'detect_method',
     'detect_difficulty',
     'YouTubeClient',
-    'VideoCache'  # ✨ Nouveau
+    'VideoCache'
 ]

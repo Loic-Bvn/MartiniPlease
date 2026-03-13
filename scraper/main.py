@@ -39,7 +39,7 @@ def main():
         help='YouTube channel ID (default: from config.py)'
     )
     
-    # ✨ Options de cache
+    #   Options de cache
     parser.add_argument(
         '--no-cache',
         action='store_true',
@@ -91,7 +91,7 @@ def main():
     
     results = scraper.run(seasons_filter=args.seasons)
     
-    print(f"\n✨ Successfully scraped {len(results['cocktails'])} cocktails!")
+    print(f"\n  Successfully scraped {len(results['cocktails'])} cocktails!")
 
 
 if __name__ == "__main__":
