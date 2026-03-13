@@ -586,21 +586,31 @@ body {
   height: 1em;
   display: flex;
 }
-
-.status-dot {
-  display: inline-block;
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
+.recipe-bullet {
   flex-shrink: 0;
+  width: 0.85rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.status-available { background: var(--success); }
-.status-missing   { background: var(--danger-text); }
+.recipe-bullet::before {
+  content: '';
+  display: block;
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.recipe-bullet--available { color: var(--text-dim); }
+.recipe-bullet--missing   { color: var(--danger-text); }
+.recipe-bullet--garnish   { color: var(--text-dim); opacity: 0.4; }
 
 .ingredient-name {
   flex: 0 1 auto;
-  color: var(--text-dim) !important;
+  color: var(--text-dim);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1113,12 +1123,14 @@ body {
 /* ── CocktailCard layout ───────────────────── */
 .cocktail-meta-row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
-  padding-right: 0.25rem;
 }
 
+.cocktail-meta-row .cocktail-subtitle:first-child {
+  flex: 1;
+}
 /* =============================================
    MENU CARD VIEW
    ============================================= */

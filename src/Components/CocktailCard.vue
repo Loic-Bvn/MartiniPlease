@@ -9,9 +9,9 @@
         </h3>
         <div class="cocktail-meta-row">
           <p class="cocktail-subtitle">
-            {{ cocktail.base_spirit }} · {{ seasonLabel }}
+            {{ cocktail.abv > 0 ? baseSpiritLabel : 'Mocktail' }}
           </p>
-          <span class="cocktail-subtitle shrink-0">
+          <span class="cocktail-subtitle" style="margin-left: auto;">
             {{ cocktail.abv }}°
           </span>
         </div>
@@ -38,15 +38,13 @@
         class="recipe-line"
       >
         <div class="ingredient-info">
-          <span
-            v-if="ing.Type !== 'garnish'"
-            :class="['status-dot', isAvailable(ing) ? 'status-available' : 'status-missing']"
-          ></span>
+          <span :class="['recipe-bullet', ing.Type === 'garnish' ? 'recipe-bullet--garnish' : isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
+          </span>
           <span :class="[
             'ingredient-name',
-            ing.Type !== 'garnish' && !isAvailable(ing) ? 'text-red-600' : 'text-gray-700'
+            ing.Type !== 'garnish' && !isAvailable(ing) ? 'ingredient-name--missing' : ''
           ]">
-            {{ ing.Ingredient }}
+            {{ ing.Ingredient ? getTypeLabel(ing.Type, locale) : ing.Ingredient }}
           </span>
         </div>
         <span class="ingredient-quantity">
@@ -58,8 +56,8 @@
     <!-- Badge réalisable + méthode -->
     <div class="card-footer">
       <div class="footer-left">
-        <span v-if="makeable" class="badge-makeable">✓ Réalisable</span>
-        <span v-else class="badge-missing">{{ missingCount }} ingrédient{{ missingCount > 1 ? 's' : '' }} manquant{{ missingCount > 1 ? 's' : '' }}</span>
+        <span v-if="makeable" class="badge-makeable">{{ t.makeable }}</span>
+        <span v-else class="badge-missing">{{ missingLabel }}</span>
       </div>
       <span v-if="cocktail.method" class="badge-method">
         {{ methodLabel }}
@@ -73,15 +71,34 @@
 import { computed } from 'vue'
 import { Pencil, Trash2 } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
+import { getTypeLabel } from '../constants/typeLabels.js'
 
 const props = defineProps({
   cocktail:        Object,
   isBartenderMode: { type: Boolean, default: false },
+  locale:          { type: String, default: 'fr' },
 })
 
 defineEmits(['edit', 'delete'])
 
 const { barInventory } = useInventory()
+
+const t = computed(() => ({
+  makeable: props.locale === 'fr' ? '✓ Réalisable' : '✓ Available',
+}))
+
+const missingLabel = computed(() => {
+  const n = missingCount.value
+  if (props.locale === 'fr') {
+    return `${n} ingrédient${n > 1 ? 's' : ''} manquant${n > 1 ? 's' : ''}`
+  } else {
+    return `${n} missing ingredient${n > 1 ? 's' : ''}`
+  }
+})
+
+const baseSpiritLabel = computed(() =>
+  getTypeLabel(props.cocktail.base_spirit, props.locale)
+)
 
 function isAvailable(ing) {
   if (ing.Type === 'garnish') return true
@@ -113,12 +130,4 @@ const METHOD_LABELS = {
 const methodLabel = computed(() =>
   METHOD_LABELS[props.cocktail.method] || props.cocktail.method
 )
-
-const seasonLabel = computed(() => {
-  const icons = { spring: '🌸', summer: '☀️', fall: '🍂', winter: '❄️' }
-  const s = props.cocktail.season || []
-  return Array.isArray(s)
-    ? s.map(k => icons[k] || k).join(' ')
-    : (icons[s] || s)
-})
 </script>

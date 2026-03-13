@@ -11,23 +11,26 @@
           </div>
           <div class="search-container header-search-inline">
             <Search class="search-icon" :size="16" />
-            <input type="text" placeholder="Rechercher un cocktail ou un ingrédient..." v-model="searchTerm" class="search-input" />
+            <input type="text" :placeholder="t.searchPlaceholder" v-model="searchTerm" class="search-input" />
           </div>
           <div class="header-right">
             <div class="header-actions">
               <button @click="isBartenderMode ? exitBartenderMode() : showPasswordModal = true" :class="['btn-mode', isBartenderMode ? 'btn-mode-active' : 'btn-mode-inactive']">
                 <Unlock v-if="isBartenderMode" :size="15" style="display:inline-block;width:15px;height:15px;flex-shrink:0" />
                 <Lock v-else :size="15" style="display:inline-block;width:15px;height:15px;flex-shrink:0" />
-                <span class="btn-mode-label">{{ isBartenderMode ? 'Mode Drinker' : 'Mode Bartender' }}</span>
+                <span class="btn-mode-label">{{ isBartenderMode ? t.drinkerMode : t.bartenderMode }}</span>
               </button>
               <template v-if="isBartenderMode">
                 <button @click="openNewCardModal()" class="btn-new-card">
-                  <BookOpen :size="15" /><span class="btn-label-hide"> Nouvelle carte</span>
+                  <BookOpen :size="15" /><span class="btn-label-hide"> {{ t.newCard }}</span>
                 </button>
                 <button @click="openNewModal" class="btn-new-cocktail">
-                  <Plus :size="15" /><span class="btn-label-hide"> Nouveau cocktail</span>
+                  <Plus :size="15" /><span class="btn-label-hide"> {{ t.newCocktail }}</span>
                 </button>
               </template>
+              <button @click="locale = locale === 'fr' ? 'en' : 'fr'" class="btn-mode btn-mode-inactive">
+                {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
+              </button>
             </div>
             <ThemeToggle />
           </div>
@@ -35,7 +38,7 @@
         <div class="header-search-row">
           <div class="search-container">
             <Search class="search-icon" :size="16" />
-            <input type="text" placeholder="Rechercher..." v-model="searchTerm" class="search-input" />
+            <input type="text" :placeholder="t.searchPlaceholderShort" v-model="searchTerm" class="search-input" />
           </div>
         </div>
       </div>
@@ -49,7 +52,7 @@
         <button @click="showInventory = !showInventory" class="expand-actions-btn">
           <ChevronDown :size="18" :class="{ rotated: showInventory }" />
           <h2 class="section-title">
-            📦 Stock du bar
+            {{ t.stock }}
             <span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span>
           </h2>
           <span></span>
@@ -64,7 +67,7 @@
         <div class="section-card">
           <button @click="showFilters = !showFilters" class="expand-actions-btn">
             <ChevronDown :size="18" :class="{ rotated: showFilters }" />
-            <h2 class="section-title">🔍 Filtres</h2>
+            <h2 class="section-title">{{ t.filterTitle }}</h2>
             <span></span>
           </button>
 
@@ -72,20 +75,20 @@
 
             <!-- Mode de filtrage -->
             <div class="filter-group">
-              <label class="filter-label">Mode de recherche</label>
+              <label class="filter-label">{{ t.filterMode }}</label>
               <div class="filter-mode-toggle">
                 <button @click="filterMode = 'main'" :class="['filter-mode-btn', { active: filterMode === 'main' }]">
-                  🎯 Ingrédient principal
+                  {{ t.filterMain }}
                 </button>
                 <button @click="filterMode = 'contains'" :class="['filter-mode-btn', { active: filterMode === 'contains' }]">
-                  🔍 Contient
+                  {{ t.filterContains }}
                 </button>
               </div>
             </div>
 
             <!-- Spiritueux de base -->
             <div class="filter-group">
-              <label class="filter-label">Spiritueux de base</label>
+              <label class="filter-label">{{ t.filterSpirits }}</label>
               <div class="chips-container">
                 <button
                   v-for="spirit in baseSpirits"
@@ -97,7 +100,6 @@
                 </button>
               </div>
 
-              <!-- Sous-types : apparaissent si exactement une famille avec sous-types est active -->
               <transition name="fade">
                 <div v-if="activeSubSpirits.length" class="chips-container chips-container--sub">
                   <button
@@ -114,7 +116,7 @@
 
             <!-- Liqueurs -->
             <div class="filter-group">
-              <label class="filter-label">Liqueurs</label>
+              <label class="filter-label">{{ t.filterLiqueurs }}</label>
               <div class="chips-container">
                 <button
                   v-for="liqueur in liqueurFamilies"
@@ -129,7 +131,7 @@
 
             <!-- Saison -->
             <div class="filter-group">
-              <label class="filter-label">Saison</label>
+              <label class="filter-label">{{ t.filterSeason }}</label>
               <div class="chips-container">
                 <button
                   v-for="season in seasons"
@@ -148,20 +150,20 @@
 
             <!-- Disponibilité -->
             <div class="filter-group">
-              <label class="filter-label">Disponibilité</label>
+              <label class="filter-label">{{ t.filterAvail }}</label>
               <div class="chips-container">
                 <button
                   @click="showOnlyMakeable = !showOnlyMakeable"
                   :class="['chip', { active: showOnlyMakeable }]"
                 >
-                  🍸 Cocktails réalisables
+                  {{ t.filterMakeable }}
                 </button>
               </div>
             </div>
 
             <!-- ABV -->
             <div class="filter-group">
-              <label class="filter-label">Alcool</label>
+              <label class="filter-label">{{ t.filterAbv }}</label>
               <div class="chips-container">
                 <button
                   @click="abvFilter = abvFilter === 'mocktail' ? null : 'mocktail'"
@@ -198,7 +200,7 @@
               <span v-if="abvFilter === 'low'" class="filter-tag">
                 🍃 Low ABV <X @click="abvFilter = null" :size="14" />
               </span>
-              <button @click="clearFilters" class="clear-all-btn">Effacer tout</button>
+              <button @click="clearFilters" class="clear-all-btn">{{ t.clearAll }}</button>
             </div>
           </div>
         </div>
@@ -208,14 +210,14 @@
           <button @click="showCards = !showCards" class="expand-actions-btn">
             <ChevronDown :size="18" :class="{ rotated: showCards }" />
             <h2 class="section-title">
-              📜 Cartes
+              {{ t.cardsTitle }}
               <span class="count-badge">{{ menuCards.length }}</span>
             </h2>
             <span></span>
           </button>
           <div v-if="showCards" class="cards-content">
             <div v-if="menuCards.length === 0" class="cards-empty">
-              Aucune carte créée — crée ta première carte !
+              {{ t.noCard }}
             </div>
             <div v-else class="cards-grid">
               <div v-for="card in menuCards" :key="card.id" class="menu-card-item">
@@ -246,19 +248,24 @@
       <!-- Liste cocktails -->
       <div>
         <h2 class="cocktails-header">
-          {{ filteredCocktails.length }} cocktail{{ filteredCocktails.length > 1 ? 's' : '' }} trouvé{{ filteredCocktails.length > 1 ? 's' : '' }}
+          {{ filteredCocktails.length }}
+          {{ locale === 'fr'
+            ? `cocktail${filteredCocktails.length > 1 ? 's' : ''} trouvé${filteredCocktails.length > 1 ? 's' : ''}`
+            : `cocktail${filteredCocktails.length > 1 ? 's' : ''} found`
+          }}
           <span v-if="showOnlyMakeable" class="cocktails-header-makeable">
-            ({{ makeableCount }} réalisables)
+            ({{ makeableCount }} {{ locale === 'fr' ? 'réalisables' : 'available' }})
           </span>
         </h2>
-        <div v-if="cocktailsLoading" class="loading-state">Chargement des cocktails...</div>
-        <div v-else-if="filteredCocktails.length === 0" class="empty-state">Aucun cocktail trouvé avec ces critères</div>
+        <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
+        <div v-else-if="filteredCocktails.length === 0" class="empty-state">{{ t.noResult }}</div>
         <div v-else class="cocktails-grid">
           <CocktailCard
             v-for="cocktail in filteredCocktails"
             :key="cocktail.id"
             :cocktail="cocktail"
             :isBartenderMode="isBartenderMode"
+            :locale="locale"
             @edit="openEditModal"
             @delete="handleDelete"
           />
@@ -290,6 +297,7 @@ import MenuCardModal from '@/Components/Modals/MenuCardModal.vue'
 import MenuCardView from '@/Components/MenuCardView.vue'
 import PasswordModal from '@/Components/Modals/PasswordModal.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
+import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
 
 const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, updateCocktail, deleteCocktail } = useCocktails()
 const { barInventory, ingredients, fetchIngredients } = useInventory()
@@ -310,107 +318,133 @@ const showCardModal     = ref(false)
 const editingCocktail   = ref(null)
 const editingCard       = ref(null)
 const viewingCard       = ref(null)
+const locale            = ref('fr')
+
+// Traductions
+const t = computed(() => ({
+  filterTitle:            locale.value === 'fr' ? '🔍 Filtres'                          : '🔍 Filters',
+  cardsTitle:             locale.value === 'fr' ? '📜 Cartes'                           : '📜 Cards',
+  bartenderMode:          locale.value === 'fr' ? 'Mode Bartender'                      : 'Bartender Mode',
+  drinkerMode:            locale.value === 'fr' ? 'Mode Drinker'                        : 'Drinker Mode',
+  newCard:                locale.value === 'fr' ? 'Nouvelle carte'                      : 'New card',
+  newCocktail:            locale.value === 'fr' ? 'Nouveau cocktail'                    : 'New cocktail',
+  searchPlaceholder:      locale.value === 'fr' ? 'Rechercher un cocktail ou un ingrédient...' : 'Search a cocktail or ingredient...',
+  searchPlaceholderShort: locale.value === 'fr' ? 'Rechercher...'                       : 'Search...',
+  filterMode:             locale.value === 'fr' ? 'Mode de recherche'                   : 'Search mode',
+  filterMain:             locale.value === 'fr' ? '🎯 Ingrédient principal'             : '🎯 Main ingredient',
+  filterContains:         locale.value === 'fr' ? '🔍 Contient'                         : '🔍 Contains',
+  filterSpirits:          locale.value === 'fr' ? 'Spiritueux de base'                  : 'Base spirits',
+  filterLiqueurs:         locale.value === 'fr' ? 'Liqueurs'                            : 'Liqueurs',
+  filterSeason:           locale.value === 'fr' ? 'Saison'                              : 'Season',
+  filterAvail:            locale.value === 'fr' ? 'Disponibilité'                       : 'Availability',
+  filterMakeable:         locale.value === 'fr' ? '🍸 Cocktails réalisables'            : '🍸 Available cocktails',
+  filterAbv:              locale.value === 'fr' ? 'Alcool'                              : 'Alcohol',
+  clearAll:               locale.value === 'fr' ? 'Effacer tout'                        : 'Clear all',
+  noCard:                 locale.value === 'fr' ? 'Aucune carte créée — crée ta première carte !' : 'No card yet — create your first one!',
+  loading:                locale.value === 'fr' ? 'Chargement des cocktails...'          : 'Loading cocktails...',
+  noResult:               locale.value === 'fr' ? 'Aucun cocktail trouvé avec ces critères' : 'No cocktail found with these filters',
+  stock:                  locale.value === 'fr' ? '📦 Stock du bar'                     : '📦 Bar stock',
+  deleteCard:             locale.value === 'fr' ? 'Supprimer cette carte ?'             : 'Delete this card?',
+  deleteCocktail:         locale.value === 'fr' ? 'Supprimer ce cocktail ?'             : 'Delete this cocktail?',
+}))
 
 // Filtres
 const searchTerm         = ref('')
-const selectedFamilies   = ref([])  // filtre sur `category` (ex: "Whiskey")
-const selectedSubSpirits = ref([])  // filtre sur `base_spirit` (ex: "bourbon")
+const selectedFamilies   = ref([])
+const selectedSubSpirits = ref([])
 const selectedSeasons    = ref([])
 const showOnlyMakeable   = ref(false)
-const filterMode         = ref('main') // 'main' = ingrédient principal | 'contains' = dans la recette
-const abvFilter          = ref(null)   // null | 'mocktail' | 'low'
+const filterMode         = ref('main')
+const abvFilter          = ref(null)
 
 // ── Référentiels ──────────────────────────────────────────────────────────────
 
-// baseSpirits : familles de spiritueux → correspondent au champ `category` en base
-// subSpirits  : sous-types → correspondent au champ `base_spirit` en base
-const baseSpirits = [
+const baseSpirits = computed(() => [
   {
-    key: 'Whiskey', label: '🥃 Whiskey',
+    key: 'Whiskey', label: getFL('Whiskey', locale.value),
     subs: [
-      { key: 'bourbon',       label: '🌽 Bourbon'      },
-      { key: 'rye',           label: '🌾 Rye'          },
-      { key: 'scotch',        label: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotch'       },
-      { key: 'irish_whiskey', label: '☘️ Irish'        },
-      { key: 'peated_whisky', label: '🔥 Peated/Islay' },
-      { key: 'whiskey',       label: '🥃 Autre Whiskey'},
+      { key: 'bourbon',       label: getFL('bourbon', locale.value)       },
+      { key: 'rye',           label: getFL('rye', locale.value)           },
+      { key: 'scotch',        label: getFL('scotch', locale.value)        },
+      { key: 'irish_whiskey', label: getFL('irish_whiskey', locale.value) },
+      { key: 'peated_whisky', label: getFL('peated_whisky', locale.value) },
+      { key: 'whiskey',       label: getFL('whiskey', locale.value)       },
     ]
   },
   {
-    key: 'Rum', label: '🍹 Rum',
+    key: 'Rum', label: getFL('Rum', locale.value),
     subs: [
-      { key: 'rum',          label: '🍹 Rum blanc'   },
-      { key: 'rum_agricol',  label: '🌿 Rhum Agricole'},
-      { key: 'rum_jamaican', label: '🇯🇲 Jamaïcain'  },
-      { key: 'rum_cuban',    label: '🇨🇺 Cubain'     },
-      { key: 'rum_overproof',label: '💥 Overproof'   },
-      { key: 'cachaca',      label: '🇧🇷 Cachaça'    },
+      { key: 'rum',           label: getFL('rum', locale.value)           },
+      { key: 'rum_agricol',   label: getFL('rum_agricol', locale.value)   },
+      { key: 'rum_jamaican',  label: getFL('rum_jamaican', locale.value)  },
+      { key: 'rum_cuban',     label: getFL('rum_cuban', locale.value)     },
+      { key: 'rum_overproof', label: getFL('rum_overproof', locale.value) },
+      { key: 'cachaca',       label: getFL('cachaca', locale.value)       },
     ]
   },
   {
-    key: 'Agave', label: '🌵 Agave',
+    key: 'Agave', label: getFL('Agave', locale.value),
     subs: [
-      { key: 'tequila',          label: '🌵 Tequila Blanco'  },
-      { key: 'tequila_reposado', label: '🪵 Tequila Reposado'},
-      { key: 'mezcal',           label: '🔥 Mezcal'          },
+      { key: 'tequila',          label: getFL('tequila', locale.value)          },
+      { key: 'tequila_reposado', label: getFL('tequila_reposado', locale.value) },
+      { key: 'mezcal',           label: getFL('mezcal', locale.value)           },
     ]
   },
   {
-    key: 'Gin', label: '🌿 Gin',
+    key: 'Gin', label: getFL('Gin', locale.value),
     subs: [
-      { key: 'gin',      label: '🌿 Gin'         },
-      { key: 'gin_dry',  label: '🍋 Dry Gin'     },
-      { key: 'gin_navy', label: '⚓ Navy Strength'},
-      { key: 'genever',  label: '🇳🇱 Genièvre'  },
+      { key: 'gin',      label: getFL('gin', locale.value)      },
+      { key: 'gin_dry',  label: getFL('gin_dry', locale.value)  },
+      { key: 'gin_navy', label: getFL('gin_navy', locale.value) },
+      { key: 'genever',  label: getFL('genever', locale.value)  },
     ]
   },
   {
-    key: 'Brandy', label: '🍇 Brandy',
+    key: 'Brandy', label: getFL('Brandy', locale.value),
     subs: [
-      { key: 'cognac',   label: '🇫🇷 Cognac'  },
-      { key: 'calvados', label: '🍎 Calvados' },
-      { key: 'pisco',    label: '🇵🇪 Pisco'   },
-      { key: 'grappa',   label: '🍇 Grappa'   },
-      { key: 'brandy',   label: '🍇 Brandy'   },
+      { key: 'cognac',   label: getFL('cognac', locale.value)   },
+      { key: 'calvados', label: getFL('calvados', locale.value) },
+      { key: 'pisco',    label: getFL('pisco', locale.value)    },
+      { key: 'grappa',   label: getFL('grappa', locale.value)   },
+      { key: 'brandy',   label: getFL('brandy', locale.value)   },
     ]
   },
-  { key: 'Vodka',    label: '❄️ Vodka',    subs: [] },
-  { key: 'Absinthe', label: '🌱 Absinthe', subs: [] },
-  { key: 'Aquavit',  label: '🌾 Aquavit',  subs: [] },
-]
-
-const liqueurFamilies = [
-  { key: 'Liqueur Amer',     label: '🍊 Amer'     },
-  { key: 'Liqueur Agrume',   label: '🍋 Agrume'   },
-  { key: 'Liqueur Fruits',   label: '🍒 Fruits'   },
-  { key: 'Liqueur Herbes',   label: '🌿 Herbes'   },
-  { key: 'Liqueur Noix',     label: '🌰 Noix'     },
-  { key: 'Liqueur Dessert',  label: '☕ Dessert'   },
-  { key: 'Liqueur Anisée',   label: '⭐ Anisée'  },
-]
-
-// Lookup label global
-const allFamilyLabels = Object.fromEntries([
-  ...baseSpirits.map(s => [s.key, s.label]),
-  ...liqueurFamilies.map(l => [l.key, l.label]),
+  { key: 'Vodka',    label: getFL('Vodka', locale.value),    subs: [] },
+  { key: 'Absinthe', label: getFL('Absinthe', locale.value), subs: [] },
+  { key: 'Aquavit',  label: getFL('Aquavit', locale.value),  subs: [] },
 ])
-const allSubLabels = Object.fromEntries(
-  baseSpirits.flatMap(s => s.subs.map(sub => [sub.key, sub.label]))
-)
 
-const seasons = [
-  { key: 'all',    icon: '🍸', label: 'Toutes'    },
-  { key: 'spring', icon: '🌸', label: 'Printemps' },
-  { key: 'summer', icon: '☀️', label: 'Été'       },
-  { key: 'fall',   icon: '🍂', label: 'Automne'   },
-  { key: 'winter', icon: '❄️', label: 'Hiver'     },
-]
+const liqueurFamilies = computed(() => [
+  { key: 'Liqueur Amer',    label: getFL('Liqueur Amer', locale.value)    },
+  { key: 'Liqueur Agrume',  label: getFL('Liqueur Agrume', locale.value)  },
+  { key: 'Liqueur Fruits',  label: getFL('Liqueur Fruits', locale.value)  },
+  { key: 'Liqueur Herbes',  label: getFL('Liqueur Herbes', locale.value)  },
+  { key: 'Liqueur Noix',    label: getFL('Liqueur Noix', locale.value)    },
+  { key: 'Liqueur Dessert', label: getFL('Liqueur Dessert', locale.value) },
+  { key: 'Liqueur Anisée',  label: getFL('Liqueur Anisée', locale.value)  },
+])
+
+const seasons = computed(() => [
+  { key: 'all',    icon: '🍸', label: locale.value === 'fr' ? 'Toutes'    : 'All'    },
+  { key: 'spring', icon: '🌸', label: locale.value === 'fr' ? 'Printemps' : 'Spring' },
+  { key: 'summer', icon: '☀️', label: locale.value === 'fr' ? 'Été'       : 'Summer' },
+  { key: 'fall',   icon: '🍂', label: locale.value === 'fr' ? 'Automne'   : 'Fall'   },
+  { key: 'winter', icon: '❄️', label: locale.value === 'fr' ? 'Hiver'     : 'Winter' },
+])
+
+const allFamilyLabels = computed(() => Object.fromEntries([
+  ...baseSpirits.value.map(s => [s.key, s.label]),
+  ...liqueurFamilies.value.map(l => [l.key, l.label]),
+]))
+
+const allSubLabels = computed(() => Object.fromEntries(
+  baseSpirits.value.flatMap(s => s.subs.map(sub => [sub.key, sub.label]))
+))
 
 // ── Sous-types actifs ─────────────────────────────────────────────────────────
-// Affiche les sous-types des familles de spiritueux actuellement sélectionnées
 const activeSubSpirits = computed(() => {
   const subs = []
-  for (const family of baseSpirits) {
+  for (const family of baseSpirits.value) {
     if (selectedFamilies.value.includes(family.key) && family.subs.length) {
       subs.push(...family.subs)
     }
@@ -419,19 +453,17 @@ const activeSubSpirits = computed(() => {
 })
 
 // ── Helpers filtres ───────────────────────────────────────────────────────────
-
 function toggleFilter(array, value) {
   const idx = array.indexOf(value)
   if (idx > -1) array.splice(idx, 1)
   else array.push(value)
 }
 
-// Quand on déselectionne une famille, on purge ses sous-types actifs
 function toggleFamily(familyKey) {
   const isActive = selectedFamilies.value.includes(familyKey)
   toggleFilter(selectedFamilies.value, familyKey)
   if (isActive) {
-    const family = baseSpirits.find(s => s.key === familyKey)
+    const family = baseSpirits.value.find(s => s.key === familyKey)
     if (family?.subs.length) {
       const subKeys = family.subs.map(s => s.key)
       selectedSubSpirits.value = selectedSubSpirits.value.filter(k => !subKeys.includes(k))
@@ -446,10 +478,10 @@ function clearFilters() {
   abvFilter.value          = null
 }
 
-function getFamilyLabel(key)    { return allFamilyLabels[key] ?? key }
-function getSubSpiritLabel(key) { return allSubLabels[key] ?? key }
+function getFamilyLabel(key)    { return allFamilyLabels.value[key] ?? key }
+function getSubSpiritLabel(key) { return allSubLabels.value[key] ?? key }
 function getSeasonLabel(key) {
-  const s = seasons.find(s => s.key === key)
+  const s = seasons.value.find(s => s.key === key)
   return s ? `${s.icon} ${s.label}` : key
 }
 
@@ -468,7 +500,6 @@ const makeableCount = computed(() => cocktails.value.filter(isMakeable).length)
 const filteredCocktails = computed(() => {
   let list = cocktails.value
 
-  // Recherche texte
   if (searchTerm.value.trim()) {
     const s = searchTerm.value.toLowerCase().trim()
     list = list.filter(c =>
@@ -479,54 +510,41 @@ const filteredCocktails = computed(() => {
     )
   }
 
-  // Famille + sous-type
   if (selectedFamilies.value.length || selectedSubSpirits.value.length) {
-    // Les sous-types à matcher (si sélectionnés, ils affinent ; sinon on utilise la famille)
-    const activeSubs  = selectedSubSpirits.value
+    const activeSubs     = selectedSubSpirits.value
     const activeFamilies = selectedFamilies.value
 
-    // Map type → family pour le mode "contains"
-    // On s'appuie sur baseSpirits : chaque sub.key appartient à une family.key
     const typeToFamily = {}
-    for (const family of baseSpirits) {
+    for (const family of baseSpirits.value) {
       for (const sub of family.subs) {
         typeToFamily[sub.key] = family.key
       }
-      typeToFamily[family.key.toLowerCase()] = family.key // fallback générique
+      typeToFamily[family.key.toLowerCase()] = family.key
     }
 
     list = list.filter(c => {
       if (filterMode.value === 'main') {
-        // Mode "ingrédient principal" : regarde category et base_spirit
         const familyMatch = activeFamilies.length === 0 || activeFamilies.includes(c.category)
         const subMatch    = activeSubs.length === 0     || activeSubs.includes(c.base_spirit)
         return familyMatch && subMatch
       } else {
-        // Mode "contient" : cherche dans recipe[].Type
         const recipeTypes = (c.recipe || []).map(ing => ing.Type)
-
-        // Si des sous-types sont sélectionnés → match sur les types exacts
         if (activeSubs.length) {
           return activeSubs.some(sub => recipeTypes.includes(sub))
         }
-        // Sinon → match sur la famille : un des types de la recette appartient à une famille sélectionnée
         return activeFamilies.some(family => {
-          const familyDef = baseSpirits.find(s => s.key === family)
+          const familyDef = baseSpirits.value.find(s => s.key === family)
           if (familyDef) {
-            // Famille avec sous-types connus → on vérifie si un type de la recette est dans les subs
-            const subKeys = familyDef.subs.map(s => s.key)
-            // Inclure aussi le type générique (ex: "whiskey", "rum", "gin"...)
+            const subKeys    = familyDef.subs.map(s => s.key)
             const genericKey = family.toLowerCase()
             return recipeTypes.some(t => subKeys.includes(t) || t === genericKey)
           }
-          // Famille sans sous-types (Vodka, Absinthe…) → match direct sur le type
           return recipeTypes.includes(family.toLowerCase())
         })
       }
     })
   }
 
-  // Saison
   if (selectedSeasons.value.length) {
     list = list.filter(c =>
       Array.isArray(c.season)
@@ -535,12 +553,10 @@ const filteredCocktails = computed(() => {
     )
   }
 
-  // Réalisables uniquement
   if (showOnlyMakeable.value) {
     list = list.filter(isMakeable)
   }
 
-  // ABV
   if (abvFilter.value === 'mocktail') {
     list = list.filter(c => c.abv === 0 || c.abv === null)
   } else if (abvFilter.value === 'low') {
@@ -567,7 +583,7 @@ async function handleSaveCard(data) {
   showCardModal.value = false
 }
 async function handleDeleteCard(id) {
-  if (!confirm('Supprimer cette carte ?')) return
+  if (!confirm(t.value.deleteCard)) return
   await deleteMenuCard(id)
 }
 
@@ -581,7 +597,7 @@ async function handleSave(data) {
   showCocktailModal.value = false
 }
 async function handleDelete(id) {
-  if (!confirm('Supprimer ce cocktail ?')) return
+  if (!confirm(t.value.deleteCocktail)) return
   await deleteCocktail(id)
 }
 
