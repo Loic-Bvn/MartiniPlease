@@ -8,14 +8,17 @@ from datetime import datetime
 
 from config import CACHE_FILE
 
+# Clé réservée pour la liste des vidéos (ne correspond à aucun video_id réel)
+_VIDEO_LIST_KEY = '__video_list__'
+
 
 class VideoCache:
-    """Gestionnaire de cache pour les descriptions de vidéos"""
-    
+    """Gestionnaire de cache pour les descriptions de vidéos et la liste des vidéos"""
+
     def __init__(self, cache_file: str = CACHE_FILE):
         self.cache_file = cache_file
         self.cache: Dict[str, Dict] = self._load_cache()
-    
+
     def _load_cache(self) -> Dict[str, Dict]:
         """Charge le cache depuis le fichier JSON"""
         if os.path.exists(self.cache_file):
@@ -26,7 +29,7 @@ class VideoCache:
                 print(f"⚠️  Error loading cache: {e}")
                 return {}
         return {}
-    
+
     def _save_cache(self):
         """Sauvegarde le cache dans le fichier JSON"""
         try:
@@ -34,14 +37,16 @@ class VideoCache:
                 json.dump(self.cache, f, indent=2, ensure_ascii=False)
         except Exception as e:
             print(f"⚠️  Error saving cache: {e}")
-    
+
+    # ── Descriptions ──────────────────────────────────────────────────────────
+
     def get(self, video_id: str) -> Optional[str]:
         """Récupère la description d'une vidéo depuis le cache"""
         video_data = self.cache.get(video_id)
         if video_data:
             return video_data.get('description')
         return None
-    
+
     def set(self, video_id: str, description: str, title: str = '', published_at: str = ''):
         """Stocke la description d'une vidéo dans le cache"""
         self.cache[video_id] = {
@@ -51,25 +56,46 @@ class VideoCache:
             'cached_at': datetime.now().isoformat()
         }
         self._save_cache()
-    
+
     def has(self, video_id: str) -> bool:
         """Vérifie si une vidéo est dans le cache"""
-        return video_id in self.cache
-    
+        return video_id in self.cache and video_id != _VIDEO_LIST_KEY
+
+    # ── Liste des vidéos ──────────────────────────────────────────────────────
+
+    def get_video_list(self) -> Optional[List[Dict]]:
+        """Récupère la liste des vidéos depuis le cache"""
+        entry = self.cache.get(_VIDEO_LIST_KEY)
+        if entry:
+            return entry.get('videos')
+        return None
+
+    def set_video_list(self, videos: List[Dict]):
+        """Stocke la liste des vidéos dans le cache"""
+        self.cache[_VIDEO_LIST_KEY] = {
+            'videos': videos,
+            'cached_at': datetime.now().isoformat()
+        }
+        self._save_cache()
+
+    # ── Utilitaires ───────────────────────────────────────────────────────────
+
     def get_stats(self) -> Dict:
         """Retourne des statistiques sur le cache"""
+        # Ne pas compter l'entrée __video_list__ dans le total des vidéos
+        total = sum(1 for k in self.cache if k != _VIDEO_LIST_KEY)
         return {
-            'total_videos': len(self.cache),
+            'total_videos': total,
             'cache_file': self.cache_file,
             'cache_size_mb': round(os.path.getsize(self.cache_file) / 1024 / 1024, 2) if os.path.exists(self.cache_file) else 0
         }
-    
+
     def clear(self):
-        """Vide le cache"""
+        """Vide le cache (descriptions + liste des vidéos)"""
         self.cache = {}
         self._save_cache()
         print("✅ Cache cleared")
-    
+
     def export_to_file(self, filename: str):
         """Exporte le cache vers un fichier JSON"""
         with open(filename, 'w', encoding='utf-8') as f:

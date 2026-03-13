@@ -86,17 +86,32 @@
 
         <div v-if="showFilters" class="filters-dropdown-content">
 
-          <!-- Spiritueux -->
+          <!-- Spiritueux de base -->
           <div class="filter-group">
-            <label class="filter-label">Spiritueux</label>
+            <label class="filter-label">Spiritueux de base</label>
             <div class="chips-container">
               <button
-                v-for="spirit in allSpirits"
+                v-for="spirit in baseSpirits"
                 :key="spirit.key"
-                @click="toggleFilter(selectedSpirits, spirit.key)"
-                :class="['chip', { active: selectedSpirits.includes(spirit.key) }]"
+                @click="toggleFilter(selectedFamilies, spirit.key)"
+                :class="['chip', { active: selectedFamilies.includes(spirit.key) }]"
               >
                 {{ spirit.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Liqueurs -->
+          <div class="filter-group">
+            <label class="filter-label">Liqueurs</label>
+            <div class="chips-container">
+              <button
+                v-for="liqueur in liqueurFamilies"
+                :key="liqueur.key"
+                @click="toggleFilter(selectedFamilies, liqueur.key)"
+                :class="['chip', { active: selectedFamilies.includes(liqueur.key) }]"
+              >
+                {{ liqueur.label }}
               </button>
             </div>
           </div>
@@ -135,9 +150,9 @@
 
           <!-- Tags actifs -->
           <div v-if="hasActiveFilters" class="active-filters-bar">
-            <span v-for="s in selectedSpirits" :key="s" class="filter-tag">
-              {{ getSpiritLabel(s) }}
-              <X @click="toggleFilter(selectedSpirits, s)" :size="14" />
+            <span v-for="f in selectedFamilies" :key="f" class="filter-tag">
+              {{ getFamilyLabel(f) }}
+              <X @click="toggleFilter(selectedFamilies, f)" :size="14" />
             </span>
             <span v-for="s in selectedSeasons" :key="s" class="filter-tag">
               {{ getSeasonLabel(s) }}
@@ -283,12 +298,8 @@ const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCar
 const isBartenderMode   = ref(false)
 const showPasswordModal = ref(false)
 
-function enterBartenderMode() {
-  isBartenderMode.value = true
-}
-function exitBartenderMode() {
-  isBartenderMode.value = false
-}
+function enterBartenderMode() { isBartenderMode.value = true }
+function exitBartenderMode()  { isBartenderMode.value = false }
 
 // UI
 const showInventory     = ref(false)
@@ -302,63 +313,43 @@ const viewingCard       = ref(null)
 
 // Filtres
 const searchTerm       = ref('')
-const selectedSpirits  = ref([])
+const selectedFamilies = ref([])   // remplace selectedSpirits
 const selectedSeasons  = ref([])
 const showOnlyMakeable = ref(false)
 
-// Référentiels filtres
-const spiritCategories = [
-  { key: 'Whiskey_Family', label: '🥃 Whiskey',  members: ['Whiskey_Family', 'whiskey', 'bourbon', 'scotch', 'rye'],
-    spirits: [
-      { key: 'bourbon', label: '🥃 Bourbon' },
-      { key: 'rye',     label: '🌾 Rye' },
-      { key: 'scotch',  label: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotch' },
-      { key: 'whiskey', label: '🥃 Whiskey' },
-    ]},
-  { key: 'Rum_Family',    label: '🍹 Rhum',      members: ['Rum_Family', 'rum', 'cachaca'],
-    spirits: [
-      { key: 'rum',     label: '🍹 Rum' },
-      { key: 'cachaca', label: '🇧🇷 Cachaça' },
-    ]},
-  { key: 'Agave_Family',  label: '🌵 Agave',     members: ['Agave_Family', 'tequila', 'mezcal'],
-    spirits: [
-      { key: 'tequila', label: '🌵 Tequila' },
-      { key: 'mezcal',  label: '🔥 Mezcal' },
-    ]},
-  { key: 'Gin',           label: '🌿 Gin',       members: ['Gin', 'gin'] },
-  { key: 'Vodka',         label: '❄️ Vodka',     members: ['Vodka', 'vodka'] },
-  { key: 'Brandy_Family', label: '🍇 Brandy',    members: ['Brandy_Family', 'brandy', 'cognac', 'calvados'],
-    spirits: [
-      { key: 'cognac',   label: '🇫🇷 Cognac' },
-      { key: 'calvados', label: '🍎 Calvados' },
-      { key: 'brandy',   label: '🍇 Brandy' },
-    ]},
-  { key: 'Pisco',         label: '🫙 Pisco',     members: ['Pisco', 'pisco'] },
-  { key: 'Absinthe',      label: '🌱 Absinthe',  members: ['Absinthe', 'absinthe'] },
-  { key: 'Other',         label: '✨ Autre',      members: ['Other'] },
+// ── Référentiels de familles ──────────────────────────────────────────────────
+// Ces valeurs correspondent au champ `category` stocké en base (= family du scraper)
+
+const baseSpirits = [
+  { key: 'Whiskey',  label: '🥃 Whiskey'  },
+  { key: 'Rum',      label: '🍹 Rum'       },
+  { key: 'Agave',    label: '🌵 Agave'     },
+  { key: 'Gin',      label: '🌿 Gin'       },
+  { key: 'Vodka',    label: '❄️ Vodka'    },
+  { key: 'Brandy',   label: '🍇 Brandy'   },
+  { key: 'Absinthe', label: '🌱 Absinthe' },
+  { key: 'Aquavit',  label: '🌾 Aquavit'  },
 ]
 
-// Lookup plat : key → membres qu'il couvre
-const spiritMembersMap = Object.fromEntries(
-  spiritCategories.flatMap(f => [
-    [f.key, f.members],
-    ...(f.spirits || []).map(s => [s.key, [s.key]]),
-  ])
-)
+const liqueurFamilies = [
+  { key: 'Liqueur Amer',      label: '🍊 Amer'       },
+  { key: 'Liqueur Agrume',    label: '🍋 Agrume'     },
+  { key: 'Liqueur Fruits',    label: '🍒 Fruits'     },
+  { key: 'Liqueur Herbes',    label: '🌿 Herbes'     },
+  { key: 'Liqueur Noix',      label: '🌰 Noix'       },
+  { key: 'Liqueur Dessert',   label: '☕ Dessert'       },
+  { key: 'Liqueur Anisée',    label: '⭐ Anisée'    },
+]
 
-// Liste plate de tous les spirits individuels pour les chips de filtre
-const allSpirits = spiritCategories.flatMap(f =>
-  f.spirits?.length
-    ? f.spirits
-    : [{ key: f.key, label: f.label }]
-)
+// Liste plate pour le lookup label
+const allFamilies = [...baseSpirits, ...liqueurFamilies]
 
 const seasons = [
-  { key: 'all',    icon: '🍸', label: 'Toutes' },
+  { key: 'all',    icon: '🍸', label: 'Toutes'    },
   { key: 'spring', icon: '🌸', label: 'Printemps' },
-  { key: 'summer', icon: '☀️', label: 'Été' },
-  { key: 'fall',   icon: '🍂', label: 'Automne' },
-  { key: 'winter', icon: '❄️', label: 'Hiver' },
+  { key: 'summer', icon: '☀️', label: 'Été'       },
+  { key: 'fall',   icon: '🍂', label: 'Automne'   },
+  { key: 'winter', icon: '❄️', label: 'Hiver'     },
 ]
 
 // Stats inventaire
@@ -376,7 +367,7 @@ const makeableCount = computed(() =>
   cocktails.value.filter(isMakeable).length
 )
 
-// Filtrage
+// ── Filtrage ──────────────────────────────────────────────────────────────────
 const filteredCocktails = computed(() => {
   let list = cocktails.value
 
@@ -391,12 +382,9 @@ const filteredCocktails = computed(() => {
     )
   }
 
-  // Spiritueux
-  if (selectedSpirits.value.length) {
-    const allMembers = [...new Set(
-      selectedSpirits.value.flatMap(key => spiritMembersMap[key] || [key])
-    )]
-    list = list.filter(c => allMembers.includes(c.category))
+  // Famille (= champ `category` en base, ex: "Whiskey", "Liqueur Agrume"…)
+  if (selectedFamilies.value.length) {
+    list = list.filter(c => selectedFamilies.value.includes(c.category))
   }
 
   // Saison
@@ -418,7 +406,7 @@ const filteredCocktails = computed(() => {
 
 // Helpers filtres
 const hasActiveFilters = computed(() =>
-  selectedSpirits.value.length > 0 || selectedSeasons.value.length > 0
+  selectedFamilies.value.length > 0 || selectedSeasons.value.length > 0
 )
 
 function toggleFilter(array, value) {
@@ -428,17 +416,12 @@ function toggleFilter(array, value) {
 }
 
 function clearFilters() {
-  selectedSpirits.value  = []
+  selectedFamilies.value = []
   selectedSeasons.value  = []
 }
 
-function getSpiritLabel(key) {
-  for (const f of spiritCategories) {
-    if (f.key === key) return f.label
-    const s = f.spirits?.find(s => s.key === key)
-    if (s) return s.label
-  }
-  return key
+function getFamilyLabel(key) {
+  return allFamilies.find(f => f.key === key)?.label ?? key
 }
 
 function getSeasonLabel(key) {
