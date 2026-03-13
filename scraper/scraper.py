@@ -21,7 +21,9 @@ from utils.detectors import (
     find_base_spirit,
     calculate_abv,
     detect_method,
-    detect_difficulty
+    detect_difficulty,
+    detect_profile,
+    GARNISH_TYPES
 )
 
 
@@ -74,17 +76,27 @@ class CocktailScraper:
 
         # Parser les ingrédients
         ingredients = []
+        seen_garnish_types = set()
+
         for line in block[1:]:
             quantities = extract_quantities(line)
             ing_name = trim_ingredient_name(line)
             ing_type = detect_ingredient_type(line)
-            
+            is_garnish = ing_type in GARNISH_TYPES
+
+            # Dédupliquer les garnishes par type
+            if is_garnish:
+                if ing_type in seen_garnish_types:
+                    continue
+                seen_garnish_types.add(ing_type)
+
             ingredient = Ingredient(
                 ingredient=ing_name,
                 type=ing_type,
                 oz=quantities.get('Oz'),
                 ml=quantities.get('Ml'),
-                dashes=quantities.get('Dashes')
+                dashes=quantities.get('Dashes'),
+                is_garnish=is_garnish,
             )
             ingredients.append(ingredient)
 
@@ -109,6 +121,9 @@ class CocktailScraper:
         # Détecter la difficulté  
         difficulty = detect_difficulty(temp_cocktail)
 
+        # Détecter le profil gustatif
+        profile = detect_profile(ingredients_dict)
+
         # Créer le cocktail
         cocktail = Cocktail(
             name=name,
@@ -120,7 +135,7 @@ class CocktailScraper:
             difficulty=difficulty,
             abv=abv,
             description=None,
-            profile=[],
+            profile=profile,
             ice=[],
             season=[season],
             creator='Unknown',

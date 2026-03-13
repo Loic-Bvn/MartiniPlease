@@ -19,7 +19,7 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('rum_cuban',        lambda x: ('cuban' in x or 'cubano' in x) and ('rum' in x or 'ron' in x)),
     ('rum_jamaican',     lambda x: ('jamaican' in x or 'appleton' in x) and 'rum' in x),
     ('rum_overproof',    lambda x: ('overproof' in x or '151' in x) and ('rum' in x or 'rhum' in x)),
-    ('rum',              lambda x: any(w in x for w in ['rum', 'rhum', 'ron'])),
+    ('rum',              lambda x: any(w in x for w in ['rum', 'rhum', 'ron']) and 'frond' not in x),
     ('cachaca',          lambda x: 'cachaca' in x or 'cachaça' in x),
 
     # Tequila / Mezcal
@@ -42,6 +42,7 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
 
     # Autres spiritueux
     ('absinthe',         lambda x: 'absinthe' in x),
+    ('pastis',           lambda x: 'pastis' in x or 'ricard' in x),
     ('vodka',            lambda x: 'vodka' in x),
     ('aquavit',          lambda x: 'aquavit' in x or 'akvavit' in x),
 
@@ -56,15 +57,17 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     # Liqueurs de plantes / herbes
     ('chartreuse_green', lambda x: 'chartreuse' in x and ('green' in x or 'verte' in x)),
     ('chartreuse_yellow',lambda x: 'chartreuse' in x and ('yellow' in x or 'jaune' in x)),
-    ('benedictine',      lambda x: 'benedictine' in x),
+    ('benedictine',      lambda x: 'benedictine' in x or ('bene' in x and 'dom' in x)),
     ('galliano',         lambda x: 'galliano' in x),
     ('suze',             lambda x: 'suze' in x),
     ('allspice',         lambda x: 'allspice dram' in x or 'pimento dram' in x),
+    ('pimms',            lambda x: 'pimm' in x),
 
     # Liqueurs d'agrumes
     ('triple_sec',       lambda x: 'triple sec' in x or 'cointreau' in x),
     ('curacao',          lambda x: 'curacao' in x or 'curaçao' in x or 'grand marnier' in x or 'marnier' in x),
     ('limoncello',       lambda x: 'limoncello' in x),
+    ('italicus',         lambda x: 'italicus' in x),
 
     # Liqueurs de fruits
     ('cherry_heering',   lambda x: 'cherry heering' in x or ('cherry' in x and 'heering' in x)),
@@ -72,11 +75,15 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('apricot_licor',    lambda x: ('apricot' in x or 'abricot' in x) and ('liqueur' in x or 'brandy' in x or 'licor' in x or 'giffard' in x)),
     ('cassis_licor',     lambda x: 'creme de cassis' in x or ('cassis' in x and ('liqueur' in x or 'creme' in x))),
     ('mure_licor',       lambda x: 'creme de mure' in x or 'mure' in x or ('blackberry' in x and 'liqueur' in x)),
-    ('banana_licor',     lambda x: 'creme de banane' in x or ('banana' in x and ('liqueur' in x or 'licor' in x))),
+    ('banana_licor',     lambda x: 'creme de banane' in x or (('banana' in x or 'banane' in x) and ('liqueur' in x or 'licor' in x))),
     ('mint_licor',       lambda x: 'creme de menthe' in x or ('mint' in x and 'liqueur' in x)),
     ('chocolate_licor',  lambda x: 'creme de cacao' in x or ('chocolate' in x and 'liqueur' in x)),
     ('midori',           lambda x: 'midori' in x),
     ('sloe_gin',         lambda x: 'sloe' in x and 'gin' in x),
+    ('mango_licor',      lambda x: 'mango' in x and ('liqueur' in x or 'licor' in x)),
+    ('peach_licor',      lambda x: 'peach' in x and ('liqueur' in x or 'licor' in x)),
+    ('pear_licor',       lambda x: 'pear' in x and ('liqueur' in x or 'licor' in x or 'creme' in x)),
+    ('pit_licor',        lambda x: 'noyaux' in x and ('liqueur' in x or 'licor' in x or 'creme' in x)),
 
     # Liqueurs de noix / café / crème
     ('amaretto',         lambda x: 'amaretto' in x),
@@ -88,22 +95,29 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
 
     # Divers
     ('elderflower_licor',lambda x: 'elderflower' in x and ('liqueur' in x or 'cordial' in x or 'st germain' in x)),
+    ('violet_licor'     ,lambda x: 'violette' in x and ('liqueur' in x or 'creme' in x or 'licor' in x)),
     ('sambuca',          lambda x: 'sambuca' in x),
     ('drambuie',         lambda x: 'drambuie' in x),
     ('falernum',         lambda x: 'falernum' in x),
-    ('swedish_punsch',   lambda x: 'swedish_punsch' in x),
+    ('swedish_punsch',   lambda x: 'swedish punsch' in x),
+    ('malort',           lambda x: 'malort' in x),
 
     # ── Modificateurs / vins fortifiés ────────────────────────────
     ('blanc_vermouth',   lambda x: 'vermouth' in x and ('blanc' in x or 'bianco' in x)),
     ('dry_vermouth',     lambda x: 'vermouth' in x and ('dry' in x or 'extra dry' in x)),
-    ('sweet_vermouth',   lambda x: 'vermouth' in x and ('sweet' in x or 'rosso' in x or 'rouge' in x or 'cocchi' in x)),
+    ('sweet_vermouth',   lambda x: 'vermouth' in x and ('sweet' in x or 'rosso' in x or 'rouge' in x or 'cocchi')),
     ('lillet',           lambda x: 'lillet' in x),
+    ('cocchi_americano', lambda x: 'cocchi' in x and 'americano' in x),
     ('sherry',           lambda x: 'sherry' in x or 'xerez' in x or 'fino' in x or 'oloroso' in x or 'amontillado' in x),
     ('porto',            lambda x: 'porto' in x or 'port wine' in x or ('port' in x and ('ruby' in x or 'tawny' in x))),
     ('sparkling_wine',   lambda x: any(w in x for w in ['champagne', 'prosecco', 'cava', 'cremant', 'crémant', 'sparkling wine'])),
     ('sake',             lambda x: 'sake' in x or 'saké' in x),
     ('beer',             lambda x: 'beer' in x and 'ginger' not in x and 'root' not in x),
+    ('ipa_beer',         lambda x: 'ipa' in x),
+    ('stout_beer',       lambda x: 'stout' in x or 'guinness' in x),
     ('red_wine',         lambda x: 'red wine' in x or 'vin rouge' in x),
+    ('dry_white_wine',   lambda x: 'white wine' in x or 'vin blanc' in x), # dry as default white wine
+    ('sweet_white_wine', lambda x: ('white wine' in x or 'vin blanc' in x) and 'sweet' in x),
     ('rose_wine',        lambda x: 'rose wine' in x or 'rosé wine' in x or 'vin rose' in x),
 
     # ── Jus ───────────────────────────────────────────────────────
@@ -113,8 +127,9 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('lime_juice',       lambda x: 'lime juice' in x),
     ('orange_juice',     lambda x: 'orange juice' in x),
     ('pineapple_juice',  lambda x: 'pineapple' in x and 'juice' in x),
-    ('apple_juice',      lambda x: 'apple juice' in x),
-    ('tomato_juice',     lambda x: 'tomato juice' in x),
+    ('apple_juice',      lambda x: 'apple juice' in x or 'apple cider' in x),
+    ('passion_juice',    lambda x: 'passion' in x and 'juice' in x),
+    ('tomato_juice',     lambda x: 'tomato' in x and 'juice' in x),
 
     # ── Sirops ────────────────────────────────────────────────────
     ('honey_syrup',          lambda x: 'honey' in x and ('syrup' in x or 'mix' in x)),
@@ -131,6 +146,10 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('rich_simple_syrup',    lambda x: 'rich simple syrup' in x or ('rich' in x and 'syrup' in x)),
     ('semi_simple_syrup',    lambda x: 'semi' in x and 'syrup' in x),
     ('simple_syrup',         lambda x: 'simple syrup' in x or 'sugar syrup' in x or 'gomme' in x),
+    ('guava_syrup',          lambda x: 'syrup' in x and 'guava' in x),
+    ('ginger_syrup',         lambda x: 'syrup' in x and 'ginger' in x),
+    ('hibiscus_syrup',       lambda x: 'syrup' in x and 'hibiscus' in x),
+    ('redcurrant_syrup',     lambda x: 'groseille' in x and 'syrup' in x),
 
     # ── Bitters ───────────────────────────────────────────────────
     ('angostura_bitters',    lambda x: 'angostura' in x),
@@ -159,7 +178,11 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('grapefruit_zest',  lambda x: 'grapefruit' in x and ('zest' in x or 'twist' in x or 'peel' in x or 'oil' in x)),
     ('cocktail_cherry',  lambda x: 'cherry' in x and 'heering' not in x and 'liqueur' not in x),
     ('olive',            lambda x: 'olive' in x and 'oil' not in x),
+    ('orange_wheel',     lambda x: 'orange' in x and 'wheel' in x),
+    ('lemon_wheel',      lambda x: 'lemon' in x and 'wheel' in x),
     ('lime_wheel',       lambda x: 'lime' in x and 'wheel' in x),
+    ('pineapple',        lambda x: 'pineapple' in x),
+    ('pineapple_fronds', lambda x: 'pineapple' in x and 'frond' in x),
     ('nutmeg',           lambda x: 'nutmeg' in x or 'muscade' in x),
     ('mint',             lambda x: 'mint' in x and 'liqueur' not in x and 'creme de' not in x),
     ('cucumber',         lambda x: 'cucumber' in x),
@@ -168,6 +191,8 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('salt',             lambda x: 'salt' in x and ('rim' in x or 'pinch' in x or 'flake' in x)),
     ('sugar_rim',        lambda x: 'sugar' in x and 'rim' in x),
     ('dried_fruit',      lambda x: 'dried fruit' in x or 'dehydrated' in x),
+    ('cinnamon_stick',   lambda x: 'cinnamon' in x and 'stick' in x),
+    ('grape',            lambda x: 'grape' in x and not 'grapefruit' in x),
 
     # ── Autres / dairy / divers ───────────────────────────────────
     ('worcestershire',   lambda x: 'worcestershire' in x),
@@ -175,10 +200,12 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('cold_brew',        lambda x: 'cold brew' in x),
     ('matcha',           lambda x: 'matcha' in x),
     ('butter',           lambda x: 'butter' in x),
-    ('heavy_cream',      lambda x: 'heavy cream' in x or 'double cream' in x or 'whipping cream' in x or 'half and half' in x),
+    ('heavy_cream',      lambda x: 'heavy cream' in x or 'double cream' in x or 'whipping cream' in x or ('half' in x and 'half in x') or ('1/2' in x and '1/2' in x) or 'creamer' in x),
     ('aquafaba',         lambda x: 'egg white' in x or 'aquafaba' in x),
     ('egg',              lambda x: 'whole egg' in x or ('egg' in x and 'nog' not in x)),
     ('milk',             lambda x: 'milk' in x),
-    ('coffee',           lambda x: 'coffee' in x and 'liqueur' not in x),
+    ('coffee',           lambda x: 'coffee' in x and 'liqueur' not in x or 'espresso' in x),
     ('tea',              lambda x: 'tea' in x and 'peach' not in x),
+    ('water',            lambda x: 'water' in x and 'hot' not in x and 'sparkling' not in x),
+    ('hot_water',        lambda x: 'hot water' in x),
 ]

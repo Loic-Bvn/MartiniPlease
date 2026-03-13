@@ -1,8 +1,7 @@
 <template>
   <button
     @click="toggle"
-    class="btn-theme-toggle"
-    :title="isDark ? 'Mode clair' : 'Mode sombre'"
+    class="btn-mode btn-mode-inactive"
   >
     <Sun v-if="isDark" :size="16" />
     <Moon v-else :size="16" />

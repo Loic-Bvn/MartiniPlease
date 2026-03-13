@@ -586,26 +586,45 @@ body {
   height: 1em;
   display: flex;
 }
-
-.status-dot {
-  display: inline-block;
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
+.recipe-bullet {
   flex-shrink: 0;
+  width: 0.85rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.status-available { background: var(--success); }
-.status-missing   { background: var(--danger-text); }
+.recipe-bullet::before {
+  content: '';
+  display: block;
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.recipe-bullet--available { color: var(--text-dim); }
+.recipe-bullet--missing   { color: var(--danger-text); }
 
 .ingredient-name {
   flex: 0 1 auto;
-  color: var(--text-dim) !important;
+  color: var(--text-dim);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.ingredient-name--garnish {
+  color: var(--text-dim);
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.recipe-bullet--garnish {
+  color: var(--text-dim);
+  opacity: 0.25;
+}
 .ingredient-quantity {
   font-weight: 600;
   color: var(--gold);
@@ -1113,12 +1132,14 @@ body {
 /* ── CocktailCard layout ───────────────────── */
 .cocktail-meta-row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
-  padding-right: 0.25rem;
 }
 
+.cocktail-meta-row .cocktail-subtitle:first-child {
+  flex: 1;
+}
 /* =============================================
    MENU CARD VIEW
    ============================================= */
@@ -1843,4 +1864,91 @@ body {
   .modal-container--cocktail { max-height: 95vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .modal-container--menucard { max-height: 90vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .password-modal-content { padding: 1.25rem; }
+}
+/* ── Sub-spirit chips ──────────────────────── */
+.chips-container--sub {
+  margin-top: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--gold-dim);
+}
+
+.chip--sub {
+  font-size: 0.72rem;
+  padding: 0.25rem 0.7rem;
+  opacity: 0.85;
+}
+
+.chip--sub.active {
+  background: rgba(201, 168, 76, 0.18);
+  opacity: 1;
+}
+
+.filter-tag--sub {
+  font-size: 0.72rem;
+  opacity: 0.9;
+  background: rgba(201, 168, 76, 0.07);
+}
+
+/* ── Fade transition pour les sous-chips ───── */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* ── Filter mode toggle ────────────────────── */
+.filter-mode-toggle {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.filter-mode-btn {
+  flex: 1;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-mid);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.filter-mode-btn:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
+.filter-mode-btn.active {
+  background: rgba(201, 168, 76, 0.12);
+  color: var(--gold);
+  border-color: var(--gold-dim);
+}
+
+/* ── Chip hint (ex: "< 15°") ───────────────── */
+.chip-hint {
+  opacity: 0.6;
+  font-weight: 400;
+  font-size: 0.68rem;
+  margin-left: 0.2rem;
+}
+
+.profile-tags {
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+.profile-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.profile-tag + .profile-tag::before {
+  content: ' · ';
 }
