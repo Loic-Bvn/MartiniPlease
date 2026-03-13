@@ -9,8 +9,8 @@ from typing import Optional, List, Dict
 from unidecode import unidecode
 
 from constants.ingredients import INGREDIENT_RULES
-from constants.spirits import SPIRIT_TO_CATEGORY
-from constants.abv import INGREDIENT_ABV
+# from constants.spirits import SPIRIT_TO_CATEGORY
+# from constants.abv import INGREDIENT_ABV
 from config import DASH_ML, OZ_TO_ML
 
 def detect_ingredient_type(ingredient: str) -> str:
