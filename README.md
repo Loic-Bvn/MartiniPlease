@@ -31,19 +31,6 @@ cd scraper
 pip install -r requirements.txt
 ```
 
-### Configuration des secrets
-
-Les credentials ne sont jamais stockés dans le projet. Ils sont gérés via **GitHub Secrets** :
-
-**Secrets à créer dans GitHub** (Settings > Secrets and variables > Actions) :
-
-| Secret                | Description                                                                 |
-|-----------------------|-----------------------------------------------------------------------------|
-| `YOUTUBE_API_KEY`     | Clé YouTube Data API v3 ([Google Cloud Console](https://console.cloud.google.com/)) |
-| `YOUTUBE_CHANNEL_ID`  | ID de la chaîne YouTube à scraper                                          |
-| `SUPABASE_URL`        | URL du projet Supabase (Project Settings > API)                            |
-| `SUPABASE_KEY`        | Clé `anon` Supabase (Project Settings > API)                               |
-
 ### Lancer le scraper depuis GitHub Actions (recommandé)
 
 Dans l'onglet **Actions** du dépôt, sélectionner le workflow **"Run Scraper"** et cliquer sur **"Run workflow"**.
@@ -60,13 +47,6 @@ Le script `run_scraper.sh` injecte les secrets depuis le trousseau système (mac
 
 **Prérequis :** [GitHub CLI](https://cli.github.com/) installée et authentifiée (`gh auth login`).
 
-**Enregistrer les secrets une seule fois (macOS) :**
-```bash
-security add-generic-password -a "$USER" -s MARTINI_YOUTUBE_API_KEY    -w 'ta_clé_youtube'
-security add-generic-password -a "$USER" -s MARTINI_YOUTUBE_CHANNEL_ID -w 'UCEK-PgJHg4Jupi7k7re0qGg'
-security add-generic-password -a "$USER" -s MARTINI_SUPABASE_URL        -w 'https://xxx.supabase.co'
-security add-generic-password -a "$USER" -s MARTINI_SUPABASE_KEY        -w 'ta_clé_supabase'
-```
 
 **Lancer le scraper :**
 ```bash
@@ -154,14 +134,6 @@ npm run build
 
 ---
 
-## Sécurité
-
-> ⚠️ **Ne jamais committer de clés API ou tokens dans le code.**
-
-- Les fichiers `.env` et `scraper/.env` sont ignorés par git (voir `.gitignore`)
-- Le frontend utilise des variables `VITE_*` (publiques côté client) — n'y mettre que la clé `anon` Supabase
-- Pour le scraper (usage local uniquement), utiliser `scraper/.env`
-
 ---
 
 ## Structure de la base de données
@@ -196,3 +168,4 @@ npm run build
 | `name`      | text    | Nom affiché (ex: `Bourbon`)              |
 | `category`  | text    | Catégorie (spirits, licors, syrups...)   |
 | `available` | boolean | Présent dans le bar (géré via l'UI)      |
+| `abv`       | float   | Degré d'alcool                           |
