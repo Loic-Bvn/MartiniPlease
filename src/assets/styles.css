@@ -1167,6 +1167,14 @@ body {
   box-shadow: var(--shadow-md);
 }
 
+.cv-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 80px;
+  justify-content: flex-end;
+}
+
 .cv-back {
   display: flex;
   align-items: center;
@@ -1951,4 +1959,9 @@ body {
 
 .profile-tag + .profile-tag::before {
   content: ' · ';
+}
+
+.cv-card-meta .profile-tags {
+  font-size: 0.72rem;
+  color: var(--text-dim);
 }

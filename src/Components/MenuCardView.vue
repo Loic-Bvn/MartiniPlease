@@ -5,25 +5,32 @@
     <div class="cv-header">
       <button @click="$emit('close')" class="cv-back">
         <ArrowLeft :size="18" />
-        Retour
+        {{ t.back }}
       </button>
       <div class="cv-title-block">
         <h1 class="cv-title">{{ card.name }}</h1>
         <span class="cv-meta">{{ cardCocktails.length }} cocktail{{ cardCocktails.length > 1 ? 's' : '' }}</span>
       </div>
-      <div style="width: 80px"></div>
+      <div class="cv-header-actions">
+        <button @click="$emit('toggle-locale')" class="btn-mode btn-mode-inactive">
+          {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
+        </button>
+        <button @click="toggleDark" class="btn-mode btn-mode-inactive">
+          <Sun v-if="isDark" :size="16" />
+          <Moon v-else :size="16" />
+        </button>
+      </div>
     </div>
 
-    <!-- Loading -->
+    <!-- Empty -->
     <div v-if="!cardCocktails.length" class="cv-empty">
-      Aucun cocktail dans cette carte.
+      {{ t.empty }}
     </div>
 
     <!-- Cocktails groupés par catégorie -->
     <div v-else class="cv-content">
       <div v-for="group in groupedCocktails" :key="group.category" class="cv-group">
 
-        <!-- Section title -->
         <div class="cv-group-header">
           <span class="cv-group-icon">{{ group.icon }}</span>
           <h2 class="cv-group-title">{{ group.label }}</h2>
@@ -43,12 +50,15 @@
                 <span v-if="cocktail.abv" class="cv-abv">{{ cocktail.abv }}°</span>
               </div>
               <div class="cv-card-meta">
-                <span v-if="cocktail.base_spirit" class="cv-spirit">{{ cocktail.base_spirit }}</span>
-                <span class="cv-seasons">{{ seasonLabel(cocktail.season) }}</span>
+                <span v-if="cocktail.base_spirit" class="cv-spirit">
+                  {{ getTypeLabel(cocktail.base_spirit, locale) }}
+                </span>
+                <span v-if="cocktail.profile?.length" class="profile-tags">
+                  - <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
+                </span>
               </div>
             </div>
 
-            <!-- Divider -->
             <div class="cv-divider"></div>
 
             <!-- Recipe -->
@@ -57,20 +67,24 @@
                 v-for="(ing, idx) in cocktail.recipe"
                 :key="idx"
                 class="cv-ing-row"
-                :class="{ 'cv-ing-garnish': ing.Type === 'garnish' }"
+                :class="{ 'cv-ing-garnish': ing.IsGarnish }"
               >
-                <span class="cv-ing-name">{{ ing.Ingredient }}</span>
+                <span class="cv-ing-name">
+                  {{ (ing.IsGarnish && getTypeLabel(ing.Type, locale) === ing.Type)
+                    ? ing.Ingredient
+                    : getTypeLabel(ing.Type, locale) }}
+                </span>
                 <span class="cv-ing-qty">
                   <template v-if="ing.Oz">{{ ing.Oz }} oz</template>
                   <template v-else-if="ing.Dashes">{{ ing.Dashes }} dash{{ ing.Dashes > 1 ? 'es' : '' }}</template>
-                  <template v-else-if="ing.Type === 'garnish'">garniture</template>
+                  <template v-else-if="ing.IsGarnish">{{ t.garnish }}</template>
                 </span>
               </div>
             </div>
 
-            <!-- Footer badges -->
+            <!-- Footer -->
             <div class="cv-card-footer">
-              <span v-if="cocktail.method" class="cv-badge">{{ cocktail.method }}</span>
+              <span v-if="cocktail.method" class="cv-badge">{{ methodLabel(cocktail.method) }}</span>
               <span v-if="cocktail.glass" class="cv-badge">{{ cocktail.glass }}</span>
               <span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cv-creator">
                 by {{ cocktail.creator }}
@@ -85,28 +99,70 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { ArrowLeft } from 'lucide-vue-next'
+import { ref, computed, onMounted } from 'vue'
+import { ArrowLeft, Sun, Moon } from 'lucide-vue-next'
+import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 
 const props = defineProps({
   card:      { type: Object, required: true },
   cocktails: { type: Array,  default: () => [] },
+  locale:    { type: String, default: 'fr' },
 })
 
-defineEmits(['close'])
+defineEmits(['close', 'toggle-locale'])
 
-const CATEGORY_ORDER = [
-  { key: 'Whiskey_Family', label: 'Whiskey',  icon: '🥃' },
-  { key: 'Rum_Family',     label: 'Rhum',     icon: '🍹' },
-  { key: 'Agave_Family',   label: 'Agave',    icon: '🌵' },
-  { key: 'Gin',            label: 'Gin',      icon: '🌿' },
-  { key: 'Vodka',          label: 'Vodka',    icon: '❄️' },
-  { key: 'Brandy_Family',  label: 'Brandy',   icon: '🍇' },
-  { key: 'Pisco',          label: 'Pisco',    icon: '🫙' },
-  { key: 'Absinthe',       label: 'Absinthe', icon: '🌱' },
-  { key: 'Chartreuse',     label: 'Chartreuse', icon: '💚' },
-  { key: null,             label: 'Autres',   icon: ' ' },
-]
+// Dark mode — même logique que ThemeToggle
+const isDark = ref(false)
+
+onMounted(() => {
+  const saved = localStorage.getItem('theme')
+  if (saved) {
+    isDark.value = saved === 'dark'
+  } else {
+    isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
+  }
+})
+
+function toggleDark() {
+  isDark.value = !isDark.value
+  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+  document.documentElement.classList.toggle('dark', isDark.value)
+}
+
+const t = computed(() => ({
+  back:    props.locale === 'fr' ? 'Retour'                          : 'Back',
+  empty:   props.locale === 'fr' ? 'Aucun cocktail dans cette carte.' : 'No cocktail in this card.',
+  garnish: props.locale === 'fr' ? 'garniture'                      : 'garnish',
+  others:  props.locale === 'fr' ? 'Autres'                         : 'Others',
+}))
+
+const CATEGORY_ORDER = computed(() => [
+  { key: 'Whiskey',  label: 'Whiskey',               icon: '🥃' },
+  { key: 'Rum',      label: props.locale === 'fr' ? 'Rhum'     : 'Rum',      icon: '🍹' },
+  { key: 'Agave',    label: 'Agave',                 icon: '🌵' },
+  { key: 'Gin',      label: 'Gin',                   icon: '🌿' },
+  { key: 'Vodka',    label: 'Vodka',                 icon: '❄️' },
+  { key: 'Brandy',   label: 'Brandy',                icon: '🍇' },
+  { key: 'Absinthe', label: 'Absinthe',              icon: '🌱' },
+  { key: 'Aquavit',  label: 'Aquavit',               icon: '🌾' },
+  { key: 'Pastis',   label: 'Pastis',                icon: '⭐' },
+  { key: null,       label: t.value.others,          icon: '🍸' },
+])
+
+const METHOD_LABELS = {
+  shake:       '🍸 Shake',
+  regal_shake: '🍸 Regal Shake',
+  stir:        '🥄 Stir',
+  regal_stir:  '🥄 Regal Stir',
+  build:       '🫗 Build',
+  blend:       '🌀 Blend',
+  swizzle:     '🌿 Swizzle',
+  throw:       '🤹 Throw',
+}
+
+function methodLabel(method) {
+  return METHOD_LABELS[method] || method
+}
 
 const cardCocktails = computed(() =>
   (props.card.cocktail_ids || [])
@@ -115,11 +171,12 @@ const cardCocktails = computed(() =>
 )
 
 const groupedCocktails = computed(() => {
+  const order = CATEGORY_ORDER.value
   const groups = []
-  for (const cat of CATEGORY_ORDER) {
+  for (const cat of order) {
     const matched = cardCocktails.value.filter(c =>
       cat.key === null
-        ? !CATEGORY_ORDER.slice(0, -1).some(o => o.key === c.category)
+        ? !order.slice(0, -1).some(o => o.key === c.category)
         : c.category === cat.key
     )
     if (matched.length) {
