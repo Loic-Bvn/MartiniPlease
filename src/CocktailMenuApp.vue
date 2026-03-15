@@ -180,6 +180,21 @@
               </div>
             </div>
 
+            <!-- Profils -->
+            <div class="filter-group">
+              <label class="filter-label">{{ t.filterProfile }}</label>
+              <div class="chips-container">
+                <button
+                  v-for="p in profileFilters"
+                  :key="p.key"
+                  @click="toggleFilter(selectedProfiles, p.key)"
+                  :class="['chip', { active: selectedProfiles.includes(p.key) }]"
+                >
+                  {{ p.label }}
+                </button>
+              </div>
+            </div>
+
             <!-- Tags actifs -->
             <div v-if="hasActiveFilters" class="active-filters-bar">
               <span v-for="f in selectedFamilies" :key="f" class="filter-tag">
@@ -199,6 +214,10 @@
               </span>
               <span v-if="abvFilter === 'low'" class="filter-tag">
                 🍃 Low ABV <X @click="abvFilter = null" :size="14" />
+              </span>
+              <span v-for="p in selectedProfiles" :key="p" class="filter-tag">
+                {{ profileFilters.find(f => f.key === p)?.label }}
+                <X @click="toggleFilter(selectedProfiles, p)" :size="14" />
               </span>
               <button @click="clearFilters" class="clear-all-btn">{{ t.clearAll }}</button>
             </div>
@@ -275,10 +294,17 @@
     </div>
 
     <PasswordModal v-if="showPasswordModal" @close="showPasswordModal = false" @success="enterBartenderMode" />
-    <MenuCardView v-if="viewingCard" :card="viewingCard" :cocktails="cocktails" @close="viewingCard = null" />
+    <MenuCardModal v-if="showCardModal" :card="editingCard" :cocktails="cocktails" :locale="locale" @save="handleSaveCard" @close="showCardModal = false" />
     <MenuCardModal v-if="showCardModal" :card="editingCard" :cocktails="cocktails" @save="handleSaveCard" @close="showCardModal = false" />
     <CocktailModal v-if="showCocktailModal" :cocktail="editingCocktail" @save="handleSave" @close="showCocktailModal = false" />
-
+    <MenuCardView
+      v-if="viewingCard"
+      :card="viewingCard"
+      :cocktails="cocktails"
+      :locale="locale"
+      @close="viewingCard = null"
+      @toggle-locale="locale = locale === 'fr' ? 'en' : 'fr'"
+    />
   </div>
 </template>
 
@@ -346,6 +372,7 @@ const t = computed(() => ({
   stock:                  locale.value === 'fr' ? '📦 Stock du bar'                     : '📦 Bar stock',
   deleteCard:             locale.value === 'fr' ? 'Supprimer cette carte ?'             : 'Delete this card?',
   deleteCocktail:         locale.value === 'fr' ? 'Supprimer ce cocktail ?'             : 'Delete this cocktail?',
+  filterProfile: locale.value === 'fr' ? 'Profil gustatif' : 'Flavor profile',
 }))
 
 // Filtres
@@ -356,6 +383,7 @@ const selectedSeasons    = ref([])
 const showOnlyMakeable   = ref(false)
 const filterMode         = ref('main')
 const abvFilter          = ref(null)
+const selectedProfiles = ref([])
 
 // ── Référentiels ──────────────────────────────────────────────────────────────
 
@@ -424,6 +452,29 @@ const liqueurFamilies = computed(() => [
   { key: 'Liqueur Anisée',  label: getFL('Liqueur Anisée', locale.value)  },
 ])
 
+const profileFilters = computed(() => {
+  const labels = {
+    Smoky:      locale.value === 'fr' ? 'Fumé'      : 'Smoky',
+    Bitter:     locale.value === 'fr' ? 'Amer'       : 'Bitter',
+    Creamy:     locale.value === 'fr' ? 'Crémeux'    : 'Creamy',
+    Tropical:   locale.value === 'fr' ? 'Tropical'   : 'Tropical',
+    Floral:     locale.value === 'fr' ? 'Floral'     : 'Floral',
+    Nutty:      locale.value === 'fr' ? 'Noisetté'   : 'Nutty',
+    Spicy:      locale.value === 'fr' ? 'Épicé'      : 'Spicy',
+    Herbal:     locale.value === 'fr' ? 'Herbacé'    : 'Herbal',
+    Fruity:     locale.value === 'fr' ? 'Fruité'     : 'Fruity',
+    Citrus:     locale.value === 'fr' ? 'Agrume'     : 'Citrus',
+    Sour:       locale.value === 'fr' ? 'Acidulé'    : 'Sour',
+    Dry:        locale.value === 'fr' ? 'Sec'        : 'Dry',
+    Boozy:      locale.value === 'fr' ? 'Corsé'      : 'Boozy',
+    Refreshing: locale.value === 'fr' ? 'Frais'      : 'Refreshing',
+    Rich:       locale.value === 'fr' ? 'Riche'      : 'Rich',
+    Sweet:      locale.value === 'fr' ? 'Sucré'      : 'Sweet',
+  }
+  return Object.entries(labels).map(([key, label]) => ({ key, label }))
+})
+
+
 const seasons = computed(() => [
   { key: 'all',    icon: '🍸', label: locale.value === 'fr' ? 'Toutes'    : 'All'    },
   { key: 'spring', icon: '🌸', label: locale.value === 'fr' ? 'Printemps' : 'Spring' },
@@ -475,6 +526,7 @@ function clearFilters() {
   selectedFamilies.value   = []
   selectedSubSpirits.value = []
   selectedSeasons.value    = []
+  selectedProfiles.value   = []
   abvFilter.value          = null
 }
 
@@ -563,6 +615,12 @@ const filteredCocktails = computed(() => {
     list = list.filter(c => c.abv !== null && c.abv > 0 && c.abv < 15)
   }
 
+  if (selectedProfiles.value.length) {
+    list = list.filter(c =>
+      selectedProfiles.value.every(p => c.profile?.includes(p))
+    )
+  }
+
   return list
 })
 
@@ -570,6 +628,7 @@ const hasActiveFilters = computed(() =>
   selectedFamilies.value.length > 0 ||
   selectedSubSpirits.value.length > 0 ||
   selectedSeasons.value.length > 0 ||
+  selectedProfiles.value.length > 0 ||
   abvFilter.value !== null
 )
 

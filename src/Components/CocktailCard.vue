@@ -11,7 +11,7 @@
           <p class="cocktail-subtitle">
             {{ cocktail.abv > 0 ? baseSpiritLabel : 'Mocktail' }}
           <span v-if="cocktail.profile?.length" class="profile-tags">
-            - {{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}
+            - <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
           </span>
           </p>
           <span class="cocktail-subtitle" style="margin-left: auto;">
