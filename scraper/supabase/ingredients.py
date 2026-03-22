@@ -1,6 +1,7 @@
 """
 Génère et importe la table `ingredients` depuis les `Type` présents dans les recettes.
-Usage: python -m scraper.supabase.ingredients
+Usage: python -m scraper.supabase.ingredients <bar_id>
+       python scraper/supabase/ingredients.py xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 """
 
 import sys
@@ -10,9 +11,13 @@ from scraper.config import SUPABASE_URL, SUPABASE_KEY
 from scraper.constants.ingredients_meta import TYPE_METADATA
 
 
-def generate_ingredients():
+def generate_ingredients(bar_id: str):
     if not SUPABASE_URL or not SUPABASE_KEY:
         print("❌ SUPABASE_URL et SUPABASE_KEY doivent être définis dans le fichier .env")
+        sys.exit(1)
+
+    if not bar_id:
+        print("❌ bar_id manquant. Usage: python scraper/supabase/ingredients.py <bar_id>")
         sys.exit(1)
 
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -26,15 +31,17 @@ def generate_ingredients():
             "category":  meta[1] if meta else "others",
             "abv":       meta[2] if meta else 0.0,
             "family":    meta[3] if meta else None,
-            "available": False
+            "available": False,
+            "bar_id":    bar_id,
         })
 
-    print(f"\n📥 Import de {len(rows)} ingrédients dans Supabase...")
+    print(f"\n📥 Import de {len(rows)} ingrédients pour le bar {bar_id}...")
     try:
         supabase.table("ingredients").insert(rows).execute()
         print(f"✅ {len(rows)} ingrédients importés avec succès !")
     except Exception as e:
         print(f"❌ Erreur : {e}")
+        sys.exit(1)
 
     print("\nRésumé par catégorie :")
     counter = Counter(r["category"] for r in rows)
@@ -48,4 +55,7 @@ def generate_ingredients():
 
 
 if __name__ == "__main__":
-    generate_ingredients()
+    if len(sys.argv) < 2:
+        print("Usage: python scraper/supabase/ingredients.py <bar_id>")
+        sys.exit(1)
+    generate_ingredients(sys.argv[1])

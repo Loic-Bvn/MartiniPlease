@@ -1,19 +1,24 @@
 // composables/useCocktails.js
-// Fetche et gère les cocktails depuis Supabase
+// Fetche et gère les cocktails depuis Supabase, filtrés par bar_id
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/composables/useAuth'
 
 const cocktails = ref([])
-const loading = ref(false)
+const loading   = ref(false)
 
 export function useCocktails() {
+  const { currentBarId } = useAuth()
 
-  async function fetchCocktails() {
+  async function fetchCocktails(barId) {
+    const id = barId ?? currentBarId.value
+    if (!id) return
     loading.value = true
     try {
       const { data, error } = await supabase
         .from('cocktails')
         .select('*')
+        .eq('bar_id', id)
         .order('name')
 
       if (error) throw error
@@ -26,16 +31,19 @@ export function useCocktails() {
   }
 
   async function createCocktail(cocktailData) {
+    const barId = currentBarId.value
+    if (!barId) return { success: false, error: 'Non connecté' }
     try {
       const { id, ...dataWithoutId } = cocktailData
       const { data, error } = await supabase
         .from('cocktails')
-        .insert(dataWithoutId)
+        .insert({ ...dataWithoutId, bar_id: barId })
         .select()
         .single()
 
       if (error) throw error
       cocktails.value.push(data)
+      cocktails.value.sort((a, b) => a.name.localeCompare(b.name))
       return { success: true, data }
     } catch (err) {
       console.error('❌ Erreur createCocktail:', err)

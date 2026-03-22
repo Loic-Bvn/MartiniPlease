@@ -1,19 +1,24 @@
 // composables/useMenuCards.js
-// Gère les cartes de menu custom (création, lecture, édition, suppression)
+// Gère les cartes de menu — filtrées par bar_id
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/composables/useAuth'
 
 const menuCards = ref([])
 const loading   = ref(false)
 
 export function useMenuCards() {
+  const { currentBarId } = useAuth()
 
-  async function fetchMenuCards() {
+  async function fetchMenuCards(barId) {
+    const id = barId ?? currentBarId.value
+    if (!id) return
     loading.value = true
     try {
       const { data, error } = await supabase
         .from('menu_cards')
         .select('*')
+        .eq('bar_id', id)
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -26,10 +31,12 @@ export function useMenuCards() {
   }
 
   async function createMenuCard(cardData) {
+    const barId = currentBarId.value
+    if (!barId) return { success: false, error: 'Non connecté' }
     try {
       const { data, error } = await supabase
         .from('menu_cards')
-        .insert({ name: cardData.name, cocktail_ids: cardData.cocktail_ids })
+        .insert({ name: cardData.name, cocktail_ids: cardData.cocktail_ids, bar_id: barId })
         .select()
         .single()
 
