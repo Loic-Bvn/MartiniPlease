@@ -1,29 +1,30 @@
 // composables/useInventory.js
-// Gère le stock du bar — lit et écrit dans Supabase
+// Gère le stock du bar — filtré par bar_id
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/composables/useAuth'
 
-const barInventory = ref(new Set()) // Set de `type` disponibles (ex: "bourbon", "gin")
-const ingredients = ref([])         // Liste complète des ingrédients depuis Supabase
-const loading = ref(false)
+const barInventory = ref(new Set())
+const ingredients  = ref([])
+const loading      = ref(false)
 
 export function useInventory() {
+  const { currentBarId } = useAuth()
 
-  // Charger tous les ingrédients depuis Supabase
-  async function fetchIngredients() {
+  async function fetchIngredients(barId) {
+    const id = barId ?? currentBarId.value
+    if (!id) return
     loading.value = true
     try {
       const { data, error } = await supabase
         .from('ingredients')
         .select('*')
+        .eq('bar_id', id)
         .order('category')
         .order('name')
 
       if (error) throw error
-
       ingredients.value = data
-
-      // Reconstruire le Set des ingrédients disponibles
       barInventory.value = new Set(
         data.filter(i => i.available).map(i => i.type)
       )
@@ -34,74 +35,57 @@ export function useInventory() {
     }
   }
 
-  // Basculer la disponibilité d'un ingrédient
   async function toggleIngredient(ingredientType) {
     const ingredient = ingredients.value.find(i => i.type === ingredientType)
     if (!ingredient) return
-
     const newAvailable = !ingredient.available
-
     try {
       const { error } = await supabase
         .from('ingredients')
         .update({ available: newAvailable })
         .eq('type', ingredientType)
+        .eq('bar_id', currentBarId.value)
 
       if (error) throw error
-
-      // Mettre à jour localement
       ingredient.available = newAvailable
-      if (newAvailable) {
-        barInventory.value.add(ingredientType)
-      } else {
-        barInventory.value.delete(ingredientType)
-      }
-      barInventory.value = new Set(barInventory.value) // Forcer réactivité
-
+      if (newAvailable) barInventory.value.add(ingredientType)
+      else              barInventory.value.delete(ingredientType)
+      barInventory.value = new Set(barInventory.value)
     } catch (err) {
       console.error('❌ Erreur toggleIngredient:', err)
     }
   }
 
-  // Tout sélectionner / désélectionner dans une catégorie
   async function toggleCategory(categoryKey, select) {
     const categoryIngredients = ingredients.value.filter(i => i.category === categoryKey)
     if (!categoryIngredients.length) return
-
     try {
       const { error } = await supabase
         .from('ingredients')
         .update({ available: select })
         .eq('category', categoryKey)
+        .eq('bar_id', currentBarId.value)
 
       if (error) throw error
-
-      // Mettre à jour localement
       categoryIngredients.forEach(ing => {
         ing.available = select
-        if (select) {
-          barInventory.value.add(ing.type)
-        } else {
-          barInventory.value.delete(ing.type)
-        }
+        if (select) barInventory.value.add(ing.type)
+        else        barInventory.value.delete(ing.type)
       })
       barInventory.value = new Set(barInventory.value)
-
     } catch (err) {
       console.error('❌ Erreur toggleCategory:', err)
     }
   }
 
-  // Tout sélectionner
   async function selectAll() {
     try {
       const { error } = await supabase
         .from('ingredients')
         .update({ available: true })
-        .neq('type', '') // met à jour toutes les lignes
+        .eq('bar_id', currentBarId.value)
 
       if (error) throw error
-
       ingredients.value.forEach(i => i.available = true)
       barInventory.value = new Set(ingredients.value.map(i => i.type))
     } catch (err) {
@@ -109,16 +93,14 @@ export function useInventory() {
     }
   }
 
-  // Tout désélectionner
   async function deselectAll() {
     try {
       const { error } = await supabase
         .from('ingredients')
         .update({ available: false })
-        .neq('type', '')
+        .eq('bar_id', currentBarId.value)
 
       if (error) throw error
-
       ingredients.value.forEach(i => i.available = false)
       barInventory.value = new Set()
     } catch (err) {
@@ -126,9 +108,7 @@ export function useInventory() {
     }
   }
 
-  function hasIngredient(type) {
-    return barInventory.value.has(type)
-  }
+  function hasIngredient(type) { return barInventory.value.has(type) }
 
   return {
     barInventory,

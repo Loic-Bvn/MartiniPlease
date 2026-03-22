@@ -15,6 +15,9 @@
         <button @click="$emit('toggle-locale')" class="btn-mode btn-mode-inactive">
           {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
         </button>
+        <button @click="$emit('toggle-unit')" class="btn-mode btn-mode-inactive">
+          {{ unit === 'oz' ? 'ml' : 'oz' }}
+        </button>
         <button @click="toggleDark" class="btn-mode btn-mode-inactive">
           <Sun v-if="isDark" :size="16" />
           <Moon v-else :size="16" />
@@ -75,7 +78,8 @@
                     : getTypeLabel(ing.Type, locale) }}
                 </span>
                 <span class="cv-ing-qty">
-                  <template v-if="ing.Oz">{{ ing.Oz }} oz</template>
+                  <template v-if="unit === 'ml' && ing.Ml">{{ ing.Ml }}ml</template>
+                  <template v-else-if="ing.Oz">{{ ing.Oz }}oz</template>
                   <template v-else-if="ing.Dashes">{{ ing.Dashes }} dash{{ ing.Dashes > 1 ? 'es' : '' }}</template>
                   <template v-else-if="ing.IsGarnish">{{ t.garnish }}</template>
                 </span>
@@ -107,9 +111,10 @@ const props = defineProps({
   card:      { type: Object, required: true },
   cocktails: { type: Array,  default: () => [] },
   locale:    { type: String, default: 'fr' },
+  unit:      { type: String, default: 'oz' },
 })
 
-defineEmits(['close', 'toggle-locale'])
+defineEmits(['close', 'toggle-locale', 'toggle-unit'])
 
 // Dark mode — même logique que ThemeToggle
 const isDark = ref(false)
