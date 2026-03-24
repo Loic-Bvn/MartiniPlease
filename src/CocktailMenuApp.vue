@@ -30,7 +30,7 @@
               <button @click="locale = locale === 'fr' ? 'en' : 'fr'" class="btn-mode btn-mode-inactive">
                 {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
               </button>
-              <button @click="unit = unit === 'oz' ? 'ml' : 'oz'" class="btn-mode btn-mode-inactive" :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'">
+              <button v-if="isLoggedIn" @click="unit = unit === 'oz' ? 'ml' : 'oz'" class="btn-mode btn-mode-inactive" :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'">
                 {{ unit === 'oz' ? 'ml' : 'oz' }}
               </button>
             </div>
@@ -124,6 +124,32 @@
             <p v-if="codeError" class="password-form-error">{{ codeError }}</p>
           </div>
 
+        </div>
+      </div>
+    </div>
+
+    <!-- Sélecteur de bar (bartender connecté avec plusieurs bars) -->
+    <div v-else-if="isLoggedIn && hasMultipleBars" class="main-content">
+      <div class="welcome-screen">
+        <img src="/logo_square.png" alt="Martini Please" class="welcome-logo" />
+        <h2 class="welcome-title">{{ locale === 'fr' ? 'Quel bar ?' : 'Which bar?' }}</h2>
+        <p class="welcome-subtitle">{{ locale === 'fr' ? 'Sélectionne le bar auquel accéder.' : 'Select the bar you want to access.' }}</p>
+        <div class="welcome-cards">
+          <div
+            v-for="b in bars"
+            :key="b.id"
+            class="welcome-card"
+            style="cursor: pointer;"
+            @click="selectBar(b)"
+          >
+            <div class="welcome-card-header">
+              <span class="welcome-card-icon">🍾</span>
+              <div>
+                <div class="welcome-card-title">{{ b.name }}</div>
+                <div class="welcome-card-desc">{{ locale === 'fr' ? 'Code :' : 'Code:' }} {{ b.invite_code }}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -443,7 +469,7 @@ import ThemeToggle     from '@/Components/ThemeToggle.vue'
 import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
 import { supabase }    from '@/lib/supabase'
 
-const { isLoggedIn, currentBarId, currentBarName, inviteCode, initAuth, signOut } = useAuth()
+const { isLoggedIn, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, initAuth, signOut, fetchBar } = useAuth()
 
 // Bar chargé via code d'invitation (guest sans compte)
 const guestBar = ref(null)
@@ -469,6 +495,16 @@ function handleLogoClick() {
 async function handleSignOut() {
   await signOut()
   guestBar.value = null
+}
+
+// Sélection d'un bar parmi plusieurs (cas multi-bars)
+async function selectBar(b) {
+  await fetchBar(b.id)
+  await Promise.all([
+    fetchCocktails(b.id),
+    fetchIngredients(b.id),
+    fetchMenuCards(b.id),
+  ])
 }
 
 const showDrinkerPanel  = ref(false)
@@ -533,6 +569,9 @@ async function joinByCode() {
 
 async function onAuthSuccess() {
   clearDrinker()
+  // Si plusieurs bars sur le compte, fetchBar() aura rempli bars[] sans sélectionner
+  // → l'UI affichera le sélecteur de bar ; pas besoin de charger les données ici
+  if (!currentBarId.value) return
   await Promise.all([
     fetchCocktails(currentBarId.value),
     fetchIngredients(currentBarId.value),
@@ -927,6 +966,9 @@ onMounted(async () => {
   margin-bottom: 16px;
   border-radius: 16px;
 }
+
+.dark .welcome-logo { filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(5deg);}
+
 .welcome-title {
   font-size: 1.4rem;
   font-weight: 700;
