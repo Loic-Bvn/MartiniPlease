@@ -18,7 +18,7 @@
             <div class="header-actions">
 
               <!-- Bartender connecté -->
-              <template v-if="isLoggedIn">
+              <template v-if="activeBarId && isLoggedIn">
                 <button @click="openNewModal" class="btn-new-cocktail">
                   <Plus :size="15" /><span class="btn-label-hide"> {{ t.newCocktail }}</span>
                 </button>
@@ -30,7 +30,7 @@
               <button @click="locale = locale === 'fr' ? 'en' : 'fr'" class="btn-mode btn-mode-inactive">
                 {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
               </button>
-              <button v-if="isLoggedIn" @click="unit = unit === 'oz' ? 'ml' : 'oz'" class="btn-mode btn-mode-inactive" :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'">
+              <button v-if="activeBarId" @click="unit = unit === 'oz' ? 'ml' : 'oz'" class="btn-mode btn-mode-inactive" :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'">
                 {{ unit === 'oz' ? 'ml' : 'oz' }}
               </button>
             </div>
@@ -43,16 +43,16 @@
               </button>
               <transition name="fade">
                 <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
-                  <div class="burger-item burger-item--info">
+                  <div v-if="activeBarId" class="burger-item burger-item--info">
                     <span>🔑 {{ inviteCode }}</span>
                     <span class="burger-item-hint">Code d'invitation</span>
                   </div>
-                  <div class="burger-divider" />
-                  <button @click="openNewCardModal(); burgerOpen = false" class="burger-item">
+                  <div v-if="activeBarId" class="burger-divider" />
+                  <button v-if="activeBarId" @click="openNewCardModal(); burgerOpen = false" class="burger-item">
                     <BookOpen :size="15" />
                     {{ t.newCard }}
                   </button>
-                  <div class="burger-divider" />
+                  <div v-if="activeBarId" class="burger-divider" />
                   <button @click="handleSignOut(); burgerOpen = false" class="burger-item burger-item--danger">
                     <LogOut :size="15" />
                     {{ locale === 'fr' ? 'Se déconnecter' : 'Sign out' }}
