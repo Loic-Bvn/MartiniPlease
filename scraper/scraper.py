@@ -23,6 +23,7 @@ from utils.detectors import (
     detect_method,
     detect_difficulty,
     detect_profile,
+    detect_cocktail_style,
     GARNISH_TYPES
 )
 
@@ -124,6 +125,9 @@ class CocktailScraper:
         # Détecter le profil gustatif
         profile = detect_profile(ingredients_dict)
 
+        # Détecter le style du cocktail
+        cocktail_style = detect_cocktail_style(ingredients_dict, method)
+
         # Créer le cocktail
         cocktail = Cocktail(
             name=name,
@@ -140,7 +144,8 @@ class CocktailScraper:
             season=[season],
             creator='Unknown',
             image=f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg",
-            tags=[]
+            tags=[],
+            cocktail_style=cocktail_style,
         )
 
         return cocktail

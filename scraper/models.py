@@ -48,6 +48,7 @@ class Cocktail:
     creator: str = 'Unknown'
     image: Optional[str] = None
     tags: List[str] = field(default_factory=list)
+    cocktail_style: Optional[str] = None
 
     def to_dict(self) -> Dict:
         return {
@@ -65,6 +66,7 @@ class Cocktail:
             'Creator': self.creator,
             'Image': self.image,
             'Tags': self.tags,
+            'CocktailStyle': self.cocktail_style,
             'Recipe': [ing.to_dict() for ing in self.recipe]
         }
 

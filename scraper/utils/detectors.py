@@ -360,3 +360,97 @@ def detect_profile(ingredients: List[Dict]) -> List[str]:
 
     ordered = [p for p in PRIORITY if p in profile]
     return ordered[:2]
+
+def detect_cocktail_style(ingredients: List[Dict], method: Optional[str] = None) -> Optional[str]:
+    """
+    Detecte le style/famille du cocktail base sur ses ingredients et sa methode.
+
+    Retourne un tag parmi :
+    - 'sour'          : spirit + citrus + sucre (la famille la plus large)
+    - 'fizz'          : sour + carbonate (Collins, Fizz...)
+    - 'highball'      : spirit + 1 carbonate, peu d'ingredients
+    - 'tiki'          : rum + ingredients tropicaux
+    - 'old_fashioned' : spirit + bitters + sucre, stir, pas de jus
+    - 'negroni'       : spirit + amaro + vermouth, stir
+    - 'flip'          : contient un oeuf entier
+    - 'creamy'        : creme / coconut cream
+    - 'spritz'        : vin petillant + amaro
+    - 'classic'       : fallback stir
+    - 'modern'        : fallback shake
+    """
+
+    types = {ing.get("Type", "") for ing in ingredients}
+
+    spirits      = {"bourbon","rye","scotch","irish_whiskey","peated_whisky","whiskey","rum","rum_agricol","rum_cuban","rum_jamaican","rum_overproof","cachaca","tequila","tequila_reposado","mezcal","gin","gin_dry","gin_navy","genever","vodka","cognac","brandy","calvados","pisco","absinthe","aquavit","grappa"}
+    rum_types    = {"rum","rum_agricol","rum_cuban","rum_jamaican","rum_overproof","cachaca"}
+    citrus       = {"lemon_juice","lime_juice","grapefruit_juice","orange_juice"}
+    syrups       = {"simple_syrup","rich_simple_syrup","semi_simple_syrup","honey_syrup","agave_syrup","demerara_syrup","maple_syrup","grenadine","orgeat","cinnamon_syrup","vanilla_syrup","coconut_syrup","passion_fruit_syrup","raspberry_syrup","guava_syrup","ginger_syrup","hibiscus_syrup","redcurrant_syrup"}
+    carbonated   = {"club_soda","tonic_water","ginger_soda","beer","cola"}
+    sparkling    = {"sparkling_wine","champagne","prosecco","cava"}
+    modifiers    = {"dry_vermouth","sweet_vermouth","blanc_vermouth","sherry","porto","lillet","cocchi_americano"}
+    amari        = {"campari","aperol","cynar","fernet_branca","amaro","suze","select","malort"}
+    tiki_markers = {"orgeat","falernum","allspice","swedish_punsch","coconut_cream","pineapple_juice","passion_juice","guava_syrup","mango_licor","coconut_syrup"}
+    bitters      = {"angostura_bitters","peychaud_bitters","orange_bitters","chocolate_bitters","walnut_bitters","bitters","celery_bitters"}
+    creamy_types = {"heavy_cream","milk","baileys","coconut_cream","butter"}
+
+    has_spirit     = bool(types & spirits)
+    has_rum        = bool(types & rum_types)
+    has_citrus     = bool(types & citrus)
+    has_syrup      = bool(types & syrups)
+    has_carbonated = bool(types & carbonated)
+    has_sparkling  = bool(types & sparkling)
+    has_modifier   = bool(types & modifiers)
+    has_amaro      = bool(types & amari)
+    has_tiki       = bool(types & tiki_markers)
+    has_bitters    = bool(types & bitters)
+    has_creamy     = bool(types & creamy_types)
+    has_egg        = "egg" in types
+
+    non_garnish = [ing for ing in ingredients if ing.get("Type") != "garnish"]
+    ing_count   = len(non_garnish)
+    tiki_count  = len(types & tiki_markers)
+
+    is_stir  = method in ("stir", "regal_stir")
+    is_build = method == "build"
+
+    # Flip
+    if has_egg and has_spirit:
+        return "flip"
+
+    # Creamy
+    if has_creamy and has_spirit:
+        return "creamy"
+
+    # Tiki : rum + au moins 2 marqueurs tiki
+    if has_rum and tiki_count >= 2:
+        return "tiki"
+
+    # Spritz : vin petillant + amaro, sans spirit fort
+    if has_sparkling and has_amaro and not has_spirit:
+        return "spritz"
+
+    # Negroni family : spirit + amaro + modifier, stir, sans jus
+    if has_spirit and has_amaro and has_modifier and not has_citrus and is_stir:
+        return "negroni"
+
+    # Old Fashioned family : spirit + bitters + sucre, stir, sans jus
+    if has_spirit and has_bitters and has_syrup and not has_citrus and not has_amaro and is_stir:
+        return "old_fashioned"
+
+    # Highball : spirit + carbonate, <= 4 ingredients, build
+    if has_spirit and has_carbonated and ing_count <= 4 and is_build:
+        return "highball"
+
+    # Fizz / Collins : sour + carbonate
+    if has_spirit and has_citrus and has_syrup and has_carbonated:
+        return "fizz"
+
+    # Sour : spirit + citrus + sucre
+    if has_spirit and has_citrus and has_syrup:
+        return "sour"
+
+    # Fallbacks
+    if is_stir or (has_spirit and has_modifier and not has_citrus):
+        return "classic"
+
+    return "modern"

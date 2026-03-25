@@ -667,12 +667,60 @@ body {
   border: 1px solid var(--border);
 }
 
-.cocktail-creator {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.badge-style {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* Couleurs par style — toutes subtiles, fond teinté + texte assorti */
+.badge-style--sour          { background: #fef9c3; color: #854d0e; border-color: #fde68a; }
+.badge-style--fizz          { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+.badge-style--highball      { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+.badge-style--tiki          { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
+.badge-style--negroni       { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+.badge-style--old_fashioned { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.badge-style--classic       { background: #f5f3ff; color: #4c1d95; border-color: #ddd6fe; }
+.badge-style--modern        { background: #fdf4ff; color: #6b21a8; border-color: #e9d5ff; }
+.badge-style--creamy        { background: #f8fafc; color: #334155; border-color: #e2e8f0; }
+.badge-style--flip          { background: #fffbeb; color: #78350f; border-color: #fde68a; }
+.badge-style--spritz        { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+
+/* Dark mode overrides */
+.dark .badge-style--sour          { background: #422006; color: #fde68a; border-color: #78350f; }
+.dark .badge-style--fizz          { background: #0c2a3f; color: #7dd3fc; border-color: #0e4f7a; }
+.dark .badge-style--highball      { background: #052e16; color: #86efac; border-color: #14532d; }
+.dark .badge-style--tiki          { background: #431407; color: #fdba74; border-color: #7c2d12; }
+.dark .badge-style--negroni       { background: #450a0a; color: #fca5a5; border-color: #7f1d1d; }
+.dark .badge-style--old_fashioned { background: #451a03; color: #fcd34d; border-color: #78350f; }
+.dark .badge-style--classic       { background: #1e1b4b; color: #c4b5fd; border-color: #3730a3; }
+.dark .badge-style--modern        { background: #2e1065; color: #d8b4fe; border-color: #581c87; }
+.dark .badge-style--creamy        { background: #1e293b; color: #94a3b8; border-color: #334155; }
+.dark .badge-style--flip          { background: #451a03; color: #fcd34d; border-color: #92400e; }
+.dark .badge-style--spritz        { background: #431407; color: #fb923c; border-color: #7c2d12; }
+
+.cocktail-creator-meta {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.cocktail-subtitle--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   min-width: 0;
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cocktail-subtitle--abv {
+  flex-shrink: 0;
 }
 
 /* ── Menu cards ────────────────────────────── */
