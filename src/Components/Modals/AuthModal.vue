@@ -24,7 +24,7 @@
       </div>
 
       <!-- Formulaire login -->
-      <template v-if="mode === 'login'">
+      <form v-if="mode === 'login'" @submit.prevent="handleLogin" novalidate>
         <div class="password-form-group">
           <input
             type="email"
@@ -40,20 +40,29 @@
             v-model="password"
             placeholder="Mot de passe"
             class="password-form-input"
-            @keyup.enter="handleLogin"
             autocomplete="current-password"
           />
         </div>
-      </template>
+
+        <p v-if="authError" class="password-form-error">{{ authError }}</p>
+
+        <div class="password-modal-buttons">
+          <button type="button" @click="$emit('close')" class="password-btn-cancel">Annuler</button>
+          <button type="submit" class="password-btn-submit" :disabled="authLoading">
+            {{ authLoading ? '...' : 'Se connecter' }}
+          </button>
+        </div>
+      </form>
 
       <!-- Formulaire signup -->
-      <template v-else>
+      <form v-else @submit.prevent="handleSignup" novalidate>
         <div class="password-form-group">
           <input
             type="text"
             v-model="barName"
             placeholder="Nom de ton bar"
             class="password-form-input"
+            autocomplete="organization"
           />
         </div>
         <div class="password-form-group">
@@ -71,24 +80,19 @@
             v-model="password"
             placeholder="Mot de passe (8 caractères min)"
             class="password-form-input"
-            @keyup.enter="handleSignup"
             autocomplete="new-password"
           />
         </div>
-      </template>
 
-      <p v-if="authError" class="password-form-error">{{ authError }}</p>
+        <p v-if="authError" class="password-form-error">{{ authError }}</p>
 
-      <div class="password-modal-buttons">
-        <button @click="$emit('close')" class="password-btn-cancel">Annuler</button>
-        <button
-          @click="mode === 'login' ? handleLogin() : handleSignup()"
-          class="password-btn-submit"
-          :disabled="authLoading"
-        >
-          {{ authLoading ? '...' : mode === 'login' ? 'Se connecter' : 'Créer mon bar' }}
-        </button>
-      </div>
+        <div class="password-modal-buttons">
+          <button type="button" @click="$emit('close')" class="password-btn-cancel">Annuler</button>
+          <button type="submit" class="password-btn-submit" :disabled="authLoading">
+            {{ authLoading ? '...' : 'Créer mon bar' }}
+          </button>
+        </div>
+      </form>
 
     </div>
   </div>

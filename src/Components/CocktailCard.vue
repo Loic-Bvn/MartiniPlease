@@ -8,15 +8,13 @@
           {{ cocktail.name }}
         </h3>
         <div class="cocktail-meta-row">
-          <p class="cocktail-subtitle">
-            {{ cocktail.abv > 0 ? baseSpiritLabel : 'Mocktail' }}
+          <p class="cocktail-subtitle cocktail-subtitle--truncate">
+            <span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cocktail-creator-meta">{{ cocktail.creator }}</span>
             <span v-if="cocktail.profile?.length" class="profile-tags">
-              - <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
+              <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
             </span>
           </p>
-          <span class="cocktail-subtitle" style="margin-left: auto;">
-            {{ cocktail.abv }}°
-          </span>
+          <span class="cocktail-subtitle cocktail-subtitle--abv">{{ cocktail.abv }}°</span>
         </div>
       </div>
 
@@ -30,6 +28,16 @@
           :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
         >
           <Heart :size="16" :fill="isFav ? 'currentColor' : 'none'" />
+        </button>
+
+        <!-- Bouton favoris (mode drinker uniquement) -->
+        <button
+          v-if="hasDrinker && !isBartenderMode"
+          @click="handleHistoric"
+          :class="['btn-order']"
+          :title="'Ajouter à l\'historique'"
+        >
+          <PlusIcon :size="16" />
         </button>
 
         <template v-if="isBartenderMode">
@@ -67,23 +75,21 @@
       </div>
     </div>
 
-    <!-- Footer : badge réalisable + méthode + bouton commander -->
+    <!-- Footer : tags du cocktail -->
     <div class="card-footer">
       <div class="footer-left">
         <span v-if="makeable" class="badge-makeable">{{ t.makeable }}</span>
         <span v-else class="badge-missing">{{ missingLabel }}</span>
       </div>
-      <div class="footer-right" style="display:flex; align-items:center; gap:8px;">
-        <!-- Bouton "J'ai commandé" (mode drinker uniquement) -->
-        <button
-          v-if="hasDrinker && !isBartenderMode"
-          @click="handleOrder"
-          class="btn-order"
-          :class="{ 'btn-order--done': justOrdered }"
-          :title="locale === 'fr' ? 'J\'ai commandé ça !' : 'I ordered this!'"
-        >
-          {{ justOrdered ? '✓' : '＋' }}
-        </button>
+
+      <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
+        <span v-if="cocktail.cocktail_style" :class="['badge-style', 'badge-style--' + cocktail.cocktail_style]">
+          {{ styleLabel }}
+        </span>
+        <span v-if="cocktail.abv > 0" class="badge-method">
+          {{ baseSpiritLabel }}
+        </span>
+        <span v-else class="badge-method">Mocktail</span>
         <span v-if="cocktail.method" class="badge-method">
           {{ methodLabel }}
         </span>
@@ -95,7 +101,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Pencil, Trash2, Heart } from 'lucide-vue-next'
+import { Pencil, Trash2, Heart, PlusIcon } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
@@ -115,7 +121,7 @@ const { hasDrinker, isFavorite, toggleFavorite, addToHistory } = useDrinker()
 const justOrdered = ref(false)
 
 const t = computed(() => ({
-  makeable: props.locale === 'fr' ? '✓ Réalisable' : '✓ Available',
+  makeable: props.locale === 'fr' ? '✓' : '✓',
 }))
 
 const missingLabel = computed(() => {
@@ -148,7 +154,7 @@ async function handleFavorite() {
   await toggleFavorite(props.cocktail.id)
 }
 
-async function handleOrder() {
+async function handleHistoric() {
   await addToHistory(props.cocktail.id)
   justOrdered.value = true
   setTimeout(() => { justOrdered.value = false }, 2000)
@@ -172,6 +178,22 @@ const recipeWithQty = computed(() =>
     _qty: formatQty(ing),
   }))
 )
+
+const STYLE_LABELS = {
+  sour:          '🍋 Sour',
+  fizz:          '🫧 Fizz',
+  highball:      '🥃 Highball',
+  tiki:          '🌺 Tiki',
+  negroni:       '🔴 Negroni',
+  old_fashioned: '🟠 Old Fashioned',
+  classic:       '🎩 Classic',
+  modern:        '✨ Modern',
+  creamy:        '🥛 Creamy',
+  flip:          '🥚 Flip',
+  spritz:        '🍾 Spritz',
+}
+
+const styleLabel = computed(() => STYLE_LABELS[props.cocktail.cocktail_style] || props.cocktail.cocktail_style)
 
 const METHOD_LABELS = {
   shake:       '🍸 Shake',

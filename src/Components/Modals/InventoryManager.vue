@@ -95,17 +95,38 @@
             />
             <span class="ingredient-name">{{ ing.name }}</span>
           </label>
+
+          <!-- Bouton "+" -->
+          <button
+            @click="openAddModal(category)"
+            class="btn-add-ingredient"
+            :title="`Ajouter un ingrédient dans ${category.label}`"
+          >
+            <Plus :size="14" />
+            <span>Ajouter</span>
+          </button>
         </div>
       </div>
     </div>
+
+    <!-- Modal d'ajout -->
+    <AddIngredientModal
+      v-if="addModalTarget"
+      :category-key="addModalTarget.key"
+      :category-label="addModalTarget.label"
+      :category-icon="addModalTarget.icon"
+      @close="addModalTarget = null"
+      @added="addModalTarget = null"
+    />
 
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { CheckSquare, Square, Search } from 'lucide-vue-next'
+import { CheckSquare, Square, Search, Plus } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
+import AddIngredientModal from '@/Components/Modals/AddIngredientModal.vue'
 
 const {
   ingredients,
@@ -116,7 +137,12 @@ const {
   deselectAll,
 } = useInventory()
 
-const searchQuery = ref('')
+const searchQuery    = ref('')
+const addModalTarget = ref(null)
+
+function openAddModal(category) {
+  addModalTarget.value = category
+}
 
 const categoryMetadata = {
   spirits:   { label: 'Spiritueux',    icon: '🥃' },
@@ -134,15 +160,12 @@ const selectedCount = computed(() =>
 )
 const totalCount = computed(() => ingredients.value.length)
 
-// Ingrédients groupés par catégorie avec stats
 const categorizedIngredients = computed(() => {
   const groups = {}
-
   ingredients.value.forEach(ing => {
     if (!groups[ing.category]) groups[ing.category] = []
     groups[ing.category].push(ing)
   })
-
   return Object.entries(groups).map(([key, ings]) => ({
     key,
     label: categoryMetadata[key]?.label || key,
@@ -153,7 +176,6 @@ const categorizedIngredients = computed(() => {
   }))
 })
 
-// Recherche
 const searchResults = computed(() => {
   const q = searchQuery.value.toLowerCase().trim()
   if (!q) return []

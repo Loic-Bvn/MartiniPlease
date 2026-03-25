@@ -274,6 +274,18 @@
               </div>
             </div>
 
+            <div class="filter-group">
+              <label class="filter-label">{{ t.filterStyle }}</label>
+              <div class="chips-container">
+                <button
+                  v-for="s in styleFilters"
+                  :key="s.key"
+                  @click="toggleFilter(selectedStyles, s.key)"
+                  :class="['chip', { active: selectedStyles.includes(s.key) }]"
+                >{{ s.label }}</button>
+              </div>
+            </div>
+
             <!-- Filtre favoris (si drinker connecté) -->
             <div v-if="hasDrinker" class="filter-group">
               <label class="filter-label">{{ locale === 'fr' ? 'Mes favoris' : 'My favorites' }}</label>
@@ -303,6 +315,10 @@
               <span v-for="p in selectedProfiles" :key="p" class="filter-tag">
                 {{ profileFilters.find(f => f.key === p)?.label }}
                 <X @click="toggleFilter(selectedProfiles, p)" :size="14" />
+              </span>
+              <span v-for="s in selectedStyles" :key="s" class="filter-tag">
+                {{ styleFilters.find(f => f.key === s)?.label }}
+                <X @click="toggleFilter(selectedStyles, s)" :size="14" />
               </span>
               <button @click="clearFilters" class="clear-all-btn">{{ t.clearAll }}</button>
             </div>
@@ -606,6 +622,7 @@ const t = computed(() => ({
   deleteCard:             locale.value === 'fr' ? 'Supprimer cette carte ?'             : 'Delete this card?',
   deleteCocktail:         locale.value === 'fr' ? 'Supprimer ce cocktail ?'             : 'Delete this cocktail?',
   filterProfile:          locale.value === 'fr' ? 'Profil gustatif'                     : 'Flavor profile',
+  filterStyle:            locale.value === 'fr' ? 'Style'                                 : 'Style',
 }))
 
 // ── Filtres (identique à l'original) ─────────────────────────────────────────
@@ -618,6 +635,7 @@ const showOnlyFavorites  = ref(false)
 const filterMode         = ref('main')
 const abvFilter          = ref(null)
 const selectedProfiles   = ref([])
+const selectedStyles     = ref([])
 const unit               = ref('oz') // 'oz' ou 'ml'
 
 const baseSpirits = computed(() => [
@@ -692,6 +710,23 @@ const profileFilters = computed(() => {
   return Object.entries(labels).map(([key, label]) => ({ key, label }))
 })
 
+const styleFilters = computed(() => {
+  const labels = {
+    sour:          locale.value === 'fr' ? '🍋 Sour'          : '🍋 Sour',
+    fizz:          locale.value === 'fr' ? '🫧 Fizz'          : '🫧 Fizz',
+    highball:      locale.value === 'fr' ? '🥃 Highball'      : '🥃 Highball',
+    tiki:          locale.value === 'fr' ? '🌺 Tiki'          : '🌺 Tiki',
+    negroni:       locale.value === 'fr' ? '🔴 Negroni'       : '🔴 Negroni',
+    old_fashioned: locale.value === 'fr' ? '🟠 Old Fashioned' : '🟠 Old Fashioned',
+    classic:       locale.value === 'fr' ? '🎩 Classique'     : '🎩 Classic',
+    modern:        locale.value === 'fr' ? '✨ Moderne'        : '✨ Modern',
+    creamy:        locale.value === 'fr' ? '🥛 Crémeux'       : '🥛 Creamy',
+    flip:          locale.value === 'fr' ? '🥚 Flip'          : '🥚 Flip',
+    spritz:        locale.value === 'fr' ? '🍾 Spritz'        : '🍾 Spritz',
+  }
+  return Object.entries(labels).map(([key, label]) => ({ key, label }))
+})
+
 const seasons = computed(() => [
   { key: 'all',    icon: '🍸', label: locale.value === 'fr' ? 'Toutes'    : 'All'    },
   { key: 'spring', icon: '🌸', label: locale.value === 'fr' ? 'Printemps' : 'Spring' },
@@ -734,7 +769,7 @@ function toggleFamily(familyKey) {
 function clearFilters() {
   selectedFamilies.value = []; selectedSubSpirits.value = []
   selectedSeasons.value  = []; selectedProfiles.value = []
-  abvFilter.value = null; showOnlyFavorites.value = false
+  abvFilter.value = null; showOnlyFavorites.value = false; selectedStyles.value = []
 }
 function getFamilyLabel(key)    { return allFamilyLabels.value[key] ?? key }
 function getSubSpiritLabel(key) { return allSubLabels.value[key] ?? key }
@@ -810,6 +845,10 @@ const filteredCocktails = computed(() => {
     list = list.filter(c => selectedProfiles.value.every(p => c.profile?.includes(p)))
   }
 
+  if (selectedStyles.value.length) {
+    list = list.filter(c => selectedStyles.value.includes(c.cocktail_style))
+  }
+
   if (showOnlyFavorites.value && hasDrinker.value) {
     list = list.filter(c => favorites.value.has(c.id))
   }
@@ -823,7 +862,8 @@ const hasActiveFilters = computed(() =>
   selectedSeasons.value.length > 0 ||
   selectedProfiles.value.length > 0 ||
   abvFilter.value !== null ||
-  showOnlyFavorites.value
+  showOnlyFavorites.value ||
+  selectedStyles.value.length > 0
 )
 
 // ── CRUD menu cards ───────────────────────────────────────────────────────────

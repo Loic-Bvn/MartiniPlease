@@ -200,7 +200,7 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('cold_brew',        lambda x: 'cold brew' in x),
     ('matcha',           lambda x: 'matcha' in x),
     ('butter',           lambda x: 'butter' in x),
-    ('heavy_cream',      lambda x: 'heavy cream' in x or 'double cream' in x or 'whipping cream' in x or ('half' in x and 'half in x') or ('1/2' in x and '1/2' in x) or 'creamer' in x),
+    ('heavy_cream',      lambda x: 'heavy cream' in x or 'double cream' in x or 'whipping cream' in x or ('half and half' in x or 'half & half' in x) or ('1/2 and 1/2' in x or '1/2 & 1/2' in x) or 'creamer' in x),
     ('aquafaba',         lambda x: 'egg white' in x or 'aquafaba' in x),
     ('egg',              lambda x: 'whole egg' in x or ('egg' in x and 'nog' not in x)),
     ('milk',             lambda x: 'milk' in x),

@@ -110,6 +110,41 @@ export function useInventory() {
 
   function hasIngredient(type) { return barInventory.value.has(type) }
 
+  async function addIngredient({ name, type: typeArg, category, family = null, abv = null, available = true }) {
+    const barId = currentBarId.value
+    if (!barId || !name?.trim()) return
+
+    const resolvedType = typeArg?.trim() ||
+      name.trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
+
+    if (ingredients.value.find(i => i.type === resolvedType)) {
+      throw new Error('duplicate')
+    }
+
+    const { data, error } = await supabase
+      .from('ingredients')
+      .insert({
+        bar_id:    barId,
+        name:      name.trim(),
+        type:      resolvedType,
+        category,
+        family:    family || null,
+        abv:       abv ?? null,
+        available,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    ingredients.value.push(data)
+    if (available) {
+      barInventory.value.add(resolvedType)
+      barInventory.value = new Set(barInventory.value)
+    }
+  }
+
   return {
     barInventory,
     ingredients,
@@ -120,5 +155,6 @@ export function useInventory() {
     selectAll,
     deselectAll,
     hasIngredient,
+    addIngredient,
   }
 }
