@@ -593,6 +593,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--text-dim);
 }
 
 .recipe-bullet::before {
@@ -603,10 +604,10 @@ body {
   border-radius: 50%;
   background: currentColor;
 }
-
-.recipe-bullet--available { color: var(--text-dim); }
-.recipe-bullet--missing   { color: var(--danger-text); }
-
+.recipe-bullet--missing {
+  color: var(--text-muted, #999);
+  opacity: 0.4;
+}
 .ingredient-name {
   flex: 0 1 auto;
   color: var(--text-dim);
@@ -614,17 +615,12 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.ingredient-name--garnish {
-  color: var(--text-dim);
-  font-style: italic;
-  opacity: 0.6;
+.ingredient-name--missing {
+  color: var(--text-muted, #999);
+  opacity: 0.5;
 }
 
-.recipe-bullet--garnish {
-  color: var(--text-dim);
-  opacity: 0.25;
-}
+
 .ingredient-quantity {
   font-weight: 600;
   color: var(--gold);
@@ -654,7 +650,7 @@ body {
 
 .badge-missing {
   font-size: 0.7rem;
-  color: var(--text-dim);
+  color: #d87676;
   font-weight: 500;
 }
 

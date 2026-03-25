@@ -3740,7 +3740,7 @@
             "Category": "Gin",
             "Glass": null,
             "Method": "stir",
-            "Difficulty": "easy",
+            "Difficulty": "medium",
             "ABV": 30,
             "Description": null,
             "Profile": [
@@ -3779,8 +3779,8 @@
                 },
                 {
                     "Ingredient": "Expressed orang oil",
-                    "Type": "garnish",
-                    "IsGarnish": false
+                    "Type": "orange_zest",
+                    "IsGarnish": true
                 }
             ]
         },

@@ -174,7 +174,7 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('grapefruit_swath', lambda x: 'grapefruit' in x and 'swath' in x),
     ('lemon_zest',       lambda x: 'lemon' in x and ('zest' in x or 'twist' in x or 'peel' in x or 'oil' in x)),
     ('lime_zest',        lambda x: 'lime' in x and ('zest' in x or 'twist' in x or 'peel' in x  or 'oil' in x)),
-    ('orange_zest',      lambda x: 'orange' in x and ('zest' in x or 'twist' in x or 'peel' in x  or 'oil' in x)),
+    ('orange_zest',      lambda x: ('orange' in x or 'oran' in x) and ('zest' in x or 'twist' in x or 'peel' in x  or 'oil' in x)),
     ('grapefruit_zest',  lambda x: 'grapefruit' in x and ('zest' in x or 'twist' in x or 'peel' in x or 'oil' in x)),
     ('cocktail_cherry',  lambda x: 'cherry' in x and 'heering' not in x and 'liqueur' not in x),
     ('olive',            lambda x: 'olive' in x and 'oil' not in x),

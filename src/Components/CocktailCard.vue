@@ -1,5 +1,5 @@
 <template>
-  <div :class="['cocktail-card-compact', !makeable ? 'opacity-60' : '']">
+  <div :class="['cocktail-card-compact']">
 
     <!-- Header -->
     <div class="card-header">
@@ -7,20 +7,18 @@
         <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
           {{ cocktail.name }}
         </h3>
-        <div class="cocktail-meta-row">
-          <p class="cocktail-subtitle cocktail-subtitle--truncate">
+        <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
             <span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cocktail-creator-meta">{{ cocktail.creator }}</span>
             <span v-if="cocktail.profile?.length" class="profile-tags">
               <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
             </span>
-          </p>
-          <span class="cocktail-subtitle cocktail-subtitle--abv">{{ cocktail.abv }}°</span>
+            <span v-if="cocktail.abv != null" class="cocktail-subtitle--abv">{{ cocktail.abv }}°</span>
         </div>
       </div>
 
       <!-- Actions -->
       <div class="header-actions shrink-0">
-        <!-- Bouton favori (mode drinker uniquement) -->
+        <!-- Bouton favori et historique (mode drinker uniquement) -->
         <button
           v-if="hasDrinker && !isBartenderMode"
           @click="handleFavorite"
@@ -29,8 +27,6 @@
         >
           <Heart :size="16" :fill="isFav ? 'currentColor' : 'none'" />
         </button>
-
-        <!-- Bouton favoris (mode drinker uniquement) -->
         <button
           v-if="hasDrinker && !isBartenderMode"
           @click="handleHistoric"
@@ -59,16 +55,10 @@
         class="recipe-line"
       >
         <div class="ingredient-info">
-          <span :class="['recipe-bullet', ing.Type === 'garnish' ? 'recipe-bullet--garnish' : isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
+          <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
           </span>
-          <span :class="[
-            'ingredient-name',
-            ing.IsGarnish ? 'ingredient-name--garnish' : '',
-            !ing.IsGarnish && !isAvailable(ing) ? 'ingredient-name--missing' : ''
-          ]">
-            {{ (ing.Type === 'garnish' && getTypeLabel(ing.Type, locale) === ing.Type)
-            ? ing.Ingredient
-            : getTypeLabel(ing.Type, locale) }}
+          <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
+            {{ getTypeLabel(ing.Type, locale) }}
           </span>
         </div>
         <span class="ingredient-quantity">{{ ing._qty }}</span>
@@ -78,8 +68,12 @@
     <!-- Footer : tags du cocktail -->
     <div class="card-footer">
       <div class="footer-left">
-        <span v-if="makeable" class="badge-makeable">{{ t.makeable }}</span>
-        <span v-else class="badge-missing">{{ missingLabel }}</span>
+        <span v-if="makeable" class="badge-makeable" :title="t.makeable">
+          <Check :size="16" />
+        </span>
+        <span v-else class="badge-missing" :title="t.notMakeable">
+          <XIcon :size="16" />
+        </span>
       </div>
 
       <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
@@ -101,7 +95,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Pencil, Trash2, Heart, PlusIcon } from 'lucide-vue-next'
+import { Pencil, Trash2, Heart, PlusIcon, Check, XIcon } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
@@ -121,14 +115,9 @@ const { hasDrinker, isFavorite, toggleFavorite, addToHistory } = useDrinker()
 const justOrdered = ref(false)
 
 const t = computed(() => ({
-  makeable: props.locale === 'fr' ? '✓' : '✓',
+  makeable: props.locale === 'fr' ? 'Disponible' : 'Available',
+  notMakeable: props.locale === 'fr' ? 'Non disponible' : 'Not available',
 }))
-
-const missingLabel = computed(() => {
-  const n = missingCount.value
-  if (props.locale === 'fr') return `${n} ingrédient${n > 1 ? 's' : ''} manquant${n > 1 ? 's' : ''}`
-  return `${n} missing ingredient${n > 1 ? 's' : ''}`
-})
 
 const baseSpiritLabel = computed(() => getTypeLabel(props.cocktail.base_spirit, props.locale))
 
@@ -141,12 +130,6 @@ const makeable = computed(() => {
   const recipe = props.cocktail.recipe || []
   return recipe.length > 0 && recipe.every(ing => isAvailable(ing))
 })
-
-const missingCount = computed(() =>
-  (props.cocktail.recipe || []).filter(ing =>
-    ing.Type !== 'garnish' && !barInventory.value.has(ing.Type)
-  ).length
-)
 
 const isFav = computed(() => isFavorite(props.cocktail.id))
 
