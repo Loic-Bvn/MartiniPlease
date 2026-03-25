@@ -32,6 +32,16 @@
           <Heart :size="16" :fill="isFav ? 'currentColor' : 'none'" />
         </button>
 
+        <!-- Bouton favoris (mode drinker uniquement) -->
+        <button
+          v-if="hasDrinker && !isBartenderMode"
+          @click="handleHistoric"
+          :class="['btn-order']"
+          :title="'Ajouter à l\'historique'"
+        >
+          <PlusIcon :size="16" />
+        </button>
+
         <template v-if="isBartenderMode">
           <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
             <Pencil :size="18" />
@@ -73,17 +83,12 @@
         <span v-if="makeable" class="badge-makeable">{{ t.makeable }}</span>
         <span v-else class="badge-missing">{{ missingLabel }}</span>
       </div>
+
+      <div class="cocktail-creator">
+        <span v-if="cocktail.creator" class="cocktail-creator">{{ cocktail.creator }}</span>
+      </div>
+      
       <div class="footer-right" style="display:flex; align-items:center; gap:8px;">
-        <!-- Bouton "J'ai commandé" (mode drinker uniquement) -->
-        <button
-          v-if="hasDrinker && !isBartenderMode"
-          @click="handleOrder"
-          class="btn-order"
-          :class="{ 'btn-order--done': justOrdered }"
-          :title="locale === 'fr' ? 'J\'ai commandé ça !' : 'I ordered this!'"
-        >
-          {{ justOrdered ? '✓' : '＋' }}
-        </button>
         <span v-if="cocktail.method" class="badge-method">
           {{ methodLabel }}
         </span>
@@ -95,7 +100,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Pencil, Trash2, Heart } from 'lucide-vue-next'
+import { Pencil, Trash2, Heart, PlusIcon } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
@@ -115,7 +120,7 @@ const { hasDrinker, isFavorite, toggleFavorite, addToHistory } = useDrinker()
 const justOrdered = ref(false)
 
 const t = computed(() => ({
-  makeable: props.locale === 'fr' ? '✓ Réalisable' : '✓ Available',
+  makeable: props.locale === 'fr' ? '✓' : '✓',
 }))
 
 const missingLabel = computed(() => {
@@ -148,7 +153,7 @@ async function handleFavorite() {
   await toggleFavorite(props.cocktail.id)
 }
 
-async function handleOrder() {
+async function handleHistoric() {
   await addToHistory(props.cocktail.id)
   justOrdered.value = true
   setTimeout(() => { justOrdered.value = false }, 2000)
