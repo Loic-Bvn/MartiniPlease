@@ -484,6 +484,7 @@ import DrinkerPanel    from '@/Components/DrinkerPanel.vue'
 import ThemeToggle     from '@/Components/ThemeToggle.vue'
 import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
 import { supabase }    from '@/lib/supabase'
+import { useCatalogue } from '@/composables/useCatalogue'
 
 const { isLoggedIn, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, initAuth, signOut, fetchBar } = useAuth()
 
@@ -495,6 +496,7 @@ const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, up
 const { barInventory, ingredients, fetchIngredients } = useInventory()
 const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCard } = useMenuCards()
 const { hasDrinker, drinkerPseudo, initDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
+const { fetchSubmitted } = useCatalogue()
 
 // Logo → retour à l'écran de connexion
 function handleLogoClick() {
@@ -901,6 +903,7 @@ onMounted(async () => {
       fetchMenuCards(currentBarId.value),
       initDrinker(currentBarId.value),
     ])
+  await fetchSubmitted()
   }
 })
 </script>
