@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
-import { useCatalogue } from '@/composables/useCatalogue'
+import { useCatalog } from '@/composables/useCatalog'
 
 const cocktails = ref([])
 const loading   = ref(false)
@@ -72,21 +72,18 @@ export function useCocktails() {
 
   async function deleteCocktail(id) {
     const barId = currentBarId.value
-    try {
-      const cocktail = cocktails.value.find(c => c.id === id)
 
+    try {
       const { error } = await supabase
         .from('cocktails')
         .delete()
         .eq('id', id)
+        .eq('bar_id', barId) // 🔥 sécurité multi-tenant
 
       if (error) throw error
 
-      // La FK bar_cocktail_id est ON DELETE CASCADE :
-      // Postgres supprime automatiquement les lignes catalogue_imports
-      // liées à ce cocktail → pas de nettoyage manuel nécessaire.
-
       cocktails.value = cocktails.value.filter(c => c.id !== id)
+
       return { success: true }
     } catch (err) {
       console.error('❌ Erreur deleteCocktail:', err)

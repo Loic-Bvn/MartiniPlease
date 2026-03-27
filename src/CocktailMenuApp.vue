@@ -54,7 +54,7 @@
                   </button>
                   <div v-if="activeBarId" class="burger-divider" />
 
-                  <button v-if="activeBarId" @click="showCatalogueModal = true; burgerOpen = false" class="burger-item">
+                  <button v-if="activeBarId" @click="showCatalogModal = true; burgerOpen = false" class="burger-item">
                     <Library :size="15" />
                     {{ locale === 'fr' ? 'Catalogue de recettes' : 'Recipe Catalog' }}
                   </button> 
@@ -457,7 +457,7 @@
     <!-- Modals -->
     <AuthModal v-if="showAuthModal" @close="showAuthModal = false" @success="onAuthSuccess" />
     <MenuCardModal v-if="showCardModal" :card="editingCard" :cocktails="cocktails" :locale="locale" @save="handleSaveCard" @close="showCardModal = false" />
-    <CatalogueModal v-if="showCatalogueModal" @close="showCatalogueModal = false" @imported="handleCatalogueImport" />
+    <CatalogModal v-if="showCatalogModal" @close="showCatalogModal = false" @imported="handleCatalogImport" />
     <CocktailModal v-if="showCocktailModal" :cocktail="editingCocktail" @save="handleSave" @close="showCocktailModal = false" />
     <MenuCardView
       v-if="viewingCard"
@@ -492,8 +492,8 @@ import DrinkerPanel    from '@/Components/DrinkerPanel.vue'
 import ThemeToggle     from '@/Components/ThemeToggle.vue'
 import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
 import { supabase }    from '@/lib/supabase'
-import { useCatalogue } from '@/composables/useCatalogue'
-import CatalogueModal from '@/Components/Modals/CatalogueModal.vue'
+import { useCatalog } from '@/composables/useCatalog'
+import CatalogModal from '@/Components/Modals/CatalogModal.vue'
 
 const { isLoggedIn, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, initAuth, signOut, fetchBar } = useAuth()
 
@@ -505,8 +505,8 @@ const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, up
 const { barInventory, ingredients, fetchIngredients } = useInventory()
 const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCard } = useMenuCards()
 const { hasDrinker, drinkerPseudo, initDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
-// const { fetchSubmitted, importCocktail: catalogueImport, } = useCatalogue()
-const { fetchSnapshots } = useCatalogue()
+// const { fetchSubmitted, importCocktail: catalogImport, } = useCatalog()
+const { fetchSnapshots } = useCatalog()
 
 // Logo → retour à l'écran de connexion
 function handleLogoClick() {
@@ -533,7 +533,7 @@ async function selectBar(b) {
     fetchIngredients(b.id),
     fetchMenuCards(b.id),
   ])
-  await fetchSnapshots()  // après fetchCocktails pour que currentBarId soit prêt
+  // await fetchSnapshots()  // après fetchCocktails pour que currentBarId soit prêt
 }
 
 const showDrinkerPanel  = ref(false)
@@ -555,7 +555,7 @@ const showFilters       = ref(false)
 const showCards         = ref(false)
 const showCocktailModal = ref(false)
 const showCardModal     = ref(false)
-const showCatalogueModal = ref(false)
+const showCatalogModal = ref(false)
 const editingCocktail   = ref(null)
 const editingCard       = ref(null)
 const viewingCard       = ref(null)
@@ -605,7 +605,7 @@ async function onAuthSuccess() {
     fetchIngredients(currentBarId.value),
     fetchMenuCards(currentBarId.value),
   ])
-  await fetchSnapshots()  // charge imported + submitted + hashes depuis la BDD
+  // await fetchSnapshots()  // charge imported + submitted + hashes depuis la BDD
 }
 
 // Traductions
@@ -917,8 +917,8 @@ onMounted(async () => {
   }
 })
 
-async function handleCatalogueImport(newCocktail) {
-  // Le cocktail est déjà créé dans useCatalogue.importCocktail
+async function handleCatalogImport(newCocktail) {
+  // Le cocktail est déjà créé dans useCatalog.importCocktail
   // On l'ajoute simplement à la liste locale
   if (newCocktail) { 
     cocktails.value.push(newCocktail)

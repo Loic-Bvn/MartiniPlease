@@ -10,16 +10,16 @@ CREATE TABLE public.bars (
   CONSTRAINT bars_pkey PRIMARY KEY (id),
   CONSTRAINT bars_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
 );
-CREATE TABLE public.catalogue_imports (
+CREATE TABLE public.catalog_imports (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   bar_id uuid NOT NULL,
-  catalogue_cocktail_id uuid NOT NULL,
+  catalog_cocktail_id uuid NOT NULL,
   source_cocktail_id uuid,
   imported_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT catalogue_imports_pkey PRIMARY KEY (id),
-  CONSTRAINT catalogue_imports_source_cocktail_id_fkey FOREIGN KEY (source_cocktail_id) REFERENCES public.cocktails(id),
-  CONSTRAINT catalogue_imports_bar_id_fkey FOREIGN KEY (bar_id) REFERENCES public.bars(id),
-  CONSTRAINT catalogue_imports_catalogue_cocktail_id_fkey FOREIGN KEY (catalogue_cocktail_id) REFERENCES public.cocktails(id)
+  CONSTRAINT catalog_imports_pkey PRIMARY KEY (id),
+  CONSTRAINT catalog_imports_source_cocktail_id_fkey FOREIGN KEY (source_cocktail_id) REFERENCES public.cocktails(id),
+  CONSTRAINT catalog_imports_bar_id_fkey FOREIGN KEY (bar_id) REFERENCES public.bars(id),
+  CONSTRAINT catalog_imports_catalog_cocktail_id_fkey FOREIGN KEY (catalog_cocktail_id) REFERENCES public.cocktails(id)
 );
 CREATE TABLE public.cocktails (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),

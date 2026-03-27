@@ -48,7 +48,7 @@
             v-if="!isSubmitted(cocktail.id)"
             @click="handleSubmit"
             class="btn-icon btn-icon--submit"
-            :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalogue'"
+            :title="locale === 'fr' ? 'Proposer au catalog' : 'Submit to catalog'"
           >
             <Upload :size="18" />
           </button>
@@ -116,9 +116,9 @@ import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { Upload, Bookmark } from 'lucide-vue-next'
-import { useCatalogue } from '@/composables/useCatalogue'
+import { useCatalog } from '@/composables/useCatalog'
 
-const { isSubmitted, submitToCatalogue } = useCatalogue()
+const { isSubmitted, submitToCatalog } = useCatalog()
 
 const props = defineProps({
   cocktail:        Object,
@@ -212,7 +212,7 @@ const METHOD_LABELS = {
 const methodLabel = computed(() => METHOD_LABELS[props.cocktail.method] || props.cocktail.method)
 
 async function handleSubmit() {
-  const { success } = await submitToCatalogue(props.cocktail)
+  const { success } = await submitToCatalog(props.cocktail)
   if (success) {
     // Toast ou feedback visuel
   }
