@@ -1,8 +1,8 @@
 // composables/useCocktails.js
-// Fetche et gère les cocktails depuis Supabase, filtrés par bar_id
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
+import { useCatalog } from '@/composables/useCatalog'
 
 const cocktails = ref([])
 const loading   = ref(false)
@@ -71,14 +71,19 @@ export function useCocktails() {
   }
 
   async function deleteCocktail(id) {
+    const barId = currentBarId.value
+
     try {
       const { error } = await supabase
         .from('cocktails')
         .delete()
         .eq('id', id)
+        .eq('bar_id', barId) // 🔥 sécurité multi-tenant
 
       if (error) throw error
+
       cocktails.value = cocktails.value.filter(c => c.id !== id)
+
       return { success: true }
     } catch (err) {
       console.error('❌ Erreur deleteCocktail:', err)

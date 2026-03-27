@@ -36,6 +36,7 @@
           <PlusIcon :size="16" />
         </button>
 
+        <!-- Bouton edit, delete et push (mode bartender uniquement) -->
         <template v-if="isBartenderMode">
           <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
             <Pencil :size="18" />
@@ -43,6 +44,21 @@
           <button @click="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
             <Trash2 :size="18" />
           </button>
+          <button
+            v-if="!isSubmitted(cocktail.id)"
+            @click="handleSubmit"
+            class="btn-icon btn-icon--submit"
+            :title="locale === 'fr' ? 'Proposer au catalog' : 'Submit to catalog'"
+          >
+            <Upload :size="18" />
+          </button>
+          <span
+            v-else
+            class="btn-icon btn-icon--submitted"
+            :title="locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
+          >
+            <Bookmark :size="18" />
+          </span>
         </template>
       </div>
     </div>
@@ -99,6 +115,10 @@ import { Pencil, Trash2, Heart, PlusIcon, Check, XIcon } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
+import { Upload, Bookmark } from 'lucide-vue-next'
+import { useCatalog } from '@/composables/useCatalog'
+
+const { isSubmitted, submitToCatalog } = useCatalog()
 
 const props = defineProps({
   cocktail:        Object,
@@ -190,6 +210,14 @@ const METHOD_LABELS = {
 }
 
 const methodLabel = computed(() => METHOD_LABELS[props.cocktail.method] || props.cocktail.method)
+
+async function handleSubmit() {
+  const { success } = await submitToCatalog(props.cocktail)
+  if (success) {
+    // Toast ou feedback visuel
+  }
+}
+
 </script>
 
 <style scoped>
