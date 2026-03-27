@@ -131,7 +131,7 @@
             </div>
 
             <div class="catalog-item-actions">
-              <!-- Déjà soumis ET non modifié → grisé avec tooltip -->
+              <!-- Déjà soumis ET non modifié → grisé -->
               <span
                 v-if="isSubmitted(cocktail.id) && modifiedStates[cocktail.id] === false"
                 class="catalog-badge catalog-badge--unchanged"
@@ -140,7 +140,7 @@
                 = Inchangé
               </span>
 
-              <!-- Déjà soumis mais modifié depuis → peut re-proposer (fork) -->
+              <!-- Déjà soumis mais modifié depuis → fork possible -->
               <button
                 v-else-if="isSubmitted(cocktail.id) && modifiedStates[cocktail.id] === true"
                 @click="handleSubmit(cocktail)"
@@ -160,7 +160,7 @@
                 {{ submitting === cocktail.id ? '⏳' : '🌐 Proposer' }}
               </button>
 
-              <!-- État en cours de vérification -->
+              <!-- Vérification en cours -->
               <span v-else class="catalog-badge catalog-badge--checking">…</span>
             </div>
           </div>
@@ -180,12 +180,14 @@ import { useCocktails } from '@/composables/useCocktails'
 const emit = defineEmits(['close', 'imported'])
 
 const {
-  catalog, loading,
-  fetchCatalog, 
-  // fetchImported, 
-  // fetchSubmitted,
-  importCocktail, submitToCatalog,
-  isImported, isSubmitted, isModified,
+  catalog,
+  loading,
+  fetchCatalog,
+  importCocktail,
+  submitToCatalog,
+  isImported,
+  isSubmitted,
+  isModified,
 } = useCatalog()
 
 const { cocktails } = useCocktails()
@@ -205,7 +207,7 @@ let debounceTimer = null
 // ── Computed ──────────────────────────────────────────
 const barCocktails = computed(() => cocktails.value ?? [])
 
-// Nombre de cocktails proposables (non soumis OU soumis+modifiés)
+// Nombre de cocktails proposables (non soumis OU soumis + modifiés)
 const submittableCount = computed(() =>
   barCocktails.value.filter(c =>
     !isSubmitted(c.id) || modifiedStates.value[c.id] === true
@@ -214,19 +216,15 @@ const submittableCount = computed(() =>
 
 // ── Lifecycle ──────────────────────────────────────────
 onMounted(async () => {
-  await Promise.all([doFetch(),
-    //  fetchImported(),
-    //  fetchSubmitted()
-    ])
+  await doFetch()
 })
 
-// Quand on bascule sur l'onglet "Mes recettes", vérifier l'état de modification
-// de tous les cocktails du bar (en parallèle, sans bloquer l'UI)
-watch(activeTab, async (tab) => {
+// Quand on bascule sur "Mes recettes", vérifier l'état de modification
+// de tous les cocktails en arrière-plan (sans bloquer le rendu).
+watch(activeTab, (tab) => {
   if (tab !== 'mine') return
   for (const cocktail of barCocktails.value) {
     if (modifiedStates.value[cocktail.id] !== undefined) continue
-    // Lance en async sans await pour ne pas bloquer le rendu
     isModified(cocktail).then(result => {
       modifiedStates.value = { ...modifiedStates.value, [cocktail.id]: result }
     })
@@ -235,7 +233,11 @@ watch(activeTab, async (tab) => {
 
 // ── Methods ───────────────────────────────────────────
 async function doFetch() {
-  await fetchCatalog({ search: filters.value.search, spirit: filters.value.spirit, season: filters.value.season })
+  await fetchCatalog({
+    search: filters.value.search,
+    spirit: filters.value.spirit,
+    season: filters.value.season,
+  })
 }
 
 function debouncedFetch() {
@@ -261,11 +263,7 @@ async function handleSubmit(cocktail) {
   submitting.value = cocktail.id
   try {
     const result = await submitToCatalog(cocktail)
-    if (result.success) {
-      // Mettre à jour l'état local : la recette vient d'être soumise, hash = actuel
-      modifiedStates.value = { ...modifiedStates.value, [cocktail.id]: false }
-    } else if (result.error === 'unchanged') {
-      // Ne devrait pas arriver (bouton déjà désactivé) mais sécurité
+    if (result.success || result.error === 'unchanged') {
       modifiedStates.value = { ...modifiedStates.value, [cocktail.id]: false }
     }
   } finally {
