@@ -36,6 +36,7 @@
           <PlusIcon :size="16" />
         </button>
 
+        <!-- Bouton edit, delete et push (mode bartender uniquement) -->
         <template v-if="isBartenderMode">
           <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
             <Pencil :size="18" />
@@ -43,22 +44,20 @@
           <button @click="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
             <Trash2 :size="18" />
           </button>
-
-          <!-- Nouveau : proposer au catalogue -->
           <button
             v-if="!isSubmitted(cocktail.id)"
             @click="handleSubmit"
             class="btn-icon btn-icon--submit"
             :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalogue'"
           >
-            <Upload :size="16" />
+            <Upload :size="18" />
           </button>
           <span
             v-else
             class="btn-icon btn-icon--submitted"
             :title="locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
           >
-            <Clock :size="16" />
+            <Bookmark :size="18" />
           </span>
         </template>
       </div>
@@ -116,7 +115,7 @@ import { Pencil, Trash2, Heart, PlusIcon, Check, XIcon } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
-import { Upload, Clock } from 'lucide-vue-next'
+import { Upload, Bookmark } from 'lucide-vue-next'
 import { useCatalogue } from '@/composables/useCatalogue'
 
 const { isSubmitted, submitToCatalogue } = useCatalogue()

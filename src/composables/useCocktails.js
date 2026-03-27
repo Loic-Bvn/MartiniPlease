@@ -1,8 +1,8 @@
 // composables/useCocktails.js
-// Fetche et gère les cocktails depuis Supabase, filtrés par bar_id
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
+import { useCatalogue } from '@/composables/useCatalogue'
 
 const cocktails = ref([])
 const loading   = ref(false)
@@ -71,13 +71,21 @@ export function useCocktails() {
   }
 
   async function deleteCocktail(id) {
+    const barId = currentBarId.value
     try {
+      const cocktail = cocktails.value.find(c => c.id === id)
+
       const { error } = await supabase
         .from('cocktails')
         .delete()
         .eq('id', id)
 
       if (error) throw error
+
+      // La FK bar_cocktail_id est ON DELETE CASCADE :
+      // Postgres supprime automatiquement les lignes catalogue_imports
+      // liées à ce cocktail → pas de nettoyage manuel nécessaire.
+
       cocktails.value = cocktails.value.filter(c => c.id !== id)
       return { success: true }
     } catch (err) {
