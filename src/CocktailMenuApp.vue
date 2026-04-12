@@ -48,6 +48,15 @@
                     <span class="burger-item-hint">Code d'invitation</span>
                   </div>
                   <div v-if="activeBarId" class="burger-divider" />
+                  <button v-if="activeBarId" @click="handleTogglePublic" class="burger-item burger-item--toggle" :class="{ 'burger-item--toggle-on': isBarPublic }">
+                    <Globe v-if="isBarPublic" :size="15" />
+                    <EyeOff v-else :size="15" />
+                    <span>{{ isBarPublic ? (locale === 'fr' ? 'Bar public' : 'Public bar') : (locale === 'fr' ? 'Bar privé' : 'Private bar') }}</span>
+                    <span class="burger-toggle-badge" :class="isBarPublic ? 'badge-on' : 'badge-off'">
+                      {{ isBarPublic ? (locale === 'fr' ? 'visible' : 'visible') : (locale === 'fr' ? 'masqué' : 'hidden') }}
+                    </span>
+                  </button>
+                  <div v-if="activeBarId" class="burger-divider" />
                   <button v-if="activeBarId" @click="openNewCardModal(); burgerOpen = false" class="burger-item">
                     <BookOpen :size="15" />
                     {{ t.newCard }}
@@ -59,6 +68,11 @@
                     {{ locale === 'fr' ? 'Catalogue de recettes' : 'Recipe Catalog' }}
                   </button> 
                   
+                  <div v-if="activeBarId" class="burger-divider" />
+                  <button v-if="activeBarId" @click="copyBarLink" class="burger-item burger-item--copy">
+                    <Link :size="15" />
+                    <span>{{ linkCopied ? (locale === 'fr' ? 'Lien copié !' : 'Link copied!') : (locale === 'fr' ? 'Copier le lien du bar' : 'Copy bar link') }}</span>
+                  </button>
                   <div v-if="activeBarId" class="burger-divider" />
                   <button @click="handleSignOut(); burgerOpen = false" class="burger-item burger-item--danger">
                     <LogOut :size="15" />
@@ -112,10 +126,28 @@
                 <div class="welcome-card-desc">{{ locale === 'fr' ? 'Explorez la carte d\'un bar' : 'Explore a bar\'s menu' }}</div>
               </div>
             </div>
-            <button class="welcome-demo" @click="joinDemo">
-              🍹 {{ locale === 'fr' ? 'Voir la démo' : 'View demo' }}
-              <span class="welcome-demo-code">DEMO-0000</span>
-            </button>
+
+            <!-- Bars publics disponibles -->
+            <template v-if="!publicBarsLoading && publicBars.length > 0">
+              <p class="welcome-public-label">
+                {{ locale === 'fr' ? 'Bars disponibles' : 'Available bars' }}
+              </p>
+              <button
+                v-for="b in publicBars"
+                :key="b.id"
+                class="welcome-demo"
+                @click="joinPublicBar(b)"
+              >
+                🍸 {{ b.name }}
+                <span class="welcome-demo-code">{{ b.invite_code }}</span>
+              </button>
+              <div class="welcome-or-divider">
+                <span>{{ locale === 'fr' ? 'ou entrer un code' : 'or enter a code' }}</span>
+              </div>
+            </template>
+            <div v-if="publicBarsLoading" class="welcome-public-loading">
+              {{ locale === 'fr' ? 'Chargement des bars...' : 'Loading bars...' }}
+            </div>
             <div class="welcome-code-row">
               <input
                 v-model="inviteCodeInput"
@@ -473,8 +505,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu } from 'lucide-vue-next'
+import { ref, computed, onMounted, watch } from 'vue'
+import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link } from 'lucide-vue-next'
 
 import { useAuth }      from '@/composables/useAuth'
 import { useCocktails } from '@/composables/useCocktails'
@@ -492,10 +524,11 @@ import DrinkerPanel    from '@/Components/DrinkerPanel.vue'
 import ThemeToggle     from '@/Components/ThemeToggle.vue'
 import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
 import { supabase }    from '@/lib/supabase'
+import { parseHash, setHash, clearHash, buildShareUrl, slugify } from '@/composables/useRouter'
 import { useCatalog } from '@/composables/useCatalog'
 import CatalogModal from '@/Components/Modals/CatalogModal.vue'
 
-const { isLoggedIn, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, initAuth, signOut, fetchBar } = useAuth()
+const { isLoggedIn, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, isBarPublic, initAuth, signOut, fetchBar, toggleBarPublic } = useAuth()
 
 // Bar chargé via code d'invitation (guest sans compte)
 const guestBar = ref(null)
@@ -520,9 +553,18 @@ function handleLogoClick() {
   }
 }
 
+const togglingPublic = ref(false)
+async function handleTogglePublic() {
+  if (togglingPublic.value) return
+  togglingPublic.value = true
+  await toggleBarPublic()
+  togglingPublic.value = false
+}
+
 async function handleSignOut() {
   await signOut()
   guestBar.value = null
+  clearHash()
 }
 
 // Sélection d'un bar parmi plusieurs (cas multi-bars)
@@ -565,6 +607,26 @@ const locale            = ref('fr')
 const inviteCodeInput = ref('')
 const codeError       = ref('')
 
+// Bars publics affichés sur la page d'accueil
+const publicBars      = ref([])
+const publicBarsLoading = ref(false)
+
+async function fetchPublicBars() {
+  publicBarsLoading.value = true
+  const { data, error } = await supabase
+    .from('bars')
+    .select('id, name, invite_code')
+    .eq('is_public', true)
+    .order('name')
+  if (!error && data) publicBars.value = data
+  publicBarsLoading.value = false
+}
+
+async function joinPublicBar(bar) {
+  inviteCodeInput.value = bar.invite_code
+  await joinByCode()
+}
+
 async function joinDemo() {
   inviteCodeInput.value = 'DEMO-0000'
   await joinByCode()
@@ -577,7 +639,7 @@ async function joinByCode() {
 
   const { data, error } = await supabase
     .from('bars')
-    .select('id, name')
+    .select('id, name, invite_code')
     .eq('invite_code', code)
     .single()
 
@@ -595,6 +657,7 @@ async function joinByCode() {
     fetchMenuCards(data.id),
     initDrinker(data.id),
   ])
+  setHash(code)
 }
 
 async function onAuthSuccess() {
@@ -905,8 +968,57 @@ async function handleDelete(id) {
   await deleteCocktail(id)
 }
 
+// ── Deep link via hash ────────────────────────────────────────────────────────
+const linkCopied = ref(false)
+
+function copyBarLink() {
+  const code = inviteCode.value || guestBar.value?.invite_code
+  if (!code) return
+  const card = viewingCard.value
+  const cardSlug = card ? slugify(card.name) : null
+  const url = buildShareUrl(code, cardSlug)
+  navigator.clipboard.writeText(url).then(() => {
+    linkCopied.value = true
+    setTimeout(() => { linkCopied.value = false }, 2000)
+  })
+}
+
+// Ouvre automatiquement une carte si le slug correspond
+function openCardFromSlug(slug) {
+  if (!slug || !menuCards.value.length) return
+  const match = menuCards.value.find(c => slugify(c.name) === slug)
+  if (match) viewingCard.value = match
+}
+
+// Lit le hash et charge le bar + éventuellement la carte correspondante
+async function handleHashRoute() {
+  const { inviteCode: code, cardSlug } = parseHash()
+  if (!code) return
+  // Ne pas re-charger si déjà sur ce bar
+  if (guestBar.value?.invite_code === code || inviteCode.value === code) {
+    if (cardSlug) openCardFromSlug(cardSlug)
+    return
+  }
+  inviteCodeInput.value = code
+  await joinByCode()
+  if (cardSlug) openCardFromSlug(cardSlug)
+}
+
+// Sync hash quand on ouvre/ferme une carte
+watch(viewingCard, (card) => {
+  const code = inviteCode.value || guestBar.value?.invite_code
+  if (!code) return
+  if (card) {
+    setHash(code, slugify(card.name))
+  } else {
+    setHash(code)
+  }
+})
+
 onMounted(async () => {
   await initAuth()
+  await fetchPublicBars()
+  await handleHashRoute()
   if (currentBarId.value) {
     await Promise.all([
       fetchCocktails(currentBarId.value),
@@ -1006,6 +1118,49 @@ async function handleCatalogImport(newCocktail) {
 }
 .burger-item--danger {
   color: var(--danger-text);
+}
+.burger-item--toggle {
+  color: var(--text-muted);
+  justify-content: flex-start;
+}
+.burger-item--toggle:hover {
+  color: var(--text);
+}
+.burger-item--toggle-on {
+  color: var(--gold);
+}
+.burger-item--toggle-on:hover {
+  color: var(--gold);
+  background: rgba(201, 168, 76, 0.08);
+}
+.burger-toggle-badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.badge-on {
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+}
+.badge-off {
+  background: var(--bg-raised);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.burger-item--copy {
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+.burger-item--copy:hover {
+  color: var(--text);
+}
+.burger-item--copy.copied {
+  color: var(--gold);
 }
 .burger-divider {
   height: 1px;
@@ -1126,6 +1281,36 @@ async function handleCatalogImport(newCocktail) {
   flex: 1;
   text-transform: uppercase;
 }
+.welcome-public-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin: 0 0 2px;
+}
+.welcome-public-loading {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 6px 0;
+}
+.welcome-or-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  margin: 2px 0;
+}
+.welcome-or-divider::before,
+.welcome-or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
 
 .invite-code-badge {
   display: flex;

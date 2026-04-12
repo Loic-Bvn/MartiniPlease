@@ -17,6 +17,7 @@ export function useAuth() {
   const currentBarName  = computed(() => bar.value?.name ?? '')
   const inviteCode      = computed(() => bar.value?.invite_code ?? '')
   const hasMultipleBars = computed(() => bars.value.length > 1 && !bar.value)
+  const isBarPublic     = computed(() => bar.value?.is_public ?? false)
 
   // Initialise la session au démarrage (appelé dans App.vue onMounted)
   async function initAuth() {
@@ -86,6 +87,22 @@ export function useAuth() {
     }
   }
 
+  // Active / désactive la visibilité publique du bar
+  async function toggleBarPublic() {
+    if (!bar.value) return { success: false }
+    const newValue = !bar.value.is_public
+    const { error } = await supabase
+      .from('bars')
+      .update({ is_public: newValue })
+      .eq('id', bar.value.id)
+    if (error) {
+      console.error('❌ toggleBarPublic:', error)
+      return { success: false, error: error.message }
+    }
+    bar.value = { ...bar.value, is_public: newValue }
+    return { success: true }
+  }
+
   // Inscription bartender + création du bar
   async function signUp({ email, password, barName }) {
     authLoading.value = true
@@ -149,8 +166,10 @@ export function useAuth() {
     currentBarName,
     inviteCode,
     hasMultipleBars,
+    isBarPublic,
     initAuth,
     fetchBar,
+    toggleBarPublic,
     signUp,
     signIn,
     signOut,
