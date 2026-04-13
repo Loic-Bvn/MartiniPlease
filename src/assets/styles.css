@@ -26,6 +26,19 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+
+  /* CSS variable aliases for consistency */
+  --primary: var(--gold);
+  --primary-muted: var(--gold);
+  --surface: var(--bg-card);
+  --surface-alt: var(--bg-raised);
+  --bg-alt: var(--bg-raised);
+  --color-text-primary: var(--text);
+  --color-text-secondary: var(--text-muted);
+  --color-border-primary: var(--border);
+  --color-border-secondary: var(--border-mid);
+  --color-border-tertiary: var(--border);
+  --color-background-secondary: var(--bg-raised);
 }
 
 .dark {
@@ -2241,6 +2254,403 @@ body {
   .modal-container--menucard { max-height: 90vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .password-modal-content { padding: 1.25rem; }
 }
+
+/* =============================================
+   CONSOLIDATED STYLES (FROM VUE COMPONENTS)
+   ============================================= */
+
+/* ── Auth Tabs (CocktailMenuApp, DrinkerPanel, AuthModal) ─── */
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.auth-tab {
+  flex: 1;
+  padding: 8px 0;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.auth-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* ── Burger Menu (CocktailMenuApp) ────────────── */
+.burger-wrapper {
+  position: relative;
+}
+.burger-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  z-index: 200;
+  box-shadow: var(--shadow-lg);
+}
+.burger-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+}
+.burger-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+.burger-item:hover {
+  background: var(--bg-raised);
+}
+.burger-item--info {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  cursor: default;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.burger-item--info:hover {
+  background: none;
+}
+.burger-item-hint {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.burger-item--danger {
+  color: var(--danger-text);
+}
+.burger-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+/* ── Welcome Screen (CocktailMenuApp) ────────── */
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 24px;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+.welcome-logo {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+}
+.dark .welcome-logo { filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(5deg);}
+.welcome-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+.welcome-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 40px;
+}
+.welcome-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+.welcome-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+}
+.welcome-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.welcome-card-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.welcome-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.welcome-card-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.welcome-btn {
+  width: 100%;
+}
+.welcome-demo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--gold-dim);
+  background: rgba(201, 168, 76, 0.06);
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+.welcome-demo:hover {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: var(--gold);
+}
+.welcome-demo-code {
+  font-family: monospace;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(201, 168, 76, 0.15);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  letter-spacing: 1px;
+  margin-left: auto;
+}
+.welcome-code-row {
+  display: flex;
+  gap: 8px;
+}
+.welcome-code-input {
+  flex: 1;
+  text-transform: uppercase;
+}
+.invite-code-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  cursor: default;
+  user-select: all;
+}
+
+/* ── Drinker Panel (DrinkerPanel) ──────────────── */
+.drinker-panel-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.drinker-identity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-mid);
+  background: var(--bg-raised);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: default;
+  user-select: none;
+}
+.btn-drinker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-mid);
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-drinker:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
+/* ── Cocktail Card Scoped Styles (CocktailCard) ────────── */
+.btn-icon--fav {
+  color: var(--text-secondary);
+  transition: color 0.15s;
+}
+.btn-icon--fav:hover {
+  color: #e05c6e;
+}
+.btn-icon--fav-active {
+  color: #e05c6e;
+}
+.btn-order {
+  font-size: 14px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--border-mid);
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+.btn-order:hover {
+  border-color: var(--gold-dim);
+  color: var(--text);
+}
+.btn-order--done {
+  background: #1a7a4a;
+  border-color: #1a7a4a;
+  color: #fff;
+}
+
+/* ── Catalog Modal (CatalogModal) ────────────── */
+.modal-container--catalog {
+  max-width: 720px;
+  width: 95vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+.catalog-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 1rem;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.catalog-tab {
+  padding: 0.6rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.catalog-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.catalog-tab-badge {
+  background: var(--gold);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+.catalog-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.catalog-filter-select { width: auto; min-width: 140px; flex-shrink: 0; }
+.catalog-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.catalog-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
+.catalog-item-info { flex: 1; min-width: 0; }
+.catalog-item-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; color: var(--text); }
+.catalog-item-meta { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.25rem; }
+.catalog-item-desc {
+  font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-top: 0.25rem;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.catalog-chip {
+  font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 999px;
+  background: var(--bg-raised); color: var(--text-muted); border: 1px solid var(--border);
+}
+.catalog-item-actions { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
+.catalog-btn-import { font-size: 0.8rem; padding: 0.35rem 0.75rem; white-space: nowrap; }
+.catalog-btn-preview { padding: 0.35rem 0.5rem; font-size: 0.8rem; }
+.catalog-btn--fork { background: var(--primary-muted, #7c3aed22) !important; }
+.catalog-badge {
+  font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 999px; font-weight: 600;
+}
+.catalog-badge--done      { background: #d1fae5; color: #065f46; }
+.catalog-badge--submitted { background: #dbeafe; color: #1e40af; }
+.catalog-badge--unchanged { background: var(--bg-raised); color: var(--text-muted); cursor: default; }
+.catalog-badge--checking  { background: transparent; color: var(--text-muted); font-size: 0.9rem; }
+.catalog-preview {
+  width: 100%; border-top: 1px solid var(--border); padding-top: 0.6rem; margin-top: 0.25rem;
+}
+.catalog-recipe { display: flex; flex-direction: column; gap: 0.2rem; }
+.catalog-recipe-line { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 0.15rem 0; }
+.catalog-recipe-ingredient { color: var(--text); }
+.catalog-recipe-qty { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.catalog-creator { margin-top: 0.4rem; font-size: 0.75rem; color: var(--text-muted); font-style: italic; }
+.catalog-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  padding: 2rem 0; color: var(--text-muted); font-size: 0.9rem;
+}
+.catalog-mine-hint {
+  font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;
+  padding: 0.6rem 0.75rem; background: var(--bg-raised);
+  border-radius: 6px; border-left: 3px solid var(--gold);
+}
+
 /* ── Sub-spirit chips ──────────────────────── */
 .chips-container--sub {
   margin-top: 0.5rem;
