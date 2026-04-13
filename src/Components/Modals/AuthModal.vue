@@ -134,29 +134,3 @@ async function handleSignup() {
   }
 }
 </script>
-
-<style scoped>
-.auth-tabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--color-border-tertiary);
-}
-.auth-tab {
-  flex: 1;
-  padding: 8px 0;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.15s;
-  margin-bottom: -1px;
-}
-.auth-tab.active {
-  color: var(--color-text-primary);
-  border-bottom-color: var(--color-text-primary);
-  font-weight: 500;
-}
-</style>

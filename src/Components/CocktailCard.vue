@@ -132,8 +132,6 @@ defineEmits(['edit', 'delete'])
 const { barInventory }                             = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, addToHistory } = useDrinker()
 
-const justOrdered = ref(false)
-
 const t = computed(() => ({
   makeable: props.locale === 'fr' ? 'Disponible' : 'Available',
   notMakeable: props.locale === 'fr' ? 'Non disponible' : 'Not available',
@@ -159,8 +157,6 @@ async function handleFavorite() {
 
 async function handleHistoric() {
   await addToHistory(props.cocktail.id)
-  justOrdered.value = true
-  setTimeout(() => { justOrdered.value = false }, 2000)
 }
 
 function formatQty(ing) {
@@ -219,37 +215,3 @@ async function handleSubmit() {
 }
 
 </script>
-
-<style scoped>
-.btn-icon--fav {
-  color: var(--color-text-secondary);
-  transition: color 0.15s;
-}
-.btn-icon--fav:hover {
-  color: #e05c6e;
-}
-.btn-icon--fav-active {
-  color: #e05c6e;
-}
-
-.btn-order {
-  font-size: 14px;
-  padding: 2px 7px;
-  border-radius: 6px;
-  border: 1px solid var(--color-border-secondary);
-  background: var(--color-background-secondary);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.2s;
-  line-height: 1;
-}
-.btn-order:hover {
-  border-color: var(--color-border-primary);
-  color: var(--color-text-primary);
-}
-.btn-order--done {
-  background: #1a7a4a;
-  border-color: #1a7a4a;
-  color: #fff;
-}
-</style>
