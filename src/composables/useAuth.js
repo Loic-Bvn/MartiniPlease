@@ -43,24 +43,6 @@ export function useAuth() {
   async function fetchBar(barId = null) {
     if (!session.value) return
 
-    if (barId) {
-      // Sélection explicite d'un bar (après choix dans l'UI)
-      const { data, error } = await supabase
-        .from('bars')
-        .select('*')
-        .eq('id', barId)
-        .eq('owner_id', session.value.user.id)
-        .single()
-
-      if (error) {
-        console.error('❌ fetchBar (by id):', error)
-        return
-      }
-      bar.value  = data
-      bars.value = []
-      return
-    }
-
     // Chargement initial : récupérer tous les bars du compte
     const { data, error } = await supabase
       .from('bars')
@@ -73,17 +55,38 @@ export function useAuth() {
       return
     }
 
-    if (!data || data.length === 0) {
-      bar.value  = null
-      bars.value = []
-    } else if (data.length === 1) {
+    bars.value = data || []
+
+    if (barId) {
+      // Sélection explicite d'un bar (après choix dans l'UI)
+      const selected = bars.value.find(b => b.id === barId)
+      if (selected) {
+        bar.value = selected
+      } else {
+        console.error('❌ Bar not found:', barId)
+      }
+      return
+    }
+
+    // Sélection automatique
+    if (!bars.value || bars.value.length === 0) {
+      bar.value = null
+    } else if (bars.value.length === 1) {
       // Un seul bar : sélection automatique, pas besoin de sélecteur
-      bar.value  = data[0]
-      bars.value = []
+      bar.value = bars.value[0]
     } else {
-      // Plusieurs bars : laisser l'utilisateur choisir
-      bar.value  = null
-      bars.value = data
+      // Plusieurs bars : laisser l'utilisateur choisir (bar reste null)
+      bar.value = null
+    }
+  }
+
+  // Basculer vers un autre bar (navigation rapide entre ses bars)
+  async function switchBar(barId) {
+    const selected = bars.value.find(b => b.id === barId)
+    if (selected) {
+      bar.value = selected
+    } else {
+      console.error('❌ Bar not found:', barId)
     }
   }
 
@@ -155,6 +158,86 @@ export function useAuth() {
     bars.value    = []
   }
 
+  // Créer un nouveau bar (pour un bartender déjà connecté)
+  async function createNewBar(barName) {
+    if (!session.value) return { success: false, error: 'Non connecté' }
+    authLoading.value = true
+    authError.value   = ''
+    try {
+      const { data: barData, error: barError } = await supabase
+        .from('bars')
+        .insert({ name: barName, owner_id: session.value.user.id, invite_code: '' })
+        .select()
+        .single()
+      if (barError) throw barError
+
+      // Ajouter le nouveau bar à la liste
+      bars.value.push(barData)
+      // Sélectionner le nouveau bar automatiquement
+      bar.value = barData
+      return { success: true, data: barData }
+    } catch (err) {
+      authError.value = err.message
+      return { success: false, error: err.message }
+    } finally {
+      authLoading.value = false
+    }
+  }
+
+  // Modifier le nom d'un bar
+  async function updateBarName(barId, newName) {
+    if (!session.value) return { success: false, error: 'Non connecté' }
+    try {
+      const { error } = await supabase
+        .from('bars')
+        .update({ name: newName })
+        .eq('id', barId)
+        .eq('owner_id', session.value.user.id)
+      if (error) throw error
+
+      // Mettre à jour dans la liste locale
+      const barIndex = bars.value.findIndex(b => b.id === barId)
+      if (barIndex > -1) {
+        bars.value[barIndex].name = newName
+      }
+      // Mettre à jour le bar actif si c'est le même
+      if (bar.value?.id === barId) {
+        bar.value.name = newName
+      }
+      return { success: true }
+    } catch (err) {
+      console.error('❌ updateBarName:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  // Modifier le code d'invitation d'un bar
+  async function updateInviteCode(barId, newCode) {
+    if (!session.value) return { success: false, error: 'Non connecté' }
+    try {
+      const { error } = await supabase
+        .from('bars')
+        .update({ invite_code: newCode })
+        .eq('id', barId)
+        .eq('owner_id', session.value.user.id)
+      if (error) throw error
+
+      // Mettre à jour dans la liste locale
+      const barIndex = bars.value.findIndex(b => b.id === barId)
+      if (barIndex > -1) {
+        bars.value[barIndex].invite_code = newCode
+      }
+      // Mettre à jour le bar actif si c'est le même
+      if (bar.value?.id === barId) {
+        bar.value.invite_code = newCode
+      }
+      return { success: true }
+    } catch (err) {
+      console.error('❌ updateInviteCode:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
   return {
     session,
     bar,
@@ -169,9 +252,13 @@ export function useAuth() {
     isBarPublic,
     initAuth,
     fetchBar,
+    switchBar,
     toggleBarPublic,
     signUp,
     signIn,
     signOut,
+    createNewBar,
+    updateBarName,
+    updateInviteCode,
   }
 }

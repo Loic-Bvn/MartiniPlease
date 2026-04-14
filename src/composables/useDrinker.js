@@ -5,6 +5,7 @@
 // - Le drinker retrouve son profil sur n'importe quel appareil via son token
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { validateDrinkerCreation } from '@/composables/useDataValidator'
 
 const drinker    = ref(null)      // { id, pseudo, bar_id, token }
 const favorites  = ref(new Set()) // Set de cocktail_id
@@ -44,21 +45,25 @@ export function useDrinker() {
 
   // Crée un nouveau profil drinker, stocke uniquement le token
   async function createDrinker({ pseudo, barId }) {
-    const { data, error } = await supabase
-      .from('drinker_profiles')
-      .insert({ pseudo, bar_id: barId })
-      .select()
-      .single()
+    try {
+      const validated = validateDrinkerCreation({ pseudo, barId })
+      
+      const { data, error } = await supabase
+        .from('drinker_profiles')
+        .insert({ pseudo: validated.pseudo, bar_id: validated.barId })
+        .select()
+        .single()
 
-    if (error) {
-      console.error('❌ createDrinker:', error)
-      return { success: false, error: error.message }
+      if (error) throw error
+
+      // On ne stocke que le token, pas le profil entier
+      localStorage.setItem(TOKEN_KEY, data.token)
+      drinker.value = data
+      return { success: true }
+    } catch (err) {
+      console.error('❌ createDrinker:', err)
+      return { success: false, error: err.message || err }
     }
-
-    // On ne stocke que le token, pas le profil entier
-    localStorage.setItem(TOKEN_KEY, data.token)
-    drinker.value = data
-    return { success: true }
   }
 
   // Reconnexion via pseudo

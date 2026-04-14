@@ -4,7 +4,7 @@
 
       <!-- Header -->
       <div class="modal-header">
-        <h2 class="modal-title">📚 catalog de recettes</h2>
+        <h2 class="modal-title">📚 catalogue de recettes</h2>
         <button @click="$emit('close')" class="modal-close-btn">
           <X :size="20" />
         </button>
@@ -13,7 +13,7 @@
       <!-- Tabs -->
       <div class="catalog-tabs">
         <button :class="['catalog-tab', { active: activeTab === 'browse' }]" @click="activeTab = 'browse'">
-          🌐 catalog global
+          🌐 Catalogue global
         </button>
         <button :class="['catalog-tab', { active: activeTab === 'mine' }]" @click="activeTab = 'mine'">
           🍾 Mes recettes
