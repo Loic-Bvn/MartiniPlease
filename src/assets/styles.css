@@ -340,6 +340,8 @@ body {
 
 /* New card / cocktail buttons */
 .btn-new-card {
+  width: 100%;
+  justify-content: center;
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -352,6 +354,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  margin-top: 8px;
 }
 
 .btn-new-card:hover {
@@ -2348,6 +2351,125 @@ body {
 .burger-item--danger {
   color: var(--danger-text);
 }
+.burger-item--bars-selector {
+  flex-direction: column;
+  gap: 8px;
+  cursor: default;
+}
+.burger-item--new-bar {
+  flex-direction: column;
+  gap: 8px;
+  cursor: default;
+}
+.burger-item-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0 4px;
+}
+.bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.bar-option {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.bar-option:hover {
+  background: var(--bg-raised);
+  border-color: var(--gold);
+}
+.bar-option--active {
+  background: var(--bg-raised);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 600;
+}
+.bar-option-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-left: 8px;
+}
+.bar-new-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.bar-new-btn:hover {
+  background: var(--bg-raised);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.new-bar-input-wrapper {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.new-bar-input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+.new-bar-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+}
+.new-bar-btn-confirm {
+  all: unset;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: var(--success-bg, #10b981);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: background 0.15s;
+}
+.new-bar-btn-confirm:hover {
+  background: var(--success-hover, #059669);
+}
+.new-bar-btn-cancel {
+  all: unset;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: var(--danger-bg, #ef4444);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: background 0.15s;
+}
+.new-bar-btn-cancel:hover {
+  background: var(--danger-hover, #dc2626);
+}
 .burger-divider {
   height: 1px;
   background: var(--border);
@@ -2428,6 +2550,256 @@ body {
 .welcome-btn {
   width: 100%;
 }
+
+/* ── Bars Management Screen ──────────────────── */
+.bars-management-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+.btn-create-bar {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--gold);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-create-bar:hover {
+  background: #d4a737;
+  transform: translateY(-1px);
+}
+.new-bar-input-group {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  align-items: center;
+}
+.new-bar-input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+.new-bar-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+}
+.btn-confirm, .btn-cancel {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 600;
+}
+.btn-confirm {
+  background: /* var(--success-bg, */#10b981;
+  color: white;
+}
+.btn-confirm:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+.btn-cancel {
+  background: #ef4444;
+  color: white;
+}
+.btn-cancel:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+.bars-management-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bar-management-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: default !important;
+}
+.bar-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-select-bar, .btn-delete-bar {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: 1;
+}
+.btn-select-bar {
+  background: var(--gold);
+  color: white;
+}
+.btn-select-bar:hover {
+  background: #d4a737;
+}
+.btn-delete-bar {
+  background: #ef4444;
+  color: white;
+}
+.btn-delete-bar:hover {
+  background: #dc2626;
+}
+
+/* ── Bar Edit Mode ────────────────────────────────── */
+.bar-edit-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-radius: 8px;
+}
+.edit-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.edit-field-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.edit-field-input {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 6px;
+  background: var(--color-bg-input, white);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+.edit-field-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+}
+.bar-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+.bar-edit-actions .btn-confirm, .bar-edit-actions .btn-cancel {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: 1;
+}
+.bar-edit-actions .btn-confirm {
+  background: var(--gold);
+  color: white;
+}
+.bar-edit-actions .btn-confirm:hover:not(:disabled) {
+  background: #d4a737;
+}
+.bar-edit-actions .btn-cancel {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-secondary);
+}
+.bar-edit-actions .btn-cancel:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+}
+.bar-edit-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Delete Bar Modal ────────────────────────── */
+.modal-container--delete-bar {
+  max-width: 400px;
+}
+.delete-warning {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.delete-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.delete-confirmation-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.delete-confirmation-label {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.delete-confirmation-input {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.delete-confirmation-input:focus {
+  outline: none;
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+}
+.btn-modal-danger {
+  all: unset;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-modal-danger:hover:not(:disabled) {
+  background: #dc2626;
+}
+.btn-modal-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .welcome-demo {
   display: flex;
   align-items: center;
@@ -2480,6 +2852,32 @@ body {
   letter-spacing: 0.05em;
   cursor: default;
   user-select: all;
+}
+
+.welcome-public-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0 0 4px;
+}
+
+.welcome-or-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  margin: 4px 0;
+}
+
+.welcome-or-divider::before,
+.welcome-or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 /* ── Drinker Panel (DrinkerPanel) ──────────────── */

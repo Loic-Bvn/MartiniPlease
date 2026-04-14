@@ -3,6 +3,7 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
+import ingredientsDatabase from '@/constants/ingredientsDatabase.json'
 
 const barInventory = ref(new Set())
 const ingredients  = ref([])
@@ -145,6 +146,31 @@ export function useInventory() {
     }
   }
 
+  // Initialiser les ingrédients par défaut pour un nouveau bar
+  async function initializeDefaultIngredients(barId) {
+    try {
+      const rows = ingredientsDatabase.map(ing => ({
+        type: ing.type,
+        name: ing.name,
+        category: ing.category,
+        family: ing.family,
+        abv: ing.abv,
+        bar_id: barId,
+        available: false,
+      }))
+      
+      const { error } = await supabase
+        .from('ingredients')
+        .insert(rows)
+      
+      if (error) throw error
+      console.log(`✅ ${rows.length} ingrédients par défaut créés pour le bar`)
+    } catch (err) {
+      console.error('❌ Erreur initializeDefaultIngredients:', err)
+      throw err
+    }
+  }
+
   return {
     barInventory,
     ingredients,
@@ -156,5 +182,6 @@ export function useInventory() {
     deselectAll,
     hasIngredient,
     addIngredient,
+    initializeDefaultIngredients,
   }
 }

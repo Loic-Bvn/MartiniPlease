@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
+import { validateCocktail } from '@/composables/useDataValidator'
 
 const catalog        = ref([])
 const imported       = ref(new Set()) // catalog IDs importés par ce bar
@@ -82,29 +83,34 @@ export function useCatalog() {
     const barId = currentBarId.value
     if (!barId) return { success: false, error: 'Non connecté' }
 
-    const { data, error } = await supabase
-      .from('cocktails')
-      .insert({
-        ...stripCatalogFields(catalogCocktail),
-        bar_id: barId,
-        submitted_by_bar_id: catalogCocktail.id, // FK → cocktail_catalog.id
-      })
-      .select()
-      .single()
+    try {
+      const strippedData = stripCatalogFields(catalogCocktail)
+      const validated = validateCocktail(strippedData)
 
-    if (error) {
-      console.error('❌ importCocktail:', error)
-      return { success: false, error }
+      const { data, error } = await supabase
+        .from('cocktails')
+        .insert({
+          ...validated,
+          bar_id: barId,
+          submitted_by_bar_id: catalogCocktail.id, // FK → cocktail_catalog.id
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Mise à jour des états locaux
+      imported.value = new Set([...imported.value, catalogCocktail.id])
+      originMap.value = { ...originMap.value, [data.id]: catalogCocktail.id }
+
+      const hash = await hashCocktail(catalogCocktail)
+      snapshotHashes.value = { ...snapshotHashes.value, [data.id]: hash }
+
+      return { success: true, data }
+    } catch (err) {
+      console.error('❌ importCocktail:', err)
+      return { success: false, error: err.message || err }
     }
-
-    // Mise à jour des états locaux
-    imported.value = new Set([...imported.value, catalogCocktail.id])
-    originMap.value = { ...originMap.value, [data.id]: catalogCocktail.id }
-
-    const hash = await hashCocktail(catalogCocktail)
-    snapshotHashes.value = { ...snapshotHashes.value, [data.id]: hash }
-
-    return { success: true, data }
   }
 
   // ── Soumission d'un cocktail bar au catalog global ────────────────────────
@@ -113,31 +119,34 @@ export function useCatalog() {
     const barId = currentBarId.value
     if (!barId) return { success: false, error: 'Non connecté' }
 
-    const modified = await isModified(barCocktail)
-    if (!modified) return { success: false, error: 'unchanged' }
+    try {
+      const modified = await isModified(barCocktail)
+      if (!modified) return { success: false, error: 'unchanged' }
 
-    // On exclut tous les champs liés à la table cocktails (bar_id, submitted_by_bar_id…)
-    // pour insérer uniquement les champs métier dans cocktail_catalog.
-    const payload = omitEmpty(stripBarFields(barCocktail))
+      // Valider le cocktail avant soumission
+      const strippedData = stripBarFields(barCocktail)
+      const validated = validateCocktail(strippedData)
+      const payload = omitEmpty(validated)
 
-    const { data: catalogEntry, error } = await supabase
-      .from('cocktail_catalog')
-      .insert(payload)
-      .select()
-      .single()
+      const { data: catalogEntry, error } = await supabase
+        .from('cocktail_catalog')
+        .insert(payload)
+        .select()
+        .single()
 
-    if (error) {
-      console.error('❌ submitToCatalog:', error)
-      return { success: false, error }
+      if (error) throw error
+
+      // Mise à jour des états locaux
+      submitted.value = new Set([...submitted.value, barCocktail.id])
+      const hash = await hashCocktail(barCocktail)
+      snapshotHashes.value = { ...snapshotHashes.value, [barCocktail.id]: hash }
+      originMap.value = { ...originMap.value, [barCocktail.id]: catalogEntry.id }
+
+      return { success: true, data: catalogEntry }
+    } catch (err) {
+      console.error('❌ submitToCatalog:', err)
+      return { success: false, error: err.message || err }
     }
-
-    // Mise à jour des états locaux
-    submitted.value = new Set([...submitted.value, barCocktail.id])
-    const hash = await hashCocktail(barCocktail)
-    snapshotHashes.value = { ...snapshotHashes.value, [barCocktail.id]: hash }
-    originMap.value = { ...originMap.value, [barCocktail.id]: catalogEntry.id }
-
-    return { success: true, data: catalogEntry }
   }
 
   // ── Détection de modification ─────────────────────────────────────────────

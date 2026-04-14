@@ -105,6 +105,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { X, Search, Check } from 'lucide-vue-next'
+import { validateMenuCard } from '@/composables/useDataValidator'
 
 const props = defineProps({
   card:      { type: Object, default: null },
@@ -164,11 +165,18 @@ function seasonIcon(season) {
 
 async function save() {
   if (!cardName.value.trim()) return
-  saving.value = true
-  emit('save', {
-    id:           props.card?.id,
-    name:         cardName.value.trim(),
-    cocktail_ids: selectedIds.value,
-  })
+  
+  try {
+    const validated = validateMenuCard({
+      id: props.card?.id,
+      name: cardName.value.trim(),
+      cocktail_ids: selectedIds.value
+    })
+    saving.value = true
+    emit('save', validated)
+  } catch (err) {
+    alert(`❌ ${err.message}`)
+    saving.value = false
+  }
 }
 </script>

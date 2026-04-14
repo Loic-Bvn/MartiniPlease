@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
 import { useCatalog } from '@/composables/useCatalog'
+import { validateCocktail } from '@/composables/useDataValidator'
 
 const cocktails = ref([])
 const loading   = ref(false)
@@ -33,11 +34,14 @@ export function useCocktails() {
   async function createCocktail(cocktailData) {
     const barId = currentBarId.value
     if (!barId) return { success: false, error: 'Non connecté' }
+    
     try {
       const { id, ...dataWithoutId } = cocktailData
+      const validated = validateCocktail(dataWithoutId)
+      
       const { data, error } = await supabase
         .from('cocktails')
-        .insert({ ...dataWithoutId, bar_id: barId })
+        .insert({ ...validated, bar_id: barId })
         .select()
         .single()
 
@@ -47,16 +51,21 @@ export function useCocktails() {
       return { success: true, data }
     } catch (err) {
       console.error('❌ Erreur createCocktail:', err)
-      return { success: false, error: err }
+      return { success: false, error: err.message || err }
     }
   }
 
   async function updateCocktail(id, cocktailData) {
+    const barId = currentBarId.value
+    if (!barId) return { success: false, error: 'Non connecté' }
+    
     try {
+      const validated = validateCocktail(cocktailData)
       const { data, error } = await supabase
         .from('cocktails')
-        .update(cocktailData)
+        .update(validated)
         .eq('id', id)
+        .eq('bar_id', barId) // 🔥 sécurité multi-tenant
         .select()
         .single()
 
@@ -66,7 +75,7 @@ export function useCocktails() {
       return { success: true, data }
     } catch (err) {
       console.error('❌ Erreur updateCocktail:', err)
-      return { success: false, error: err }
+      return { success: false, error: err.message || err }
     }
   }
 

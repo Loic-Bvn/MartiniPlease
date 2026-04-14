@@ -268,6 +268,7 @@
 import { ref, computed } from 'vue'
 import { X, Trash2, Plus } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
+import { validateCocktail } from '@/composables/useDataValidator'
 
 const props = defineProps({ cocktail: Object })
 const emit  = defineEmits(['save', 'close'])
@@ -456,24 +457,11 @@ function removeRecipeLine(idx) {
 }
 
 function handleSave() {
-  if (!form.value.name.trim()) return
-
-  const cleanRecipe = form.value.recipe
-    .filter(i => i.Ingredient?.trim())
-    .map(i => {
-      const line = { Ingredient: i.Ingredient.trim(), Type: i.Type ?? '' }
-      if (i.Oz)   line.Oz     = i.Oz
-      if (i.Ml)   line.Ml     = i.Ml
-      if (i.Dashes != null && i.Dashes !== '') line.Dashes = Number(i.Dashes)
-      return line
-    })
-
-  emit('save', {
-    ...form.value,
-    recipe:  cleanRecipe,
-    season:  [...form.value.season],
-    profile: [...form.value.profile],
-    tags:    [...form.value.tags],
-  })
+  try {
+    const validated = validateCocktail(form.value)
+    emit('save', validated)
+  } catch (err) {
+    alert(`❌ ${err.message}`)
+  }
 }
 </script>

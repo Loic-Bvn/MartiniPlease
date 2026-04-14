@@ -48,7 +48,7 @@
             v-if="!isSubmitted(cocktail.id)"
             @click="handleSubmit"
             class="btn-icon btn-icon--submit"
-            :title="locale === 'fr' ? 'Proposer au catalog' : 'Submit to catalog'"
+            :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
           >
             <Upload :size="18" />
           </button>

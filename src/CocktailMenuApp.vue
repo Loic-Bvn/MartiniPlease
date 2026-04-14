@@ -6,7 +6,9 @@
       <div class="header-container">
         <div class="header-top">
           <div class="header-brand" @click="handleLogoClick" style="cursor: pointer;">
-            <img src="/logo_square.png" alt="Martini Please" class="header-logo" />
+            <!-- <img :src="randomLogo" alt="/margarita_square.png" class="header-logo" /> -->
+            <img v-if="randomLogo" :src="randomLogo" alt="logo" class="header-logo" />
+
             <h1 class="header-title">{{ activeBarName }}</h1>
           </div>
           <!-- Barre de recherche masquée sur l'écran d'accueil -->
@@ -18,7 +20,7 @@
             <div class="header-actions">
 
               <!-- Bartender connecté -->
-              <template v-if="activeBarId && isLoggedIn">
+              <template v-if="activeBarId && isLoggedIn && !showBarsSelection">
                 <button @click="openNewModal" class="btn-new-cocktail">
                   <Plus :size="15" /><span class="btn-label-hide"> {{ t.newCocktail }}</span>
                 </button>
@@ -30,7 +32,7 @@
               <button @click="locale = locale === 'fr' ? 'en' : 'fr'" class="btn-mode btn-mode-inactive">
                 {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
               </button>
-              <button v-if="activeBarId" @click="unit = unit === 'oz' ? 'ml' : 'oz'" class="btn-mode btn-mode-inactive" :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'">
+              <button v-if="activeBarId && !showBarsSelection" @click="unit = unit === 'oz' ? 'ml' : 'oz'" class="btn-mode btn-mode-inactive" :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'">
                 {{ unit === 'oz' ? 'ml' : 'oz' }}
               </button>
             </div>
@@ -43,37 +45,38 @@
               </button>
               <transition name="fade">
                 <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
-                  <div v-if="activeBarId" class="burger-item burger-item--info">
+                  <!-- Gérer mes bars (si plusieurs) -->
+                  <button v-if="isLoggedIn && bars.length > 1 && !showBarsSelection" @click="showBarsSelection = true; burgerOpen = false" class="burger-item">
+                    {{ locale === 'fr' ? '📋 Gérer mes bars' : '📋 Manage bars' }}
+                  </button>
+                  <div v-if="isLoggedIn && bars.length > 1 && !showBarsSelection" class="burger-divider" />
+                  
+                  <div v-if="activeBarId && !showBarsSelection" class="burger-item burger-item--info">
                     <span>🔑 {{ inviteCode }}</span>
                     <span class="burger-item-hint">Code d'invitation</span>
                   </div>
-                  <div v-if="activeBarId" class="burger-divider" />
-                  <button v-if="activeBarId" @click="handleTogglePublic" class="burger-item burger-item--toggle" :class="{ 'burger-item--toggle-on': isBarPublic }">
+                  <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
+                  <button v-if="activeBarId && !showBarsSelection" @click="handleTogglePublic" class="burger-item burger-item--toggle" :class="{ 'burger-item--toggle-on': isBarPublic }">
                     <Globe v-if="isBarPublic" :size="15" />
                     <EyeOff v-else :size="15" />
-                    <span>{{ isBarPublic ? (locale === 'fr' ? 'Bar public' : 'Public bar') : (locale === 'fr' ? 'Bar privé' : 'Private bar') }}</span>
+                    <span>{{ isBarPublic ? (locale === 'fr' ? 'Bar public:' : 'Public bar:') : (locale === 'fr' ? 'Bar privé:' : 'Private bar:') }}</span>
                     <span class="burger-toggle-badge" :class="isBarPublic ? 'badge-on' : 'badge-off'">
                       {{ isBarPublic ? (locale === 'fr' ? 'visible' : 'visible') : (locale === 'fr' ? 'masqué' : 'hidden') }}
                     </span>
                   </button>
-                  <div v-if="activeBarId" class="burger-divider" />
-                  <button v-if="activeBarId" @click="openNewCardModal(); burgerOpen = false" class="burger-item">
-                    <BookOpen :size="15" />
-                    {{ t.newCard }}
-                  </button>
-                  <div v-if="activeBarId" class="burger-divider" />
+                  <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
 
-                  <button v-if="activeBarId" @click="showCatalogModal = true; burgerOpen = false" class="burger-item">
+                  <button v-if="activeBarId && !showBarsSelection" @click="showCatalogModal = true; burgerOpen = false" class="burger-item">
                     <Library :size="15" />
                     {{ locale === 'fr' ? 'Catalogue de recettes' : 'Recipe Catalog' }}
                   </button> 
                   
-                  <div v-if="activeBarId" class="burger-divider" />
-                  <button v-if="activeBarId" @click="copyBarLink" class="burger-item burger-item--copy">
+                  <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
+                  <button v-if="activeBarId && !showBarsSelection" @click="copyBarLink" class="burger-item burger-item--copy">
                     <Link :size="15" />
                     <span>{{ linkCopied ? (locale === 'fr' ? 'Lien copié !' : 'Link copied!') : (locale === 'fr' ? 'Copier le lien du bar' : 'Copy bar link') }}</span>
                   </button>
-                  <div v-if="activeBarId" class="burger-divider" />
+                  <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
                   <button @click="handleSignOut(); burgerOpen = false" class="burger-item burger-item--danger">
                     <LogOut :size="15" />
                     {{ locale === 'fr' ? 'Se déconnecter' : 'Sign out' }}
@@ -97,7 +100,7 @@
     <!-- État : pas connecté + pas de bar -->
     <div v-if="!isLoggedIn && !activeBarId" class="main-content">
       <div class="welcome-screen">
-        <img src="/logo_square.png" alt="Martini Please" class="welcome-logo" />
+        <img :src="randomLogo" alt="Martini Please" class="welcome-logo" />
         <h2 class="welcome-title">Martini Please</h2>
         <p class="welcome-subtitle">{{ locale === 'fr' ? 'Gérez votre bar, explorez les cocktails.' : 'Manage your bar, explore cocktails.' }}</p>
 
@@ -129,7 +132,7 @@
 
             <!-- Bars publics disponibles -->
             <template v-if="!publicBarsLoading && publicBars.length > 0">
-              <p class="welcome-public-label">
+              <p class="welcome-public-title">
                 {{ locale === 'fr' ? 'Bars disponibles' : 'Available bars' }}
               </p>
               <button
@@ -167,29 +170,151 @@
       </div>
     </div>
 
-    <!-- Sélecteur de bar (bartender connecté avec plusieurs bars) -->
-    <div v-else-if="isLoggedIn && hasMultipleBars" class="main-content">
+    <!-- Sélecteur de bar (bartender connecté avec plusieurs bars) ou vue de gestion -->
+    <div v-if="(isLoggedIn && hasMultipleBars) || showBarsSelection" class="main-content">
       <div class="welcome-screen">
-        <img src="/logo_square.png" alt="Martini Please" class="welcome-logo" />
-        <h2 class="welcome-title">{{ locale === 'fr' ? 'Quel bar ?' : 'Which bar?' }}</h2>
-        <p class="welcome-subtitle">{{ locale === 'fr' ? 'Sélectionne le bar auquel accéder.' : 'Select the bar you want to access.' }}</p>
-        <div class="welcome-cards">
-          <div
-            v-for="b in bars"
-            :key="b.id"
-            class="welcome-card"
-            style="cursor: pointer;"
-            @click="selectBar(b)"
-          >
-            <div class="welcome-card-header">
-              <span class="welcome-card-icon">🍾</span>
-              <div>
-                <div class="welcome-card-title">{{ b.name }}</div>
-                <div class="welcome-card-desc">{{ locale === 'fr' ? 'Code :' : 'Code:' }} {{ b.invite_code }}</div>
+        <img :src="randomLogo" alt="Martini Please" class="welcome-logo" />
+        <h2 class="welcome-title">{{ locale === 'fr' ? 'Gérer vos bars' : 'Manage your bars' }}</h2>
+        <p class="welcome-subtitle">{{ locale === 'fr' ? 'Créez, sélectionnez ou supprimez vos bars.' : 'Create, select or delete your bars.' }}</p>
+        
+        <!-- Bouton créer nouveau bar -->
+        <div class="bars-management-header">
+          <button v-if="!showNewBarInput" @click="showNewBarInput = true" class="btn-create-bar">
+            <Plus :size="16" />
+            {{ locale === 'fr' ? 'Créer un nouveau bar' : 'Create new bar' }}
+          </button>
+          <div v-else class="new-bar-input-group">
+            <input
+              v-model="newBarName"
+              type="text"
+              :placeholder="locale === 'fr' ? 'Nom du bar...' : 'Bar name...'"
+              class="new-bar-input"
+              @keyup.enter="handleCreateNewBar"
+              @keyup.esc="showNewBarInput = false"
+              autofocus
+            />
+            <button @click="handleCreateNewBar" class="btn-confirm" title="Créer">
+              <Plus :size="14" />
+            </button>
+            <button @click="showNewBarInput = false" class="btn-cancel" title="Annuler">
+              <X :size="14" />
+            </button>
+          </div>
+        </div>
+        
+        <!-- Liste des bars -->
+        <div class="welcome-cards bars-management-list">
+          <div v-for="b in bars" :key="b.id" class="welcome-card bar-management-card">
+            <!-- Mode édition -->
+            <div v-if="editingBarId === b.id" class="bar-edit-mode">
+              <div class="edit-field-group">
+                <label class="edit-field-label">{{ locale === 'fr' ? 'Nom du bar:' : 'Bar name:' }}</label>
+                <input 
+                  v-model="editingBarName" 
+                  type="text" 
+                  class="edit-field-input"
+                  :placeholder="locale === 'fr' ? 'Nom du bar...' : 'Bar name...'"
+                  autofocus
+                />
+              </div>
+              <div class="edit-field-group">
+                <label class="edit-field-label">{{ locale === 'fr' ? 'Code d\'invitation:' : 'Invite code:' }}</label>
+                <input 
+                  v-model="editingBarCode" 
+                  type="text" 
+                  class="edit-field-input"
+                  :placeholder="locale === 'fr' ? 'Code d\'invitation...' : 'Invite code...'"
+                />
+              </div>
+              <div class="bar-edit-actions">
+                <button @click="saveBarEdits(b.id)" :disabled="updatingBarId === b.id" class="btn-confirm">
+                  {{ updatingBarId === b.id ? '⏳' : '✓' }} {{ locale === 'fr' ? 'Sauvegarder' : 'Save' }}
+                </button>
+                <button @click="cancelEditBar" :disabled="updatingBarId === b.id" class="btn-cancel">
+                  {{ locale === 'fr' ? 'Annuler' : 'Cancel' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Mode affichage -->
+            <div v-else>
+              <div class="welcome-card-header">
+                <span class="welcome-card-icon">🍾</span>
+                <div>
+                  <div class="welcome-card-title">{{ b.name }}</div>
+                  <div class="welcome-card-desc">{{ locale === 'fr' ? 'Code :' : 'Code:' }} {{ b.invite_code }}</div>
+                </div>
+              </div>
+              <!-- Actions pour ce bar -->
+              <div class="bar-actions">
+                <button @click="startEditBar(b)" class="btn-select-bar" title="Modifier ce bar">
+                  <Pencil :size="16" />
+                  {{ locale === 'fr' ? 'Modifier' : 'Edit' }}
+                </button>
+                <button @click="selectBar(b)" class="btn-select-bar" title="Sélectionner ce bar">
+                  <Check :size="16" />
+                  {{ locale === 'fr' ? 'Sélectionner' : 'Select' }}
+                </button>
+                <button @click="startDeleteBar(b)" class="btn-delete-bar" title="Supprimer ce bar">
+                  <Trash2 :size="16" />
+                  {{ locale === 'fr' ? 'Supprimer' : 'Delete' }}
+                </button>
               </div>
             </div>
           </div>
         </div>
+        
+        <!-- Modal de confirmation de suppression -->
+        <transition name="fade">
+          <div v-if="barToDelete" class="modal-overlay" @click.self="barToDelete = null">
+            <div class="modal-container modal-container--delete-bar">
+              <div class="modal-header">
+                <h2 class="modal-title">{{ locale === 'fr' ? '⚠️ Supprimer le bar' : '⚠️ Delete bar' }}</h2>
+                <button @click="barToDelete = null" class="btn-icon btn-icon--close">
+                  <X :size="20" />
+                </button>
+              </div>
+              <div class="modal-body">
+                <p class="delete-warning">
+                  {{ locale === 'fr' 
+                    ? `Êtes-vous sûr de vouloir supprimer le bar "${barToDelete.name}" ?` 
+                    : `Are you sure you want to delete the bar "${barToDelete.name}"?` 
+                  }}
+                </p>
+                <p class="delete-hint">
+                  {{ locale === 'fr' 
+                    ? 'Cette action est irréversible. Écrivez le mot de confirmation ci-dessous.' 
+                    : 'This action is irreversible. Type the confirmation word below.' 
+                  }}
+                </p>
+                <div class="delete-confirmation-group">
+                  <label class="delete-confirmation-label">
+                    {{ locale === 'fr' ? 'Écrivez' : 'Type' }} <strong>{{ barToDelete.name }}</strong> {{ locale === 'fr' ? 'pour confirmer:' : 'to confirm:' }}
+                  </label>
+                  <input
+                    v-model="deleteConfirmationInput"
+                    type="text"
+                    :placeholder="barToDelete.name"
+                    class="field-input delete-confirmation-input"
+                    @keyup.enter="handleDeleteBar"
+                  />
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button @click="barToDelete = null" class="btn-modal-secondary">
+                  {{ locale === 'fr' ? 'Annuler' : 'Cancel' }}
+                </button>
+                <button
+                  @click="handleDeleteBar"
+                  :disabled="deleteConfirmationInput !== barToDelete.name"
+                  class="btn-modal-danger"
+                >
+                  {{ locale === 'fr' ? 'Supprimer' : 'Delete' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </transition>
       </div>
     </div>
 
@@ -213,7 +338,7 @@
       <div class="side-by-side">
 
         <!-- Filtres -->
-        <div class="section-card">
+        <div  v-if="activeBarId" class="section-card">
           <button @click="showFilters = !showFilters" class="expand-actions-btn">
             <ChevronDown :size="18" :class="{ rotated: showFilters }" />
             <h2 class="section-title">{{ t.filterTitle }}</h2>
@@ -342,9 +467,9 @@
               <span v-for="s in selectedSubSpirits" :key="s" class="filter-tag filter-tag--sub">
                 {{ getSubSpiritLabel(s) }}<X @click="toggleFilter(selectedSubSpirits, s)" :size="14" />
               </span>
-              <span v-for="s in selectedSeasons" :key="s" class="filter-tag">
+              <!-- <span v-for="s in selectedSeasons" :key="s" class="filter-tag">
                 {{ getSeasonLabel(s) }}<X @click="toggleFilter(selectedSeasons, s)" :size="14" />
-              </span>
+              </span> -->
               <span v-if="abvFilter === 'mocktail'" class="filter-tag">
                 🧃 Mocktail <X @click="abvFilter = null" :size="14" />
               </span>
@@ -365,7 +490,7 @@
         </div>
 
         <!-- Cartes custom -->
-        <div class="section-card">
+        <div  v-if="activeBarId" class="section-card">
           <button @click="showCards = !showCards" class="expand-actions-btn">
             <ChevronDown :size="18" :class="{ rotated: showCards }" />
             <h2 class="section-title">
@@ -397,6 +522,9 @@
                 </div>
               </div>
             </div>
+            <button v-if="activeBarId && isLoggedIn" @click="openNewCardModal()" class="btn-new-card">
+              <Plus :size="15" /><span class="btn-label-hide"> {{ t.newCard }}</span>
+            </button>
           </div>
         </div>
 
@@ -457,7 +585,7 @@
       </div>
 
       <!-- Liste cocktails -->
-      <div>
+      <div v-if="activeBarId">
         <h2 class="cocktails-header">
           {{ filteredCocktails.length }}
           {{ locale === 'fr'
@@ -506,7 +634,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link } from 'lucide-vue-next'
+import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link, Check } from 'lucide-vue-next'
 
 import { useAuth }      from '@/composables/useAuth'
 import { useCocktails } from '@/composables/useCocktails'
@@ -528,18 +656,35 @@ import { parseHash, setHash, clearHash, buildShareUrl, slugify } from '@/composa
 import { useCatalog } from '@/composables/useCatalog'
 import CatalogModal from '@/Components/Modals/CatalogModal.vue'
 
-const { isLoggedIn, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, isBarPublic, initAuth, signOut, fetchBar, toggleBarPublic } = useAuth()
+const { isLoggedIn, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, isBarPublic, session, initAuth, signOut, fetchBar, switchBar, toggleBarPublic, createNewBar, updateBarName, updateInviteCode } = useAuth()
 
 // Bar chargé via code d'invitation (guest sans compte)
 const guestBar = ref(null)
 const activeBarId   = computed(() => currentBarId.value ?? guestBar.value?.id ?? null)
 const activeBarName = computed(() => currentBarName.value || guestBar.value?.name || 'Martini Please')
 const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, updateCocktail, deleteCocktail } = useCocktails()
-const { barInventory, ingredients, fetchIngredients } = useInventory()
+const { barInventory, ingredients, fetchIngredients, initializeDefaultIngredients } = useInventory()
 const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCard } = useMenuCards()
 const { hasDrinker, drinkerPseudo, initDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { fetchSnapshots } = useCatalog()
 
+// Logos disponibles
+const base = import.meta.env.BASE_URL // ex: '/'
+
+const availableLogos = [
+  `${base}margarita_square.png`,
+  `${base}amaretto_sour_square.png`,
+  `${base}aviation_square.png`,
+  `${base}negroni_square.png`
+]
+
+// Fonction pour obtenir un logo aléatoire
+function getRandomLogo() {
+  return availableLogos[Math.floor(Math.random() * availableLogos.length)]
+}
+
+const randomLogo = ref(getRandomLogo())
+console.log(randomLogo.value)
 // Logo → retour à l'écran de connexion
 function handleLogoClick() {
   if (isLoggedIn.value) {
@@ -553,6 +698,12 @@ function handleLogoClick() {
 }
 
 const togglingPublic = ref(false)
+const newBarName = ref('')
+const showNewBarInput = ref(false)
+const showBarsSelection = ref(false)
+const barToDelete = ref(null)
+const deleteConfirmationInput = ref('')
+
 async function handleTogglePublic() {
   if (togglingPublic.value) return
   togglingPublic.value = true
@@ -566,9 +717,10 @@ async function handleSignOut() {
   clearHash()
 }
 
-// Sélection d'un bar parmi plusieurs (cas multi-bars)
+// Sélection d'un bar parmi plusieurs (cas multi-bars) dans l'écran de sélection
 async function selectBar(b) {
   await fetchBar(b.id)
+  showBarsSelection.value = false
   await Promise.all([
     fetchCocktails(b.id),
     fetchIngredients(b.id),
@@ -576,11 +728,132 @@ async function selectBar(b) {
   ])
 }
 
+// Créer un nouveau bar
+async function handleCreateNewBar() {
+  const name = newBarName.value.trim()
+  if (!name) return
+  const result = await createNewBar(name)
+  if (result.success) {
+    newBarName.value = ''
+    showNewBarInput.value = false
+    
+    // Initialiser les ingrédients par défaut pour le nouveau bar
+    try {
+      await initializeDefaultIngredients(result.data.id)
+    } catch (err) {
+      console.error('⚠️ Error initializing ingredients:', err)
+    }
+    
+    // Changer vers le nouveau bar créé
+    await Promise.all([
+      fetchCocktails(result.data.id),
+      fetchIngredients(result.data.id),
+      fetchMenuCards(result.data.id),
+    ])
+    showBarsSelection.value = false
+  }
+}
+
+// Initier la suppression d'un bar
+function startDeleteBar(bar) {
+  barToDelete.value = bar
+  deleteConfirmationInput.value = ''
+}
+
+// Supprimer un bar après confirmation
+async function handleDeleteBar() {
+  if (!barToDelete.value || deleteConfirmationInput.value !== barToDelete.value.name) {
+    return
+  }
+  
+  try {
+    const { error } = await supabase
+      .from('bars')
+      .delete()
+      .eq('id', barToDelete.value.id)
+      .eq('owner_id', session.value.user.id)
+    
+    if (error) throw error
+    
+    // Retirer le bar de la liste
+    const index = bars.value.findIndex(b => b.id === barToDelete.value.id)
+    if (index > -1) {
+      bars.value.splice(index, 1)
+    }
+    
+    // Si c'était le bar actif, sélectionner un autre ou retourner à l'écran de sélection
+    if (currentBarId.value === barToDelete.value.id) {
+      if (bars.value.length > 0) {
+        await selectBar(bars.value[0])
+      } else {
+        bar.value = null
+        showBarsSelection.value = false
+      }
+    }
+    
+    barToDelete.value = null
+    deleteConfirmationInput.value = ''
+  } catch (err) {
+    console.error('❌ Error deleting bar:', err)
+    alert(`${locale.value === 'fr' ? 'Erreur' : 'Error'}: ${err.message}`)
+  }
+}
+
+// Fonctions d'édition des bars
+function startEditBar(bar) {
+  editingBarId.value = bar.id
+  editingBarName.value = bar.name
+  editingBarCode.value = bar.invite_code
+}
+
+function cancelEditBar() {
+  editingBarId.value = null
+  editingBarName.value = ''
+  editingBarCode.value = ''
+}
+
+async function saveBarEdits(barId) {
+  if (!editingBarName.value.trim()) {
+    alert(locale.value === 'fr' ? 'Le nom du bar ne peut pas être vide.' : 'Bar name cannot be empty.')
+    return
+  }
+  if (!editingBarCode.value.trim()) {
+    alert(locale.value === 'fr' ? 'Le code d\'invitation ne peut pas être vide.' : 'Invite code cannot be empty.')
+    return
+  }
+
+  updatingBarId.value = barId
+  try {
+    // Mettre à jour le nom
+    if (editingBarName.value !== bars.value.find(b => b.id === barId)?.name) {
+      const resultName = await updateBarName(barId, editingBarName.value.trim())
+      if (!resultName.success) throw new Error(resultName.error)
+    }
+
+    // Mettre à jour le code d'invitation
+    if (editingBarCode.value !== bars.value.find(b => b.id === barId)?.invite_code) {
+      const resultCode = await updateInviteCode(barId, editingBarCode.value.trim().toUpperCase())
+      if (!resultCode.success) throw new Error(resultCode.error)
+    }
+
+    cancelEditBar()
+  } catch (err) {
+    console.error('❌ Error saving bar edits:', err)
+    alert(`${locale.value === 'fr' ? 'Erreur' : 'Error'}: ${err.message}`)
+  } finally {
+    updatingBarId.value = null
+  }
+}
+
 const showDrinkerPanel  = ref(false)
 const drinkerTab        = ref('favorites')
 const burgerOpen        = ref(false)
 
-// Helpers pour le panel drinker
+// État édition des bars
+const editingBarId      = ref(null)
+const editingBarName    = ref('')
+const editingBarCode    = ref('')
+const updatingBarId     = ref(null)
 const favoriteCocktails = computed(() => cocktails.value.filter(c => favorites.value.has(c.id)))
 function getCocktailName(id) { return cocktails.value.find(c => c.id === id)?.name ?? '—' }
 function formatDate(iso) {
@@ -625,10 +898,10 @@ async function joinPublicBar(bar) {
   await joinByCode()
 }
 
-async function joinDemo() {
-  inviteCodeInput.value = 'DEMO-0000'
-  await joinByCode()
-}
+// async function joinDemo() {
+//   inviteCodeInput.value = 'DEMO-0000'
+//   await joinByCode()
+// }
 
 async function joinByCode() {
   codeError.value = ''
