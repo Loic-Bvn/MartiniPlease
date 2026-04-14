@@ -98,7 +98,7 @@ body {
 .header-container {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1.5rem;
 }
 
 .header-top {
@@ -115,22 +115,32 @@ body {
 }
 
 .header-logo {
-  height: 40px;
+  height: 36px;
   width: auto;
   object-fit: contain;
   filter: brightness(0.9) sepia(0.3);
+  transition: transform 0.2s ease;
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
 }
 
 .dark .header-logo { filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(5deg);}
 
 
 .header-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--gold);
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
+  transition: color 0.2s ease;
+}
+
+.header-brand:hover .header-title {
+  color: var(--gold-bright, #d4a537);
 }
 
 /* ── Search ────────────────────────────────── */
@@ -526,16 +536,33 @@ body {
   min-width: 0;
   max-width: 100%;
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.cocktail-card-compact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transition: left 0.5s ease;
 }
 
 .cocktail-card-compact:hover {
-  border-color: var(--border-mid);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  border-color: var(--gold);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.15);
+  transform: translateY(-4px);
+}
+
+.cocktail-card-compact:hover::before {
+  left: 100%;
 }
 
 .cocktail-card-compact.opacity-60 { opacity: 0.45; }
@@ -2423,10 +2450,65 @@ body {
   border-color: var(--gold);
   color: var(--gold);
 }
+.bar-stats {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  padding: 8px 16px;
+  background: var(--bg-raised);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+
+  flex-shrink: 0;
+}
+.bar-header {
+  display: flex;
+  align-items: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+.bar-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bar-status-badge {
+  margin-left: 6px;
+}
+.welcome-card-title {
+  white-space: nowrap;
+}
+.bar-actions-new {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.bar-header > div:nth-child(2) {
+  flex: 1;
+  min-width: 0; /* 🔥 clé magique anti cassure */
+}
+.bar-stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.bar-stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
 .new-bar-input-wrapper {
   display: flex;
   gap: 4px;
   align-items: center;
+}
+.bar-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 🔥 centre vertical interne */
+  gap: 4px;
 }
 .new-bar-input {
   flex: 1;
