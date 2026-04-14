@@ -12,9 +12,24 @@
             <h1 class="header-title">{{ activeBarName }}</h1>
           </div>
           <!-- Barre de recherche masquée sur l'écran d'accueil -->
-          <div v-if="activeBarId" class="search-container header-search-inline">
+          <div v-if="activeBarId" class="search-wrapper header-search-inline">
             <Search class="search-icon" :size="16" />
-            <input type="text" :placeholder="t.searchPlaceholder" v-model="searchTerm" class="search-input" />
+            <input 
+              type="text" 
+              :placeholder="t.searchPlaceholder" 
+              v-model="searchTerm" 
+              class="search-input"
+              @focus="showSearchSuggestions = searchTerm.length > 0"
+              @blur="setTimeout(() => showSearchSuggestions = false, 150)"
+            />
+            <transition name="fade">
+              <div v-if="showSearchSuggestions && suggestions.length > 0" class="search-suggestions" @click.stop>
+                <div v-for="suggestion in suggestions" :key="suggestion.id" class="suggestion-item" @click="scrollToCocktailCard(suggestion.id)">
+                  <span class="suggestion-type">🍹</span>
+                  <span class="suggestion-name">{{ suggestion.name }}</span>
+                </div>
+              </div>
+            </transition>
           </div>
           <div class="header-right" style="display:flex; align-items:center; gap:0.5rem;">
             <div class="header-actions">
@@ -235,30 +250,55 @@
                 </button>
               </div>
             </div>
-
             <!-- Mode affichage -->
             <div v-else>
-              <div class="welcome-card-header">
+              <div class="bar-header">
                 <span class="welcome-card-icon">🍾</span>
-                <div>
+                
+                <!-- Infos -->
+                <!-- <div style="flex: 1;">
                   <div class="welcome-card-title">{{ b.name }}</div>
-                  <div class="welcome-card-desc">{{ locale === 'fr' ? 'Code :' : 'Code:' }} {{ b.invite_code }}</div>
+                  <div class="welcome-card-desc">Code : <code>{{ b.invite_code }}</code></div>
+                  <div style="margin-top: 8px;">
+                    <span v-if="b.is_public" class="bar-status-badge public">🌐 Public</span>
+                    <span v-else class="bar-status-badge private">🔒 {{ locale === 'fr' ? 'Privé' : 'Private' }}</span>
+                  </div>
+                </div> -->
+
+                <div style="flex: 1;">
+                  <div class="bar-title-row">
+                    <div class="welcome-card-title">{{ b.name }}</div>
+
+                    <span v-if="b.is_public" class="bar-status-badge public">🌐 Public</span>
+                    <span v-else class="bar-status-badge private">🔒 {{ locale === 'fr' ? 'Privé' : 'Private' }}</span>
+                  </div>
+
+                  <div class="welcome-card-desc">
+                    Code : <code>{{ b.invite_code }}</code>
+                  </div>
+                </div>
+
+                <!-- Stats à droite -->
+                <div class="bar-stats" @mouseenter="loadBarStats(b.id)">
+                  <div class="bar-stat">
+                    <div class="bar-stat-value">{{ barStatsMap[b.id]?.cocktails ?? '-' }}</div>
+                    <div class="bar-stat-label">Cocktails</div>
+                  </div>
+                  <div class="bar-stat">
+                    <div class="bar-stat-value">{{ barStatsMap[b.id]?.cards ?? '-' }}</div>
+                    <div class="bar-stat-label">{{ locale === 'fr' ? 'Cartes' : 'Cards' }}</div>
+                  </div>
                 </div>
               </div>
-              <!-- Actions pour ce bar -->
-              <div class="bar-actions">
-                <button @click="startEditBar(b)" class="btn-select-bar" title="Modifier ce bar">
-                  <Pencil :size="16" />
-                  {{ locale === 'fr' ? 'Modifier' : 'Edit' }}
-                </button>
-                <button @click="selectBar(b)" class="btn-select-bar" title="Sélectionner ce bar">
-                  <Check :size="16" />
-                  {{ locale === 'fr' ? 'Sélectionner' : 'Select' }}
-                </button>
-                <button @click="startDeleteBar(b)" class="btn-delete-bar" title="Supprimer ce bar">
-                  <Trash2 :size="16" />
-                  {{ locale === 'fr' ? 'Supprimer' : 'Delete' }}
-                </button>
+
+              <div class="bar-actions-new">
+                <div class="bar-actions-small">
+                  <button @click="selectBar(b)" class="btn-select-bar-large">
+                    <Check :size="18" /> {{ locale === 'fr' ? 'Sélectionner' : 'Select' }}
+                  </button>
+                  <button @click="startEditBar(b)" class="btn-action-small"><Pencil :size="14" /></button>
+                  <button @click="startDeleteBar(b)" class="btn-action-small btn-action-small--danger"><Trash2 :size="14" /></button>
+                </div>
               </div>
             </div>
           </div>
@@ -597,18 +637,35 @@
           </span>
         </h2>
         <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
-        <div v-else-if="filteredCocktails.length === 0" class="empty-state">{{ t.noResult }}</div>
+        <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
+          <div class="empty-state-icon">🍹</div>
+          <h3 class="empty-state-title">{{ locale === 'fr' ? 'Aucun cocktail trouvé' : 'No cocktails found' }}</h3>
+          <p class="empty-state-message">
+            {{ locale === 'fr' 
+              ? 'Essayez d\'ajuster vos filtres ou de chercher un autre ingrédient.' 
+              : 'Try adjusting your filters or search for another ingredient.' 
+            }}
+          </p>
+          <div class="empty-state-actions">
+            <button v-if="hasActiveFilters" @click="clearFilters" class="empty-state-btn empty-state-btn-primary">
+              {{ locale === 'fr' ? 'Effacer les filtres' : 'Clear filters' }}
+            </button>
+            <button v-if="isLoggedIn" @click="openNewModal" class="empty-state-btn empty-state-btn-primary">
+              {{ locale === 'fr' ? '+ Créer un cocktail' : '+ Create cocktail' }}
+            </button>
+          </div>
+        </div>
         <div v-else class="cocktails-grid">
-          <CocktailCard
-            v-for="cocktail in filteredCocktails"
-            :key="cocktail.id"
-            :cocktail="cocktail"
-            :isBartenderMode="isLoggedIn"
-            :locale="locale"
-            :unit="unit"
-            @edit="openEditModal"
-            @delete="handleDelete"
-          />
+          <div v-for="cocktail in filteredCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
+            <CocktailCard
+              :cocktail="cocktail"
+              :isBartenderMode="isLoggedIn"
+              :locale="locale"
+              :unit="unit"
+              @edit="openEditModal"
+              @delete="handleDelete"
+            />
+          </div>
         </div>
       </div>
 
@@ -641,6 +698,9 @@ import { useCocktails } from '@/composables/useCocktails'
 import { useInventory } from '@/composables/useInventory'
 import { useMenuCards } from '@/composables/useMenuCards'
 import { useDrinker }   from '@/composables/useDrinker'
+import { useSearchSuggestions } from '@/composables/useSearchSuggestions'
+import { useBarStatistics } from '@/composables/useBarStatistics'
+import { useFilterCounts } from '@/composables/useFilterCounts'
 
 import CocktailCard    from '@/Components/CocktailCard.vue'
 import InventoryManager from '@/Components/Modals/InventoryManager.vue'
@@ -854,6 +914,15 @@ const editingBarId      = ref(null)
 const editingBarName    = ref('')
 const editingBarCode    = ref('')
 const updatingBarId     = ref(null)
+const barStatsMap       = ref({}) // { barId: { cocktails: 0, cards: 0 } }
+
+// Charger les stats d'un bar
+async function loadBarStats(barId) {
+  if (barStatsMap.value[barId]) return // Cache
+  const stats = await getBarStats(barId)
+  barStatsMap.value[barId] = stats
+}
+
 const favoriteCocktails = computed(() => cocktails.value.filter(c => favorites.value.has(c.id)))
 function getCocktailName(id) { return cocktails.value.find(c => c.id === id)?.name ?? '—' }
 function formatDate(iso) {
@@ -971,7 +1040,11 @@ const t = computed(() => ({
   filterStyle:            locale.value === 'fr' ? 'Style'                                 : 'Style',
 }))
 // ── Filtres (identique à l'original) ─────────────────────────────────────────
-const searchTerm         = ref('')
+// Utiliser la composable useSearchSuggestions
+const { searchInput: searchTerm, showSuggestions: showSearchSuggestions, suggestions } = useSearchSuggestions(cocktails)
+// Statistiques des bars
+const { getBarStats } = useBarStatistics()
+
 const selectedFamilies   = ref([])
 const selectedSubSpirits = ref([])
 const selectedSeasons    = ref([])
@@ -1235,6 +1308,17 @@ async function handleSave(data) {
 async function handleDelete(id) {
   if (!confirm(t.value.deleteCocktail)) return
   await deleteCocktail(id)
+}
+
+// Scroll to cocktail card when selected from search suggestions
+function scrollToCocktailCard(cocktailId) {
+  showSearchSuggestions.value = false
+  const element = document.getElementById(`cocktail-${cocktailId}`)
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    element.style.animation = 'pulse 0.6s ease'
+    setTimeout(() => { element.style.animation = '' }, 600)
+  }
 }
 
 // ── Deep link via hash ────────────────────────────────────────────────────────
