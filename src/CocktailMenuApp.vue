@@ -758,6 +758,7 @@
       :cocktails="cocktails"
       :locale="locale"
       :unit="unit"
+      :bar-id="activeBarId"
       @close="viewingCard = null"
       @toggle-locale="locale = locale === 'fr' ? 'en' : 'fr'"
       @toggle-unit="unit = unit === 'oz' ? 'ml' : 'oz'"

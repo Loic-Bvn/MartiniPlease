@@ -93,6 +93,18 @@
               <span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cv-creator">
                 by {{ cocktail.creator }}
               </span>
+              <button
+                @click="handleHistoric(cocktail)"
+                class="btn-order-simple"
+                :class="{ 'is-active': isChecked }"
+                title="Commander"
+              >
+                <transition name="tick-pop" mode="out-in">
+                  <Check v-if="isChecked" :key="'check'" :size="16" />
+
+                  <GlassWater v-else :key="'glass'" :size="16" />
+                </transition>
+              </button>
             </div>
           </div>
         </div>
@@ -104,14 +116,17 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { ArrowLeft, Sun, Moon } from 'lucide-vue-next'
+import { ArrowLeft, Sun, Moon, GlassWater } from 'lucide-vue-next'
 import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
+import { useDrinker } from '@/composables/useDrinker'
+import { useOrders } from '@/composables/useOrders'
 
 const props = defineProps({
   card:      { type: Object, required: true },
   cocktails: { type: Array,  default: () => [] },
   locale:    { type: String, default: 'fr' },
   unit:      { type: String, default: 'oz' },
+  barId:     { type: String, default: '' },
 })
 
 defineEmits(['close', 'toggle-locale', 'toggle-unit'])
@@ -196,4 +211,47 @@ function seasonLabel(season) {
   const s = Array.isArray(season) ? season : [season]
   return s.map(k => icons[k] || k).join(' ')
 }
+const { hasDrinker, drinker, quickRefreshHistory } = useDrinker()
+const isChecked = ref(false)
+const { addOrder } = useOrders()
+
+
+async function handleHistoric(cocktail) {
+  
+  if (isChecked.value) {
+    console.warn('⚠️ Already checked, ignoring')
+    return
+  }
+  if (!hasDrinker.value) {
+    console.warn('⚠️ No drinker')
+    return
+  }
+  if (!drinker.value) {
+    console.warn('⚠️ Drinker is null')
+    return
+  }
+  if (!props.barId) {
+    console.warn('⚠️ No barId prop')
+    return
+  }
+
+  console.log('✅ All checks passed, creating order...')
+  // Créer une commande pour le bartender
+  const result = await addOrder(drinker.value, cocktail.id, props.barId)
+
+  console.log('📊 Order result:', result)
+  
+  if (result.success) {
+    // Rafraîchir rapidement l'historique du drinker
+    await quickRefreshHistory()
+    
+    isChecked.value = true
+    setTimeout(() => {
+      isChecked.value = false
+    }, 900)
+  } else {
+    console.error('❌ Order failed:', result.error)
+  }
+}
+
 </script>
