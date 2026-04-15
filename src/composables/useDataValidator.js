@@ -3,34 +3,40 @@
 
 /**
  * Nettoie une recette : force les quantités en nombres, enlève les champs vides
+ * Assure que chaque ingrédient a au moins une quantité (Oz ou Ml)
  */
 export function cleanRecipe(recipe) {
   if (!Array.isArray(recipe)) return []
   
   return recipe
-    .filter(ing => ing.Ingredient?.trim())
+    .filter(ing => ing.Ingredient?.trim()) // Champ obligatoire
     .map(ing => {
       const cleaned = {
         Ingredient: ing.Ingredient.trim(),
-        Type: ing.Type?.trim() || '',
+      }
+      
+      // Type est optionnel - on l'ajoute seulement si fourni
+      const typeValue = ing.Type?.trim()
+      if (typeValue) {
+        cleaned.Type = typeValue
       }
       
       // Convertir Oz en nombre si présent
       if (ing.Oz !== null && ing.Oz !== undefined && ing.Oz !== '') {
         const oz = parseFloat(ing.Oz)
-        if (!isNaN(oz)) cleaned.Oz = oz
+        if (!isNaN(oz) && oz > 0) cleaned.Oz = oz
       }
       
       // Convertir Ml en nombre si présent
       if (ing.Ml !== null && ing.Ml !== undefined && ing.Ml !== '') {
         const ml = parseFloat(ing.Ml)
-        if (!isNaN(ml)) cleaned.Ml = ml
+        if (!isNaN(ml) && ml > 0) cleaned.Ml = ml
       }
       
       // Convertir Dashes en nombre si présent
       if (ing.Dashes !== null && ing.Dashes !== undefined && ing.Dashes !== '') {
         const dashes = parseInt(ing.Dashes, 10)
-        if (!isNaN(dashes) && dashes >= 0) cleaned.Dashes = dashes
+        if (!isNaN(dashes) && dashes > 0) cleaned.Dashes = dashes
       }
       
       return cleaned
@@ -46,6 +52,7 @@ export function validateCocktail(cocktail) {
   }
 
   const cleaned = {
+    ...(cocktail.id ? { id: cocktail.id } : {}),
     name: cocktail.name.trim(),
     recipe: cleanRecipe(cocktail.recipe),
   }
@@ -78,23 +85,34 @@ export function validateCocktail(cocktail) {
     }
   }
 
-  // Arrays - profil, saisons, tags
-  cleaned.profile = Array.isArray(cocktail.profile)
+  // Arrays - profil, saisons, tags - les omettre si vides pour laisser les defaults BD s'appliquer
+  const profileFiltered = Array.isArray(cocktail.profile)
     ? cocktail.profile.filter(p => p?.trim?.())
     : []
+  if (profileFiltered.length > 0) {
+    cleaned.profile = profileFiltered
+  }
 
-  cleaned.season = Array.isArray(cocktail.season)
+  const seasonFiltered = Array.isArray(cocktail.season)
     ? cocktail.season.filter(s => s?.trim?.())
     : []
+  if (seasonFiltered.length > 0) {
+    cleaned.season = seasonFiltered
+  }
 
-  cleaned.tags = Array.isArray(cocktail.tags)
+  const tagsFiltered = Array.isArray(cocktail.tags)
     ? cocktail.tags.filter(t => t?.trim?.())
     : []
+  if (tagsFiltered.length > 0) {
+    cleaned.tags = tagsFiltered
+  }
 
   // Ice - optionnel
-  if (Array.isArray(cocktail.ice)) {
-    const cleanIce = cocktail.ice.filter(i => i?.trim?.())
-    if (cleanIce.length > 0) cleaned.ice = cleanIce
+  const iceFiltered = Array.isArray(cocktail.ice)
+    ? cocktail.ice.filter(i => i?.trim?.())
+    : []
+  if (iceFiltered.length > 0) {
+    cleaned.ice = iceFiltered
   }
 
   return cleaned

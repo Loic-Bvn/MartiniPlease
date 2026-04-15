@@ -11,7 +11,7 @@ Structure du tuple : (nom affiché, catégorie, abv, famille)
 
 TYPE_METADATA = {
     # Spiritueux          name                      category      abv    family
-    "bourbon":            ("Bourbon",              "spirits",     40.0,  "Whiskey"),
+    "bourbon":            ("Bourbon",               "spirits",    40.0,  "Whiskey"),
     "rye":                ("Rye Whiskey",           "spirits",    40.0,  "Whiskey"),
     "scotch":             ("Scotch Whisky",         "spirits",    40.0,  "Whiskey"),
     "irish_whiskey":      ("Irish Whiskey",         "spirits",    40.0,  "Whiskey"),

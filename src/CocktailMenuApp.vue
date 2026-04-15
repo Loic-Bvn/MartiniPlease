@@ -6,8 +6,8 @@
       <div class="header-container">
         <div class="header-top">
           <div class="header-brand" @click="handleLogoClick" style="cursor: pointer;">
-            <!-- <img :src="randomLogo" alt="/margarita_square.png" class="header-logo" /> -->
-            <img v-if="randomLogo" :src="randomLogo" alt="logo" class="header-logo" />
+            <!-- <img src="/margarita_square.png" alt="MartiniPlease" class="header-logo" /> -->
+            <img v-if="randomLogo" :src="randomLogo" alt="/margarita_square.png" class="header-logo" />
 
             <h1 class="header-title">{{ activeBarName }}</h1>
           </div>
@@ -1301,9 +1301,19 @@ async function handleDeleteCard(id) {
 function openEditModal(cocktail) { editingCocktail.value = cocktail; showCocktailModal.value = true }
 function openNewModal()          { editingCocktail.value = null;      showCocktailModal.value = true }
 async function handleSave(data) {
-  if (data.id) await updateCocktail(data.id, data)
-  else         await createCocktail(data)
-  showCocktailModal.value = false
+  try {
+    if (data.id) {
+      const result = await updateCocktail(data.id, data)
+      if (!result.success) throw new Error(result.error?.message || 'Erreur lors de la modification')
+    } else {
+      const result = await createCocktail(data)
+      if (!result.success) throw new Error(result.error?.message || 'Erreur lors de la création')
+    }
+    showCocktailModal.value = false
+  } catch (err) {
+    console.error('❌ Erreur handleSave:', err)
+    alert(`❌ ${err.message}`)
+  }
 }
 async function handleDelete(id) {
   if (!confirm(t.value.deleteCocktail)) return
