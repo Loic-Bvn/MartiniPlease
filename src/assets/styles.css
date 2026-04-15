@@ -2353,6 +2353,12 @@ body {
   text-align: left;
   transition: background 0.1s;
 }
+.burger-title,
+.burger-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .burger-item:hover {
   background: var(--bg-raised);
 }
@@ -2401,6 +2407,52 @@ body {
   flex-direction: column;
   gap: 4px;
   width: 100%;
+}
+.toggle-switch {
+  width: 34px;
+  height: 18px;
+  background: #ccc;
+  border-radius: 999px;
+  position: relative;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.toggle-switch.on {
+  background: #b07a2a;
+}
+
+.toggle-knob {
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.2s ease;
+}
+
+.toggle-switch.on .toggle-knob {
+  left: 18px;
+}
+.burger-item--toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.burger-item--toggle svg {
+  opacity: 0.7;
+}
+
+/* Optionnel mais très cool */
+.burger-item--toggle .lucide-lock {
+  color: #888;
+}
+
+.burger-item--toggle .lucide-unlock {
+  color: #b07a2a; /* ton accent */
 }
 .bar-option {
   all: unset;
@@ -2556,6 +2608,67 @@ body {
   height: 1px;
   background: var(--border);
   margin: 4px 0;
+}
+.burger-header {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.burger-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.burger-subtitle {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.burger-item--clickable {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.burger-item--clickable:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.burger-dropdown {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.18s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.burger-item--primary {
+  font-weight: 500;
+  color: #b07a2a; /* ton accent cocktail */
+}
+
+.burger-item--primary:hover {
+  background: rgba(176, 122, 42, 0.08);
+}
+
+.burger-item--hint {
+  font-size: 12px;
+  opacity: 0.6;
+  cursor: default;
 }
 
 /* ── Welcome Screen (CocktailMenuApp) ────────── */
@@ -3222,4 +3335,18 @@ body {
 .cv-card-meta .profile-tags {
   font-size: 0.72rem;
   color: var(--text-dim);
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  opacity: 0.95;
+  z-index: 9999;
 }
