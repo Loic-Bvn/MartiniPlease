@@ -8,7 +8,7 @@ import sys
 from collections import Counter
 from supabase import create_client
 from scraper.config import SUPABASE_URL, SUPABASE_KEY
-from scraper.constants.ingredients_meta import TYPE_METADATA
+from scraper.constants.shared_constants import get_all_ingredients_dict
 
 
 def generate_ingredients(bar_id: str):
@@ -21,6 +21,9 @@ def generate_ingredients(bar_id: str):
         sys.exit(1)
 
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    
+    # 📌 Charger depuis les constantes centralisées
+    TYPE_METADATA = get_all_ingredients_dict()
 
     rows = []
     for ing_type in sorted(TYPE_METADATA):

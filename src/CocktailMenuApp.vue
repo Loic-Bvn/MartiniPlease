@@ -6,8 +6,8 @@
       <div class="header-container">
         <div class="header-top">
           <div class="header-brand" @click="handleLogoClick" style="cursor: pointer;">
-            <!-- <img :src="randomLogo" alt="/margarita_square.png" class="header-logo" /> -->
-            <img v-if="randomLogo" :src="randomLogo" alt="logo" class="header-logo" />
+            <!-- <img src="/margarita_square.png" alt="MartiniPlease" class="header-logo" /> -->
+            <img v-if="randomLogo" :src="randomLogo" alt="/margarita_square.png" class="header-logo" />
 
             <h1 class="header-title">{{ activeBarName }}</h1>
           </div>
@@ -61,10 +61,10 @@
               <transition name="fade">
                 <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
                   <!-- Gérer mes bars (si plusieurs) -->
-                  <button v-if="isLoggedIn && bars.length > 1 && !showBarsSelection" @click="showBarsSelection = true; burgerOpen = false" class="burger-item">
+                  <button v-if="isLoggedIn && bars.length >= 1 && !showBarsSelection" @click="showBarsSelection = true; burgerOpen = false" class="burger-item">
                     {{ locale === 'fr' ? '📋 Gérer mes bars' : '📋 Manage bars' }}
                   </button>
-                  <div v-if="isLoggedIn && bars.length > 1 && !showBarsSelection" class="burger-divider" />
+                  <div v-if="isLoggedIn && bars.length >= 1 && !showBarsSelection" class="burger-divider" />
                   
                   <div v-if="activeBarId && !showBarsSelection" class="burger-item burger-item--info">
                     <span>🔑 {{ inviteCode }}</span>
@@ -744,7 +744,6 @@ function getRandomLogo() {
 }
 
 const randomLogo = ref(getRandomLogo())
-console.log(randomLogo.value)
 // Logo → retour à l'écran de connexion
 function handleLogoClick() {
   if (isLoggedIn.value) {
@@ -982,8 +981,6 @@ async function joinByCode() {
     .select('id, name, invite_code')
     .eq('invite_code', code)
     .single()
-
-  console.log('joinByCode result:', data, error)
 
   if (error || !data) {
     codeError.value = 'Code invalide. Vérifie avec ton bartender.'
@@ -1301,9 +1298,19 @@ async function handleDeleteCard(id) {
 function openEditModal(cocktail) { editingCocktail.value = cocktail; showCocktailModal.value = true }
 function openNewModal()          { editingCocktail.value = null;      showCocktailModal.value = true }
 async function handleSave(data) {
-  if (data.id) await updateCocktail(data.id, data)
-  else         await createCocktail(data)
-  showCocktailModal.value = false
+  try {
+    if (data.id) {
+      const result = await updateCocktail(data.id, data)
+      if (!result.success) throw new Error(result.error?.message || 'Erreur lors de la modification')
+    } else {
+      const result = await createCocktail(data)
+      if (!result.success) throw new Error(result.error?.message || 'Erreur lors de la création')
+    }
+    showCocktailModal.value = false
+  } catch (err) {
+    console.error('❌ Erreur handleSave:', err)
+    alert(`❌ ${err.message}`)
+  }
 }
 async function handleDelete(id) {
   if (!confirm(t.value.deleteCocktail)) return

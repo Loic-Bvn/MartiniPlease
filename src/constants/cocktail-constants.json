@@ -1,0 +1,1316 @@
+{
+  "version": "1.0.0",
+  "description": "📌 Source de vérité unique pour tous les paramètres cocktail (scraper + frontend)",
+  "lastUpdated": "2026-04-15",
+  "ingredients": {
+    "description": "Ingrédients avec (name, category, abv, family)",
+    "spirits": {
+      "bourbon": {
+        "name": "Bourbon",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Whiskey"
+      },
+      "rye": {
+        "name": "Rye Whiskey",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Whiskey"
+      },
+      "scotch": {
+        "name": "Scotch Whisky",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Whiskey"
+      },
+      "irish_whiskey": {
+        "name": "Irish Whiskey",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Whiskey"
+      },
+      "peated_whisky": {
+        "name": "Islay Scotch",
+        "category": "spirits",
+        "abv": 43.0,
+        "family": "Whiskey"
+      },
+      "whiskey": {
+        "name": "Whiskey",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Whiskey"
+      },
+      "rum": {
+        "name": "Rum",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Rum"
+      },
+      "rum_agricol": {
+        "name": "Rhum Agricole",
+        "category": "spirits",
+        "abv": 50.0,
+        "family": "Rum"
+      },
+      "rum_cuban": {
+        "name": "Rhum Cubain",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Rum"
+      },
+      "rum_jamaican": {
+        "name": "Rhum Jamaicain",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Rum"
+      },
+      "rum_overproof": {
+        "name": "Overproof Rhum",
+        "category": "spirits",
+        "abv": 63.0,
+        "family": "Rum"
+      },
+      "cachaca": {
+        "name": "Cachaça",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Rum"
+      },
+      "tequila": {
+        "name": "Tequila",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Agave"
+      },
+      "tequila_reposado": {
+        "name": "Tequila Reposado",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Agave"
+      },
+      "mezcal": {
+        "name": "Mezcal",
+        "category": "spirits",
+        "abv": 42.0,
+        "family": "Agave"
+      },
+      "gin": {
+        "name": "Gin",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Gin"
+      },
+      "gin_dry": {
+        "name": "Dry Gin",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Gin"
+      },
+      "gin_navy": {
+        "name": "Navy Strength Gin",
+        "category": "spirits",
+        "abv": 57.0,
+        "family": "Gin"
+      },
+      "genever": {
+        "name": "Genièvre",
+        "category": "spirits",
+        "abv": 35.0,
+        "family": "Gin"
+      },
+      "vodka": {
+        "name": "Vodka",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Vodka"
+      },
+      "cognac": {
+        "name": "Cognac",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Brandy"
+      },
+      "brandy": {
+        "name": "Brandy",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Brandy"
+      },
+      "calvados": {
+        "name": "Calvados",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Brandy"
+      },
+      "pisco": {
+        "name": "Pisco",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Brandy"
+      },
+      "grappa": {
+        "name": "Grappa",
+        "category": "spirits",
+        "abv": 42.0,
+        "family": "Brandy"
+      },
+      "absinthe": {
+        "name": "Absinthe",
+        "category": "spirits",
+        "abv": 65.0,
+        "family": "Absinthe"
+      },
+      "aquavit": {
+        "name": "Aquavit",
+        "category": "spirits",
+        "abv": 40.0,
+        "family": "Aquavit"
+      },
+      "pastis": {
+        "name": "Pastis",
+        "category": "spirits",
+        "abv": 45.0,
+        "family": "Pastis"
+      }
+    },
+    "liqueurs": {
+      "aperol": {
+        "name": "Aperol",
+        "category": "liqueurs",
+        "abv": 11.0,
+        "family": "Liqueur Amer"
+      },
+      "campari": {
+        "name": "Campari",
+        "category": "liqueurs",
+        "abv": 24.0,
+        "family": "Liqueur Amer"
+      },
+      "cynar": {
+        "name": "Cynar",
+        "category": "liqueurs",
+        "abv": 16.5,
+        "family": "Liqueur Amer"
+      },
+      "fernet_branca": {
+        "name": "Fernet Branca",
+        "category": "liqueurs",
+        "abv": 39.0,
+        "family": "Liqueur Amer"
+      },
+      "amaretto": {
+        "name": "Amaretto",
+        "category": "liqueurs",
+        "abv": 21.0,
+        "family": "Liqueur Noix"
+      },
+      "frangelico": {
+        "name": "Frangelico",
+        "category": "liqueurs",
+        "abv": 20.0,
+        "family": "Liqueur Noix"
+      },
+      "chartreuse_green": {
+        "name": "Chartreuse Verte",
+        "category": "liqueurs",
+        "abv": 55.0,
+        "family": "Liqueur Herbes"
+      },
+      "chartreuse_yellow": {
+        "name": "Chartreuse Jaune",
+        "category": "liqueurs",
+        "abv": 40.0,
+        "family": "Liqueur Herbes"
+      },
+      "benedictine": {
+        "name": "Bénédictine",
+        "category": "liqueurs",
+        "abv": 40.0,
+        "family": "Liqueur Herbes"
+      },
+      "galliano": {
+        "name": "Galliano",
+        "category": "liqueurs",
+        "abv": 42.3,
+        "family": "Liqueur Herbes"
+      },
+      "allspice": {
+        "name": "AllSpice Dram",
+        "category": "liqueurs",
+        "abv": 22.0,
+        "family": "Liqueur Herbes"
+      },
+      "falernum": {
+        "name": "Falernum",
+        "category": "liqueurs",
+        "abv": 11.0,
+        "family": "Liqueur Herbes"
+      },
+      "cherry_heering": {
+        "name": "Cherry Heering",
+        "category": "liqueurs",
+        "abv": 24.0,
+        "family": "Liqueur Fruits"
+      },
+      "maraschino": {
+        "name": "Maraschino",
+        "category": "liqueurs",
+        "abv": 32.0,
+        "family": "Liqueur Fruits"
+      },
+      "sloe_gin": {
+        "name": "Sloe Gin",
+        "category": "liqueurs",
+        "abv": 26.0,
+        "family": "Liqueur Fruits"
+      },
+      "triple_sec": {
+        "name": "Triple Sec",
+        "category": "liqueurs",
+        "abv": 40.0,
+        "family": "Liqueur Agrume"
+      },
+      "curacao": {
+        "name": "Curaçao",
+        "category": "liqueurs",
+        "abv": 40.0,
+        "family": "Liqueur Agrume"
+      },
+      "limoncello": {
+        "name": "Limoncello",
+        "category": "liqueurs",
+        "abv": 26.0,
+        "family": "Liqueur Agrume"
+      },
+      "baileys": {
+        "name": "Baileys",
+        "category": "liqueurs",
+        "abv": 17.0,
+        "family": "Liqueur Dessert"
+      },
+      "drambuie": {
+        "name": "Drambuie",
+        "category": "liqueurs",
+        "abv": 40.0,
+        "family": "Liqueur Dessert"
+      },
+      "pimms": {
+        "name": "Pimm's",
+        "category": "liqueurs",
+        "abv": 25.0,
+        "family": "Liqueur Fruits"
+      },
+      "amaro": {
+        "name": "Amaro",
+        "category": "licors",
+        "abv": 30.0,
+        "family": "Liqueur Amer"
+      },
+      "suze": {
+        "name": "Suze",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Amer"
+      },
+      "malort": {
+        "name": "Malört",
+        "category": "licors",
+        "abv": 35.0,
+        "family": "Liqueur Amer"
+      },
+      "swedish_punsch": {
+        "name": "Swedish Punsch",
+        "category": "licors",
+        "abv": 26.0,
+        "family": "Liqueur Herbes"
+      },
+      "mint_licor": {
+        "name": "Liqueur Menthe",
+        "category": "licors",
+        "abv": 25.0,
+        "family": "Liqueur Herbes"
+      },
+      "sambuca": {
+        "name": "Sambuca",
+        "category": "licors",
+        "abv": 38.0,
+        "family": "Liqueur Herbes"
+      },
+      "italicus": {
+        "name": "Italicus",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Agrume"
+      },
+      "cassis_licor": {
+        "name": "Liqueur Cassis",
+        "category": "licors",
+        "abv": 16.0,
+        "family": "Liqueur Fruits"
+      },
+      "mure_licor": {
+        "name": "Liqueur Mûre",
+        "category": "licors",
+        "abv": 18.0,
+        "family": "Liqueur Fruits"
+      },
+      "elderflower_licor": {
+        "name": "Liqueur de Sureau",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Fruits"
+      },
+      "violet_licor": {
+        "name": "Liqueur de Violette",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Fruits"
+      },
+      "apricot_licor": {
+        "name": "Liqueur Abricot",
+        "category": "licors",
+        "abv": 25.0,
+        "family": "Liqueur Fruits"
+      },
+      "banana_licor": {
+        "name": "Liqueur Banane",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Fruits"
+      },
+      "mango_licor": {
+        "name": "Liqueur Mangue",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Fruits"
+      },
+      "peach_licor": {
+        "name": "Liqueur Pêche",
+        "category": "licors",
+        "abv": 18.0,
+        "family": "Liqueur Fruits"
+      },
+      "midori": {
+        "name": "Midori",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Fruits"
+      },
+      "pear_licor": {
+        "name": "Liqueur de Poire",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Fruits"
+      },
+      "walnut_licor": {
+        "name": "Liqueur Noix",
+        "category": "licors",
+        "abv": 30.0,
+        "family": "Liqueur Noix"
+      },
+      "pit_licor": {
+        "name": "Liqueur de Noyaux",
+        "category": "licors",
+        "abv": 25.0,
+        "family": "Liqueur Noix"
+      },
+      "coffee_licor": {
+        "name": "Liqueur de Café",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Dessert"
+      },
+      "licor_43": {
+        "name": "Liqueur 43",
+        "category": "licors",
+        "abv": 31.0,
+        "family": "Liqueur Dessert"
+      },
+      "chocolate_licor": {
+        "name": "Liqueur Chocolat",
+        "category": "licors",
+        "abv": 20.0,
+        "family": "Liqueur Dessert"
+      }
+    },
+    "modifiers": {
+      "dry_vermouth": {
+        "name": "Vermouth Dry",
+        "category": "modifiers",
+        "abv": 18.0,
+        "family": "Vermouth"
+      },
+      "blanc_vermouth": {
+        "name": "Vermouth Blanc",
+        "category": "modifiers",
+        "abv": 18.0,
+        "family": "Vermouth"
+      },
+      "sweet_vermouth": {
+        "name": "Vermouth Sweet",
+        "category": "modifiers",
+        "abv": 16.0,
+        "family": "Vermouth"
+      },
+      "lillet": {
+        "name": "Lillet",
+        "category": "modifiers",
+        "abv": 17.0,
+        "family": "Vin Aromatisé"
+      },
+      "cocchi_americano": {
+        "name": "Cocchi Americano",
+        "category": "modifiers",
+        "abv": 16.5,
+        "family": "Vin Aromatisé"
+      },
+      "sherry": {
+        "name": "Xérès / Sherry",
+        "category": "modifiers",
+        "abv": 17.0,
+        "family": "Vin Fortifié"
+      },
+      "porto": {
+        "name": "Porto",
+        "category": "modifiers",
+        "abv": 20.0,
+        "family": "Vin Fortifié"
+      },
+      "sparkling_wine": {
+        "name": "Vin Pétillant",
+        "category": "modifiers",
+        "abv": 12.0,
+        "family": "Vin Pétillant"
+      },
+      "red_wine": {
+        "name": "Vin Rouge",
+        "category": "modifiers",
+        "abv": 13.0,
+        "family": "Vin"
+      },
+      "dry_white_wine": {
+        "name": "Vin Blanc Sec",
+        "category": "modifiers",
+        "abv": 12.5,
+        "family": "Vin"
+      },
+      "sake": {
+        "name": "Saké",
+        "category": "modifiers",
+        "abv": 15.0,
+        "family": "Saké"
+      },
+      "beer": {
+        "name": "Bière",
+        "category": "modifiers",
+        "abv": 5.0,
+        "family": "Bière"
+      },
+      "ipa_beer": {
+        "name": "Bière IPA",
+        "category": "modifiers",
+        "abv": 6.5,
+        "family": "Bière"
+      },
+      "stout_beer": {
+        "name": "Stout",
+        "category": "modifiers",
+        "abv": 5.0,
+        "family": "Bière"
+      },
+      "sweet_white_wine": {
+        "name": "Vin Blanc Doux",
+        "category": "modifiers",
+        "abv": 11.0,
+        "family": "Vin"
+      },
+      "rose_wine": {
+        "name": "Vin Rosé",
+        "category": "modifiers",
+        "abv": 12.0,
+        "family": "Vin"
+      }
+    },
+    "juices": {
+      "lemon_juice": {
+        "name": "Jus de citron",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      },
+      "lime_juice": {
+        "name": "Jus de Lime",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      },
+      "orange_juice": {
+        "name": "Jus d'orange",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      },
+      "grapefruit_juice": {
+        "name": "Jus de pamplemousse",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      },
+      "pineapple_juice": {
+        "name": "Jus d'ananas",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      },
+      "cranberry_juice": {
+        "name": "Jus de cranberry",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      },
+      "tomato_juice": {
+        "name": "Jus de tomate",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      },
+      "apple_juice": {
+        "name": "Jus de pomme",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      },
+      "passion_juice": {
+        "name": "Jus de passion",
+        "category": "juices",
+        "abv": 0.0,
+        "family": null
+      }
+    },
+    "syrups": {
+      "simple_syrup": {
+        "name": "Sirop simple",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "honey_syrup": {
+        "name": "Sirop de miel",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "grenadine": {
+        "name": "Grenadine",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "orgeat": {
+        "name": "Orgeat",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "agave_syrup": {
+        "name": "Sirop d'agave",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "cinnamon_syrup": {
+        "name": "Sirop de cannelle",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "ginger_syrup": {
+        "name": "Sirop de Gingembre",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "semi_simple_syrup": {
+        "name": "Sirop semi",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "rich_simple_syrup": {
+        "name": "Sirop riche",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "passion_fruit_syrup": {
+        "name": "Sirop de passion",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "raspberry_syrup": {
+        "name": "Sirop de framboise",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "vanilla_syrup": {
+        "name": "Sirop de vanille",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "maple_syrup": {
+        "name": "Sirop d'érable",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "demerara_syrup": {
+        "name": "Sirop Demerara",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "coconut_syrup": {
+        "name": "Sirop de coco",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "guava_syrup": {
+        "name": "Sirop de Goyave",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "hibiscus_syrup": {
+        "name": "Sirop d'Hibiscus",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      },
+      "redcurrant_syrup": {
+        "name": "Sirop de Groseille",
+        "category": "syrups",
+        "abv": 0.0,
+        "family": null
+      }
+    },
+    "bitters": {
+      "angostura_bitters": {
+        "name": "Angostura Bitters",
+        "category": "bitters",
+        "abv": 44.7,
+        "family": "Bitters"
+      },
+      "peychaud_bitters": {
+        "name": "Peychaud's Bitters",
+        "category": "bitters",
+        "abv": 35.0,
+        "family": "Bitters"
+      },
+      "orange_bitters": {
+        "name": "Orange Bitters",
+        "category": "bitters",
+        "abv": 28.0,
+        "family": "Bitters"
+      },
+      "chocolate_bitters": {
+        "name": "Chocolate Bitters",
+        "category": "bitters",
+        "abv": 40.0,
+        "family": "Bitters"
+      },
+      "celery_bitters": {
+        "name": "Celery Bitters",
+        "category": "bitters",
+        "abv": 40.0,
+        "family": "Bitters"
+      },
+      "walnut_bitters": {
+        "name": "Walnut Bitters",
+        "category": "bitters",
+        "abv": 40.0,
+        "family": "Bitters"
+      },
+      "bitters": {
+        "name": "Bitters",
+        "category": "bitters",
+        "abv": 40.0,
+        "family": "Bitters"
+      }
+    },
+    "mixers": {
+      "club_soda": {
+        "name": "Eau gazeuse",
+        "category": "mixers",
+        "abv": 0.0,
+        "family": null
+      },
+      "tonic_water": {
+        "name": "Tonic",
+        "category": "mixers",
+        "abv": 0.0,
+        "family": null
+      },
+      "ginger_soda": {
+        "name": "Ginger Beer",
+        "category": "mixers",
+        "abv": 0.0,
+        "family": null
+      },
+      "cola": {
+        "name": "Cola",
+        "category": "mixers",
+        "abv": 0.0,
+        "family": null
+      },
+      "coconut_cream": {
+        "name": "Crème de coco",
+        "category": "mixers",
+        "abv": 0.0,
+        "family": null
+      }
+    },
+    "garnish": {
+      "lemon_zest": {
+        "name": "Zeste Citron",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "lime_zest": {
+        "name": "Zeste Lime",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "lemon_wheel": {
+        "name": "Rondelle Citron",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "lime_wheel": {
+        "name": "Rondelle Lime",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "cocktail_cherry": {
+        "name": "Cerise",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "olive": {
+        "name": "Olive",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "mint": {
+        "name": "Menthe",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "cucumber": {
+        "name": "Concombre",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "salt": {
+        "name": "Sel",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "orange_zest": {
+        "name": "Zeste Orange",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "grapefruit_zest": {
+        "name": "Zeste Pamplemousse",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "lemon_swath": {
+        "name": "Swath Citron",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "lime_swath": {
+        "name": "Swath Lime",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "orange_swath": {
+        "name": "Swath Orange",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "grapefruit_swath": {
+        "name": "Swath Pamplemousse",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "nutmeg": {
+        "name": "Muscade",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "strawberry": {
+        "name": "Fraise",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "celery": {
+        "name": "Céleri",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "sugar_rim": {
+        "name": "Sucre (bord)",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "dried_fruit": {
+        "name": "Fruits séchés",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "cinnamon_stick": {
+        "name": "Bâton de cannelle",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "grape": {
+        "name": "Raisin",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "orange_wheel": {
+        "name": "Rondelle Orange",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "pineapple": {
+        "name": "Ananas",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      },
+      "pineapple_fronds": {
+        "name": "Feuilles Ananas",
+        "category": "garnish",
+        "abv": 0.0,
+        "family": null
+      }
+    },
+    "others": {
+      "aquafaba": {
+        "name": "Aquafaba",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "egg": {
+        "name": "Œuf entier",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "heavy_cream": {
+        "name": "Crème épaisse",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "milk": {
+        "name": "Lait",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "butter": {
+        "name": "Beurre",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "coffee": {
+        "name": "Café",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "cold_brew": {
+        "name": "Cold Brew",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "tea": {
+        "name": "Thé",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "matcha": {
+        "name": "Matcha",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "hot_sauce": {
+        "name": "Sauce piquante",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "worcestershire": {
+        "name": "Worcestershire",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "water": {
+        "name": "Eau",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      },
+      "hot_water": {
+        "name": "Eau chaude",
+        "category": "others",
+        "abv": 0.0,
+        "family": null
+      }
+    }
+  },
+  "glasses": {
+    "rocks": {
+      "name": "Rocks (Old Fashioned)",
+      "emoji": "🥃"
+    },
+    "coupe": {
+      "name": "Coupe",
+      "emoji": "🍸"
+    },
+    "martini": {
+      "name": "Martini / Cocktail",
+      "emoji": "🍸"
+    },
+    "highball": {
+      "name": "Highball",
+      "emoji": "🥤"
+    },
+    "collins": {
+      "name": "Collins",
+      "emoji": "🥤"
+    },
+    "nick_nora": {
+      "name": "Nick & Nora",
+      "emoji": "🍸"
+    },
+    "champagne_flute": {
+      "name": "Flûte à Champagne",
+      "emoji": "🥂"
+    },
+    "wine": {
+      "name": "Verre à vin",
+      "emoji": "🍷"
+    },
+    "shot": {
+      "name": "Shot",
+      "emoji": "🥃"
+    },
+    "tiki": {
+      "name": "Tiki",
+      "emoji": "🌺"
+    },
+    "hurricane": {
+      "name": "Hurricane",
+      "emoji": "🌀"
+    },
+    "copper_mug": {
+      "name": "Copper Mug",
+      "emoji": "🫙"
+    },
+    "snifter": {
+      "name": "Snifter / Ballon",
+      "emoji": "🫗"
+    }
+  },
+  "methods": {
+    "stir": {
+      "name": "Stirred (remué)",
+      "emoji": "🥄"
+    },
+    "shake": {
+      "name": "Shaken (secoué)",
+      "emoji": "🍸"
+    },
+    "build": {
+      "name": "Built (construit)",
+      "emoji": "🫗"
+    },
+    "blend": {
+      "name": "Blended (mixé)",
+      "emoji": "🌀"
+    },
+    "throw": {
+      "name": "Thrown (versé en hauteur)",
+      "emoji": "🤹"
+    },
+    "roll": {
+      "name": "Rolled",
+      "emoji": "🔄"
+    },
+    "swizzle": {
+      "name": "Swizzle",
+      "emoji": "🌿"
+    },
+    "regal_stir": {
+      "name": "Regal Stirred",
+      "emoji": "👑"
+    },
+    "regal_shake": {
+      "name": "Regal Shaken",
+      "emoji": "👑"
+    }
+  },
+  "difficulties": {
+    "easy": {
+      "name": "Easy",
+      "stars": 1,
+      "emoji": "⭐"
+    },
+    "medium": {
+      "name": "Medium",
+      "stars": 2,
+      "emoji": "⭐⭐"
+    },
+    "hard": {
+      "name": "Hard",
+      "stars": 3,
+      "emoji": "⭐⭐⭐"
+    }
+  },
+  "ice_types": {
+    "cubed": {
+      "name": "Glaçons cubiques",
+      "emoji": "🧊"
+    },
+    "crushed": {
+      "name": "Glaçons concassés",
+      "emoji": "🧊"
+    },
+    "cracked": {
+      "name": "Glaçons fissurés",
+      "emoji": "🧊"
+    },
+    "spear": {
+      "name": "Glaçons en pics",
+      "emoji": "🧊"
+    },
+    "block": {
+      "name": "Bloc de glaçon",
+      "emoji": "🧊"
+    },
+    "no_ice": {
+      "name": "Sans glaçons",
+      "emoji": "🌡️"
+    }
+  },
+  "profiles": {
+    "Citrus": {
+      "name": "Agrume",
+      "emoji": "🍋"
+    },
+    "Fruity": {
+      "name": "Fruité",
+      "emoji": "🍒"
+    },
+    "Tropical": {
+      "name": "Tropical",
+      "emoji": "🌴"
+    },
+    "Herbal": {
+      "name": "Herbacé",
+      "emoji": "🌿"
+    },
+    "Floral": {
+      "name": "Floral",
+      "emoji": "🌸"
+    },
+    "Spicy": {
+      "name": "Épicé",
+      "emoji": "🌶️"
+    },
+    "Smoky": {
+      "name": "Fumé",
+      "emoji": "🔥"
+    },
+    "Bitter": {
+      "name": "Amer",
+      "emoji": "😬"
+    },
+    "Sour": {
+      "name": "Acidulé",
+      "emoji": "😮"
+    },
+    "Sweet": {
+      "name": "Sucré",
+      "emoji": "🍯"
+    },
+    "Dry": {
+      "name": "Sec",
+      "emoji": "🏜️"
+    },
+    "Refreshing": {
+      "name": "Frais",
+      "emoji": "💧"
+    },
+    "Rich": {
+      "name": "Riche",
+      "emoji": "✨"
+    },
+    "Creamy": {
+      "name": "Crémeux",
+      "emoji": "🥛"
+    },
+    "Nutty": {
+      "name": "Noisetté",
+      "emoji": "🌰"
+    },
+    "Boozy": {
+      "name": "Corsé",
+      "emoji": "💥"
+    }
+  },
+  "seasons": {
+    "spring": {
+      "name": "Printemps",
+      "emoji": "🌸"
+    },
+    "summer": {
+      "name": "Été",
+      "emoji": "☀️"
+    },
+    "fall": {
+      "name": "Automne",
+      "emoji": "🍂"
+    },
+    "winter": {
+      "name": "Hiver",
+      "emoji": "❄️"
+    }
+  },
+  "cocktail_styles": [
+    "Classic",
+    "Modern",
+    "Tiki",
+    "Sour",
+    "Punch",
+    "Daisy",
+    "Fizz",
+    "Sling",
+    "Flip",
+    "Fix",
+    "Highball",
+    "Smash",
+    "Mule",
+    "Martini",
+    "Negroni",
+    "Margarita",
+    "Colada",
+    "Contemporary"
+  ],
+  "cocktail_categories": {
+    "Whiskey_Family": {
+      "key": "Whiskey",
+      "label": "🥃 Whiskey",
+      "emoji": "🥃"
+    },
+    "Rum_Family": {
+      "key": "Rum",
+      "label": "🍹 Rhum",
+      "emoji": "🍹"
+    },
+    "Agave_Family": {
+      "key": "Agave",
+      "label": "🌵 Agave",
+      "emoji": "🌵"
+    },
+    "Gin": {
+      "key": "Gin",
+      "label": "🌿 Gin",
+      "emoji": "🌿"
+    },
+    "Vodka": {
+      "key": "Vodka",
+      "label": "❄️ Vodka",
+      "emoji": "❄️"
+    },
+    "Brandy_Family": {
+      "key": "Brandy",
+      "label": "🍇 Brandy",
+      "emoji": "🍇"
+    },
+    "Absinthe": {
+      "key": "Absinthe",
+      "label": "🌱 Absinthe",
+      "emoji": "🌱"
+    },
+    "Liqueur Amer": {
+      "key": "Liqueur Amer",
+      "label": "🔴 Liqueur Amer",
+      "emoji": "🔴"
+    },
+    "Liqueur Herbes": {
+      "key": "Liqueur Herbes",
+      "label": "🌿 Liqueur Herbes",
+      "emoji": "🌿"
+    },
+    "Liqueur Agrume": {
+      "key": "Liqueur Agrume",
+      "label": "🍋 Liqueur Agrume",
+      "emoji": "🍋"
+    },
+    "Liqueur Fruits": {
+      "key": "Liqueur Fruits",
+      "label": "🍒 Liqueur Fruits",
+      "emoji": "🍒"
+    },
+    "Liqueur Dessert": {
+      "key": "Liqueur Dessert",
+      "label": "🍯 Liqueur Dessert",
+      "emoji": "🍯"
+    },
+    "Liqueur Noix": {
+      "key": "Liqueur Noix",
+      "label": "🌰 Liqueur Noix",
+      "emoji": "🌰"
+    }
+  }
+}

@@ -5,7 +5,7 @@ import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 
 const session     = ref(null)   // session Supabase (bartender connecté)
-const bar         = ref(null)   // bar actif du bartender connecté
+const bar = ref(JSON.parse(localStorage.getItem('selectedBar') || 'null')) // bar actif du bartender connecté
 const bars        = ref([])     // tous les bars du compte (si plusieurs)
 const authLoading = ref(false)
 const authError   = ref('')
@@ -16,7 +16,7 @@ export function useAuth() {
   const currentBarId    = computed(() => bar.value?.id ?? null)
   const currentBarName  = computed(() => bar.value?.name ?? '')
   const inviteCode      = computed(() => bar.value?.invite_code ?? '')
-  const hasMultipleBars = computed(() => bars.value.length > 1 && !bar.value)
+  const hasMultipleBars = computed(() => bars.value.length >= 1 && !bar.value)
   const isBarPublic     = computed(() => bar.value?.is_public ?? false)
 
   // Initialise la session au démarrage (appelé dans App.vue onMounted)
@@ -68,16 +68,7 @@ export function useAuth() {
       return
     }
 
-    // Sélection automatique
-    if (!bars.value || bars.value.length === 0) {
-      bar.value = null
-    } else if (bars.value.length === 1) {
-      // Un seul bar : sélection automatique, pas besoin de sélecteur
-      bar.value = bars.value[0]
-    } else {
-      // Plusieurs bars : laisser l'utilisateur choisir (bar reste null)
-      bar.value = null
-    }
+    bar.value = null
   }
 
   // Basculer vers un autre bar (navigation rapide entre ses bars)
@@ -88,6 +79,11 @@ export function useAuth() {
     } else {
       console.error('❌ Bar not found:', barId)
     }
+  }
+
+  async function selectBar(selectedBar) {
+    bar.value = selectedBar
+    localStorage.setItem('selectedBar', JSON.stringify(selectedBar))
   }
 
   // Active / désactive la visibilité publique du bar
@@ -156,6 +152,7 @@ export function useAuth() {
     session.value = null
     bar.value     = null
     bars.value    = []
+    localStorage.removeItem('selectedBar')
   }
 
   // Créer un nouveau bar (pour un bartender déjà connecté)

@@ -411,16 +411,16 @@
         },
         {
             "Name": "Blackthorn #2",
-            "BaseSpirit": "gin",
-            "Category": "Gin",
+            "BaseSpirit": "sloe_gin",
+            "Category": "Liqueur Fruits",
             "Glass": null,
-            "Method": "stir",
+            "Method": "shake",
             "Difficulty": "hard",
-            "ABV": 25,
+            "ABV": 20,
             "Description": null,
             "Profile": [
                 "Bitter",
-                "Dry"
+                "Fruity"
             ],
             "Ice": [],
             "Season": [
@@ -429,11 +429,11 @@
             "Creator": "Unknown",
             "Image": "https://img.youtube.com/vi/Wqy0LuuERco/hqdefault.jpg",
             "Tags": [],
-            "CocktailStyle": "classic",
+            "CocktailStyle": "modern",
             "Recipe": [
                 {
                     "Ingredient": "Plymouth Sloe Gin",
-                    "Type": "gin",
+                    "Type": "sloe_gin",
                     "IsGarnish": false,
                     "Oz": 0.75,
                     "Ml": 22.5
@@ -974,12 +974,12 @@
         },
         {
             "Name": "Charlie Chaplin",
-            "BaseSpirit": "gin",
-            "Category": "Gin",
+            "BaseSpirit": "sloe_gin",
+            "Category": "Liqueur Fruits",
             "Glass": null,
             "Method": "shake",
             "Difficulty": "medium",
-            "ABV": 22,
+            "ABV": 17,
             "Description": null,
             "Profile": [
                 "Fruity",
@@ -996,7 +996,7 @@
             "Recipe": [
                 {
                     "Ingredient": "Plymouth Sloe Gin",
-                    "Type": "gin",
+                    "Type": "sloe_gin",
                     "IsGarnish": false,
                     "Oz": 1.0,
                     "Ml": 30.0
@@ -8273,7 +8273,7 @@
             "Glass": null,
             "Method": "shake",
             "Difficulty": "hard",
-            "ABV": 24,
+            "ABV": 22,
             "Description": null,
             "Profile": [
                 "Tropical",
@@ -8304,7 +8304,7 @@
                 },
                 {
                     "Ingredient": "Plymouth Sloe Gin",
-                    "Type": "gin",
+                    "Type": "sloe_gin",
                     "IsGarnish": false,
                     "Oz": 0.5,
                     "Ml": 15.0
@@ -11718,12 +11718,12 @@
         },
         {
             "Name": "Sloe Gin Sour",
-            "BaseSpirit": "gin",
-            "Category": "Gin",
+            "BaseSpirit": "sloe_gin",
+            "Category": "Liqueur Fruits",
             "Glass": null,
             "Method": "shake",
             "Difficulty": "hard",
-            "ABV": 19,
+            "ABV": 14,
             "Description": null,
             "Profile": [
                 "Bitter",
@@ -11736,11 +11736,11 @@
             "Creator": "Unknown",
             "Image": "https://img.youtube.com/vi/W50W19vwjmk/hqdefault.jpg",
             "Tags": [],
-            "CocktailStyle": "sour",
+            "CocktailStyle": "modern",
             "Recipe": [
                 {
                     "Ingredient": "Plymouth Sloe Gin",
-                    "Type": "gin",
+                    "Type": "sloe_gin",
                     "IsGarnish": false,
                     "Oz": 1.5,
                     "Ml": 45.0
@@ -12454,16 +12454,16 @@
         },
         {
             "Name": "Sloe Gin Fizz",
-            "BaseSpirit": "gin",
-            "Category": "Gin",
+            "BaseSpirit": "sloe_gin",
+            "Category": "Liqueur Fruits",
             "Glass": null,
             "Method": "build",
             "Difficulty": "medium",
-            "ABV": 12,
+            "ABV": 8,
             "Description": null,
             "Profile": [
-                "Citrus",
-                "Sour"
+                "Fruity",
+                "Citrus"
             ],
             "Ice": [],
             "Season": [
@@ -12472,11 +12472,11 @@
             "Creator": "Unknown",
             "Image": "https://img.youtube.com/vi/gGlTXp_oujk/hqdefault.jpg",
             "Tags": [],
-            "CocktailStyle": "fizz",
+            "CocktailStyle": "modern",
             "Recipe": [
                 {
                     "Ingredient": "Plymouth Sloe Gin*",
-                    "Type": "gin",
+                    "Type": "sloe_gin",
                     "IsGarnish": false,
                     "Oz": 2.0,
                     "Ml": 60.0

@@ -7,19 +7,32 @@ CREATE TABLE public.bars (
   owner_id uuid NOT NULL,
   invite_code text NOT NULL UNIQUE,
   created_at timestamp with time zone DEFAULT now(),
+  is_public boolean NOT NULL DEFAULT false,
   CONSTRAINT bars_pkey PRIMARY KEY (id),
   CONSTRAINT bars_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
 );
-CREATE TABLE public.catalog_imports (
+CREATE TABLE public.cocktail_catalog (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  bar_id uuid NOT NULL,
-  catalog_cocktail_id uuid NOT NULL,
-  source_cocktail_id uuid,
-  imported_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT catalog_imports_pkey PRIMARY KEY (id),
-  CONSTRAINT catalog_imports_source_cocktail_id_fkey FOREIGN KEY (source_cocktail_id) REFERENCES public.cocktails(id),
-  CONSTRAINT catalog_imports_bar_id_fkey FOREIGN KEY (bar_id) REFERENCES public.bars(id),
-  CONSTRAINT catalog_imports_catalog_cocktail_id_fkey FOREIGN KEY (catalog_cocktail_id) REFERENCES public.cocktails(id)
+  name text NOT NULL,
+  base_spirit text,
+  category text,
+  glass text,
+  method text,
+  difficulty text,
+  abv numeric,
+  description text,
+  recipe jsonb NOT NULL DEFAULT '[]'::jsonb,
+  profile jsonb DEFAULT '[]'::jsonb,
+  season jsonb DEFAULT '[]'::jsonb,
+  tags jsonb DEFAULT '[]'::jsonb,
+  creator text,
+  image text,
+  cocktail_style text,
+  submitted_by_bar_id uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  ice jsonb,
+  CONSTRAINT cocktail_catalog_pkey PRIMARY KEY (id),
+  CONSTRAINT cocktail_catalog_submitted_by_bar_id_fkey FOREIGN KEY (submitted_by_bar_id) REFERENCES public.bars(id)
 );
 CREATE TABLE public.cocktails (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -41,8 +54,10 @@ CREATE TABLE public.cocktails (
   created_at timestamp with time zone DEFAULT now(),
   bar_id uuid,
   cocktail_style text,
+  submitted_by_bar_id uuid,
   CONSTRAINT cocktails_pkey PRIMARY KEY (id),
-  CONSTRAINT cocktails_bar_id_fkey FOREIGN KEY (bar_id) REFERENCES public.bars(id)
+  CONSTRAINT cocktails_bar_id_fkey FOREIGN KEY (bar_id) REFERENCES public.bars(id),
+  CONSTRAINT cocktails_submitted_by_bar_id_fkey FOREIGN KEY (submitted_by_bar_id) REFERENCES public.cocktail_catalog(id)
 );
 CREATE TABLE public.drink_history (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

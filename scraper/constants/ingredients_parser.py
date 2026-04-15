@@ -31,7 +31,7 @@ INGREDIENT_RULES: List[Tuple[str, Callable[[str], bool]]] = [
     ('gin_navy',         lambda x: 'navy' in x and 'gin' in x),
     ('gin_dry',          lambda x: 'dry gin' in x and 'ginger' not in x),
     ('genever',          lambda x: 'genever' in x or 'jenever' in x or 'genièvre' in x),
-    ('gin',              lambda x: 'gin' in x and 'ginger' not in x and 'beijing' not in x),
+    ('gin',              lambda x: 'gin' in x and 'ginger' not in x and 'beijing' not in x and 'sloe' not in x),
 
     # Brandy / Cognac
     ('calvados',         lambda x: 'calvados' in x or 'apple brandy' in x or 'applejack' in x),

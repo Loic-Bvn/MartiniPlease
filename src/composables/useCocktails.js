@@ -34,14 +34,19 @@ export function useCocktails() {
   async function createCocktail(cocktailData) {
     const barId = currentBarId.value
     if (!barId) return { success: false, error: 'Non connecté' }
-    
+
+    // Si id présent → déléguer à updateCocktail
+    if (cocktailData.id) {
+      return updateCocktail(cocktailData.id, cocktailData)
+    }
+
     try {
-      const { id, ...dataWithoutId } = cocktailData
-      const validated = validateCocktail(dataWithoutId)
-      
+      const validated = validateCocktail(cocktailData)
+      const { id, ...dataWithoutId } = validated
+
       const { data, error } = await supabase
         .from('cocktails')
-        .insert({ ...validated, bar_id: barId })
+        .insert(dataWithoutId)
         .select()
         .single()
 
