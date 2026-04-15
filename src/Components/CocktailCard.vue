@@ -30,10 +30,15 @@
         <button
           v-if="hasDrinker && !isBartenderMode"
           @click="handleHistoric"
-          :class="['btn-order']"
-          :title="'Ajouter à l\'historique'"
+          class="btn-order-simple"
+          :class="{ 'is-active': isChecked }"
+          title="Commander"
         >
-          <PlusIcon :size="16" />
+          <transition name="tick-pop" mode="out-in">
+            <Check v-if="isChecked" :key="'check'" :size="16" />
+
+            <GlassWater v-else :key="'glass'" :size="16" />
+          </transition>
         </button>
 
         <!-- Bouton edit, delete et push (mode bartender uniquement) -->
@@ -111,7 +116,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Pencil, Trash2, Heart, PlusIcon, Check, XIcon } from 'lucide-vue-next'
+import { Pencil, Trash2, Heart, PlusIcon, XIcon, GlassWater, Loader2, Check} from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
@@ -119,7 +124,7 @@ import { Upload, Bookmark } from 'lucide-vue-next'
 import { useCatalog } from '@/composables/useCatalog'
 
 const { isSubmitted, submitToCatalog } = useCatalog()
-
+const isChecked = ref(false)
 const props = defineProps({
   cocktail:        Object,
   isBartenderMode: { type: Boolean, default: false },
@@ -154,9 +159,16 @@ const isFav = computed(() => isFavorite(props.cocktail.id))
 async function handleFavorite() {
   await toggleFavorite(props.cocktail.id)
 }
-
 async function handleHistoric() {
+  if (isChecked.value) return
+
   await addToHistory(props.cocktail.id)
+
+  isChecked.value = true
+
+  setTimeout(() => {
+    isChecked.value = false
+  }, 900)
 }
 
 function formatQty(ing) {

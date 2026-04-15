@@ -3350,3 +3350,58 @@ body {
   opacity: 0.95;
   z-index: 9999;
 }
+.btn-order-simple {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.btn-order-simple:active {
+  transform: scale(0.92);
+}
+
+/* petit feedback vert */
+.btn-order-simple.is-active {
+  background: rgba(34,197,94,0.12);
+  border-color: rgba(34,197,94,0.3);
+}
+
+/* animation tick */
+.tick-pop-enter-active {
+  animation: tickPop 0.18s ease-out;
+}
+
+.tick-pop-leave-active {
+  animation: tickPopOut 0.12s ease-in;
+}
+
+@keyframes tickPop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes tickPopOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
