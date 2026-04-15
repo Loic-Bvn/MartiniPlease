@@ -5,7 +5,7 @@ import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 
 const session     = ref(null)   // session Supabase (bartender connecté)
-const bar         = ref(null)   // bar actif du bartender connecté
+const bar = ref(JSON.parse(localStorage.getItem('selectedBar') || 'null')) // bar actif du bartender connecté
 const bars        = ref([])     // tous les bars du compte (si plusieurs)
 const authLoading = ref(false)
 const authError   = ref('')
@@ -90,6 +90,11 @@ export function useAuth() {
     }
   }
 
+  async function selectBar(selectedBar) {
+    bar.value = selectedBar
+    localStorage.setItem('selectedBar', JSON.stringify(selectedBar))
+  }
+
   // Active / désactive la visibilité publique du bar
   async function toggleBarPublic() {
     if (!bar.value) return { success: false }
@@ -156,6 +161,7 @@ export function useAuth() {
     session.value = null
     bar.value     = null
     bars.value    = []
+    localStorage.removeItem('selectedBar')
   }
 
   // Créer un nouveau bar (pour un bartender déjà connecté)

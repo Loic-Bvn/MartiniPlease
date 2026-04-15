@@ -164,7 +164,6 @@ export function useInventory() {
         .insert(rows)
       
       if (error) throw error
-      console.log(`✅ ${rows.length} ingrédients par défaut créés pour le bar`)
     } catch (err) {
       console.error('❌ Erreur initializeDefaultIngredients:', err)
       throw err

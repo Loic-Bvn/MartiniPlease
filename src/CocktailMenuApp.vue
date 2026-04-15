@@ -744,7 +744,6 @@ function getRandomLogo() {
 }
 
 const randomLogo = ref(getRandomLogo())
-console.log(randomLogo.value)
 // Logo → retour à l'écran de connexion
 function handleLogoClick() {
   if (isLoggedIn.value) {
@@ -982,8 +981,6 @@ async function joinByCode() {
     .select('id, name, invite_code')
     .eq('invite_code', code)
     .single()
-
-  console.log('joinByCode result:', data, error)
 
   if (error || !data) {
     codeError.value = 'Code invalide. Vérifie avec ton bartender.'

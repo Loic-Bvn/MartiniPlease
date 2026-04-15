@@ -23,7 +23,6 @@ function loadConstants() {
   }
   
   loadedConstants = constantsData
-  console.log('✅ Constantes chargées depuis cocktail-constants.json')
   return constantsData
 }
 
