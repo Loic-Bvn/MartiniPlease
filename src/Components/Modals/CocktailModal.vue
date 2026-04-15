@@ -278,7 +278,10 @@ import { useInventory } from '@/composables/useInventory'
 import { validateCocktail } from '@/composables/useDataValidator'
 import { getGlassesAsOptions, getMethodsAsOptions, getCocktailCategoriesAsOptions } from '@/lib/cocktail-constants'
 
-const props = defineProps({ cocktail: Object })
+const props = defineProps({ 
+  cocktail: Object,
+    barId:{ type: String, default: '' },
+})
 const emit  = defineEmits(['save', 'close'])
 
 const { ingredients } = useInventory()
@@ -536,7 +539,16 @@ function removeRecipeLine(idx) {
 function handleSave() {
   try {
     const validated = validateCocktail(form.value)
-    emit('save', validated)
+
+    if (!props.barId) {
+      throw new Error('barId manquant')
+    }
+
+    emit('save', {
+      ...validated,
+      bar_id: props.barId
+    })
+
   } catch (err) {
     alert(`❌ ${err.message}`)
   }

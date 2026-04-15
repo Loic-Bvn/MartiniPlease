@@ -682,6 +682,21 @@
           </div>
         </div>
 
+        <!-- Commandes en attente (bartender mode) -->
+        <div v-if="isLoggedIn && activeBarId" class="section-card">
+          <button @click="showOrdersPanel = !showOrdersPanel" class="expand-actions-btn">
+            <ChevronDown :size="18" :class="{ rotated: showOrdersPanel }" />
+            <h2 class="section-title">
+              🍸 {{ locale === 'fr' ? 'Commandes' : 'Orders' }}
+              <span v-if="pendingOrdersCount > 0" class="count-badge pending-badge">{{ pendingOrdersCount }}</span>
+            </h2>
+            <span></span>
+          </button>
+          <div v-if="showOrdersPanel" class="filters-dropdown-content">
+            <OrdersPanel :locale="locale" :unit="unit" />
+          </div>
+        </div>
+
       </div>
 
       <!-- Liste cocktails -->
@@ -722,6 +737,7 @@
               :isBartenderMode="isLoggedIn"
               :locale="locale"
               :unit="unit"
+              :bar-id="activeBarId"
               @edit="openEditModal"
               @delete="handleDelete"
             />
@@ -735,7 +751,7 @@
     <AuthModal v-if="showAuthModal" @close="showAuthModal = false" @success="onAuthSuccess" />
     <MenuCardModal v-if="showCardModal" :card="editingCard" :cocktails="cocktails" :locale="locale" @save="handleSaveCard" @close="showCardModal = false" />
     <CatalogModal v-if="showCatalogModal" @close="showCatalogModal = false" @imported="handleCatalogImport" />
-    <CocktailModal v-if="showCocktailModal" :cocktail="editingCocktail" @save="handleSave" @close="showCocktailModal = false" />
+    <CocktailModal v-if="showCocktailModal" :cocktail="editingCocktail" @save="handleSave" @close="showCocktailModal = false" :bar-id="activeBarId"/>
     <MenuCardView
       v-if="viewingCard"
       :card="viewingCard"
@@ -758,6 +774,7 @@ import { useCocktails } from '@/composables/useCocktails'
 import { useInventory } from '@/composables/useInventory'
 import { useMenuCards } from '@/composables/useMenuCards'
 import { useDrinker }   from '@/composables/useDrinker'
+import { useOrders }    from '@/composables/useOrders'
 import { useSearchSuggestions } from '@/composables/useSearchSuggestions'
 import { useBarStatistics } from '@/composables/useBarStatistics'
 import { useFilterCounts } from '@/composables/useFilterCounts'
@@ -769,6 +786,7 @@ import MenuCardModal   from '@/Components/Modals/MenuCardModal.vue'
 import MenuCardView    from '@/Components/MenuCardView.vue'
 import AuthModal       from '@/Components/Modals/AuthModal.vue'
 import DrinkerPanel    from '@/Components/DrinkerPanel.vue'
+import OrdersPanel     from '@/Components/OrdersPanel.vue'
 import ThemeToggle     from '@/Components/ThemeToggle.vue'
 import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
 import { supabase }    from '@/lib/supabase'
@@ -988,6 +1006,10 @@ async function saveBarEdits(barId) {
 const showDrinkerPanel  = ref(false)
 const drinkerTab        = ref('favorites')
 const burgerOpen        = ref(false)
+
+// Initialiser useOrders et écouter les commandes
+const { orders, pendingOrdersCount, initOrdersListener, stopOrdersListener } = useOrders()
+const showOrdersPanel = ref(false)
 
 // État édition des bars
 const editingBarId      = ref(null)
@@ -1453,6 +1475,17 @@ watch(viewingCard, (card) => {
     setHash(code, slugify(card.name))
   } else {
     setHash(code)
+  }
+})
+
+// Écouter les commandes en temps réel (bartender mode uniquement)
+watch([activeBarId, isLoggedIn], async ([newBarId, newIsLoggedIn]) => {
+  if (newIsLoggedIn && newBarId) {
+    // Bartender connecté : activer l'écoute des commandes
+    await initOrdersListener(newBarId)
+  } else {
+    // Arrêter l'écoute des commandes
+    stopOrdersListener()
   }
 })
 
