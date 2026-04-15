@@ -13,6 +13,7 @@ from typing import Dict, Any, Optional, Tuple
 # Chemin vers le fichier de constantes centralisées
 CONSTANTS_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    'src',
     'constants',
     'cocktail-constants.json'
 )
