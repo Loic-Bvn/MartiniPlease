@@ -61,10 +61,10 @@
               <transition name="fade">
                 <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
                   <!-- Gérer mes bars (si plusieurs) -->
-                  <button v-if="isLoggedIn && bars.length > 1 && !showBarsSelection" @click="showBarsSelection = true; burgerOpen = false" class="burger-item">
+                  <button v-if="isLoggedIn && bars.length >= 1 && !showBarsSelection" @click="showBarsSelection = true; burgerOpen = false" class="burger-item">
                     {{ locale === 'fr' ? '📋 Gérer mes bars' : '📋 Manage bars' }}
                   </button>
-                  <div v-if="isLoggedIn && bars.length > 1 && !showBarsSelection" class="burger-divider" />
+                  <div v-if="isLoggedIn && bars.length >= 1 && !showBarsSelection" class="burger-divider" />
                   
                   <div v-if="activeBarId && !showBarsSelection" class="burger-item burger-item--info">
                     <span>🔑 {{ inviteCode }}</span>

@@ -16,7 +16,7 @@ export function useAuth() {
   const currentBarId    = computed(() => bar.value?.id ?? null)
   const currentBarName  = computed(() => bar.value?.name ?? '')
   const inviteCode      = computed(() => bar.value?.invite_code ?? '')
-  const hasMultipleBars = computed(() => bars.value.length > 1 && !bar.value)
+  const hasMultipleBars = computed(() => bars.value.length >= 1 && !bar.value)
   const isBarPublic     = computed(() => bar.value?.is_public ?? false)
 
   // Initialise la session au démarrage (appelé dans App.vue onMounted)
@@ -68,16 +68,7 @@ export function useAuth() {
       return
     }
 
-    // Sélection automatique
-    if (!bars.value || bars.value.length === 0) {
-      bar.value = null
-    } else if (bars.value.length === 1) {
-      // Un seul bar : sélection automatique, pas besoin de sélecteur
-      bar.value = bars.value[0]
-    } else {
-      // Plusieurs bars : laisser l'utilisateur choisir (bar reste null)
-      bar.value = null
-    }
+    bar.value = null
   }
 
   // Basculer vers un autre bar (navigation rapide entre ses bars)
