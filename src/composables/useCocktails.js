@@ -46,7 +46,7 @@ export function useCocktails() {
 
       const { data, error } = await supabase
         .from('cocktails')
-        .insert(dataWithoutId)
+        .insert({...dataWithoutId, bar_id: barId})
         .select()
         .single()
 

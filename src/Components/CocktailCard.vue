@@ -30,10 +30,15 @@
         <button
           v-if="hasDrinker && !isBartenderMode"
           @click="handleHistoric"
-          :class="['btn-order']"
-          :title="'Ajouter à l\'historique'"
+          class="btn-order-simple"
+          :class="{ 'is-active': isChecked }"
+          title="Commander"
         >
-          <PlusIcon :size="16" />
+          <transition name="tick-pop" mode="out-in">
+            <Check v-if="isChecked" :key="'check'" :size="16" />
+
+            <GlassWater v-else :key="'glass'" :size="16" />
+          </transition>
         </button>
 
         <!-- Bouton edit, delete et push (mode bartender uniquement) -->
@@ -111,26 +116,29 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Pencil, Trash2, Heart, PlusIcon, Check, XIcon } from 'lucide-vue-next'
+import { Pencil, Trash2, Heart, PlusIcon, XIcon, GlassWater, Loader2, Check} from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
+import { useOrders } from '@/composables/useOrders'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { Upload, Bookmark } from 'lucide-vue-next'
 import { useCatalog } from '@/composables/useCatalog'
 
 const { isSubmitted, submitToCatalog } = useCatalog()
-
+const isChecked = ref(false)
 const props = defineProps({
   cocktail:        Object,
   isBartenderMode: { type: Boolean, default: false },
   locale:          { type: String, default: 'fr' },
   unit:            { type: String, default: 'oz' },
+  barId:           { type: String, default: '' },
 })
 
 defineEmits(['edit', 'delete'])
 
 const { barInventory }                             = useInventory()
-const { hasDrinker, isFavorite, toggleFavorite, addToHistory } = useDrinker()
+const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
+const { addOrder } = useOrders()
 
 const t = computed(() => ({
   makeable: props.locale === 'fr' ? 'Disponible' : 'Available',
@@ -156,7 +164,42 @@ async function handleFavorite() {
 }
 
 async function handleHistoric() {
-  await addToHistory(props.cocktail.id)
+  console.log('🍸 handleHistoric called', { hasDrinker: hasDrinker.value, drinker: drinker.value, barId: props.barId })
+  
+  if (isChecked.value) {
+    console.warn('⚠️ Already checked, ignoring')
+    return
+  }
+  if (!hasDrinker.value) {
+    console.warn('⚠️ No drinker')
+    return
+  }
+  if (!drinker.value) {
+    console.warn('⚠️ Drinker is null')
+    return
+  }
+  if (!props.barId) {
+    console.warn('⚠️ No barId prop')
+    return
+  }
+
+  console.log('✅ All checks passed, creating order...')
+  // Créer une commande pour le bartender
+  const result = await addOrder(drinker.value, props.cocktail.id, props.barId)
+
+  console.log('📊 Order result:', result)
+  
+  if (result.success) {
+    // Rafraîchir rapidement l'historique du drinker
+    await quickRefreshHistory()
+    
+    isChecked.value = true
+    setTimeout(() => {
+      isChecked.value = false
+    }, 900)
+  } else {
+    console.error('❌ Order failed:', result.error)
+  }
 }
 
 function formatQty(ing) {

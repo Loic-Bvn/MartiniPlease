@@ -401,6 +401,8 @@ body {
   flex-direction: column;
   gap: 1.25rem;
   animation: slideDown 0.25s ease;
+  overflow: hidden;
+  max-height: 70vh;
 }
 
 .filter-group {
@@ -508,6 +510,18 @@ body {
   border-radius: 9999px;
   font-size: 0.72rem;
   font-weight: 700;
+}
+
+.count-badge.pending-badge {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+  border-color: #991b1b;
+}
+
+.dark .count-badge.pending-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border-color: #7f1d1d;
 }
 
 /* ── Cocktails grid ────────────────────────── */
@@ -2353,6 +2367,12 @@ body {
   text-align: left;
   transition: background 0.1s;
 }
+.burger-title,
+.burger-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .burger-item:hover {
   background: var(--bg-raised);
 }
@@ -2401,6 +2421,52 @@ body {
   flex-direction: column;
   gap: 4px;
   width: 100%;
+}
+.toggle-switch {
+  width: 34px;
+  height: 18px;
+  background: #ccc;
+  border-radius: 999px;
+  position: relative;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.toggle-switch.on {
+  background: #b07a2a;
+}
+
+.toggle-knob {
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.2s ease;
+}
+
+.toggle-switch.on .toggle-knob {
+  left: 18px;
+}
+.burger-item--toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.burger-item--toggle svg {
+  opacity: 0.7;
+}
+
+/* Optionnel mais très cool */
+.burger-item--toggle .lucide-lock {
+  color: #888;
+}
+
+.burger-item--toggle .lucide-unlock {
+  color: #b07a2a; /* ton accent */
 }
 .bar-option {
   all: unset;
@@ -2556,6 +2622,67 @@ body {
   height: 1px;
   background: var(--border);
   margin: 4px 0;
+}
+.burger-header {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.burger-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.burger-subtitle {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.burger-item--clickable {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.burger-item--clickable:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.burger-dropdown {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.18s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.burger-item--primary {
+  font-weight: 500;
+  color: #b07a2a; /* ton accent cocktail */
+}
+
+.burger-item--primary:hover {
+  background: rgba(176, 122, 42, 0.08);
+}
+
+.burger-item--hint {
+  font-size: 12px;
+  opacity: 0.6;
+  cursor: default;
 }
 
 /* ── Welcome Screen (CocktailMenuApp) ────────── */
@@ -3222,4 +3349,465 @@ body {
 .cv-card-meta .profile-tags {
   font-size: 0.72rem;
   color: var(--text-dim);
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  opacity: 0.95;
+  z-index: 9999;
+}
+.btn-order-simple {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.btn-order-simple:active {
+  transform: scale(0.92);
+}
+
+/* petit feedback vert */
+.btn-order-simple.is-active {
+  background: rgba(34,197,94,0.12);
+  border-color: rgba(34,197,94,0.3);
+}
+
+/* animation tick */
+.tick-pop-enter-active {
+  animation: tickPop 0.18s ease-out;
+}
+
+.tick-pop-leave-active {
+  animation: tickPopOut 0.12s ease-in;
+}
+
+@keyframes tickPop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes tickPopOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* =========================
+   ORDERS PANEL (ROOT)
+========================= */
+
+.orders-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  max-height: 60vh;
+  overflow-y: auto;
+
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   TABS
+========================= */
+
+.orders-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+
+  background: transparent;
+  border: none;
+
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.tab-btn--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+
+  background: var(--color-primary);
+  color: white;
+
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.orders-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sort-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sort-label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.sort-select {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 6px;
+
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.orders-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orders-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* =========================
+   CARD (PENDING)
+========================= */
+
+.order-card {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 10px;
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  transition: border 0.2s ease;
+}
+
+.order-card:hover {
+  border-color: var(--color-primary);
+}
+
+/* HEADER */
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+
+.order-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.order-card-count {
+  background: var(--color-primary);
+  color: white;
+
+  padding: 2px 8px;
+  border-radius: 10px;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* =========================
+   CONTENT (Recette + Info)
+========================= */
+
+.order-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.order-card-recipe {
+  background: var(--color-bg-secondary);
+  border-radius: 8px;
+  padding: 8px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.recipe-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.recipe-name {
+  text-transform: capitalize;
+  color: var(--color-text-primary);
+}
+
+.recipe-amount {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* RECIPE CHIPS (Method + Ice) */
+
+.recipe-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 8px;
+}
+
+.chip-small {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  text-transform: capitalize;
+}
+
+/* =========================
+   COMMANDES
+========================= */
+
+.order-card-orders {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  border-top: 1px dashed var(--color-border-secondary);
+  padding-top: 8px;
+}
+
+/* =========================
+   ORDER ITEM
+========================= */
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+  padding: 10px;
+
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 8px;
+
+  animation: slideInOrder 0.3s ease-out;
+}
+
+.order-item--completed {
+  opacity: 0.85;
+  background: var(--color-bg-tertiary);
+}
+
+/* INFO */
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.order-drinker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.order-time {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.order-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.order-actions-completed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.order-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 6px;
+
+  background: var(--color-bg-primary);
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.order-btn:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.order-btn--complete {
+  color: #10b981;
+}
+
+.order-btn--complete:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.order-btn--cancel,
+.order-btn--delete {
+  color: #ef4444;
+}
+
+.order-btn--cancel:hover,
+.order-btn--delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* =========================
+   BADGE
+========================= */
+
+.order-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 10px;
+
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid #10b981;
+
+  border-radius: 6px;
+
+  color: #10b981;
+  font-size: 0.875rem;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes slideInOrder {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

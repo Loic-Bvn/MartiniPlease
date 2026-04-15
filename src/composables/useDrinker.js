@@ -168,6 +168,25 @@ export function useDrinker() {
     history.value.unshift({ cocktail_id: cocktailId, ordered_at: new Date().toISOString() })
   }
 
+  // Rafraîchit rapidement l'historique (sans refetch complet)
+  async function quickRefreshHistory() {
+    if (!drinker.value) return
+    const { data, error } = await supabase
+      .from('drink_history')
+      .select('cocktail_id, ordered_at')
+      .eq('drinker_id', drinker.value.id)
+      .order('ordered_at', { ascending: false })
+      .limit(1)
+
+    if (error) { console.error('❌ quickRefreshHistory:', error); return }
+    if (data && data.length > 0) {
+      // Vérifier que ce n'est pas déjà dans l'historique (Realtime peut avoir fait ça)
+      if (!history.value.some(h => h.cocktail_id === data[0].cocktail_id && h.ordered_at === data[0].ordered_at)) {
+        history.value.unshift(data[0])
+      }
+    }
+  }
+
   return {
     drinker,
     favorites,
@@ -183,5 +202,6 @@ export function useDrinker() {
     toggleFavorite,
     fetchHistory,
     addToHistory,
+    quickRefreshHistory,
   }
 }

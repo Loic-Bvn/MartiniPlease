@@ -53,52 +53,112 @@
             </div>
             <ThemeToggle />
 
-            <!-- Menu burger tout à droite (bartender uniquement) -->
-            <div v-if="isLoggedIn" class="burger-wrapper">
-              <button @click="burgerOpen = !burgerOpen" class="btn-mode btn-mode-inactive" title="Plus d'options">
-                <Menu :size="15" />
-              </button>
-              <transition name="fade">
-                <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
-                  <!-- Gérer mes bars (si plusieurs) -->
-                  <button v-if="isLoggedIn && bars.length >= 1 && !showBarsSelection" @click="showBarsSelection = true; burgerOpen = false" class="burger-item">
-                    {{ locale === 'fr' ? '📋 Gérer mes bars' : '📋 Manage bars' }}
-                  </button>
-                  <div v-if="isLoggedIn && bars.length >= 1 && !showBarsSelection" class="burger-divider" />
-                  
-                  <div v-if="activeBarId && !showBarsSelection" class="burger-item burger-item--info">
-                    <span>🔑 {{ inviteCode }}</span>
-                    <span class="burger-item-hint">Code d'invitation</span>
-                  </div>
-                  <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
-                  <button v-if="activeBarId && !showBarsSelection" @click="handleTogglePublic" class="burger-item burger-item--toggle" :class="{ 'burger-item--toggle-on': isBarPublic }">
-                    <Globe v-if="isBarPublic" :size="15" />
-                    <EyeOff v-else :size="15" />
-                    <span>{{ isBarPublic ? (locale === 'fr' ? 'Bar public:' : 'Public bar:') : (locale === 'fr' ? 'Bar privé:' : 'Private bar:') }}</span>
-                    <span class="burger-toggle-badge" :class="isBarPublic ? 'badge-on' : 'badge-off'">
-                      {{ isBarPublic ? (locale === 'fr' ? 'visible' : 'visible') : (locale === 'fr' ? 'masqué' : 'hidden') }}
-                    </span>
-                  </button>
-                  <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
+          <div v-if="toastMessage" class="toast">
+            {{ toastMessage }}
+          </div>
 
-                  <button v-if="activeBarId && !showBarsSelection" @click="showCatalogModal = true; burgerOpen = false" class="burger-item">
+            <!-- Menu burger tout à droite (bartender uniquement) --><!-- Menu burger tout à droite -->
+            <div v-if="isLoggedIn" class="burger-wrapper">
+              <button 
+                @click="burgerOpen = !burgerOpen" 
+                class="btn-mode btn-mode-inactive burger-button"
+                title="Plus d'options"
+              >
+                <Menu :size="16" />
+              </button>
+
+              <transition name="fade-slide">
+                <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
+
+                  <div v-if="activeBarId" class="burger-header">
+                    <span class="burger-title">
+                      <Martini :size="16" />
+                      {{ activeBarName }}
+                    </span>
+
+                    <span class="burger-subtitle">
+                      <Key :size="14" />
+                      {{ inviteCode }}
+                    </span>
+                  </div>
+                  <div v-if="activeBarId" class="burger-divider" />
+
+                  <button 
+                    v-if="activeBarId && !showBarsSelection" 
+                    @click="handleInvite" 
+                    class="burger-item burger-item--primary"
+                  >
+                    <Link :size="15" />
+                    {{ locale === 'fr' ? 'Inviter au bar' : 'Invite to bar' }}
+                  </button>
+
+                  <!-- SECTION : GESTION -->
+                  <div v-if="bars.length >= 1 && !showBarsSelection && activeBarId">
+                    <button 
+                      @click="showBarsSelection = true; burgerOpen = false" 
+                      class="burger-item"
+                    >
+                      <Folder :size="16" />
+                      {{ locale === 'fr' ? 'Gérer mes bars' : 'Manage bars' }}
+                    </button>
+                  </div>
+
+
+                  <button 
+                    v-if="activeBarId && !showBarsSelection" 
+                    @click="handleTogglePublic" 
+                    class="burger-item burger-item--toggle"
+                  >
+                    <!-- Icône dynamique -->
+                    <component 
+                      :is="isBarPublic ? Unlock : Lock" 
+                      :size="15" 
+                    />
+
+                    <span>
+                      {{ isBarPublic 
+                        ? (locale === 'fr' ? 'Bar public' : 'Public bar') 
+                        : (locale === 'fr' ? 'Bar privé' : 'Private bar') 
+                      }}
+                    </span>
+
+                    <!-- Toggle -->
+                    <div class="toggle-switch" :class="{ 'on': isBarPublic }">
+                      <div class="toggle-knob"></div>
+                    </div>
+                  </button>
+
+                  <div v-if="activeBarId" class="burger-divider" />
+
+                  <!-- SECTION : CATALOG -->
+                  <button 
+                    v-if="activeBarId && !showBarsSelection" 
+                    @click="showCatalogModal = true; burgerOpen = false" 
+                    class="burger-item"
+                  >
                     <Library :size="15" />
                     {{ locale === 'fr' ? 'Catalogue de recettes' : 'Recipe Catalog' }}
                   </button> 
-                  
-                  <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
-                  <button v-if="activeBarId && !showBarsSelection" @click="copyBarLink" class="burger-item burger-item--copy">
-                    <Link :size="15" />
-                    <span>{{ linkCopied ? (locale === 'fr' ? 'Lien copié !' : 'Link copied!') : (locale === 'fr' ? 'Copier le lien du bar' : 'Copy bar link') }}</span>
-                  </button>
-                  <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
-                  <button @click="handleSignOut(); burgerOpen = false" class="burger-item burger-item--danger">
+
+                  <div v-if="activeBarId" class="burger-divider" />
+
+                  <!-- SECTION : DISCONNECT -->
+                  <button 
+                    @click="handleSignOut(); burgerOpen = false" 
+                    class="burger-item burger-item--danger"
+                  >
                     <LogOut :size="15" />
                     {{ locale === 'fr' ? 'Se déconnecter' : 'Sign out' }}
                   </button>
+
                 </div>
               </transition>
-              <div v-if="burgerOpen" class="burger-overlay" @click="burgerOpen = false" />
+
+              <div 
+                v-if="burgerOpen" 
+                class="burger-overlay" 
+                @click="burgerOpen = false" 
+              />
             </div>
           </div>
         </div>
@@ -622,6 +682,21 @@
           </div>
         </div>
 
+        <!-- Commandes en attente (bartender mode) -->
+        <div v-if="isLoggedIn && activeBarId" class="section-card">
+          <button @click="showOrdersPanel = !showOrdersPanel" class="expand-actions-btn">
+            <ChevronDown :size="18" :class="{ rotated: showOrdersPanel }" />
+            <h2 class="section-title">
+              🍸 {{ locale === 'fr' ? 'Commandes' : 'Orders' }}
+              <span v-if="pendingOrdersCount > 0" class="count-badge pending-badge">{{ pendingOrdersCount }}</span>
+            </h2>
+            <span></span>
+          </button>
+          <div v-if="showOrdersPanel" class="filters-dropdown-content">
+            <OrdersPanel :locale="locale" :unit="unit" />
+          </div>
+        </div>
+
       </div>
 
       <!-- Liste cocktails -->
@@ -662,6 +737,7 @@
               :isBartenderMode="isLoggedIn"
               :locale="locale"
               :unit="unit"
+              :bar-id="activeBarId"
               @edit="openEditModal"
               @delete="handleDelete"
             />
@@ -675,13 +751,14 @@
     <AuthModal v-if="showAuthModal" @close="showAuthModal = false" @success="onAuthSuccess" />
     <MenuCardModal v-if="showCardModal" :card="editingCard" :cocktails="cocktails" :locale="locale" @save="handleSaveCard" @close="showCardModal = false" />
     <CatalogModal v-if="showCatalogModal" @close="showCatalogModal = false" @imported="handleCatalogImport" />
-    <CocktailModal v-if="showCocktailModal" :cocktail="editingCocktail" @save="handleSave" @close="showCocktailModal = false" />
+    <CocktailModal v-if="showCocktailModal" :cocktail="editingCocktail" @save="handleSave" @close="showCocktailModal = false" :bar-id="activeBarId"/>
     <MenuCardView
       v-if="viewingCard"
       :card="viewingCard"
       :cocktails="cocktails"
       :locale="locale"
       :unit="unit"
+      :bar-id="activeBarId"
       @close="viewingCard = null"
       @toggle-locale="locale = locale === 'fr' ? 'en' : 'fr'"
       @toggle-unit="unit = unit === 'oz' ? 'ml' : 'oz'"
@@ -691,13 +768,14 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link, Check } from 'lucide-vue-next'
+import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link, Check, Folder, Martini, Key} from 'lucide-vue-next'
 
 import { useAuth }      from '@/composables/useAuth'
 import { useCocktails } from '@/composables/useCocktails'
 import { useInventory } from '@/composables/useInventory'
 import { useMenuCards } from '@/composables/useMenuCards'
 import { useDrinker }   from '@/composables/useDrinker'
+import { useOrders }    from '@/composables/useOrders'
 import { useSearchSuggestions } from '@/composables/useSearchSuggestions'
 import { useBarStatistics } from '@/composables/useBarStatistics'
 import { useFilterCounts } from '@/composables/useFilterCounts'
@@ -709,6 +787,7 @@ import MenuCardModal   from '@/Components/Modals/MenuCardModal.vue'
 import MenuCardView    from '@/Components/MenuCardView.vue'
 import AuthModal       from '@/Components/Modals/AuthModal.vue'
 import DrinkerPanel    from '@/Components/DrinkerPanel.vue'
+import OrdersPanel     from '@/Components/OrdersPanel.vue'
 import ThemeToggle     from '@/Components/ThemeToggle.vue'
 import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
 import { supabase }    from '@/lib/supabase'
@@ -819,6 +898,27 @@ function startDeleteBar(bar) {
   deleteConfirmationInput.value = ''
 }
 
+const inviteCopied = ref(false)
+
+const handleInvite = async () => {
+  const link = `${window.location.origin}/bar/${activeBarId}`
+
+  try {
+    await navigator.clipboard.writeText(link)
+    inviteCopied.value = true
+    showToast(
+      locale === 'fr' ? 'Lien copié 🍸' : 'Link copied 🍸'
+    )
+
+    setTimeout(() => {
+      inviteCopied.value = false
+    }, 2000)
+  } catch (e) {
+    console.error('Erreur copie lien', e)
+  }
+}
+
+
 // Supprimer un bar après confirmation
 async function handleDeleteBar() {
   if (!barToDelete.value || deleteConfirmationInput.value !== barToDelete.value.name) {
@@ -907,6 +1007,10 @@ async function saveBarEdits(barId) {
 const showDrinkerPanel  = ref(false)
 const drinkerTab        = ref('favorites')
 const burgerOpen        = ref(false)
+
+// Initialiser useOrders et écouter les commandes
+const { orders, pendingOrdersCount, initOrdersListener, stopOrdersListener } = useOrders()
+const showOrdersPanel = ref(false)
 
 // État édition des bars
 const editingBarId      = ref(null)
@@ -1375,6 +1479,17 @@ watch(viewingCard, (card) => {
   }
 })
 
+// Écouter les commandes en temps réel (bartender mode uniquement)
+watch([activeBarId, isLoggedIn], async ([newBarId, newIsLoggedIn]) => {
+  if (newIsLoggedIn && newBarId) {
+    // Bartender connecté : activer l'écoute des commandes
+    await initOrdersListener(newBarId)
+  } else {
+    // Arrêter l'écoute des commandes
+    stopOrdersListener()
+  }
+})
+
 onMounted(async () => {
   await initAuth()
   await fetchPublicBars()
@@ -1396,5 +1511,15 @@ async function handleCatalogImport(newCocktail) {
     cocktails.value.push(newCocktail)
     cocktails.value.sort((a, b) => a.name.localeCompare(b.name)) 
   } 
+}
+
+const toastMessage = ref('')
+
+const showToast = (message) => {
+  toastMessage.value = message
+
+  setTimeout(() => {
+    toastMessage.value = ''
+  }, 2000)
 }
 </script>

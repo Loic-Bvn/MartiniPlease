@@ -150,7 +150,7 @@ export function validateDrinkerCreation(data) {
 
   return {
     pseudo: data.pseudo.trim(),
-    bar_id: data.barId,
+    barId: data.barId,
   }
 }
 
@@ -168,6 +168,6 @@ export function validateDrinkerReconnect(data) {
 
   return {
     pseudo: data.pseudo.trim(),
-    bar_id: data.barId,
+    barId: data.barId,
   }
 }

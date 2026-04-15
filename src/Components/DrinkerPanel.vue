@@ -31,11 +31,11 @@
           </div>
 
           <div class="auth-tabs">
+            <button :class="['auth-tab', { active: loginTab === 'reconnect' }]" @click="loginTab = 'reconnect'; createError = ''">
+              Se connecter
+            </button>
             <button :class="['auth-tab', { active: loginTab === 'create' }]" @click="loginTab = 'create'; createError = ''">
               Nouveau profil
-            </button>
-            <button :class="['auth-tab', { active: loginTab === 'reconnect' }]" @click="loginTab = 'reconnect'; createError = ''">
-              Se reconnecter
             </button>
           </div>
 
@@ -102,7 +102,7 @@ const props = defineProps({
 const { hasDrinker, drinkerPseudo, createDrinker, reconnectDrinker, clearDrinker } = useDrinker()
 
 const showModal   = ref(false)
-const loginTab    = ref('create')
+const loginTab    = ref('reconnect')
 const pseudoInput = ref('')
 const tokenInput  = ref('')
 const createError = ref('')
