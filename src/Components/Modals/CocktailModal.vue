@@ -38,7 +38,7 @@
             </div>
             <div class="form-field">
               <label class="form-label">Catégorie</label>
-              <select v-model="form.category" class="form-input">
+              <select v-model="form.category" class="form-input" :disabled="!!form.base_spirit">
                 <option value="">-- Choisir --</option>
                 <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">{{ cat.label }}</option>
               </select>
@@ -68,19 +68,41 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label class="form-label">Difficulté</label>
-              <select v-model="form.difficulty" class="form-input">
-                <option value="">--</option>
-                <option value="easy">⭐ Easy</option>
-                <option value="medium">⭐⭐ Medium</option>
-                <option value="hard">⭐⭐⭐ Hard</option>
-              </select>
+              <label class="form-label">
+                ABV (%)
+                <button type="button" @click="abvAuto = !abvAuto" class="btn-toggle-auto">
+                  {{ abvAuto ? '🔄 Auto' : '✏️ Manuel' }}
+                </button>
+              </label>
+              <input
+                v-if="abvAuto"
+                :value="computedAbv"
+                type="number"
+                class="form-input"
+                readonly
+                style="opacity:0.65; cursor:not-allowed;"
+                placeholder="Calculé depuis la recette"
+              />
+              <input
+                v-else
+                v-model.number="form.abv"
+                type="number"
+                min="0"
+                max="100"
+                step="0.5"
+                class="form-input"
+                placeholder="Ex: 32"
+              />
             </div>
             <div class="form-field">
-              <label class="form-label">ABV (%)</label>
-              <input v-model.number="form.abv" type="number" min="0" max="100" step="0.5" class="form-input" placeholder="Ex: 32" />
+              <label class="form-label">Type de glace</label>
+              <select v-model="form.ice" class="form-input">
+                <option value="">-- Aucun --</option>
+                <option v-for="opt in iceOptions" :key="opt.name" :value="opt.name">{{opt.emoji + " " +  opt.name }}</option>
+              </select>
             </div>
           </div>
+
           <div class="form-row">
             <div class="form-field">
               <label class="form-label">Createur</label>
@@ -88,7 +110,10 @@
             </div>
             <div class="form-field">
               <label class="form-label">Style de cocktail</label>
-              <input v-model="form.cocktail_style" type="text" class="form-input" placeholder="Ex: Classic, Tiki, etc." />
+              <select v-model="form.cocktail_style" class="form-input">
+                <option value="">-- Choisir --</option>
+                <option v-for="s in cocktailStyleOptions" :key="s" :value="s">{{ s }}</option>
+              </select>
             </div>
           </div>
         </section>
@@ -105,38 +130,6 @@
               :class="['chip', { active: form.profile.includes(p.key) }]"
             >
               {{ p.icon }} {{ p.label }}
-            </button>
-          </div>
-        </section>
-
-        <!-- ── Section : Saisons ── -->
-        <section class="form-section">
-          <h3 class="form-section-title">Saisons</h3>
-          <div class="chips-container">
-            <button
-              v-for="s in seasonOptions"
-              :key="s.key"
-              type="button"
-              @click="toggleSeason(s.key)"
-              :class="['chip', { active: form.season.includes(s.key) }]"
-            >
-              {{ s.icon }} {{ s.label }}
-            </button>
-          </div>
-        </section>
-
-        <!-- ── Section : Types de glaçons ── -->
-        <section class="form-section">
-          <h3 class="form-section-title">Types de glaçons</h3>
-          <div class="chips-container">
-            <button
-              v-for="ice in iceOptions"
-              :key="ice.key"
-              type="button"
-              @click="toggleIce(ice.key)"
-              :class="['chip', { active: form.ice.includes(ice.key) }]"
-            >
-              {{ ice.icon }} {{ ice.label }}
             </button>
           </div>
         </section>
@@ -168,6 +161,7 @@
           <!-- En-têtes colonnes -->
           <div class="recipe-columns-header">
             <span>Ingrédient</span>
+            <span>Catégorie</span>
             <span>Type</span>
             <span>{{ unit === 'oz' ? 'Oz' : 'Ml' }}</span>
             <span>Dash</span>
@@ -183,43 +177,51 @@
               :key="idx"
               class="recipe-row"
             >
-              <!-- Nom de l'ingrédient -->
-              <input
-                v-model="ing.Ingredient"
-                type="text"
-                class="form-input"
-                placeholder="Ex: Bourbon"
-              />
-
-              <!-- Type (select depuis l'inventaire) -->
-              <select v-model="ing.Type" class="form-input">
-                <option value="">--</option>
-                <option value="garnish">🍋 Garniture</option>
-                <optgroup
-                  v-for="(ings, catKey) in ingredientsByCategory"
+              <!-- categorie l'ingrédient -->
+              <select v-model="ing.Category" @change="onCategoryChange(ing)" class="form-input">
+                <option value="">-- Catégorie --</option>
+                <option
+                  v-for="(_, catKey) in INGREDIENTS_BY_CATEGORY"
                   :key="catKey"
-                  :label="categoryLabels[catKey] || catKey"
+                  :value="catKey"
                 >
-                  <option v-for="i in ings" :key="i.type" :value="i.type">
-                    {{ i.name }}
-                  </option>
-                </optgroup>
+                  {{ CATEGORY_LABELS[catKey] ?? catKey }}
+                </option>
               </select>
 
-              <!-- Quantité (Oz ou Ml selon le switch) -->
+              <!-- Nom de l'ingrédient -->
+              <select v-model="ing.Type" @change="onIngredientChange(ing)" class="form-input">
+                <option value="">-- Ingrédient --</option>
+                <option
+                  v-for="(item, typeKey) in getTypesByCategory(ing.Category)"
+                  :key="typeKey"
+                  :value="typeKey"
+                >
+                  {{ item.name }}
+                </option>
+              </select>
+
+              <!-- Quantité -->
+              <!-- OZ -->
               <input
                 v-if="unit === 'oz'"
                 v-model="ing.Oz"
-                type="text"
+                @input="onOzChange(ing)"
+                type="number"
+                min="0"
                 class="form-input"
-                placeholder="2"
+                placeholder="—"
               />
+
+              <!-- ML -->
               <input
                 v-else
                 v-model="ing.Ml"
-                type="text"
+                @input="onMlChange(ing)"
+                type="number"
+                min="0"
                 class="form-input"
-                placeholder="60"
+                placeholder="—"
               />
 
               <!-- Dashes -->
@@ -272,273 +274,173 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { X, Trash2, Plus } from 'lucide-vue-next'
-import { useInventory } from '@/composables/useInventory'
 import { validateCocktail } from '@/composables/useDataValidator'
-import { getGlassesAsOptions, getMethodsAsOptions, getCocktailCategoriesAsOptions } from '@/lib/cocktail-constants'
+import { getGlassesAsOptions,
+  getMethodsAsOptions,
+  getCocktailCategoriesAsOptions,
+  getCocktailStyles,
+  getAllIngredients,
+  getIngredientsByCategory,
+  getIceTypes,
+  getBaseSpiritGroups,
+  getSpiritToCategoryMap,
+  getProfileOptions } from '@/lib/cocktail-constants'
+
+const categories = getBaseSpiritGroups()
+const spiritToCategoryMap = getSpiritToCategoryMap()
+
+const INGREDIENTS_MAP = getAllIngredients()
+const INGREDIENTS_BY_CATEGORY = getIngredientsByCategory()
 
 const props = defineProps({ 
   cocktail: Object,
-    barId:{ type: String, default: '' },
+  barId: { type: String, default: '' },
 })
-const emit  = defineEmits(['save', 'close'])
-
-const { ingredients } = useInventory()
+const emit = defineEmits(['save', 'close'])
 
 // ── Unité active (oz ou ml) ──────────────────────
 const unit = ref('oz')
 
-// ── Ingrédients groupés par catégorie ────────────
-const ingredientsByCategory = computed(() => {
-  const groups = {}
-  ingredients.value.forEach(ing => {
-    if (!groups[ing.category]) groups[ing.category] = []
-    groups[ing.category].push(ing)
-  })
-  return groups
-})
+// ── ABV auto/manuel ───────────────────────────────
+const abvAuto = ref(true)
 
-const categoryLabels = {
+// ── Catégories pour filtre recette ───────────────
+const recipeCategoryFilter = reactive({})
+
+const CATEGORY_LABELS = {
   spirits:   '🥃 Spiritueux',
-  liqueurs:  '🍷 Liqueurs',
+  licors:    '🍷 Liqueurs',
   modifiers: '🍸 Modificateurs',
   juices:    '🍊 Jus',
   syrups:    '🍯 Sirops',
   bitters:   '💧 Bitters',
   mixers:    '🥤 Mixers',
+  garnish:   '🍋 Garniture',
   others:    '📦 Autres',
 }
 
 // ── Options depuis constantes centralisées ───────
 const glassOptions = computed(() => getGlassesAsOptions())
+const iceOptions = computed(() => getIceTypes())
 const methodOptions = computed(() => getMethodsAsOptions())
 const categoryOptions = computed(() => getCocktailCategoriesAsOptions())
+const cocktailStyleOptions = computed(() => getCocktailStyles())
 
 // ── Computed ─────────────────────────────────────
 const isNew = computed(() => !props.cocktail?.id)
 
-// ── Mapping: Spirit de base -> Catégorie réelle ──────────────────────────────
-const spiritToCategoryMap = {
-  // Whiskey Family
-  'bourbon': 'Whiskey',
-  'rye': 'Whiskey',
-  'scotch': 'Whiskey',
-  'irish_whiskey': 'Whiskey',
-  'peated_whisky': 'Whiskey',
-  'whiskey': 'Whiskey',
-  
-  // Rum
-  'rum': 'Rum',
-  'rum_agricol': 'Rum',
-  'rum_jamaican': 'Rum',
-  'rum_cuban': 'Rum',
-  'rum_overproof': 'Rum',
-  'cachaca': 'Rum',
-  
-  // Agave
-  'tequila': 'Agave',
-  'tequila_reposado': 'Agave',
-  'mezcal': 'Agave',
-  
-  // Gin
-  'gin': 'Gin',
-  'gin_dry': 'Gin',
-  'gin_navy': 'Gin',
-  'genever': 'Gin',
-  
-  // Vodka
-  'vodka': 'Vodka',
-  
-  // Brandy Family
-  'cognac': 'Brandy',
-  'brandy': 'Brandy',
-  'calvados': 'Brandy',
-  'pisco': 'Brandy',
-  'grappa': 'Brandy',
-  
-  // Absinthe
-  'absinthe': 'Absinthe',
-  'pastis': 'Absinthe',
-  'aquavit': 'Aquavit',
-}
-
-// ── Catégories listées pour le dropdown Spirit ──────────────────────────────
-const categories = [
-  {
-    key: 'Whiskey_Family', label: '🥃 Whiskey',
-    spirits: [
-      { key: 'bourbon', label: 'Bourbon' },
-      { key: 'rye',     label: 'Rye' },
-      { key: 'scotch',  label: 'Scotch' },
-      { key: 'irish_whiskey', label: 'Irish Whiskey' },
-      { key: 'peated_whisky', label: 'Islay / Peated' },
-      { key: 'whiskey', label: 'Whiskey (autre)' },
-    ]
-  },
-  {
-    key: 'Rum_Family', label: '🍹 Rhum',
-    spirits: [
-      { key: 'rum',          label: 'Rum blanc' },
-      { key: 'rum_agricol',  label: 'Rhum Agricole' },
-      { key: 'rum_jamaican', label: 'Rhum Jamaïcain' },
-      { key: 'rum_cuban',    label: 'Rhum Cubain' },
-      { key: 'rum_overproof',label: 'Overproof' },
-      { key: 'cachaca',      label: 'Cachaça' },
-    ]
-  },
-  {
-    key: 'Agave_Family', label: '🌵 Agave',
-    spirits: [
-      { key: 'tequila',          label: 'Tequila Blanco' },
-      { key: 'tequila_reposado', label: 'Tequila Reposado' },
-      { key: 'mezcal',           label: 'Mezcal' },
-    ]
-  },
-  {
-    key: 'Gin', label: '🌿 Gin',
-    spirits: [
-      { key: 'gin',      label: 'Gin' },
-      { key: 'gin_dry',  label: 'Dry Gin' },
-      { key: 'gin_navy', label: 'Navy Strength' },
-      { key: 'genever',  label: 'Genièvre' },
-    ]
-  },
-  {
-    key: 'Vodka', label: '❄️ Vodka',
-    spirits: [{ key: 'vodka', label: 'Vodka' }]
-  },
-  {
-    key: 'Brandy_Family', label: '🍇 Brandy',
-    spirits: [
-      { key: 'cognac',   label: 'Cognac' },
-      { key: 'brandy',   label: 'Brandy' },
-      { key: 'calvados', label: 'Calvados' },
-      { key: 'pisco',    label: 'Pisco' },
-      { key: 'grappa',   label: 'Grappa' },
-    ]
-  },
-  {
-    key: 'Absinthe', label: '🌱 Absinthe / Pastis',
-    spirits: [
-      { key: 'absinthe', label: 'Absinthe' },
-      { key: 'pastis',   label: 'Pastis' },
-      { key: 'aquavit',  label: 'Aquavit' },
-    ]
-  },
-]
+// ── ABV calculé automatiquement depuis la recette ──
+const computedAbv = computed(() => {
+  let totalMl = 0
+  let totalAlcMl = 0
+  form.value.recipe.forEach(ing => {
+    const ml = parseFloat(ing.Ml) || (parseFloat(ing.Oz) || 0) * 29.5735
+    if (!ml) return
+    const matched = INGREDIENTS_MAP[ing.Type]
+    const abv = matched?.abv ?? 0
+    totalMl += ml
+    totalAlcMl += (ml * abv) / 100
+  })
+  if (totalMl === 0) return 0
+  return Math.round((totalAlcMl / totalMl) * 100 * 10) / 10
+})
 
 function autoFillCategory() {
   const spirit = form.value.base_spirit
-  if (!spirit) {
-    form.value.category = ''
-    return
-  }
-  // Utiliser le mapping pour obtenir la vraie valeur de catégorie
-  const categoryValue = spiritToCategoryMap[spirit]
-  if (categoryValue) {
-    form.value.category = categoryValue
-  }
+  form.value.category = spirit ? (spiritToCategoryMap[spirit] ?? '') : ''
 }
-
-// ── Options chips ─────────────────────────────────
-const seasonOptions = [
-  { key: 'spring', icon: '🌸', label: 'Printemps' },
-  { key: 'summer', icon: '☀️', label: 'Été' },
-  { key: 'fall',   icon: '🍂', label: 'Automne' },
-  { key: 'winter', icon: '❄️', label: 'Hiver' },
-]
-
-const profileOptions = [
-  { key: 'Citrus',     icon: '🍋', label: 'Agrume' },
-  { key: 'Fruity',     icon: '🍒', label: 'Fruité' },
-  { key: 'Tropical',   icon: '🌴', label: 'Tropical' },
-  { key: 'Herbal',     icon: '🌿', label: 'Herbacé' },
-  { key: 'Floral',     icon: '🌸', label: 'Floral' },
-  { key: 'Spicy',      icon: '🌶️', label: 'Épicé' },
-  { key: 'Smoky',      icon: '🔥', label: 'Fumé' },
-  { key: 'Bitter',     icon: '😬', label: 'Amer' },
-  { key: 'Sour',       icon: '😮', label: 'Acidulé' },
-  { key: 'Sweet',      icon: '🍯', label: 'Sucré' },
-  { key: 'Dry',        icon: '🏜️', label: 'Sec' },
-  { key: 'Refreshing', icon: '💧', label: 'Frais' },
-  { key: 'Rich',       icon: '✨', label: 'Riche' },
-  { key: 'Creamy',     icon: '🥛', label: 'Crémeux' },
-  { key: 'Nutty',      icon: '🌰', label: 'Noisetté' },
-  { key: 'Boozy',      icon: '💥', label: 'Corsé' },
-]
-
-const iceOptions = [
-  { key: 'cubed',      icon: '🧊', label: 'Glaçons cubiques' },
-  { key: 'crushed',    icon: '🧊', label: 'Glaçons concassés' },
-  { key: 'cracked',    icon: '🧊', label: 'Glaçons fissurés' },
-  { key: 'spear',      icon: '🧊', label: 'Glaçons en pics' },
-  { key: 'block',      icon: '🧊', label: 'Bloc de glaçon' },
-  { key: 'no_ice',     icon: '🌡️', label: 'Sans glaçons' },
-]
+const profileOptions = getProfileOptions()
 
 // ── Formulaire ────────────────────────────────────
+// ice: string (une seule valeur) au lieu d'array
+const iceInitial = (() => {
+  const raw = props.cocktail?.ice
+  if (Array.isArray(raw) && raw.length > 0) return raw[0]
+  if (typeof raw === 'string') return raw
+  return ''
+})()
+
 const form = ref({
-  id:            props.cocktail?.id          ?? null,
-  name:          props.cocktail?.name        ?? '',
-  base_spirit:   props.cocktail?.base_spirit ?? '',
-  category:      props.cocktail?.category    ?? '',
-  glass:         props.cocktail?.glass       ?? '',
-  method:        props.cocktail?.method      ?? '',
-  difficulty:    props.cocktail?.difficulty  ?? '',
-  abv:           props.cocktail?.abv         ?? 0,
-  description:   props.cocktail?.description ?? '',
-  image:         props.cocktail?.image       ?? '',
-  creator:       props.cocktail?.creator     ?? '',
+  id:             props.cocktail?.id             ?? null,
+  name:           props.cocktail?.name           ?? '',
+  base_spirit:    props.cocktail?.base_spirit    ?? '',
+  category:       props.cocktail?.category       ?? '',
+  glass:          props.cocktail?.glass          ?? '',
+  method:         props.cocktail?.method         ?? '',
+  abv:            props.cocktail?.abv            ?? 0,
+  description:    props.cocktail?.description    ?? '',
+  image:          props.cocktail?.image          ?? '',
+  creator:        props.cocktail?.creator        ?? '',
   cocktail_style: props.cocktail?.cocktail_style ?? '',
-  season:    [...(props.cocktail?.season  ?? [])],
-  profile:   [...(props.cocktail?.profile ?? [])],
-  tags:      [...(props.cocktail?.tags    ?? [])],
-  ice:       [...(props.cocktail?.ice     ?? [])],
+  season:  [...(props.cocktail?.season  ?? [])],
+  profile: [...(props.cocktail?.profile ?? [])],
+  tags:    [...(props.cocktail?.tags    ?? [])],
+  ice:     iceInitial,
   recipe: (props.cocktail?.recipe ?? [])
     .filter(i => i.Ingredient?.trim())
-    .map(i => ({
-      Ingredient: i.Ingredient ?? '',
-      Type:       i.Type       ?? '',
-      Oz:         i.Oz         ?? '',
-      Ml:         i.Ml         ?? '',
-      Dashes:     i.Dashes     ?? null,
-    })),
+    .map(i => {
+      const type = i.Type ?? ''
+      return {
+        Ingredient: i.Ingredient ?? '',
+        Type: type,
+        Category: findCategoryFromType(type), // 💥 clé du fix
+        Oz: i.Oz ?? '',
+        Ml: i.Ml ?? '',
+        Dashes: i.Dashes ?? null,
+      }
+    }),
 })
 
 // Détecter l'unité des données existantes
 if (props.cocktail?.recipe?.some(i => i.Ml)) unit.value = 'ml'
 
 // ── Helpers ───────────────────────────────────────
-function toggleSeason(key) {
-  const idx = form.value.season.indexOf(key)
-  if (idx > -1) form.value.season.splice(idx, 1)
-  else          form.value.season.push(key)
-}
-
 function toggleProfile(key) {
   const idx = form.value.profile.indexOf(key)
   if (idx > -1) form.value.profile.splice(idx, 1)
   else          form.value.profile.push(key)
 }
 
-function toggleIce(key) {
-  const idx = form.value.ice.indexOf(key)
-  if (idx > -1) form.value.ice.splice(idx, 1)
-  else          form.value.ice.push(key)
-}
-
 function addRecipeLine() {
-  form.value.recipe.push({ Ingredient: '', Type: '', Oz: '', Ml: '', Dashes: null })
+  form.value.recipe.push({
+    Category: '',
+    Type: '',
+    Ingredient: '',
+    Oz: '',
+    Ml: '',
+    Dashes: null
+  })
 }
 
 function removeRecipeLine(idx) {
   form.value.recipe.splice(idx, 1)
+  delete recipeCategoryFilter[idx]
 }
 
 function handleSave() {
   try {
-    const validated = validateCocktail(form.value)
+    const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
+    const iceArr = form.value.ice ? [form.value.ice] : []
+
+    const cleanedRecipe = form.value.recipe
+      .filter(ing => ing.Type)
+      .map(({ Category, ...rest }) => ({
+        Ingredient: rest.Ingredient,
+        Type: rest.Type,
+        IsGarnish: Category === 'garnish',
+        Oz: normalizeNumber(rest.Oz),
+        Ml: normalizeNumber(rest.Ml),
+        Dashes: normalizeNumber(rest.Dashes),
+      }))
+
+    const validated = validateCocktail({
+      ...form.value,
+      recipe: cleanedRecipe,
+      abv: abvFinal,
+      ice: iceArr,
+    })
 
     if (!props.barId) {
       throw new Error('barId manquant')
@@ -552,5 +454,65 @@ function handleSave() {
   } catch (err) {
     alert(`❌ ${err.message}`)
   }
+}
+
+function onCategoryChange(ing) {
+  ing.Type = ''
+  ing.Ingredient = ''
+}
+
+function onIngredientChange(ing) {
+  const meta = INGREDIENTS_MAP[ing.Type]
+  if (meta) {
+    ing.Ingredient = meta.name
+  }
+}
+
+function findCategoryFromType(type) {
+  for (const [catKey, items] of Object.entries(INGREDIENTS_BY_CATEGORY)) {
+    if (items[type]) return catKey
+  }
+  return ''
+}
+
+function getTypesByCategory(cat) {
+  const raw = INGREDIENTS_BY_CATEGORY[cat] || {}
+  return Object.fromEntries(
+    Object.entries(raw).sort(([, a], [, b]) => a.name.localeCompare(b.name, 'fr'))
+  )
+}
+
+function ozToMl(oz) {
+  const val = parseFloat(oz)
+  if (isNaN(val)) return ''
+  return Math.round(val * 30)
+}
+
+function mlToOz(ml) {
+  const val = parseFloat(ml)
+  if (isNaN(val)) return ''
+  return (val / 30).toFixed(2)
+}
+
+function onOzChange(ing) {
+  if (!ing.Oz && ing.Oz !== 0) {
+    ing.Ml = null
+    return
+  }
+  ing.Ml = ozToMl(ing.Oz)
+}
+
+function onMlChange(ing) {
+  if (!ing.Ml && ing.Ml !== 0) {
+    ing.Oz = null
+    return
+  }
+  ing.Oz = mlToOz(ing.Ml)
+}
+
+function normalizeNumber(val) {
+  if (val === '' || val === null || val === undefined) return null
+  const n = Number(val)
+  return isNaN(n) ? null : n
 }
 </script>
