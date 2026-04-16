@@ -28,7 +28,6 @@
             <div class="form-field">
               <label class="form-label">Spirit de base</label>
               <select v-model="form.base_spirit" @change="autoFillCategory" class="form-input">
-                <option value="">-- Choisir --</option>
                 <optgroup v-for="cat in categories" :key="cat.key" :label="cat.label">
                   <option v-for="spirit in cat.spirits" :key="spirit.key" :value="spirit.key">
                     {{ spirit.label }}
@@ -38,8 +37,7 @@
             </div>
             <div class="form-field">
               <label class="form-label">Catégorie</label>
-              <select v-model="form.category" class="form-input" :disabled="!!form.base_spirit">
-                <option value="">-- Choisir --</option>
+              <select v-model="form.category" class="form-input" :disabled=true>
                 <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">{{ cat.label }}</option>
               </select>
             </div>
@@ -49,7 +47,6 @@
             <div class="form-field">
               <label class="form-label">Verre</label>
               <select v-model="form.glass" class="form-input">
-                <option value="">-- Choisir --</option>
                 <option v-for="glass in glassOptions" :key="glass.value" :value="glass.value">
                   {{ glass.label }}
                 </option>
@@ -58,7 +55,6 @@
             <div class="form-field">
               <label class="form-label">Méthode</label>
               <select v-model="form.method" class="form-input">
-                <option value="">-- Choisir --</option>
                 <option v-for="method in methodOptions" :key="method.value" :value="method.value">
                   {{ method.label }}
                 </option>
@@ -160,9 +156,8 @@
 
           <!-- En-têtes colonnes -->
           <div class="recipe-columns-header">
-            <span>Ingrédient</span>
             <span>Catégorie</span>
-            <span>Type</span>
+            <span>Ingrédient</span>
             <span>{{ unit === 'oz' ? 'Oz' : 'Ml' }}</span>
             <span>Dash</span>
             <span></span>
@@ -179,7 +174,6 @@
             >
               <!-- categorie l'ingrédient -->
               <select v-model="ing.Category" @change="onCategoryChange(ing)" class="form-input">
-                <option value="">-- Catégorie --</option>
                 <option
                   v-for="(_, catKey) in INGREDIENTS_BY_CATEGORY"
                   :key="catKey"
@@ -191,7 +185,6 @@
 
               <!-- Nom de l'ingrédient -->
               <select v-model="ing.Type" @change="onIngredientChange(ing)" class="form-input">
-                <option value="">-- Ingrédient --</option>
                 <option
                   v-for="(item, typeKey) in getTypesByCategory(ing.Category)"
                   :key="typeKey"
