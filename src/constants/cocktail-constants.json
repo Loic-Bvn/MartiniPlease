@@ -174,130 +174,130 @@
         "family": "Pastis"
       }
     },
-    "liqueurs": {
+    "licors": {
       "aperol": {
         "name": "Aperol",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 11.0,
         "family": "Liqueur Amer"
       },
       "campari": {
         "name": "Campari",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 24.0,
         "family": "Liqueur Amer"
       },
       "cynar": {
         "name": "Cynar",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 16.5,
         "family": "Liqueur Amer"
       },
       "fernet_branca": {
         "name": "Fernet Branca",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 39.0,
         "family": "Liqueur Amer"
       },
       "amaretto": {
         "name": "Amaretto",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 21.0,
         "family": "Liqueur Noix"
       },
       "frangelico": {
         "name": "Frangelico",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 20.0,
         "family": "Liqueur Noix"
       },
       "chartreuse_green": {
         "name": "Chartreuse Verte",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 55.0,
         "family": "Liqueur Herbes"
       },
       "chartreuse_yellow": {
         "name": "Chartreuse Jaune",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 40.0,
         "family": "Liqueur Herbes"
       },
       "benedictine": {
         "name": "Bénédictine",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 40.0,
         "family": "Liqueur Herbes"
       },
       "galliano": {
         "name": "Galliano",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 42.3,
         "family": "Liqueur Herbes"
       },
       "allspice": {
         "name": "AllSpice Dram",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 22.0,
         "family": "Liqueur Herbes"
       },
       "falernum": {
         "name": "Falernum",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 11.0,
         "family": "Liqueur Herbes"
       },
       "cherry_heering": {
         "name": "Cherry Heering",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 24.0,
         "family": "Liqueur Fruits"
       },
       "maraschino": {
         "name": "Maraschino",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 32.0,
         "family": "Liqueur Fruits"
       },
       "sloe_gin": {
         "name": "Sloe Gin",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 26.0,
         "family": "Liqueur Fruits"
       },
       "triple_sec": {
         "name": "Triple Sec",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 40.0,
         "family": "Liqueur Agrume"
       },
       "curacao": {
         "name": "Curaçao",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 40.0,
         "family": "Liqueur Agrume"
       },
       "limoncello": {
         "name": "Limoncello",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 26.0,
         "family": "Liqueur Agrume"
       },
       "baileys": {
         "name": "Baileys",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 17.0,
         "family": "Liqueur Dessert"
       },
       "drambuie": {
         "name": "Drambuie",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 40.0,
         "family": "Liqueur Dessert"
       },
       "pimms": {
         "name": "Pimm's",
-        "category": "liqueurs",
+        "category": "licors",
         "abv": 25.0,
         "family": "Liqueur Fruits"
       },
@@ -1118,27 +1118,19 @@
   },
   "ice_types": {
     "cubed": {
-      "name": "Glaçons cubiques",
+      "name": "Ice Cubes",
       "emoji": "🧊"
     },
     "crushed": {
-      "name": "Glaçons concassés",
-      "emoji": "🧊"
+      "name": "Crushed Ice",
+      "emoji": "❄️"
     },
-    "cracked": {
-      "name": "Glaçons fissurés",
-      "emoji": "🧊"
-    },
-    "spear": {
-      "name": "Glaçons en pics",
-      "emoji": "🧊"
-    },
-    "block": {
-      "name": "Bloc de glaçon",
+    "clear": {
+      "name": "Clear Ice",
       "emoji": "🧊"
     },
     "no_ice": {
-      "name": "Sans glaçons",
+      "name": "No Ice",
       "emoji": "🌡️"
     }
   },

@@ -53,7 +53,8 @@ export function getAllIngredients() {
  */
 export function getIngredientsByCategory() {
   const constants = loadedConstants || loadConstants()
-  return constants.ingredients || {}
+  const { description, ...categories } = constants.ingredients || {}
+  return categories
 }
 
 /**
@@ -98,6 +99,12 @@ export function getProfiles() {
   return constants.profiles || {}
 }
 
+export function getProfileOptions() {
+  const profiles = getProfiles()
+  return Object.entries(profiles)
+    .map(([key, data]) => ({ key, icon: data.emoji, label: data.name }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+}
 /**
  * Convertir profiles en array pour chips (comme dans CocktailModal)
  */
@@ -155,7 +162,7 @@ export function getDifficulties() {
  */
 export function getCocktailStyles() {
   const constants = loadedConstants || loadConstants()
-  return constants.cocktail_styles || []
+  return [...(constants.cocktail_styles || [])].sort((a, b) => a.localeCompare(b, 'fr'))
 }
 
 /**
@@ -171,10 +178,9 @@ export function getCocktailCategories() {
  */
 export function getGlassesAsOptions() {
   const glasses = getGlasses()
-  return Object.entries(glasses).map(([key, data]) => ({
-    value: key,
-    label: `${data.emoji} ${data.name}`
-  }))
+  return Object.entries(glasses)
+    .map(([key, data]) => ({ value: key, label: `${data.emoji} ${data.name}` }))
+    .sort((a, b) => a.label.slice(2).localeCompare(b.label, 'fr'))
 }
 
 /**
@@ -182,10 +188,9 @@ export function getGlassesAsOptions() {
  */
 export function getMethodsAsOptions() {
   const methods = getMethods()
-  return Object.entries(methods).map(([key, data]) => ({
-    value: key,
-    label: `${data.emoji} ${data.name}`
-  }))
+  return Object.entries(methods)
+    .map(([key, data]) => ({ value: key, label: `${data.emoji} ${data.name}` }))
+    .sort((a, b) => a.label.slice(2).localeCompare(b.label, 'fr'))
 }
 
 /**
@@ -193,11 +198,63 @@ export function getMethodsAsOptions() {
  */
 export function getCocktailCategoriesAsOptions() {
   const categories = getCocktailCategories()
-  return Object.entries(categories).map(([key, data]) => ({
-    value: data.key,  // Utiliser data.key comme valeur réelle
-    label: data.label,
-    familyKey: key   // Garder la clé de famille pour usage interne
-  }))
+  return Object.entries(categories)
+    .map(([key, data]) => ({ value: data.key, label: data.label, familyKey: key }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+}
+
+/**
+ * Retourne les spirits groupés par famille pour le dropdown
+ * Format: [{ key, label, spirits: [{ key, label }] }]
+ */
+export function getBaseSpiritGroups() {
+  const constants = loadedConstants || loadConstants()
+  const spirits = constants.ingredients?.spirits || {}
+  const categories = constants.cocktail_categories || {}
+
+  // Grouper les spirits par family
+  const groups = {}
+  Object.entries(spirits).forEach(([key, data]) => {
+    const family = data.family
+    if (!groups[family]) groups[family] = []
+    groups[family].push({ key, label: data.name })
+  })
+
+  // Ordonner les spirits dans chaque groupe
+  Object.values(groups).forEach(g => g.sort((a, b) => a.label.localeCompare(b.label, 'fr')))
+
+  // Mapper sur cocktail_categories pour avoir le bon label/emoji
+  return Object.entries(categories)
+    .filter(([, cat]) => groups[cat.key])
+    .map(([familyKey, cat]) => ({
+      key: familyKey,
+      label: cat.label,
+      categoryValue: cat.key,
+      spirits: groups[cat.key],
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+}
+
+/**
+ * Retourne un mapping spiritKey -> categoryValue
+ * Ex: { bourbon: 'Whiskey', gin: 'Gin', ... }
+ */
+export function getSpiritToCategoryMap() {
+  const constants = loadedConstants || loadConstants()
+  const spirits = constants.ingredients?.spirits || {}
+  const categories = constants.cocktail_categories || {}
+
+  // Inverser cocktail_categories : { Whiskey: 'Whiskey', Rum: 'Rum', ... }
+  const familyToCategory = {}
+  Object.values(categories).forEach(cat => { familyToCategory[cat.key] = cat.key })
+
+  const map = {}
+  Object.entries(spirits).forEach(([key, data]) => {
+    if (familyToCategory[data.family]) {
+      map[key] = familyToCategory[data.family]
+    }
+  })
+  return map
 }
 
 /**

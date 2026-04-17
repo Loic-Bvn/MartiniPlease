@@ -95,7 +95,7 @@
                   <!-- SECTION : GESTION -->
                   <div v-if="bars.length >= 1 && !showBarsSelection && activeBarId">
                     <button 
-                      @click="showBarsSelection = true; burgerOpen = false" 
+                      @click="showBarsSelection = true; burgerOpen = false; searchTerm.value = ''"
                       class="burger-item"
                     >
                       <Folder :size="16" />
