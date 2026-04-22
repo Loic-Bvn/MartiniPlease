@@ -57,6 +57,12 @@
         <span v-if="cocktail.method && isBartenderMode" class="badge-method">
           {{ methodLabel }}
         </span>
+        <!-- <span v-if="cocktail.ice && isBartenderMode" class="badge-method">
+          {{ iceLabel }}
+        </span> -->
+        <span v-if="cocktail.glass && isBartenderMode" class="badge-method">
+          {{ glassLabel }}
+        </span>
       </div>
 
       <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
@@ -234,6 +240,23 @@ const METHOD_LABELS = {
 }
 
 const methodLabel = computed(() => METHOD_LABELS[props.cocktail.method] || props.cocktail.method)
+
+const ICE_LABELS = {
+  // cubes:       'Cubes',
+  // clear:       'Clear',
+  // crushed:     'Crushed',
+  // none:        'None',
+}
+const iceLabel = computed(() => ICE_LABELS[props.cocktail.ice] || props.cocktail.ice)
+
+const GLASS_LABELS = {
+  // rocks:       'Rocks',
+  // coupe:       'Coupe',
+  // martini:     'Martini',
+  // highball:    'Highball',
+}
+const glassLabel = computed(() => GLASS_LABELS[props.cocktail.glass] || props.cocktail.glass)
+
 
 async function handleSubmit() {
   const { success } = await submitToCatalog(props.cocktail)
