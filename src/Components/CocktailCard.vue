@@ -18,34 +18,6 @@
             </span>
         </div>
       </div>
-
-      <!-- Actions -->
-      <div class="header-actions shrink-0">
-        <!-- Bouton edit, delete et push (mode bartender uniquement) -->
-        <template v-if="isBartenderMode">
-          <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
-            <Pencil :size="18" />
-          </button>
-          <button @click="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
-            <Trash2 :size="18" />
-          </button>
-          <button
-            v-if="!isSubmitted(cocktail.id)"
-            @click="handleSubmit"
-            class="btn-icon btn-icon--submit"
-            :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
-          >
-            <Upload :size="18" />
-          </button>
-          <span
-            v-else
-            class="btn-icon btn-icon--submitted"
-            :title="locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
-          >
-            <Bookmark :size="18" />
-          </span>
-        </template>
-      </div>
     </div>
 
     <!-- Recette -->
@@ -68,7 +40,7 @@
 
     <!-- Footer : tags du cocktail -->
     <div class="card-footer">
-      <div class="footer-left">
+      <div class="footer-left" style="display:flex; align-items:center; gap:6px;">
         <!--<span v-if="makeable" class="badge-makeable" :title="t.makeable">
           <Check :size="16" />
         </span>
@@ -105,7 +77,29 @@
           <GlassWater :size="16" />
         </button>
 
-
+        <template v-if="isBartenderMode">
+          <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
+            <Pencil :size="16" />
+          </button>
+          <button @click="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
+            <Trash2 :size="16" />
+          </button>
+          <button
+            v-if="!isSubmitted(cocktail.id)"
+            @click="handleSubmit"
+            class="btn-icon btn-icon--submit"
+            :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
+          >
+            <Upload :size="16" />
+          </button>
+          <span
+            v-else
+            class="btn-icon btn-icon--submitted"
+            :title="locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
+          >
+            <Bookmark :size="16" />
+          </span>
+        </template>
       </div>
     </div>
 
