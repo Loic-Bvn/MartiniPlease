@@ -55,6 +55,7 @@ export function useMenuCards() {
         .from('menu_cards')
         .update({ name: cardData.name, cocktail_ids: cardData.cocktail_ids })
         .eq('id', id)
+        .eq('bar_id', currentBarId.value)
         .select()
         .single()
 
@@ -74,6 +75,7 @@ export function useMenuCards() {
         .from('menu_cards')
         .delete()
         .eq('id', id)
+        .eq('bar_id', currentBarId.value)
 
       if (error) throw error
       menuCards.value = menuCards.value.filter(c => c.id !== id)

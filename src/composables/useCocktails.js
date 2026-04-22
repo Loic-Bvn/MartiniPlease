@@ -86,6 +86,7 @@ export function useCocktails() {
 
   async function deleteCocktail(id) {
     const barId = currentBarId.value
+    if (!barId) return { success: false, error: 'Non connecté' }
 
     try {
       const { error } = await supabase

@@ -4,43 +4,23 @@
     <!-- Header -->
     <div class="card-header">
       <div class="min-w-0 flex-1">
-        <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-          {{ cocktail.name }}
-        </h3>
+        <div class="cocktail-title-row">
+          <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
+            {{ cocktail.name }}
+          </h3>
+            <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
+        </div>
         <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
-            <span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cocktail-creator-meta">{{ cocktail.creator }}</span>
+            <!-- HIDE COCKTAIL CREATOR FOR NOW-->
+            <!--<span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cocktail-creator-meta">by {{ cocktail.creator }}</span>-->
             <span v-if="cocktail.profile?.length" class="profile-tags">
               <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
             </span>
-            <span v-if="cocktail.abv != null" class="cocktail-subtitle--abv">{{ cocktail.abv }}°</span>
         </div>
       </div>
 
       <!-- Actions -->
       <div class="header-actions shrink-0">
-        <!-- Bouton favori et historique (mode drinker uniquement) -->
-        <button
-          v-if="hasDrinker && !isBartenderMode"
-          @click="handleFavorite"
-          :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
-          :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
-        >
-          <Heart :size="16" :fill="isFav ? 'currentColor' : 'none'" />
-        </button>
-        <button
-          v-if="hasDrinker && !isBartenderMode"
-          @click="handleHistoric"
-          class="btn-order-simple"
-          :class="{ 'is-active': isChecked }"
-          title="Commander"
-        >
-          <transition name="tick-pop" mode="out-in">
-            <Check v-if="isChecked" :key="'check'" :size="16" />
-
-            <GlassWater v-else :key="'glass'" :size="16" />
-          </transition>
-        </button>
-
         <!-- Bouton edit, delete et push (mode bartender uniquement) -->
         <template v-if="isBartenderMode">
           <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
@@ -89,25 +69,43 @@
     <!-- Footer : tags du cocktail -->
     <div class="card-footer">
       <div class="footer-left">
-        <span v-if="makeable" class="badge-makeable" :title="t.makeable">
+        <!--<span v-if="makeable" class="badge-makeable" :title="t.makeable">
           <Check :size="16" />
         </span>
         <span v-else class="badge-missing" :title="t.notMakeable">
           <XIcon :size="16" />
+        </span>-->
+        <span v-if="cocktail.cocktail_style" class="badge-method">
+          {{ styleLabel }}
+        </span>
+        <!--<span v-if="cocktail.abv > 0" class="badge-method">
+          {{ baseSpiritLabel }}
+        </span>
+        <span v-else class="badge-method">Mocktail</span>-->
+        <span v-if="cocktail.method && isBartenderMode" class="badge-method">
+          {{ methodLabel }}
         </span>
       </div>
 
       <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
-        <span v-if="cocktail.cocktail_style" :class="['badge-style', 'badge-style--' + cocktail.cocktail_style]">
-          {{ styleLabel }}
-        </span>
-        <span v-if="cocktail.abv > 0" class="badge-method">
-          {{ baseSpiritLabel }}
-        </span>
-        <span v-else class="badge-method">Mocktail</span>
-        <span v-if="cocktail.method" class="badge-method">
-          {{ methodLabel }}
-        </span>
+        <button
+          v-if="hasDrinker && !isBartenderMode"
+          @click="handleFavorite"
+          :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
+          :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        >
+          <Heart :size="16" :fill="isFav ? 'currentColor' : 'none'" />
+        </button>
+        <button
+          v-if="hasDrinker && !isBartenderMode"
+          @click="handleHistoric"
+          class="btn-order-simple"
+          title="Commander"
+        >
+          <GlassWater :size="16" />
+        </button>
+
+
       </div>
     </div>
 
@@ -123,6 +121,7 @@ import { useOrders } from '@/composables/useOrders'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { Upload, Bookmark } from 'lucide-vue-next'
 import { useCatalog } from '@/composables/useCatalog'
+import { useToast } from '@/composables/useToast'
 
 const { isSubmitted, submitToCatalog } = useCatalog()
 const isChecked = ref(false)
@@ -133,6 +132,7 @@ const props = defineProps({
   unit:            { type: String, default: 'oz' },
   barId:           { type: String, default: '' },
 })
+const { showToast } = useToast()
 
 defineEmits(['edit', 'delete'])
 
@@ -164,7 +164,6 @@ async function handleFavorite() {
 }
 
 async function handleHistoric() {
-  console.log('🍸 handleHistoric called', { hasDrinker: hasDrinker.value, drinker: drinker.value, barId: props.barId })
   
   if (isChecked.value) {
     console.warn('⚠️ Already checked, ignoring')
@@ -183,20 +182,12 @@ async function handleHistoric() {
     return
   }
 
-  console.log('✅ All checks passed, creating order...')
   // Créer une commande pour le bartender
   const result = await addOrder(drinker.value, props.cocktail.id, props.barId)
-
-  console.log('📊 Order result:', result)
   
   if (result.success) {
-    // Rafraîchir rapidement l'historique du drinker
     await quickRefreshHistory()
-    
-    isChecked.value = true
-    setTimeout(() => {
-      isChecked.value = false
-    }, 900)
+    showToast('🍸 ' + props.cocktail.name + (props.locale === 'fr' ? ' commandé !' : ' ordered!'))
   } else {
     console.error('❌ Order failed:', result.error)
   }

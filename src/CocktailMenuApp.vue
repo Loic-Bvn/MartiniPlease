@@ -95,7 +95,7 @@
                   <!-- SECTION : GESTION -->
                   <div v-if="bars.length >= 1 && !showBarsSelection && activeBarId">
                     <button 
-                      @click="showBarsSelection = true; burgerOpen = false; searchTerm.value = ''"
+                      @click="openBarsSelection"
                       class="burger-item"
                     >
                       <Folder :size="16" />
@@ -794,8 +794,9 @@ import { supabase }    from '@/lib/supabase'
 import { parseHash, setHash, clearHash, buildShareUrl, slugify } from '@/composables/useRouter'
 import { useCatalog } from '@/composables/useCatalog'
 import CatalogModal from '@/Components/Modals/CatalogModal.vue'
+import { useToast } from '@/composables/useToast'
 
-const { isLoggedIn, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, isBarPublic, session, initAuth, signOut, fetchBar, switchBar, toggleBarPublic, createNewBar, updateBarName, updateInviteCode } = useAuth()
+const { isLoggedIn, bar, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, isBarPublic, session, initAuth, signOut, fetchBar, toggleBarPublic, createNewBar, updateBarName, updateInviteCode } = useAuth()
 
 // Bar chargé via code d'invitation (guest sans compte)
 const guestBar = ref(null)
@@ -806,6 +807,7 @@ const { barInventory, ingredients, fetchIngredients, initializeDefaultIngredient
 const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCard } = useMenuCards()
 const { hasDrinker, drinkerPseudo, initDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { fetchSnapshots } = useCatalog()
+const { toastMessage, showToast } = useToast()
 
 // Logos disponibles
 const base = import.meta.env.BASE_URL // ex: '/'
@@ -859,6 +861,7 @@ async function handleSignOut() {
 async function selectBar(b) {
   await fetchBar(b.id)
   showBarsSelection.value = false
+  setHash(b.invite_code)
   await Promise.all([
     fetchCocktails(b.id),
     fetchIngredients(b.id),
@@ -906,9 +909,7 @@ const handleInvite = async () => {
   try {
     await navigator.clipboard.writeText(link)
     inviteCopied.value = true
-    showToast(
-      locale === 'fr' ? 'Lien copié 🍸' : 'Link copied 🍸'
-    )
+    showToast(locale.value === 'fr' ? 'Lien copié 🍸' : 'Link copied 🍸')
 
     setTimeout(() => {
       inviteCopied.value = false
@@ -1513,13 +1514,23 @@ async function handleCatalogImport(newCocktail) {
   } 
 }
 
-const toastMessage = ref('')
+//const toastMessage = ref('')
 
-const showToast = (message) => {
-  toastMessage.value = message
+//const showToast = (message) => {
+//  toastMessage.value = message
+//
+//  setTimeout(() => {
+//    toastMessage.value = ''
+//  }, 2000)
+//}
 
-  setTimeout(() => {
-    toastMessage.value = ''
-  }, 2000)
+function openBarsSelection() {
+  bar.value = null
+  localStorage.removeItem('selectedBar')
+  clearHash()                  // ✅ on est en mode "sélection", pas sur un bar
+  showBarsSelection.value = true
+  burgerOpen.value = false
+  searchTerm.value = ''
 }
+
 </script>

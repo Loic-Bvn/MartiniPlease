@@ -47,22 +47,24 @@
             class="cv-card"
           >
             <!-- Card header -->
-            <div class="cv-card-header">
-              <div class="cv-card-title-row">
-                <h2 class="cv-card-name">{{ cocktail.name }}</h2>
-                <span v-if="cocktail.abv" class="cv-abv">{{ cocktail.abv }}°</span>
-              </div>
-              <div class="cv-card-meta">
-                <span v-if="cocktail.base_spirit" class="cv-spirit">
-                  {{ getTypeLabel(cocktail.base_spirit, locale) }}
-                </span>
-                <span v-if="cocktail.profile?.length" class="profile-tags">
-                  - <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
-                </span>
+            <div class="card-header">
+              <div class="min-w-0 flex-1">
+                <div class="cocktail-title-row">
+                  <!--<h2 class="cv-card-name">{{ cocktail.name }}</h2>-->
+                  <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
+                    {{ cocktail.name }}
+                  </h3>
+                  <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
+                </div>
+                <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
+                  <!-- HIDE COCKTAIL CREATOR FOR NOW-->
+                  <!--<span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cocktail-creator-meta">by {{ cocktail.creator }}</span>-->
+                  <span v-if="cocktail.profile?.length" class="profile-tags">
+                    {{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}
+                  </span>
+                </div>
               </div>
             </div>
-
-            <div class="cv-divider"></div>
 
             <!-- Recipe -->
             <div class="cv-recipe">
@@ -70,7 +72,6 @@
                 v-for="(ing, idx) in cocktail.recipe"
                 :key="idx"
                 class="cv-ing-row"
-                :class="{ 'cv-ing-garnish': ing.IsGarnish }"
               >
                 <span class="cv-ing-name">
                   {{ (ing.IsGarnish && getTypeLabel(ing.Type, locale) === ing.Type)
@@ -94,16 +95,13 @@
                 by {{ cocktail.creator }}
               </span>
               <button
+                v-if="hasDrinker && !isBartenderMode"
                 @click="handleHistoric(cocktail)"
                 class="btn-order-simple"
-                :class="{ 'is-active': isChecked }"
+                :class="{ 'is-active': checkedIds.has(cocktail.id) }"
                 title="Commander"
               >
-                <transition name="tick-pop" mode="out-in">
-                  <Check v-if="isChecked" :key="'check'" :size="16" />
-
-                  <GlassWater v-else :key="'glass'" :size="16" />
-                </transition>
+                <GlassWater :size="16" />
               </button>
             </div>
           </div>
@@ -112,6 +110,11 @@
     </div>
 
   </div>
+
+  <!-- Toast local téléporté hors du stacking context de card-view -->
+  <Teleport to="body">
+    <div v-if="toastMessage" class="toast">{{ toastMessage }}</div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -120,6 +123,7 @@ import { ArrowLeft, Sun, Moon, GlassWater } from 'lucide-vue-next'
 import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
+import { useToast } from '@/composables/useToast'
 
 const props = defineProps({
   card:      { type: Object, required: true },
@@ -206,52 +210,27 @@ const groupedCocktails = computed(() => {
   return groups
 })
 
-function seasonLabel(season) {
-  const icons = { spring: '🌸', summer: '☀️', fall: '🍂', winter: '❄️', autumn: '🍂' }
-  const s = Array.isArray(season) ? season : [season]
-  return s.map(k => icons[k] || k).join(' ')
-}
 const { hasDrinker, drinker, quickRefreshHistory } = useDrinker()
-const isChecked = ref(false)
+const checkedIds = ref(new Set())
 const { addOrder } = useOrders()
-
+const { showToast, toastMessage } = useToast()
 
 async function handleHistoric(cocktail) {
-  
-  if (isChecked.value) {
-    console.warn('⚠️ Already checked, ignoring')
-    return
-  }
-  if (!hasDrinker.value) {
-    console.warn('⚠️ No drinker')
-    return
-  }
-  if (!drinker.value) {
-    console.warn('⚠️ Drinker is null')
-    return
-  }
-  if (!props.barId) {
-    console.warn('⚠️ No barId prop')
-    return
-  }
+  if (!cocktail?.id) return
+  if (checkedIds.value.has(cocktail.id)) return
+  if (!hasDrinker.value || !drinker.value || !props.barId) return
 
-  console.log('✅ All checks passed, creating order...')
-  // Créer une commande pour le bartender
   const result = await addOrder(drinker.value, cocktail.id, props.barId)
 
-  console.log('📊 Order result:', result)
-  
   if (result.success) {
-    // Rafraîchir rapidement l'historique du drinker
     await quickRefreshHistory()
-    
-    isChecked.value = true
+    showToast('🍸 ' + cocktail.name + (props.locale === 'fr' ? ' commandé !' : ' ordered!'))
+    checkedIds.value = new Set([...checkedIds.value, cocktail.id])
     setTimeout(() => {
-      isChecked.value = false
+      const next = new Set(checkedIds.value)
+      next.delete(cocktail.id)
+      checkedIds.value = next
     }, 900)
-  } else {
-    console.error('❌ Order failed:', result.error)
   }
 }
-
 </script>
