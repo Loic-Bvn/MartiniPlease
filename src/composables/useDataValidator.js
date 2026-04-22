@@ -131,8 +131,9 @@ export function validateMenuCard(card) {
   }
 
   return {
+    ...(card.id ? { id: card.id } : {}),
     name: card.name.trim(),
-    cocktail_ids: card.cocktail_ids, // IDs sont des UUIDs - pas besoin de nettoyer
+    cocktail_ids: card.cocktail_ids,
   }
 }
 

@@ -1,0 +1,34 @@
+# TODO
+
+## Bar management view
+- Le button manage bar ne reset pas le bar id -> la barre de recherche reste affichée ducoup
+
+## DONE - Form NEW COCKTAIL
+<!-- - Modifier form NouveauCocktail -->
+    <!-- - DONE Bug lors de la creation du cocktail, pas de bar id poussé -->
+    <!-- - Dans recette: Ajouter une drop down category (spirit, licor, sirup) puis utiliser la dropdown Type avec juste les produits de la category -->
+    <!-- - Supprimer le champ difficulté, pas forcément pertinent -->
+    <!-- - Rework le naming des glacons + dropdown
+        - type de glace: Clear ice, Ice cubes, No ice, Crushed ice -->
+    <!-- - Proposer une dropdown pour les styles de cocktails -->
+    <!-- - Spirit de base force la categorie. Rendre ce champ non editable -->
+    <!-- - Calcul ABV auto ? (avec champ auto par défaut) -->
+
+## FILTER
+- Modifier modal filter
+    - Trop de filtres, on s'y perd
+    - Affiche nul, trop long comme menu
+    - le conteneur est cassé, l'ensemble des filtres n'est pas visible (sans doute due au modification du conteneur pour la gestion des commandes)
+
+## Form COCKTAIL CATALOG
+- Cassé :/
+- Rendre plus clair l'UI pour faire comprendre a l'utilisateur qu'il peut push et pull des recettes
+- Remplacer l'affichage des ingredients par les types d'ingredients (comme dans les modalCard)
+- Supprimer les étoiles
+- Avoir un status qui indique si le cocktail est déja présent dans le bar
+- supprimer drop down saison
+- Dans la vue mes Recettes, offrir la possiblité de lire la recette (comme dans la vue Catalgoe Global)
+- Est ce que la vue 'mes recettes' est vraiment utile, une fleche permet de push les cocktails sur la modal CocktailCard
+
+
+Dans CocktailMenuApp.vue — le fichier est très long (~700 lignes de <script setup>). La logique de filtrage pourrait être extraite dans un useFilters.js composable.
