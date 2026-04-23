@@ -44,71 +44,20 @@
           <div
             v-for="cocktail in group.cocktails"
             :key="cocktail.id"
-            class="cv-card"
           >
-            <!-- Card header -->
-            <div class="card-header">
-              <div class="min-w-0 flex-1">
-                <div class="cocktail-title-row">
-                  <!--<h2 class="cv-card-name">{{ cocktail.name }}</h2>-->
-                  <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-                    {{ cocktail.name }}
-                  </h3>
-                  <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
-                </div>
-                <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
-                  <!-- HIDE COCKTAIL CREATOR FOR NOW-->
-                  <!--<span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cocktail-creator-meta">by {{ cocktail.creator }}</span>-->
-                  <span v-if="cocktail.profile?.length" class="profile-tags">
-                    {{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Recipe -->
-            <div class="cv-recipe">
-              <div
-                v-for="(ing, idx) in cocktail.recipe"
-                :key="idx"
-                class="cv-ing-row"
-              >
-                <span class="cv-ing-name">
-                  {{ (ing.IsGarnish && getTypeLabel(ing.Type, locale) === ing.Type)
-                    ? ing.Ingredient
-                    : getTypeLabel(ing.Type, locale) }}
-                </span>
-                <span class="cv-ing-qty">
-                  <template v-if="unit === 'ml' && ing.Ml">{{ ing.Ml }}ml</template>
-                  <template v-else-if="ing.Oz">{{ ing.Oz }}oz</template>
-                  <template v-else-if="ing.Dashes">{{ ing.Dashes }} dash{{ ing.Dashes > 1 ? 'es' : '' }}</template>
-                  <template v-else-if="ing.IsGarnish">{{ t.garnish }}</template>
-                </span>
-              </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="cv-card-footer">
-              <span v-if="cocktail.method" class="cv-badge">{{ methodLabel(cocktail.method) }}</span>
-              <span v-if="cocktail.glass" class="cv-badge">{{ cocktail.glass }}</span>
-              <span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cv-creator">
-                by {{ cocktail.creator }}
-              </span>
-              <button
-                v-if="hasDrinker && !isBartenderMode"
-                @click="handleHistoric(cocktail)"
-                class="btn-order-simple"
-                :class="{ 'is-active': checkedIds.has(cocktail.id) }"
-                title="Commander"
-              >
-                <GlassWater :size="16" />
-              </button>
-            </div>
+          <CocktailCard
+            :cocktail="cocktail"
+            :isBartenderMode="isLoggedIn"
+            :locale="locale"
+            :unit="unit"
+            :bar-id="activeBarId"
+            @edit="$emit('edit-cocktail', cocktail)"
+            @delete="$emit('delete-cocktail', cocktail.id)"
+          />
           </div>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- Toast local téléporté hors du stacking context de card-view -->
@@ -124,6 +73,7 @@ import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { useToast } from '@/composables/useToast'
+import CocktailCard from '@/Components/CocktailCard.vue'
 
 const props = defineProps({
   card:      { type: Object, required: true },
