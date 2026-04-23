@@ -10,76 +10,85 @@
       <InventoryManager v-if="showInventory" />
     </div>
 
+    <div v-if="isLoggedIn" class="section-card">
+      <button @click="showOrdersPanel = !showOrdersPanel" class="expand-actions-btn">
+        <ChevronDown :size="18" :class="{ rotated: showOrdersPanel }" />
+        <h2 class="section-title">
+          🍸 {{ locale === 'fr' ? 'Commandes' : 'Orders' }}
+          <span v-if="pendingOrdersCount > 0" class="count-badge pending-badge">{{ pendingOrdersCount }}</span>
+        </h2>
+        <span></span>
+      </button>
+      <div v-if="showOrdersPanel" class="filters-dropdown-content">
+        <OrdersPanel :locale="locale" :unit="unit" />
+      </div>
+    </div>
+
     <div class="side-by-side">
 
-      <FilterPanel
-        :locale="locale"
-        :base-spirits="baseSpirits"
-        :liqueur-families="liqueurFamilies"
-        :profile-filters="profileFilters"
-        :style-filters="styleFilters"
-        :seasons="seasons"
-        :active-sub-spirits="activeSubSpirits"
-        :selected-families="selectedFamilies"
-        :selected-sub-spirits="selectedSubSpirits"
-        :selected-seasons="selectedSeasons"
-        :selected-profiles="selectedProfiles"
-        :selected-styles="selectedStyles"
-        :filter-mode="filterMode"
-        :abv-filter="abvFilter"
-        :show-only-makeable="showOnlyMakeable"
-        :show-only-favorites="showOnlyFavorites"
-        :has-active-filters="hasActiveFilters"
-        :has-drinker="hasDrinker"
-        :t="t"
-        @toggle-family="toggleFamily"
-        @toggle-filter="toggleFilter"
-        @toggle-filter-mode="$emit('toggle-filter-mode')"
-        @toggle-makeable="$emit('toggle-makeable')"
-        @toggle-favorites="$emit('toggle-favorites')"
-        @set-abv-filter="$emit('set-abv-filter', $event)"
-        @set-season="$emit('set-season', $event)"
-        @clear-filters="clearFilters"
-        @get-family-label="getFamilyLabel"
-        @get-sub-spirit-label="getSubSpiritLabel"
-      />
-
-      <CardPanel
-        :is-logged-in="isLoggedIn"
-        :menu-cards="menuCards"
-        :locale="locale"
-        :t="t"
-        @view-card="$emit('view-card', $event)"
-        @edit-card="$emit('edit-card', $event)"
-        @delete-card="$emit('delete-card', $event)"
-        @new-card="$emit('new-card')"
-      />
-
-      <DrinkerPanel
-        v-if="hasDrinker"
-        :locale="locale"
-        :drinker-pseudo="drinkerPseudo"
-        :favorites="favorites"
-        :favorite-cocktails="favoriteCocktails"
-        :history="history"
-        :get-cocktail-name="getCocktailName"
-        :format-date="formatDate"
-        @toggle-favorite="$emit('toggle-favorite', $event)"
-      />
-
-      <div v-if="isLoggedIn" class="section-card">
-        <button @click="showOrdersPanel = !showOrdersPanel" class="expand-actions-btn">
-          <ChevronDown :size="18" :class="{ rotated: showOrdersPanel }" />
-          <h2 class="section-title">
-            🍸 {{ locale === 'fr' ? 'Commandes' : 'Orders' }}
-            <span v-if="pendingOrdersCount > 0" class="count-badge pending-badge">{{ pendingOrdersCount }}</span>
-          </h2>
-          <span></span>
-        </button>
-        <div v-if="showOrdersPanel" class="filters-dropdown-content">
-          <OrdersPanel :locale="locale" :unit="unit" />
-        </div>
+      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+        <FilterPanel
+          :locale="locale"
+          :t="t"
+          :filter-mode="filterMode"
+          :abv-filter="abvFilter"
+          :selected-families="selectedFamilies"
+          :selected-sub-spirits="selectedSubSpirits"
+          :selected-seasons="selectedSeasons"
+          :selected-profiles="selectedProfiles"
+          :selected-styles="selectedStyles"
+          :show-only-makeable="showOnlyMakeable"
+          :show-only-favorites="showOnlyFavorites"
+          :has-active-filters="hasActiveFilters"
+          :has-drinker="hasDrinker"
+          :base-spirits="baseSpirits"
+          :liqueur-families="liqueurFamilies"
+          :profile-filters="profileFilters"
+          :style-filters="styleFilters"
+          :seasons="seasons"
+          :active-sub-spirits="activeSubSpirits"
+          :all-family-labels="allFamilyLabels"
+          :all-sub-labels="allSubLabels"
+          @toggle-family="toggleFamily"
+          @toggle-sub-spirit="$emit('toggle-sub-spirit', $event)"
+          @toggle-profile="$emit('toggle-profile', $event)"
+          @toggle-style="$emit('toggle-style', $event)"
+          @toggle-filter-mode="$emit('toggle-filter-mode', $event)"
+          @toggle-makeable="$emit('toggle-makeable')"
+          @toggle-favorites="$emit('toggle-favorites')"
+          @set-abv-filter="$emit('set-abv-filter', $event)"
+          @set-season="$emit('set-season', $event)"
+          @clear-filters="clearFilters"
+        />
       </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+
+        <CardPanel
+          :is-logged-in="isLoggedIn"
+          :menu-cards="menuCards"
+          :locale="locale"
+          :t="t"
+          @view-card="$emit('view-card', $event)"
+          @edit-card="$emit('edit-card', $event)"
+          @delete-card="$emit('delete-card', $event)"
+          @new-card="$emit('new-card')"
+        />
+
+        <DrinkerPanel
+          v-if="hasDrinker"
+          :locale="locale"
+          :drinker-pseudo="drinkerPseudo"
+          :favorites="favorites"
+          :favorite-cocktails="favoriteCocktails"
+          :history="history"
+          :get-cocktail-name="getCocktailName"
+          :format-date="formatDate"
+          @toggle-favorite="$emit('toggle-favorite', $event)"
+        />
+      </div>
+
+
 
     </div>
 
@@ -162,20 +171,29 @@ const props = defineProps({
   abvFilter: String,
   selectedProfiles: Array,
   selectedStyles: Array,
+  baseSpirits: Array,
+  liqueurFamilies: Array,
+  profileFilters: Array,
+  styleFilters: Array,
+  seasons: Array,
+  activeSubSpirits: Array,
+  allFamilyLabels: Object,
+  allSubLabels: Object,
 })
 
 const emit = defineEmits([
-  'view-card',
-  'edit-card',
-  'delete-card',
-  'new-card',
-  'toggle-favorite',
-  'edit-cocktail',
-  'delete-cocktail',
-  'new-cocktail',
+  'view-card', 'edit-card', 'delete-card', 'new-card',
+  'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail',
   'toggle-family',
-  'toggle-filter',
-  'clear-filters'
+  'toggle-sub-spirit',
+  'toggle-profile',
+  'toggle-style',
+  'toggle-filter-mode',
+  'toggle-makeable',
+  'toggle-favorites',
+  'set-abv-filter',
+  'set-season',
+  'clear-filters',
 ])
 
 const showInventory    = ref(false)
@@ -186,9 +204,11 @@ const showOrdersPanel  = ref(false)
 const drinkerTab       = ref('favorites')
 
 const {
-  baseSpirits, liqueurFamilies, profileFilters, styleFilters, seasons,
-  activeSubSpirits, makeableCount, filteredCocktails, hasActiveFilters,
-  toggleFilter, toggleFamily, clearFilters, getFamilyLabel, getSubSpiritLabel,
+  makeableCount,
+  filteredCocktails,
+  hasActiveFilters,
+  toggleFamily,
+  clearFilters,
 } = useFilters(props, emit)
 
 const selectedCount = computed(() => props.barInventory.size)
@@ -210,10 +230,12 @@ const t = computed(() => ({
   filterMain: props.locale === 'fr' ? '🎯 Ingrédient principal' : '🎯 Main ingredient',
   filterContains: props.locale === 'fr' ? '🔍 Contient' : '🔍 Contains',
   filterSpirits: props.locale === 'fr' ? 'Spiritueux de base' : 'Base spirits',
-  filterLiqueurs: props.locale === 'fr' ? 'Liqueurs' : 'Liqueurs',
+  filterLiqueurs: props.locale === 'fr' ? 'Liqueurs' : 'Licors',
   filterSeason: props.locale === 'fr' ? 'Saison' : 'Season',
+  filterProfile: props.locale === 'fr' ? 'Profil de saveur' : 'Flavor profile',
+  filterStyle: props.locale === 'fr' ? 'Style' : 'Style',
   filterAvail: props.locale === 'fr' ? 'Disponibilité' : 'Availability',
-  filterMakeable: props.locale === 'fr' ? '🍸 Cocktails réalisables' : '🍸 Available cocktails',
+  filterMakeable: props.locale === 'fr' ? 'Réalisables' : 'Available',
   filterAbv: props.locale === 'fr' ? 'Alcool' : 'Alcohol',
   clearAll: props.locale === 'fr' ? 'Effacer tout' : 'Clear all',
   loading: props.locale === 'fr' ? 'Chargement des cocktails...' : 'Loading cocktails...',

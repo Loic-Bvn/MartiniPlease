@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen menu-app">
+  <div class="min-h-screen menu-app" :class="{ 'bartender-mode': isLoggedIn }">
 
     <!-- Header -->
     <AppHeader
@@ -101,6 +101,14 @@
       :abvFilter="abvFilter"
       :selectedProfiles="selectedProfiles"
       :selectedStyles="selectedStyles"
+      :baseSpirits="baseSpirits"
+      :liqueurFamilies="liqueurFamilies"
+      :profileFilters="profileFilters"
+      :styleFilters="styleFilters"
+      :seasons="seasons"
+      :activeSubSpirits="activeSubSpirits"
+      :allFamilyLabels="allFamilyLabels"
+      :allSubLabels="allSubLabels"
       @view-card="viewingCard = $event"
       @edit-card="openEditCardModal"
       @delete-card="handleDeleteCard"
@@ -110,7 +118,14 @@
       @delete-cocktail="handleDelete"
       @new-cocktail="openNewModal"
       @toggle-family="toggleFamily"
-      @toggle-filter="toggleFilter"
+      @toggle-sub-spirit="toggleSubSpirit"
+      @toggle-profile="toggleProfile"
+      @toggle-style="toggleStyle"
+      @toggle-filter-mode="toggleFilterMode"
+      @toggle-makeable="toggleMakeable"
+      @toggle-favorites="toggleFavorites"
+      @set-abv-filter="setAbvFilter"
+      @set-season="setSeason"
       @clear-filters="clearFilters"
     />
 
@@ -609,23 +624,24 @@ const liqueurFamilies = computed(() => [
 
 const profileFilters = computed(() => {
   const labels = {
-    Smoky: locale.value === 'fr' ? 'Fumé' : 'Smoky',
-    Bitter: locale.value === 'fr' ? 'Amer' : 'Bitter',
-    Creamy: locale.value === 'fr' ? 'Crémeux' : 'Creamy',
-    Tropical: locale.value === 'fr' ? 'Tropical' : 'Tropical',
-    Floral: locale.value === 'fr' ? 'Floral' : 'Floral',
-    Nutty: locale.value === 'fr' ? 'Noisetté' : 'Nutty',
-    Spicy: locale.value === 'fr' ? 'Épicé' : 'Spicy',
-    Herbal: locale.value === 'fr' ? 'Herbacé' : 'Herbal',
-    Fruity: locale.value === 'fr' ? 'Fruité' : 'Fruity',
-    Citrus: locale.value === 'fr' ? 'Agrume' : 'Citrus',
-    Sour: locale.value === 'fr' ? 'Acidulé' : 'Sour',
-    Dry: locale.value === 'fr' ? 'Sec' : 'Dry',
-    Boozy: locale.value === 'fr' ? 'Corsé' : 'Boozy',
-    Refreshing: locale.value === 'fr' ? 'Frais' : 'Refreshing',
-    Rich: locale.value === 'fr' ? 'Riche' : 'Rich',
-    Sweet: locale.value === 'fr' ? 'Sucré' : 'Sweet',
+    Smoky:      locale.value === 'fr' ? '🔥 Fumé'        : '🔥 Smoky',
+    Bitter:     locale.value === 'fr' ? '🍫 Amer'        : '🍫 Bitter',
+    Creamy:     locale.value === 'fr' ? '🥛 Crémeux'     : '🥛 Creamy',
+    Tropical:   locale.value === 'fr' ? '🍍 Tropical'    : '🍍 Tropical',
+    Floral:     locale.value === 'fr' ? '🌸 Floral'      : '🌸 Floral',
+    Nutty:      locale.value === 'fr' ? '🌰 Noisetté'    : '🌰 Nutty',
+    Spicy:      locale.value === 'fr' ? '🌶️ Épicé'      : '🌶️ Spicy',
+    Herbal:     locale.value === 'fr' ? '🌿 Herbacé'     : '🌿 Herbal',
+    Fruity:     locale.value === 'fr' ? '🍓 Fruité'      : '🍓 Fruity',
+    Citrus:     locale.value === 'fr' ? '🍋 Agrume'      : '🍋 Citrus',
+    Sour:       locale.value === 'fr' ? '🍋 Acidulé'     : '🍋 Sour',
+    Dry:        locale.value === 'fr' ? '🧂 Sec'         : '🧂 Dry',
+    Boozy:      locale.value === 'fr' ? '🥃 Corsé'       : '🥃 Boozy',
+    Refreshing: locale.value === 'fr' ? '🧊 Frais'       : '🧊 Refreshing',
+    Rich:       locale.value === 'fr' ? '🍯 Riche'       : '🍯 Rich',
+    Sweet:      locale.value === 'fr' ? '🍬 Sucré'       : '🍬 Sweet',
   }
+
   return Object.entries(labels).map(([key, label]) => ({ key, label }))
 })
 
@@ -682,6 +698,38 @@ function toggleFamily(familyKey) {
     if (family?.subs.length) {
       const subKeys = family.subs.map(s => s.key)
       selectedSubSpirits.value = selectedSubSpirits.value.filter(k => !subKeys.includes(k))
+    }
+  }
+}
+function toggleSubSpirit(spiritKey) {
+  toggleFilter(selectedSubSpirits.value, spiritKey)
+}
+function toggleProfile(profileKey) {
+  toggleFilter(selectedProfiles.value, profileKey)
+}
+function toggleStyle(styleKey) {
+  toggleFilter(selectedStyles.value, styleKey)
+}
+function toggleFilterMode(mode) {
+  filterMode.value = mode
+}
+function toggleMakeable() {
+  showOnlyMakeable.value = !showOnlyMakeable.value
+}
+function toggleFavorites() {
+  showOnlyFavorites.value = !showOnlyFavorites.value
+}
+function setAbvFilter(value) {
+  abvFilter.value = value
+}
+function setSeason(seasonKey) {
+  if (seasonKey === 'all') {
+    selectedSeasons.value = []
+  } else {
+    if (selectedSeasons.value.includes(seasonKey)) {
+      selectedSeasons.value = selectedSeasons.value.filter(s => s !== seasonKey)
+    } else {
+      selectedSeasons.value.push(seasonKey)
     }
   }
 }
