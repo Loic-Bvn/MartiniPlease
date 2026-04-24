@@ -1,5 +1,16 @@
 <template>
-  <div class="min-h-screen menu-app" :class="{ 'bartender-mode': isLoggedIn }">
+  <!-- Pages légales -->
+  <div v-if="currentLegalPage" class="min-h-screen bg-gray-900">
+    <LegalNotice v-if="currentLegalPage === 'legal-notice'" :locale="locale" @back="closeLegalPage" @navigate="openLegalPage" />
+    <PrivacyPolicy v-if="currentLegalPage === 'privacy-policy'" :locale="locale" @back="closeLegalPage" />
+    <TermsOfUse v-if="currentLegalPage === 'terms-of-use'" :locale="locale" @back="closeLegalPage" />
+    <CookiesPolicy v-if="currentLegalPage === 'cookies-policy'" :locale="locale" @back="closeLegalPage" />
+  </div>
+
+  <!-- Application principale -->
+  <div v-else class="flex flex-col min-h-screen">
+    <div class="flex-1">
+      <div class="min-h-screen menu-app" :class="{ 'bartender-mode': isLoggedIn }">
 
     <!-- Header -->
     <AppHeader
@@ -146,6 +157,11 @@
       @toggle-locale="locale = locale === 'fr' ? 'en' : 'fr'"
       @toggle-unit="unit = unit === 'oz' ? 'ml' : 'oz'"
     />
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <Footer :locale="locale" @navigate-to-legal="openLegalPage" />
   </div>
 </template>
 
@@ -183,6 +199,26 @@ import { parseHash, setHash, clearHash, buildShareUrl, slugify } from '@/composa
 import { useCatalog } from '@/composables/useCatalog'
 import CatalogModal from '@/Components/Modals/CatalogModal.vue'
 import { useToast } from '@/composables/useToast'
+
+// Pages légales
+import LegalNotice from '@/views/LegalNotice.vue'
+import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
+import TermsOfUse from '@/views/TermsOfUse.vue'
+import CookiesPolicy from '@/views/CookiesPolicy.vue'
+import Footer from '@/Components/Footer.vue'
+
+// État pour les pages légales
+const currentLegalPage = ref(null)
+
+function openLegalPage(page) {
+  currentLegalPage.value = page
+  window.scrollTo(0, 0)
+}
+
+function closeLegalPage() {
+  currentLegalPage.value = null
+  window.scrollTo(0, 0)
+}
 
 const { isLoggedIn, bar, currentBarId, currentBarName, inviteCode, bars, hasMultipleBars, isBarPublic, session, initAuth, signOut, fetchBar, toggleBarPublic, createNewBar, updateBarName, updateInviteCode } = useAuth()
 
