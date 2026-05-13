@@ -49,7 +49,7 @@
           :active-sub-spirits="activeSubSpirits"
           :all-family-labels="allFamilyLabels"
           :all-sub-labels="allSubLabels"
-          @toggle-family="toggleFamily"
+          @toggle-family="$emit('toggle-family', $event)"
           @toggle-sub-spirit="$emit('toggle-sub-spirit', $event)"
           @toggle-profile="$emit('toggle-profile', $event)"
           @toggle-style="$emit('toggle-style', $event)"
@@ -58,12 +58,11 @@
           @toggle-favorites="$emit('toggle-favorites')"
           @set-abv-filter="$emit('set-abv-filter', $event)"
           @set-season="$emit('set-season', $event)"
-          @clear-filters="clearFilters"
+          @clear-filters="$emit('clear-filters')"
         />
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.875rem;">
-
         <CardPanel
           :is-logged-in="isLoggedIn"
           :menu-cards="menuCards"
@@ -88,8 +87,6 @@
         />
       </div>
 
-
-
     </div>
 
     <div>
@@ -109,7 +106,7 @@
         <h3 class="empty-state-title">{{ locale === 'fr' ? 'Aucun cocktail trouvé' : 'No cocktails found' }}</h3>
         <p class="empty-state-message">{{ locale === 'fr' ? 'Essayez d\'ajuster vos filtres...' : 'Try adjusting your filters...' }}</p>
         <div class="empty-state-actions">
-          <button v-if="hasActiveFilters" @click="clearFilters" class="empty-state-btn empty-state-btn-primary">
+          <button v-if="hasActiveFilters" @click="$emit('clear-filters')" class="empty-state-btn empty-state-btn-primary">
             {{ locale === 'fr' ? 'Effacer les filtres' : 'Clear filters' }}
           </button>
           <button v-if="isLoggedIn" @click="$emit('new-cocktail')" class="empty-state-btn empty-state-btn-primary">
@@ -137,107 +134,107 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { ChevronDown, X, Plus, Pencil, Trash2, Eye, Heart } from 'lucide-vue-next'
+import { ChevronDown } from 'lucide-vue-next'
 import InventoryManager from '@/Components/Modals/InventoryManager.vue'
-import OrdersPanel from '@/Components/OrdersPanel.vue'
-import FilterPanel from '@/Components/FilterPanel.vue'
-import DrinkerPanel from '@/Components/DrinkerPanel.vue'
-import CardPanel from '@/Components/CardPanel.vue'
-import CocktailCard from '@/Components/CocktailCard.vue'
-import { useFilters } from '@/composables/useFilters.js'
+import OrdersPanel      from '@/Components/OrdersPanel.vue'
+import FilterPanel      from '@/Components/FilterPanel.vue'
+import DrinkerPanel     from '@/Components/DrinkerPanel.vue'
+import CardPanel        from '@/Components/CardPanel.vue'
+import CocktailCard     from '@/Components/CocktailCard.vue'
 
+// ── Props ─────────────────────────────────────────────────────────────────────
+// filteredCocktails, hasActiveFilters et makeableCount sont calculés dans
+// useFilters (CocktailMenuApp) et passés ici en props — BarMainView n'a pas
+// à les recalculer.
 const props = defineProps({
-  isLoggedIn: Boolean,
-  activeBarId: String,
-  cocktails: Array,
-  cocktailsLoading: Boolean,
-  menuCards: Array,
-  hasDrinker: Boolean,
-  drinkerPseudo: String,
-  favorites: Set,
-  history: Array,
+  isLoggedIn:        Boolean,
+  activeBarId:       String,
+  cocktails:         Array,
+  cocktailsLoading:  Boolean,
+  menuCards:         Array,
+  hasDrinker:        Boolean,
+  drinkerPseudo:     String,
+  favorites:         Set,
+  history:           Array,
   pendingOrdersCount: Number,
-  locale: String,
-  unit: String,
-  barInventory: Set,
-  ingredients: Array,
-  searchTerm: String,
-  selectedFamilies: Array,
+  locale:            String,
+  unit:              String,
+  barInventory:      Set,
+  ingredients:       Array,
+  searchTerm:        String,
+  // Filtres (état en lecture seule — mutations via emit)
+  selectedFamilies:   Array,
   selectedSubSpirits: Array,
-  selectedSeasons: Array,
-  showOnlyMakeable: Boolean,
-  showOnlyFavorites: Boolean,
-  filterMode: String,
-  abvFilter: String,
-  selectedProfiles: Array,
-  selectedStyles: Array,
-  baseSpirits: Array,
-  liqueurFamilies: Array,
-  profileFilters: Array,
-  styleFilters: Array,
-  seasons: Array,
-  activeSubSpirits: Array,
-  allFamilyLabels: Object,
-  allSubLabels: Object,
+  selectedSeasons:    Array,
+  showOnlyMakeable:   Boolean,
+  showOnlyFavorites:  Boolean,
+  filterMode:         String,
+  abvFilter:          String,
+  selectedProfiles:   Array,
+  selectedStyles:     Array,
+  // Données de référence pour FilterPanel
+  baseSpirits:        Array,
+  liqueurFamilies:    Array,
+  profileFilters:     Array,
+  styleFilters:       Array,
+  seasons:            Array,
+  activeSubSpirits:   Array,
+  allFamilyLabels:    Object,
+  allSubLabels:       Object,
+  // Résultats calculés par useFilters dans CocktailMenuApp
+  filteredCocktails:  { type: Array,   default: () => [] },
+  hasActiveFilters:   { type: Boolean, default: false    },
+  makeableCount:      { type: Number,  default: 0        },
 })
 
 const emit = defineEmits([
   'view-card', 'edit-card', 'delete-card', 'new-card',
   'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail',
-  'toggle-family',
-  'toggle-sub-spirit',
-  'toggle-profile',
-  'toggle-style',
-  'toggle-filter-mode',
-  'toggle-makeable',
-  'toggle-favorites',
-  'set-abv-filter',
-  'set-season',
-  'clear-filters',
+  'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
+  'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
+  'set-abv-filter', 'set-season', 'clear-filters',
 ])
 
-const showInventory    = ref(false)
-const showFilters      = ref(false)
-const showCards        = ref(false)
-const showDrinkerPanel = ref(false)
-const showOrdersPanel  = ref(false)
-const drinkerTab       = ref('favorites')
+// ── État local (UI uniquement) ────────────────────────────────────────────────
+const showInventory   = ref(false)
+const showOrdersPanel = ref(false)
 
-const {
-  makeableCount,
-  filteredCocktails,
-  hasActiveFilters,
-  toggleFamily,
-  clearFilters,
-} = useFilters(props, emit)
+// ── Computed ──────────────────────────────────────────────────────────────────
+const selectedCount = computed(() => props.barInventory?.size ?? 0)
+const totalCount    = computed(() => props.ingredients?.length ?? 0)
 
-const selectedCount = computed(() => props.barInventory.size)
-const totalCount    = computed(() => props.ingredients.length)
+const favoriteCocktails = computed(() =>
+  props.cocktails.filter(c => props.favorites.has(c.id))
+)
 
-const favoriteCocktails = computed(() => props.cocktails.filter(c => props.favorites.has(c.id)))
-function getCocktailName(id) { return props.cocktails.find(c => c.id === id)?.name ?? '—' }
+function getCocktailName(id) {
+  return props.cocktails.find(c => c.id === id)?.name ?? '—'
+}
+
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  return new Date(iso).toLocaleDateString('fr-FR', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+  })
 }
 
 const t = computed(() => ({
-  filterTitle: props.locale === 'fr' ? '🔍 Filtres' : '🔍 Filters',
-  cardsTitle: props.locale === 'fr' ? '📜 Cartes' : '📜 Cards',
-  newCard: props.locale === 'fr' ? 'Nouvelle carte' : 'New card',
-  noCard: props.locale === 'fr' ? 'Aucune carte créée.' : 'No card yet.',
-  stock: props.locale === 'fr' ? '📦 Stock du bar' : '📦 Bar stock',
-  filterMode: props.locale === 'fr' ? 'Mode de recherche' : 'Search mode',
-  filterMain: props.locale === 'fr' ? '🎯 Ingrédient principal' : '🎯 Main ingredient',
-  filterContains: props.locale === 'fr' ? '🔍 Contient' : '🔍 Contains',
-  filterSpirits: props.locale === 'fr' ? 'Spiritueux de base' : 'Base spirits',
-  filterLiqueurs: props.locale === 'fr' ? 'Liqueurs' : 'Licors',
-  filterSeason: props.locale === 'fr' ? 'Saison' : 'Season',
-  filterProfile: props.locale === 'fr' ? 'Profil de saveur' : 'Flavor profile',
-  filterStyle: props.locale === 'fr' ? 'Style' : 'Style',
-  filterAvail: props.locale === 'fr' ? 'Disponibilité' : 'Availability',
-  filterMakeable: props.locale === 'fr' ? 'Réalisables' : 'Available',
-  filterAbv: props.locale === 'fr' ? 'Alcool' : 'Alcohol',
-  clearAll: props.locale === 'fr' ? 'Effacer tout' : 'Clear all',
-  loading: props.locale === 'fr' ? 'Chargement des cocktails...' : 'Loading cocktails...',
+  filterTitle:    props.locale === 'fr' ? '🔍 Filtres'                : '🔍 Filters',
+  cardsTitle:     props.locale === 'fr' ? '📜 Cartes'                 : '📜 Cards',
+  newCard:        props.locale === 'fr' ? 'Nouvelle carte'            : 'New card',
+  noCard:         props.locale === 'fr' ? 'Aucune carte créée.'       : 'No card yet.',
+  stock:          props.locale === 'fr' ? '📦 Stock du bar'           : '📦 Bar stock',
+  filterMode:     props.locale === 'fr' ? 'Mode de recherche'         : 'Search mode',
+  filterMain:     props.locale === 'fr' ? '🎯 Ingrédient principal'   : '🎯 Main ingredient',
+  filterContains: props.locale === 'fr' ? '🔍 Contient'              : '🔍 Contains',
+  filterSpirits:  props.locale === 'fr' ? 'Spiritueux de base'        : 'Base spirits',
+  filterLiqueurs: props.locale === 'fr' ? 'Liqueurs'                  : 'Licors',
+  filterSeason:   props.locale === 'fr' ? 'Saison'                   : 'Season',
+  filterProfile:  props.locale === 'fr' ? 'Profil de saveur'         : 'Flavor profile',
+  filterStyle:    props.locale === 'fr' ? 'Style'                    : 'Style',
+  filterAvail:    props.locale === 'fr' ? 'Disponibilité'            : 'Availability',
+  filterMakeable: props.locale === 'fr' ? 'Réalisables'              : 'Available',
+  filterAbv:      props.locale === 'fr' ? 'Alcool'                   : 'Alcohol',
+  clearAll:       props.locale === 'fr' ? 'Effacer tout'             : 'Clear all',
+  loading:        props.locale === 'fr' ? 'Chargement des cocktails...' : 'Loading cocktails...',
 }))
 </script>

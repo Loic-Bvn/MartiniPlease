@@ -1,25 +1,63 @@
 // composables/useAuth.js
 // Gère l'authentification des bartenders via Supabase Auth
-// + le(s) bar(s) associé(s) au compte connecté
-import { ref, computed } from 'vue'
-import { supabase } from '@/lib/supabase'
+// + le(s) bar(s) associé(s) au compte connecté.
+//
+// ⚠️  SINGLETON : les ref sont déclarées au niveau module.
+//     Elles sont donc partagées entre tous les appels à useAuth() dans l'appli.
+//     Ce pattern est intentionnel pour une SPA Vue 3 sans store Pinia :
+//     un seul état d'auth, accessible partout sans prop-drilling.
+//     Si tu migres vers Pinia, déplace ces ref dans defineStore().
+//
+// ── localStorage ─────────────────────────────────────────────────────────────
+// Seul l'ID du bar sélectionné est persisté (pas l'objet complet).
+// L'objet complet est refetché depuis Supabase à chaque rechargement.
+// Cela évite de servir des données périmées (nom, invite_code, is_public…)
+// depuis le cache localStorage.
 
-const session     = ref(null)   // session Supabase (bartender connecté)
-const bar = ref(JSON.parse(localStorage.getItem('selectedBar') || 'null')) // bar actif du bartender connecté
-const bars        = ref([])     // tous les bars du compte (si plusieurs)
+import { ref, computed } from 'vue'
+import { supabase }      from '@/lib/supabase'
+import { useToast }      from '@/composables/useToast'
+
+// ── Clé localStorage ─────────────────────────────────────────────────────────
+const SELECTED_BAR_ID_KEY = 'selectedBarId'
+
+function getPersistedBarId() {
+  try {
+    return localStorage.getItem(SELECTED_BAR_ID_KEY) ?? null
+  } catch {
+    // SSR ou accès localStorage bloqué (Safari private mode…)
+    return null
+  }
+}
+
+function persistBarId(id) {
+  try {
+    if (id) localStorage.setItem(SELECTED_BAR_ID_KEY, id)
+    else    localStorage.removeItem(SELECTED_BAR_ID_KEY)
+  } catch {
+    // silent fail
+  }
+}
+
+// ── État singleton ────────────────────────────────────────────────────────────
+const session     = ref(null)
+const bar         = ref(null)    // bar actif — hydraté depuis Supabase au démarrage
+const bars        = ref([])      // tous les bars du compte
 const authLoading = ref(false)
 const authError   = ref('')
 
 export function useAuth() {
+  const { toastError } = useToast()
 
   const isLoggedIn      = computed(() => !!session.value)
-  const currentBarId    = computed(() => bar.value?.id ?? null)
-  const currentBarName  = computed(() => bar.value?.name ?? '')
+  const currentBarId    = computed(() => bar.value?.id    ?? null)
+  const currentBarName  = computed(() => bar.value?.name  ?? '')
   const inviteCode      = computed(() => bar.value?.invite_code ?? '')
   const hasMultipleBars = computed(() => bars.value.length >= 1 && !bar.value)
-  const isBarPublic     = computed(() => bar.value?.is_public ?? false)
+  const isBarPublic     = computed(() => bar.value?.is_public  ?? false)
 
-  // Initialise la session au démarrage (appelé dans App.vue onMounted)
+  // ── Initialisation ──────────────────────────────────────────────────────────
+
   async function initAuth() {
     const { data } = await supabase.auth.getSession()
     session.value = data.session
@@ -28,22 +66,21 @@ export function useAuth() {
     supabase.auth.onAuthStateChange(async (_event, newSession) => {
       session.value = newSession
       if (newSession) await fetchBar()
-      else {
-        bar.value  = null
-        bars.value = []
-      }
+      else            _clearAuthState()
     })
   }
 
-  // Récupère le(s) bar(s) du bartender connecté
-  // - Si barId est fourni : sélectionne ce bar précis
-  // - Sinon : charge tous les bars du compte
-  //   → 1 seul bar  : sélection automatique
-  //   → plusieurs   : expose bars[] pour que l'UI affiche un sélecteur
+  // ── Récupération des bars ───────────────────────────────────────────────────
+
+  /**
+   * Récupère tous les bars du compte et sélectionne automatiquement
+   * le dernier bar utilisé (via l'ID persisté en localStorage).
+   *
+   * @param {string|null} barId - Si fourni, force la sélection de ce bar.
+   */
   async function fetchBar(barId = null) {
     if (!session.value) return
 
-    // Chargement initial : récupérer tous les bars du compte
     const { data, error } = await supabase
       .from('bars')
       .select('*')
@@ -52,30 +89,33 @@ export function useAuth() {
 
     if (error) {
       console.error('❌ fetchBar:', error)
+      toastError(`Impossible de charger les bars : ${error.message}`)
       return
     }
 
     bars.value = data || []
 
-    if (barId) {
-      // Sélection explicite d'un bar (après choix dans l'UI)
-      const selected = bars.value.find(b => b.id === barId)
-      if (selected) {
-        bar.value = selected
-      } else {
-        console.error('❌ Bar not found:', barId)
+    const targetId = barId ?? getPersistedBarId()
+
+    if (targetId) {
+      const found = bars.value.find(b => b.id === targetId)
+      if (found) {
+        bar.value = found
+        return
       }
-      return
+      // L'ID persisté n'existe plus (bar supprimé) → on nettoie
+      persistBarId(null)
     }
 
     bar.value = null
   }
 
-  // Basculer vers un autre bar (navigation rapide entre ses bars)
+  // ── Sélection / switch de bar ───────────────────────────────────────────────
+
   async function switchBar(barId) {
-    const selected = bars.value.find(b => b.id === barId)
-    if (selected) {
-      bar.value = selected
+    const found = bars.value.find(b => b.id === barId)
+    if (found) {
+      bar.value = found
     } else {
       console.error('❌ Bar not found:', barId)
     }
@@ -83,26 +123,32 @@ export function useAuth() {
 
   async function selectBar(selectedBar) {
     bar.value = selectedBar
-    localStorage.setItem('selectedBar', JSON.stringify(selectedBar))
+    persistBarId(selectedBar?.id ?? null)
   }
 
-  // Active / désactive la visibilité publique du bar
+  // ── Visibilité publique ─────────────────────────────────────────────────────
+
   async function toggleBarPublic() {
     if (!bar.value) return { success: false }
     const newValue = !bar.value.is_public
+
     const { error } = await supabase
       .from('bars')
       .update({ is_public: newValue })
       .eq('id', bar.value.id)
+
     if (error) {
       console.error('❌ toggleBarPublic:', error)
+      toastError(error.message)
       return { success: false, error: error.message }
     }
+
     bar.value = { ...bar.value, is_public: newValue }
     return { success: true }
   }
 
-  // Inscription bartender + création du bar
+  // ── Inscription ─────────────────────────────────────────────────────────────
+
   async function signUp({ email, password, barName }) {
     authLoading.value = true
     authError.value   = ''
@@ -110,7 +156,6 @@ export function useAuth() {
       const { data, error } = await supabase.auth.signUp({ email, password })
       if (error) throw error
 
-      // Créer le bar (invite_code généré automatiquement par le trigger SQL)
       const { data: barData, error: barError } = await supabase
         .from('bars')
         .insert({ name: barName, owner_id: data.user.id, invite_code: '' })
@@ -120,6 +165,7 @@ export function useAuth() {
 
       bar.value  = barData
       bars.value = []
+      persistBarId(barData.id)
       return { success: true }
     } catch (err) {
       authError.value = err.message
@@ -129,7 +175,8 @@ export function useAuth() {
     }
   }
 
-  // Connexion bartender existant
+  // ── Connexion ───────────────────────────────────────────────────────────────
+
   async function signIn({ email, password }) {
     authLoading.value = true
     authError.value   = ''
@@ -146,16 +193,15 @@ export function useAuth() {
     }
   }
 
-  // Déconnexion
+  // ── Déconnexion ─────────────────────────────────────────────────────────────
+
   async function signOut() {
     await supabase.auth.signOut()
-    session.value = null
-    bar.value     = null
-    bars.value    = []
-    localStorage.removeItem('selectedBar')
+    _clearAuthState()
   }
 
-  // Créer un nouveau bar (pour un bartender déjà connecté)
+  // ── Création d'un nouveau bar (bartender déjà connecté) ─────────────────────
+
   async function createNewBar(barName) {
     if (!session.value) return { success: false, error: 'Non connecté' }
     authLoading.value = true
@@ -168,10 +214,9 @@ export function useAuth() {
         .single()
       if (barError) throw barError
 
-      // Ajouter le nouveau bar à la liste
       bars.value.push(barData)
-      // Sélectionner le nouveau bar automatiquement
       bar.value = barData
+      persistBarId(barData.id)
       return { success: true, data: barData }
     } catch (err) {
       authError.value = err.message
@@ -181,7 +226,8 @@ export function useAuth() {
     }
   }
 
-  // Modifier le nom d'un bar
+  // ── Mise à jour du nom d'un bar ─────────────────────────────────────────────
+
   async function updateBarName(barId, newName) {
     if (!session.value) return { success: false, error: 'Non connecté' }
     try {
@@ -192,15 +238,7 @@ export function useAuth() {
         .eq('owner_id', session.value.user.id)
       if (error) throw error
 
-      // Mettre à jour dans la liste locale
-      const barIndex = bars.value.findIndex(b => b.id === barId)
-      if (barIndex > -1) {
-        bars.value[barIndex].name = newName
-      }
-      // Mettre à jour le bar actif si c'est le même
-      if (bar.value?.id === barId) {
-        bar.value.name = newName
-      }
+      _updateLocalBar(barId, { name: newName })
       return { success: true }
     } catch (err) {
       console.error('❌ updateBarName:', err)
@@ -208,7 +246,8 @@ export function useAuth() {
     }
   }
 
-  // Modifier le code d'invitation d'un bar
+  // ── Mise à jour du code d'invitation ────────────────────────────────────────
+
   async function updateInviteCode(barId, newCode) {
     if (!session.value) return { success: false, error: 'Non connecté' }
     try {
@@ -219,20 +258,27 @@ export function useAuth() {
         .eq('owner_id', session.value.user.id)
       if (error) throw error
 
-      // Mettre à jour dans la liste locale
-      const barIndex = bars.value.findIndex(b => b.id === barId)
-      if (barIndex > -1) {
-        bars.value[barIndex].invite_code = newCode
-      }
-      // Mettre à jour le bar actif si c'est le même
-      if (bar.value?.id === barId) {
-        bar.value.invite_code = newCode
-      }
+      _updateLocalBar(barId, { invite_code: newCode })
       return { success: true }
     } catch (err) {
       console.error('❌ updateInviteCode:', err)
       return { success: false, error: err.message }
     }
+  }
+
+  // ── Helpers privés ──────────────────────────────────────────────────────────
+
+  function _clearAuthState() {
+    session.value = null
+    bar.value     = null
+    bars.value    = []
+    persistBarId(null)
+  }
+
+  function _updateLocalBar(barId, patch) {
+    const idx = bars.value.findIndex(b => b.id === barId)
+    if (idx > -1) bars.value[idx] = { ...bars.value[idx], ...patch }
+    if (bar.value?.id === barId) bar.value = { ...bar.value, ...patch }
   }
 
   return {
@@ -250,6 +296,7 @@ export function useAuth() {
     initAuth,
     fetchBar,
     switchBar,
+    selectBar,
     toggleBarPublic,
     signUp,
     signIn,
