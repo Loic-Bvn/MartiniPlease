@@ -15,11 +15,11 @@
             :value="searchTerm"
             @input="$emit('update:searchTerm', $event.target.value)"
             class="search-input"
-            @focus="showSearchSuggestions = searchTerm.length > 0"
-            @blur="setTimeout(() => showSearchSuggestions = false, 150)"
+            @focus="localShowSuggestions = searchTerm.length > 0"
+            @blur="handleSearchBlur"
           />
           <transition name="fade">
-            <div v-if="showSearchSuggestions && suggestions.length > 0" class="search-suggestions" @click.stop>
+            <div v-if="localShowSuggestions && suggestions.length > 0" class="search-suggestions" @click.stop>
               <div v-for="suggestion in suggestions" :key="suggestion.id" class="suggestion-item" @click="$emit('scroll-to-cocktail', suggestion.id)">
                 <span class="suggestion-type">🍹</span>
                 <span class="suggestion-name">{{ suggestion.name }}</span>
@@ -184,7 +184,6 @@ const props = defineProps({
   unit: String,
   toastMessage: String,
   searchTerm: String,
-  showSearchSuggestions: Boolean,
   suggestions: Array,
   randomLogo: String,
 })
@@ -204,6 +203,11 @@ const emit = defineEmits([
 ])
 
 const burgerOpen = ref(false)
+const localShowSuggestions = ref(false)
+
+function handleSearchBlur() {
+  setTimeout(() => { localShowSuggestions.value = false }, 150)
+}
 
 const t = computed(() => ({
   newCocktail: props.locale === 'fr' ? 'Nouveau cocktail' : 'New cocktail',

@@ -27,7 +27,7 @@ const abvFilter          = ref(null)     // null | 'mocktail' | 'low'
 const selectedProfiles   = ref([])
 const selectedStyles     = ref([])
 
-export function useFilters({ cocktails, barInventory, favorites, hasDrinker, locale } = {}) {
+export function useFilters({ cocktails, barInventory, favorites, hasDrinker, locale, searchTerm } = {}) {
 
   // ── Données de référence (dépendent de la locale) ─────────────────────────
 
@@ -171,7 +171,13 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     let list = [...cocktails.value]
 
     // Recherche textuelle
-    // (gérée en dehors via useSearchSuggestions — pas de searchTerm ici)
+    const query = searchTerm?.value?.toLowerCase().trim()
+    if (query) {
+      list = list.filter(c =>
+        c.name.toLowerCase().includes(query) ||
+        (c.recipe && c.recipe.some(ing => ing.Type?.toLowerCase().includes(query)))
+      )
+    }
 
     // Famille / sous-spirits
     if (selectedFamilies.value.length || selectedSubSpirits.value.length) {

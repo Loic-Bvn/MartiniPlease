@@ -26,7 +26,6 @@
           :toastMessage="toastMessage"
           :toastType="toastType"
           :searchTerm="searchTerm"
-          :showSearchSuggestions="showSearchSuggestions"
           :suggestions="suggestions"
           :randomLogo="randomLogo"
           @logo-click="handleLogoClick"
@@ -301,6 +300,9 @@ async function handleCreateNewBar() {
   await create(initializeDefaultIngredients)
 }
 
+// ── Recherche ─────────────────────────────────────────────────────────────────
+const { searchInput: searchTerm, showSuggestions: showSearchSuggestions, suggestions } = useSearchSuggestions(cocktails)
+
 // ── Filtres ───────────────────────────────────────────────────────────────────
 const {
   selectedFamilies, selectedSubSpirits, selectedSeasons,
@@ -312,10 +314,7 @@ const {
   toggleFamily, toggleSubSpirit, toggleProfile, toggleStyle,
   toggleFilterMode, toggleMakeable, toggleFavorites,
   setAbvFilter, setSeason, clearFilters,
-} = useFilters({ cocktails, barInventory, favorites, hasDrinker, locale })
-
-// ── Recherche ─────────────────────────────────────────────────────────────────
-const { searchInput: searchTerm, showSuggestions: showSearchSuggestions, suggestions } = useSearchSuggestions(cocktails)
+} = useFilters({ cocktails, barInventory, favorites, hasDrinker, locale, searchTerm })
 
 // ── Commandes temps réel ──────────────────────────────────────────────────────
 const { pendingOrdersCount, initOrdersListener, stopOrdersListener } = useOrders()
@@ -433,6 +432,9 @@ async function handleInvite() {
 
 async function onAuthSuccess() {
   clearDrinker()
+  // onAuthStateChange appelle fetchBar en parallèle — on l'attend
+  // explicitement pour que currentBarId soit déjà set
+  await fetchBar()
   if (!currentBarId.value) return
   await loadBarData(currentBarId.value)
 }
