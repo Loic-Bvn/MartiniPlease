@@ -1,41 +1,43 @@
 import { computed } from 'vue'
 
 export function useFilterCounts(cocktails, baseSpirits, liqueurFamilies) {
-  // Counts for each spirit family
+  // Un seul passage sur tous les cocktails pour compter les types d'ingrédients
+  const typeCounts = computed(() => {
+    const counts = {}
+    cocktails.value.forEach(c => {
+      c.recipe?.forEach(ing => {
+        if (ing.Type) counts[ing.Type] = (counts[ing.Type] || 0) + 1
+      })
+    })
+    return counts
+  })
+
   const spiritCounts = computed(() => {
     const counts = {}
     baseSpirits.value.forEach(spirit => {
-      counts[spirit.key] = cocktails.value.filter(c =>
-        c.recipe && c.recipe.some(ing =>
-          ing.Type?.toLowerCase() === spirit.key.toLowerCase() ||
-          spirit.subs?.some(sub => ing.Type?.toLowerCase() === sub.key)
-        )
-      ).length
+      const subKeys = spirit.subs?.map(s => s.key.toLowerCase()) ?? []
+      const key     = spirit.key.toLowerCase()
+      counts[spirit.key] = Object.entries(typeCounts.value)
+        .filter(([t]) => t.toLowerCase() === key || subKeys.includes(t.toLowerCase()))
+        .reduce((sum, [, n]) => sum + n, 0)
     })
     return counts
   })
 
-  // Counts for liqueur families
   const liqueurCounts = computed(() => {
     const counts = {}
     liqueurFamilies.value.forEach(liqueur => {
-      counts[liqueur.key] = cocktails.value.filter(c =>
-        c.recipe && c.recipe.some(ing =>
-          ing.Type?.toLowerCase().includes(liqueur.key.toLowerCase())
-        )
-      ).length
+      const key = liqueur.key.toLowerCase()
+      counts[liqueur.key] = Object.entries(typeCounts.value)
+        .filter(([t]) => t.toLowerCase().includes(key))
+        .reduce((sum, [, n]) => sum + n, 0)
     })
     return counts
   })
 
-  // Get count for a specific filter
   function getFilterCount(filterKey) {
     return (spiritCounts.value[filterKey] ?? 0) + (liqueurCounts.value[filterKey] ?? 0)
   }
 
-  return {
-    spiritCounts,
-    liqueurCounts,
-    getFilterCount,
-  }
+  return { spiritCounts, liqueurCounts, getFilterCount }
 }

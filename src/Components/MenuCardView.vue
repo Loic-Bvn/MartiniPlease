@@ -50,7 +50,7 @@
             :isBartenderMode="isLoggedIn"
             :locale="locale"
             :unit="unit"
-            :bar-id="activeBarId"
+            :bar-id="barId"
             @edit="$emit('edit-cocktail', cocktail)"
             @delete="$emit('delete-cocktail', cocktail.id)"
           />
@@ -73,6 +73,7 @@ import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { useToast } from '@/composables/useToast'
+import { useAuth } from '@/composables/useAuth'
 import CocktailCard from '@/Components/CocktailCard.vue'
 
 const props = defineProps({
@@ -160,6 +161,7 @@ const groupedCocktails = computed(() => {
   return groups
 })
 
+const { isLoggedIn } = useAuth()
 const { hasDrinker, drinker, quickRefreshHistory } = useDrinker()
 const checkedIds = ref(new Set())
 const { addOrder } = useOrders()
