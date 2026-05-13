@@ -1,7 +1,19 @@
-import { ref, computed } from 'vue'
+import { ref, computed, customRef } from 'vue'
+
+function debouncedRef(initialValue, delay = 200) {
+  let timeout
+  let _value = initialValue
+  return customRef((track, trigger) => ({
+    get() { track(); return _value },
+    set(newVal) {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => { _value = newVal; trigger() }, delay)
+    }
+  }))
+}
 
 export function useSearchSuggestions(cocktails) {
-  const searchInput = ref('')
+  const searchInput   = debouncedRef('', 200)
   const showSuggestions = ref(false)
 
   const suggestions = computed(() => {

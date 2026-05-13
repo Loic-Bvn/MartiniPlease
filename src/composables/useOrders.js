@@ -100,9 +100,16 @@ export function useOrders() {
 
   // ── Gestion des événements Realtime ─────────────────────────────────────────
 
-  function handleOrderChange(payload) {
+  async function handleOrderChange(payload) {
     if (payload.eventType === 'INSERT') {
-      orders.value.push(payload.new)
+      // payload.new ne contient pas le join drinker_profiles — on fetch l'ordre complet
+      const { data } = await supabase
+        .from('orders')
+        .select('id, bar_id, drinker_id, cocktail_id, status, created_at, completed_at, drinker_profiles(pseudo)')
+        .eq('id', payload.new.id)
+        .single()
+      if (data) orders.value.push(data)
+      else orders.value.push(payload.new) // fallback sans pseudo
 
     } else if (payload.eventType === 'UPDATE') {
       const idx = orders.value.findIndex(o => o.id === payload.new.id)

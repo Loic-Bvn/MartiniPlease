@@ -197,7 +197,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 
 // ── Composables ───────────────────────────────────────────────────────────────
 import { useAuth }               from '@/composables/useAuth'
@@ -221,16 +221,18 @@ import WelcomePage       from '@/Components/WelcomePage.vue'
 import BarSelector       from '@/Components/BarSelector.vue'
 import BarMainView       from '@/Components/BarMainView.vue'
 import Footer            from '@/Components/Footer.vue'
-import AuthModal         from '@/Components/Modals/AuthModal.vue'
-import DrinkerLoginModal from '@/Components/Modals/DrinkerLoginModal.vue'
-import MenuCardModal     from '@/Components/Modals/MenuCardModal.vue'
-import CatalogModal      from '@/Components/Modals/CatalogModal.vue'
-import CocktailModal     from '@/Components/Modals/CocktailModal.vue'
-import MenuCardView      from '@/Components/MenuCardView.vue'
-import LegalNotice       from '@/views/LegalNotice.vue'
-import PrivacyPolicy     from '@/views/PrivacyPolicy.vue'
-import TermsOfUse        from '@/views/TermsOfUse.vue'
-import CookiesPolicy     from '@/views/CookiesPolicy.vue'
+
+// Lazy-loaded — ne font pas partie du bundle initial
+const AuthModal         = defineAsyncComponent(() => import('@/Components/Modals/AuthModal.vue'))
+const DrinkerLoginModal = defineAsyncComponent(() => import('@/Components/Modals/DrinkerLoginModal.vue'))
+const MenuCardModal     = defineAsyncComponent(() => import('@/Components/Modals/MenuCardModal.vue'))
+const CatalogModal      = defineAsyncComponent(() => import('@/Components/Modals/CatalogModal.vue'))
+const CocktailModal     = defineAsyncComponent(() => import('@/Components/Modals/CocktailModal.vue'))
+const MenuCardView      = defineAsyncComponent(() => import('@/Components/MenuCardView.vue'))
+const LegalNotice       = defineAsyncComponent(() => import('@/views/LegalNotice.vue'))
+const PrivacyPolicy     = defineAsyncComponent(() => import('@/views/PrivacyPolicy.vue'))
+const TermsOfUse        = defineAsyncComponent(() => import('@/views/TermsOfUse.vue'))
+const CookiesPolicy     = defineAsyncComponent(() => import('@/views/CookiesPolicy.vue'))
 
 import { supabase } from '@/lib/supabase'
 
@@ -389,6 +391,7 @@ async function loadBarData(barId) {
     fetchIngredients(barId),
     fetchMenuCards(barId),
   ])
+  clearFilters()
 }
 
 function handleLogoClick() {
@@ -550,6 +553,13 @@ watch(viewingCard, (card) => {
 watch([activeBarId, isLoggedIn], async ([newBarId, newIsLoggedIn]) => {
   if (newIsLoggedIn && newBarId) await initOrdersListener(newBarId)
   else                           stopOrdersListener()
+})
+
+// Charger les données quand le bar bartender change (reconnexion automatique)
+watch(currentBarId, async (newBarId) => {
+  if (newBarId && isLoggedIn.value) {
+    await loadBarData(newBarId)
+  }
 })
 
 // ── Montage ───────────────────────────────────────────────────────────────────

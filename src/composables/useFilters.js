@@ -298,7 +298,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     selectedStyles.value     = []
     abvFilter.value          = null
     showOnlyFavorites.value  = false
-    // showOnlyMakeable est intentionnellement conservé entre les changements de filtre
+    showOnlyMakeable.value   = false
   }
 
   // ── Helpers labels ─────────────────────────────────────────────────────────

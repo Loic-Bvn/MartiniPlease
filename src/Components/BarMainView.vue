@@ -115,7 +115,7 @@
         </div>
       </div>
       <div v-else class="cocktails-grid">
-        <div v-for="cocktail in filteredCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
+        <div v-for="cocktail in visibleCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
           <CocktailCard
             :cocktail="cocktail"
             :isBartenderMode="isLoggedIn"
@@ -127,15 +127,16 @@
           />
         </div>
       </div>
+      <div ref="sentinelEl" style="height:1px" />
     </div>
 
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
-import InventoryManager from '@/Components/Modals/InventoryManager.vue'
+const InventoryManager = defineAsyncComponent(() => import('@/Components/Modals/InventoryManager.vue'))
 import OrdersPanel      from '@/Components/OrdersPanel.vue'
 import FilterPanel      from '@/Components/FilterPanel.vue'
 import DrinkerPanel     from '@/Components/DrinkerPanel.vue'
@@ -198,6 +199,33 @@ const emit = defineEmits([
 // ── État local (UI uniquement) ────────────────────────────────────────────────
 const showInventory   = ref(false)
 const showOrdersPanel = ref(false)
+
+// ── Pagination progressive ────────────────────────────────────────────────────
+const PAGE_SIZE    = 40
+const displayCount = ref(PAGE_SIZE)
+const sentinelEl   = ref(null)
+let observer       = null
+
+const visibleCocktails = computed(() =>
+  props.filteredCocktails.slice(0, displayCount.value)
+)
+
+watch(() => props.filteredCocktails, () => {
+  displayCount.value = PAGE_SIZE
+}, { immediate: true })
+
+function setupObserver() {
+  observer?.disconnect()
+  observer = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting && displayCount.value < props.filteredCocktails.length) {
+      displayCount.value = Math.min(displayCount.value + PAGE_SIZE, props.filteredCocktails.length)
+    }
+  }, { rootMargin: '200px' })
+  if (sentinelEl.value) observer.observe(sentinelEl.value)
+}
+
+onMounted(setupObserver)
+onBeforeUnmount(() => observer?.disconnect())
 
 // ── Computed ──────────────────────────────────────────────────────────────────
 const selectedCount = computed(() => props.barInventory?.size ?? 0)

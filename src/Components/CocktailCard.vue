@@ -24,7 +24,7 @@
     <div class="recipe-compact">
       <div
         v-for="(ing, idx) in recipeWithQty"
-        :key="idx"
+        :key="ing.Type ? ing.Type + idx : idx"
         class="recipe-line"
       >
         <div class="ingredient-info">
