@@ -14,7 +14,12 @@ export function useInventory() {
 
   async function fetchIngredients(barId) {
     const id = barId ?? currentBarId.value
-    if (!id) return
+    if (!id) {
+      ingredients.value = []
+      barInventory.value = new Set()
+      return
+    }
+
     loading.value = true
     try {
       const { data, error } = await supabase
@@ -25,9 +30,11 @@ export function useInventory() {
         .order('name')
 
       if (error) throw error
-      ingredients.value = data
+
+      const rows = Array.isArray(data) ? data : []
+      ingredients.value = rows
       barInventory.value = new Set(
-        data.filter(i => i.available).map(i => i.type)
+        rows.filter(i => i.available).map(i => i.type)
       )
     } catch (err) {
       console.error('❌ Erreur fetchIngredients:', err)
@@ -148,22 +155,47 @@ export function useInventory() {
 
   // Initialiser les ingrédients par défaut pour un nouveau bar
   async function initializeDefaultIngredients(barId) {
+    const targetBarId = barId ?? currentBarId.value
+    if (!targetBarId) {
+      throw new Error('Aucun bar ID fourni pour l’initialisation des ingrédients')
+    }
+
     try {
+      const { data: existingRows, error: fetchError } = await supabase
+        .from('ingredients')
+        .select('id')
+        .eq('bar_id', targetBarId)
+        .limit(1)
+
+      if (fetchError) throw fetchError
+
+      if (existingRows?.length) {
+        await fetchIngredients(targetBarId)
+        return { success: true }
+      }
+
       const rows = ingredientsDatabase.map(ing => ({
         type: ing.type,
         name: ing.name,
         category: ing.category,
         family: ing.family,
         abv: ing.abv,
-        bar_id: barId,
+        bar_id: targetBarId,
         available: false,
       }))
-      
-      const { error } = await supabase
-        .from('ingredients')
-        .insert(rows)
-      
-      if (error) throw error
+
+      const batchSize = 100
+      for (let index = 0; index < rows.length; index += batchSize) {
+        const batch = rows.slice(index, index + batchSize)
+        const { error } = await supabase
+          .from('ingredients')
+          .insert(batch)
+
+        if (error) throw error
+      }
+
+      await fetchIngredients(targetBarId)
+      return { success: true }
     } catch (err) {
       console.error('❌ Erreur initializeDefaultIngredients:', err)
       throw err

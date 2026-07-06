@@ -49,7 +49,7 @@ export function useOrders() {
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
-          console.log('✅ Listening to orders for bar:', barId)
+          // console.log('✅ Listening to orders for bar:', barId)
         } else if (status === 'CHANNEL_ERROR') {
           console.error('❌ Orders channel error for bar:', barId)
           toastError('Connexion temps réel perdue. Recharge la page.')
