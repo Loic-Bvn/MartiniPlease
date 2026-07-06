@@ -93,7 +93,7 @@
           :activeBarId="activeBarId"
           :cocktails="cocktails"
           :cocktailsLoading="cocktailsLoading"
-          :menuCards="menuCards"
+          :menuCards="accessibleMenuCards"
           :hasDrinker="hasDrinker"
           :drinkerPseudo="drinkerPseudo"
           :favorites="favorites"
@@ -125,9 +125,11 @@
           :hasActiveFilters="hasActiveFilters"
           :makeableCount="makeableCount"
           @view-card="openCardView"
+          @open-cocktail="openCocktailView"
           @edit-card="openEditCardModal"
           @delete-card="handleDeleteCard"
           @new-card="openNewCardModal"
+          @toggle-card-visibility="handleToggleCardVisibility"
           @toggle-favorite="toggleFavorite"
           @edit-cocktail="openEditCocktailModal"
           @delete-cocktail="handleDeleteCocktail"
@@ -188,6 +190,12 @@
           @toggle-locale="toggleLocale"
           @toggle-unit="toggleUnit"
         />
+        <CocktailView
+          v-if="viewingCocktail"
+          :cocktail="viewingCocktail"
+          :locale="locale"
+          @close="closeCocktailView"
+        />
       </div>
     </div>
 
@@ -228,6 +236,7 @@ const DrinkerLoginModal = defineAsyncComponent(() => import('@/Components/Modals
 const MenuCardModal     = defineAsyncComponent(() => import('@/Components/Modals/MenuCardModal.vue'))
 const CatalogModal      = defineAsyncComponent(() => import('@/Components/Modals/CatalogModal.vue'))
 const CocktailModal     = defineAsyncComponent(() => import('@/Components/Modals/CocktailModal.vue'))
+const CocktailView      = defineAsyncComponent(() => import('@/Components/Modals/CocktailView.vue'))
 const MenuCardView      = defineAsyncComponent(() => import('@/Components/MenuCardView.vue'))
 const LegalNotice       = defineAsyncComponent(() => import('@/views/LegalNotice.vue'))
 const PrivacyPolicy     = defineAsyncComponent(() => import('@/views/PrivacyPolicy.vue'))
@@ -249,10 +258,11 @@ const {
   currentLegalPage, openLegalPage, closeLegalPage,
   toggleLocale, toggleUnit,
   showAuthModal, showCocktailModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
-  editingCocktail, editingCard, viewingCard,
+  editingCocktail, editingCard, viewingCard, viewingCocktail,
   openNewCocktailModal, openEditCocktailModal, closeCocktailModal,
   openNewCardModal,    openEditCardModal,    closeCardModal,
   openCardView,        closeCardView,
+  openCocktailView,    closeCocktailView,
 } = useUIState()
 
 // ── Bar actif (bartender connecté OU invité via code) ─────────────────────────
@@ -264,6 +274,11 @@ const activeBarName = computed(() => currentBarName.value || guestBar.value?.nam
 const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, updateCocktail, deleteCocktail } = useCocktails()
 const { barInventory, ingredients, fetchIngredients, initializeDefaultIngredients } = useInventory()
 const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCard } = useMenuCards()
+const accessibleMenuCards = computed(() =>
+  isLoggedIn.value
+    ? menuCards.value
+    : menuCards.value.filter(card => card.is_visible !== false)
+)
 const { hasDrinker, drinkerPseudo, initDrinker, createDrinker, reconnectDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { fetchSnapshots } = useCatalog()
 const { toastMessage, toastType, showToast } = useToast()
@@ -500,7 +515,30 @@ async function handleDeleteCard(id) {
   const result = await deleteMenuCard(id)
   if (!result.success) showToast(`❌ ${result.error}`, 'error')
 }
+async function handleToggleCardVisibility(card) {
+  if (!card?.id) return
 
+  const currentlyVisible = card.is_visible !== false
+  const nextVisible = !currentlyVisible
+
+  try {
+    const result = await updateMenuCard(card.id, {
+      id: card.id,
+      name: card.name,
+      cocktail_ids: card.cocktail_ids || [],
+      is_visible: nextVisible,
+    })
+
+    if (!result.success) throw new Error(result.error?.message || result.error || 'Erreur inconnue')
+
+    showToast(locale.value === 'fr'
+      ? (nextVisible ? '🗂️ Menu affiché aux drinkers' : '🙈 Menu masqué aux drinkers')
+      : (nextVisible ? '🗂️ Menu shown to drinkers' : '🙈 Menu hidden from drinkers'))
+  } catch (err) {
+    console.error('❌ handleToggleCardVisibility:', err)
+    showToast(`❌ ${err.message}`, 'error')
+  }
+}
 // ── Import catalogue ──────────────────────────────────────────────────────────
 
 function handleCatalogImport(newCocktail) {
@@ -525,8 +563,8 @@ function scrollToCocktailCard(cocktailId) {
 // ── Deep link via hash ────────────────────────────────────────────────────────
 
 function openCardFromSlug(slug) {
-  if (!slug || !menuCards.value.length) return
-  const match = menuCards.value.find(c => slugify(c.name) === slug)
+  if (!slug || !accessibleMenuCards.value.length) return
+  const match = accessibleMenuCards.value.find(c => slugify(c.name) === slug)
   if (match) openCardView(match)
 }
 

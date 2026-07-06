@@ -1,5 +1,5 @@
 <template>
-  <div :class="['cocktail-card-compact']">
+  <div :class="['cocktail-card-compact', { 'cocktail-card--flipping': isFlipping }]" @click="handleOpen">
 
     <!-- Header -->
     <div class="card-header">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- Recette -->
-    <div class="recipe-compact">
+    <div class="recipe-compact" @click="handleOpen" title="Voir les détails">
       <div
         v-for="(ing, idx) in recipeWithQty"
         :key="ing.Type ? ing.Type + idx : idx"
@@ -68,7 +68,7 @@
       <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
         <button
           v-if="hasDrinker && !isBartenderMode"
-          @click="handleFavorite"
+          @click.stop="handleFavorite"
           :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
           :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
         >
@@ -76,7 +76,7 @@
         </button>
         <button
           v-if="hasDrinker && !isBartenderMode"
-          @click="handleHistoric"
+          @click.stop="handleHistoric"
           class="btn-order-simple"
           title="Commander"
         >
@@ -84,15 +84,15 @@
         </button>
 
         <template v-if="isBartenderMode">
-          <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
+          <button @click.stop="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
             <Pencil :size="16" />
           </button>
-          <button @click="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
+          <button @click.stop="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
             <Trash2 :size="16" />
           </button>
           <button
             v-if="!isSubmitted(cocktail.id)"
-            @click="handleSubmit"
+            @click.stop="handleSubmit"
             class="btn-icon btn-icon--submit"
             :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
           >
@@ -133,8 +133,9 @@ const props = defineProps({
   barId:           { type: String, default: '' },
 })
 const { showToast } = useToast()
+const isFlipping = ref(false)
 
-defineEmits(['edit', 'delete'])
+const emit = defineEmits(['edit', 'delete', 'open'])
 
 const { barInventory }                             = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
@@ -191,6 +192,14 @@ async function handleHistoric() {
   } else {
     console.error('❌ Order failed:', result.error)
   }
+}
+
+function handleOpen() {
+  isFlipping.value = true
+  setTimeout(() => {
+    emit('open', props.cocktail)
+    isFlipping.value = false
+  }, 280)
 }
 
 function formatQty(ing) {
@@ -266,3 +275,35 @@ async function handleSubmit() {
 }
 
 </script>
+
+<style scoped>
+.cocktail-card-compact {
+  transform-style: preserve-3d;
+  perspective: 1800px;
+  will-change: transform, box-shadow;
+}
+
+.cocktail-card--flipping {
+  transform-origin: center center;
+  animation: cardFlipPulse 0.48s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+@keyframes cardFlipPulse {
+  0% {
+    transform: perspective(1800px) rotateY(0deg) scale(1) translateZ(0);
+  }
+  35% {
+    transform: perspective(1800px) rotateY(72deg) scale(1.04) translateZ(24px);
+  }
+  70% {
+    transform: perspective(1800px) rotateY(108deg) scale(1.06) translateZ(40px);
+  }
+  100% {
+    transform: perspective(1800px) rotateY(180deg) scale(1.01) translateZ(0);
+  }
+}
+</style>

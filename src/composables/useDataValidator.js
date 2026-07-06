@@ -134,6 +134,7 @@ export function validateMenuCard(card) {
     ...(card.id ? { id: card.id } : {}),
     name: card.name.trim(),
     cocktail_ids: card.cocktail_ids,
+    is_visible: card.is_visible !== false,
   }
 }
 

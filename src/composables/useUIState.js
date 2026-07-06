@@ -26,6 +26,7 @@ const showDrinkerLoginModal = ref(false)
 const editingCocktail = ref(null)
 const editingCard     = ref(null)
 const viewingCard     = ref(null)
+const viewingCocktail = ref(null)
 
 // ── Divers ────────────────────────────────────────────────────────────────────
 const burgerOpen = ref(false)
@@ -98,6 +99,14 @@ export function useUIState() {
     viewingCard.value = null
   }
 
+  function openCocktailView(cocktail) {
+    viewingCocktail.value = cocktail
+  }
+
+  function closeCocktailView() {
+    viewingCocktail.value = null
+  }
+
   return {
     // État
     locale,
@@ -111,6 +120,7 @@ export function useUIState() {
     editingCocktail,
     editingCard,
     viewingCard,
+    viewingCocktail,
     burgerOpen,
 
     // Actions
@@ -126,5 +136,7 @@ export function useUIState() {
     closeCardModal,
     openCardView,
     closeCardView,
+    openCocktailView,
+    closeCocktailView,
   }
 }

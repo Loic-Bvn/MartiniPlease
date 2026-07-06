@@ -36,7 +36,12 @@ export function useMenuCards() {
     try {
       const { data, error } = await supabase
         .from('menu_cards')
-        .insert({ name: cardData.name, cocktail_ids: cardData.cocktail_ids, bar_id: barId })
+        .insert({
+          name: cardData.name,
+          cocktail_ids: cardData.cocktail_ids,
+          is_visible: cardData.is_visible ?? true,
+          bar_id: barId,
+        })
         .select()
         .single()
 
@@ -53,7 +58,11 @@ export function useMenuCards() {
     try {
       const { data, error } = await supabase
         .from('menu_cards')
-        .update({ name: cardData.name, cocktail_ids: cardData.cocktail_ids })
+        .update({
+          name: cardData.name,
+          cocktail_ids: cardData.cocktail_ids,
+          is_visible: cardData.is_visible ?? true,
+        })
         .eq('id', id)
         .eq('bar_id', currentBarId.value)
         .select()

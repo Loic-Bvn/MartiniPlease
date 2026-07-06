@@ -107,6 +107,7 @@ CREATE TABLE public.menu_cards (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   name text NOT NULL,
   cocktail_ids ARRAY DEFAULT '{}'::uuid[],
+  is_visible boolean NOT NULL DEFAULT true,
   created_at timestamp with time zone DEFAULT now(),
   bar_id uuid,
   CONSTRAINT menu_cards_pkey PRIMARY KEY (id),
