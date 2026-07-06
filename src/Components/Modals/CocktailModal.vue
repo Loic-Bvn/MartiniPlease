@@ -257,7 +257,12 @@
       <!-- Footer -->
       <div class="modal-footer">
         <button @click="$emit('close')" class="btn-modal-secondary">Annuler</button>
-        <button @click="handleSave" class="btn-modal-primary" :disabled="!form.name.trim()">
+        <button 
+          @click="handleSave" 
+          class="btn-modal-primary" 
+          :disabled="!form.name.trim() || !hasValidRecipe"
+          :title="!form.name.trim() ? 'Remplissez le nom' : !hasValidRecipe ? 'Ajoutez une recette avec quantité' : ''"
+        >
           {{ isNew ? '✨ Créer' : '💾 Enregistrer' }}
         </button>
       </div>
@@ -323,6 +328,13 @@ const cocktailStyleOptions = computed(() => getCocktailStyles())
 
 // ── Computed ─────────────────────────────────────
 const isNew = computed(() => !props.cocktail?.id)
+
+// Vérifier que la recette est valide
+const hasValidRecipe = computed(() => {
+  return form.value.recipe.some(ing => 
+    ing.Type && ing.Ingredient?.trim() && (ing.Oz || ing.Ml)
+  )
+})
 
 // ── ABV calculé automatiquement depuis la recette ──
 const computedAbv = computed(() => {
@@ -417,8 +429,14 @@ function handleSave() {
     const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
     const iceArr = form.value.ice ? [form.value.ice] : []
 
+    // 🔥 Valider que tous les ingrédients ont un nom
+    const invalidIngredients = form.value.recipe.filter(ing => ing.Type && !ing.Ingredient?.trim())
+    if (invalidIngredients.length > 0) {
+      throw new Error(`⚠️ ${invalidIngredients.length} ingrédient(s) sans nom - cliquez sur l'ingrédient pour confirmer`)
+    }
+
     const cleanedRecipe = form.value.recipe
-      .filter(ing => ing.Type)
+      .filter(ing => ing.Type && ing.Ingredient?.trim())
       .map(({ Category, ...rest }) => ({
         Ingredient: rest.Ingredient,
         Type: rest.Type,
@@ -458,6 +476,9 @@ function onIngredientChange(ing) {
   const meta = INGREDIENTS_MAP[ing.Type]
   if (meta) {
     ing.Ingredient = meta.name
+  } else {
+    // 🔥 Si l'ingrédient n'existe pas dans la map, utiliser le Type comme fallback
+    ing.Ingredient = ing.Type || ''
   }
 }
 

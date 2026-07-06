@@ -118,7 +118,7 @@ import { Pencil, Trash2, Heart, PlusIcon, XIcon, GlassWater, Loader2, Check} fro
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
-import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
+import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { Upload, Bookmark } from 'lucide-vue-next'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'

@@ -12,6 +12,15 @@
   --white:   #ffffff;
   --success: #10b981;
   --danger:  #b91c1c;
+
+  /* Z-index layers (from main styles) */
+  --z-base:          1;
+  --z-sticky:        10;
+  --z-semi-fixed:    20;
+  --z-backdrop:      50;
+  --z-modal:         60;
+  --z-tooltip:       100;
+  --z-emergency:     9999;
 }
 
 /* ── Reset & Base ──────────────────────────── */
@@ -33,7 +42,7 @@ body {
   border: 3px solid var(--dark);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: var(--z-sticky);
   box-shadow: 4px 4px 0 var(--dark);
 }
 
@@ -684,7 +693,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  z-index: 50;
+  z-index: var(--z-backdrop);
 }
 
 /* ── Inventory manager ─────────────────────── */
@@ -908,7 +917,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: var(--z-backdrop);
   padding: 1rem;
 }
 
@@ -1166,7 +1175,7 @@ body {
   position: fixed;
   inset: 0;
   background: #f8f7f4;
-  z-index: 50;
+  z-index: var(--z-backdrop);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1181,7 +1190,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  z-index: 10;
+  z-index: var(--z-sticky);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 

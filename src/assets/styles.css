@@ -39,6 +39,15 @@
   --color-border-secondary: var(--border-mid);
   --color-border-tertiary: var(--border);
   --color-background-secondary: var(--bg-raised);
+
+  /* Z-index layers (standardized) */
+  --z-base:          1;      /* Default/select dropdowns */
+  --z-sticky:        10;     /* Sticky headers/footers */
+  --z-semi-fixed:    20;     /* Semi-fixed content */
+  --z-backdrop:      50;     /* Modal backdrops */
+  --z-modal:         60;     /* Modal content */
+  --z-tooltip:       100;    /* Tooltips/dropdowns over modals */
+  --z-emergency:     9999;   /* Emergency fallback only */
 }
 
 .dark {
@@ -98,7 +107,7 @@ body {
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: var(--z-sticky);
   box-shadow: var(--shadow-md);
 }
 
@@ -937,7 +946,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  z-index: 50;
+  z-index: var(--z-backdrop);
   backdrop-filter: blur(2px);
 }
 
@@ -1235,7 +1244,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: var(--z-backdrop);
   padding: 1rem;
   backdrop-filter: blur(3px);
 }
@@ -1365,7 +1374,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: var(--z-modal);
   padding: 1rem;
   backdrop-filter: blur(4px);
 }
@@ -1603,7 +1612,7 @@ body {
   position: fixed;
   inset: 0;
   background: var(--bg);
-  z-index: 50;
+  z-index: var(--z-backdrop);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -2481,13 +2490,13 @@ body {
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-lg);
   padding: 6px;
-  z-index: 200;
+  z-index: var(--z-tooltip);
   box-shadow: var(--shadow-lg);
 }
 .burger-overlay {
   position: fixed;
   inset: 0;
-  z-index: 199;
+  z-index: var(--z-semi-fixed);
 }
 .burger-item {
   display: flex;
@@ -3500,7 +3509,7 @@ body {
   border-radius: 8px;
   font-size: 13px;
   opacity: 0.95;
-  z-index: 9999;
+  z-index: var(--z-emergency);
 }
 .btn-order-simple {
   width: 34px;
@@ -3572,7 +3581,7 @@ body {
   overflow-y: auto;
 
   position: relative;
-  z-index: 1;
+  z-index: var(--z-base);
 }
 
 /* =========================
@@ -3960,4 +3969,107 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--gold);
+}
+
+/* =============================================
+   RESPONSIVE DESIGN — MOBILE & TABLET
+   ============================================= */
+
+/* Mobile (< 480px) */
+@media (max-width: 479px) {
+  .header-container {
+    padding: 0.5rem;
+  }
+
+  .header-left,
+  .header-right {
+    gap: 0.25rem;
+  }
+
+  .password-form-input,
+  .add-ing-input {
+    font-size: 16px; /* Prevent iOS zoom on focus */
+    padding: 0.75rem;
+  }
+
+  .password-modal-content,
+  .add-ing-content {
+    width: 95vw;
+    max-width: 90vw;
+    padding: 1rem;
+  }
+
+  .password-modal-buttons,
+  .add-ing-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .password-btn-submit,
+  .password-btn-cancel,
+  .add-ing-btn-submit,
+  .add-ing-btn-cancel {
+    width: 100%;
+  }
+
+  .modal-overlay,
+  .password-modal-overlay,
+  .add-ing-overlay {
+    padding: 0.5rem;
+  }
+
+  .auth-tabs {
+    gap: 0.5rem;
+  }
+
+  .auth-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Tablet (480px - 768px) */
+@media (max-width: 768px) {
+  .header-container {
+    max-width: 100%;
+    padding: 0.75rem 1rem;
+  }
+
+  .filter-panel,
+  .card-panel {
+    gap: 1rem;
+  }
+
+  .cocktail-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+/* =============================================
+   ACCESSIBILITY — CONTRAST FIXES
+   ============================================= */
+
+/* Fix low contrast in .dark mode for --muted text */
+.dark .text-muted,
+.dark .text-secondary {
+  color: #a8a090; /* Increased from #8a7f6e for better contrast */
+}
+
+/* Fix button contrast */
+.btn-control:disabled,
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  color: var(--text-muted);
+}
+
+/* Improved focus states for accessibility */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
 }

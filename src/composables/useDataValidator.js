@@ -21,22 +21,22 @@ export function cleanRecipe(recipe) {
         cleaned.Type = typeValue
       }
       
-      // Convertir Oz en nombre si présent
+      // Convertir Oz en nombre si présent (accepter 0 inclus)
       if (ing.Oz !== null && ing.Oz !== undefined && ing.Oz !== '') {
         const oz = parseFloat(ing.Oz)
-        if (!isNaN(oz) && oz > 0) cleaned.Oz = oz
+        if (!isNaN(oz) && oz >= 0) cleaned.Oz = oz
       }
       
-      // Convertir Ml en nombre si présent
+      // Convertir Ml en nombre si présent (accepter 0 inclus)
       if (ing.Ml !== null && ing.Ml !== undefined && ing.Ml !== '') {
         const ml = parseFloat(ing.Ml)
-        if (!isNaN(ml) && ml > 0) cleaned.Ml = ml
+        if (!isNaN(ml) && ml >= 0) cleaned.Ml = ml
       }
       
-      // Convertir Dashes en nombre si présent
+      // Convertir Dashes en nombre si présent (accepter 0 inclus)
       if (ing.Dashes !== null && ing.Dashes !== undefined && ing.Dashes !== '') {
         const dashes = parseInt(ing.Dashes, 10)
-        if (!isNaN(dashes) && dashes > 0) cleaned.Dashes = dashes
+        if (!isNaN(dashes) && dashes >= 0) cleaned.Dashes = dashes
       }
       
       return cleaned
@@ -51,10 +51,21 @@ export function validateCocktail(cocktail) {
     throw new Error('Cocktail name is required')
   }
 
+  const recipe = cleanRecipe(cocktail.recipe)
+  
+  // Vérifier qu'il y a au moins une recette avec quantité
+  if (recipe.length === 0) {
+    throw new Error('At least one ingredient is required')
+  }
+  const hasValidRecipe = recipe.some(ing => ing.Oz !== undefined || ing.Ml !== undefined)
+  if (!hasValidRecipe) {
+    throw new Error('At least one ingredient must have a quantity (Oz or Ml)')
+  }
+
   const cleaned = {
     ...(cocktail.id ? { id: cocktail.id } : {}),
     name: cocktail.name.trim(),
-    recipe: cleanRecipe(cocktail.recipe),
+    recipe: recipe,
   }
 
   // Champs optionnels - ne pas envoyer s'ils sont vides/null

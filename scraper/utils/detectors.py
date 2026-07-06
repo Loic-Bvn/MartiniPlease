@@ -8,9 +8,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from typing import Optional, List, Dict
 from unidecode import unidecode
 
-from constants.ingredients_parser import INGREDIENT_RULES
+from scraper.constants.ingredients_parser import INGREDIENT_RULES
 from scraper.constants.shared_constants import get_all_ingredients_dict
-from config import DASH_ML, OZ_TO_ML
+from scraper.config import DASH_ML, OZ_TO_ML
 # Dérivés à la volée depuis TYPE_METADATA — source centralisée
 # Structure TYPE_METADATA : { type: (name, category, abv, family) }
 TYPE_METADATA = get_all_ingredients_dict()

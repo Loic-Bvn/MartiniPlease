@@ -240,7 +240,7 @@ import { ref, computed } from 'vue'
 import { User, GlassWater, Clock, Check, X, Loader2 } from 'lucide-vue-next'
 import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
-import { getTypeLabel } from '../constants/typeLabels.js'
+import { getTypeLabel } from '@/constants/typeLabels.js'
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },

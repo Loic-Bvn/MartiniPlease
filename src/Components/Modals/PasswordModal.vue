@@ -15,12 +15,13 @@
 
       <div class="password-form-group">
         <input
+          ref="passwordInputRef"
           type="password"
           v-model="password"
           @keypress.enter="handleSubmit"
           placeholder="Mot de passe..."
           class="password-form-input"
-          autofocus
+          required
         />
         <p v-if="error" class="password-form-error">{{ error }}</p>
       </div>
@@ -37,15 +38,30 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { X } from 'lucide-vue-next'
 
 const emit = defineEmits(['close', 'success'])
 
 const password = ref('')
 const error = ref('')
+const passwordInputRef = ref(null)
+const previousFocusElement = ref(null)
 
 const BARTENDER_PASSWORD = import.meta.env.VITE_BARTENDER_PASSWORD
+
+// Focus management
+onMounted(() => {
+  previousFocusElement.value = document.activeElement
+  passwordInputRef.value?.focus()
+})
+
+onBeforeUnmount(() => {
+  // Restaurer le focus au dernier élément actif
+  if (previousFocusElement.value?.focus) {
+    previousFocusElement.value.focus()
+  }
+})
 
 function handleSubmit() {
   if (!password.value.trim()) {

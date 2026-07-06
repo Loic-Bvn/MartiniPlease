@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { X, Plus, Loader2 } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 
@@ -118,6 +118,7 @@ const emit = defineEmits(['close', 'added'])
 const { addIngredient } = useInventory()
 
 const nameInput = ref(null)
+const previousFocusElement = ref(null)
 const saving    = ref(false)
 const error     = ref('')
 
@@ -129,7 +130,18 @@ const form = ref({
   available: true,
 })
 
-onMounted(() => nameInput.value?.focus())
+// Focus management
+onMounted(() => {
+  previousFocusElement.value = document.activeElement
+  nameInput.value?.focus()
+})
+
+onBeforeUnmount(() => {
+  // Restaurer le focus au dernier élément actif
+  if (previousFocusElement.value?.focus) {
+    previousFocusElement.value.focus()
+  }
+})
 
 function toSlug(str) {
   return str
@@ -145,10 +157,39 @@ function autoSlug() {
 
 async function handleSubmit() {
   error.value = ''
+  
+  // Validation du nom
   const name = form.value.name.trim()
-  if (!name) { error.value = 'Le nom est obligatoire.'; return }
+  if (!name) { 
+    error.value = 'Le nom est obligatoire.'
+    nameInput.value?.focus()
+    return 
+  }
+  if (name.length < 2) {
+    error.value = 'Le nom doit contenir au moins 2 caractères.'
+    nameInput.value?.focus()
+    return
+  }
 
+  // Validation du type/slug
   const type = form.value.type.trim() || toSlug(name)
+  if (!type) {
+    error.value = 'Le type/identifiant ne peut pas être vide.'
+    return
+  }
+  if (!/^[a-z0-9_]+$/.test(type)) {
+    error.value = 'Le type doit contenir uniquement des lettres, chiffres et underscores.'
+    return
+  }
+
+  // Validation ABV
+  if (form.value.abv !== null && form.value.abv !== undefined) {
+    if (form.value.abv < 0 || form.value.abv > 100) {
+      error.value = 'L\'ABV doit être entre 0 et 100.'
+      return
+    }
+  }
+
   saving.value = true
   try {
     await addIngredient({
@@ -164,7 +205,7 @@ async function handleSubmit() {
   } catch (err) {
     error.value = err?.message?.includes('duplicate')
       ? 'Un ingrédient avec cet identifiant existe déjà.'
-      : 'Erreur lors de l\'ajout. Vérifie les champs.'
+      : err?.message || 'Erreur lors de l\'ajout. Vérifie les champs.'
   } finally {
     saving.value = false
   }

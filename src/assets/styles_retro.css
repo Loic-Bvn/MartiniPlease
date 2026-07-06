@@ -22,6 +22,15 @@
   --gold-2:    #b07818;
   --gold-dim:  #9a7020;
   --amber:     #a05010;
+
+  /* Z-index layers (from main styles) */
+  --z-base:          1;
+  --z-sticky:        10;
+  --z-semi-fixed:    20;
+  --z-backdrop:      50;
+  --z-modal:         60;
+  --z-tooltip:       100;
+  --z-emergency:     9999;
 }
 
 /* ── Dark variables ────────────────────────── */
@@ -61,7 +70,7 @@ body {
   border-bottom: 3px solid var(--gold-2);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: var(--z-sticky);
 }
 .dark .header { background: var(--surface);
   border-bottom-color: var(--gold-dim);
@@ -336,7 +345,7 @@ body {
 .menu-card-actions { display: flex; gap: 0.25rem; }
 
 /* ── Modal overlay ───────────────────────────── */
-.modal-overlay { position: fixed; inset: 0; background-color: rgba(30,26,14,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 50; backdrop-filter: blur(2px); }
+.modal-overlay { position: fixed; inset: 0; background-color: rgba(30,26,14,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: var(--z-backdrop); backdrop-filter: blur(2px); }
 .dark .modal-overlay { background-color: rgba(0,0,0,0.7); }
 
 /* ── Inventory ───────────────────────────────── */
@@ -378,7 +387,7 @@ body {
 .empty-state   { text-align: center; padding: 3rem; color: var(--muted-2); font-size: 0.85rem; font-style: italic; font-family: 'Georgia', serif; }
 
 /* ── Password modal ──────────────────────────── */
-.password-modal-overlay { position: fixed; inset: 0; background-color: rgba(30,26,14,0.55); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 1rem; backdrop-filter: blur(2px); }
+.password-modal-overlay { position: fixed; inset: 0; background-color: rgba(30,26,14,0.55); display: flex; align-items: center; justify-content: center; z-index: var(--z-backdrop); padding: 1rem; backdrop-filter: blur(2px); }
 .dark .password-modal-overlay { background-color: rgba(0,0,0,0.7); }
 .password-modal-content { background: var(--bg); border: 2px solid var(--gold-dim); border-radius: 2px; box-shadow: 4px 4px 0 var(--border-2); max-width: 380px; width: 100%; padding: 1.75rem; }
 .dark .password-modal-content { box-shadow: 4px 4px 0 rgba(0,0,0,0.5); }
@@ -450,8 +459,8 @@ body {
 /* =============================================
    MENU CARD VIEW
    ============================================= */
-.card-view { position: fixed; inset: 0; background: var(--bg); z-index: 50; overflow-y: auto; display: flex; flex-direction: column; }
-.cv-header { position: sticky; top: 0; background: var(--accent); border-bottom: 3px solid var(--gold-2); display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; z-index: 10; }
+.card-view { position: fixed; inset: 0; background: var(--bg); z-index: var(--z-backdrop); overflow-y: auto; display: flex; flex-direction: column; }
+.cv-header { position: sticky; top: 0; background: var(--accent); border-bottom: 3px solid var(--gold-2); display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; z-index: var(--z-sticky); }
 .dark .cv-header { background: var(--surface); border-bottom-color: var(--gold-dim); }
 .cv-back { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: rgba(240,232,204,0.7); background: none; border: none; cursor: pointer; padding: 0.4rem 0.6rem; border-radius: 2px; transition: color 0.15s; width: 80px; font-family: -apple-system, sans-serif; text-transform: uppercase; letter-spacing: 1px; }
 .dark .cv-back { color: var(--muted); }

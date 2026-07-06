@@ -2,6 +2,11 @@
    GUI IMPROVEMENTS - NOVO STYLES
    ══════════════════════════════════════════════════════════════ */
 
+/* Import z-index layers from main styles */
+:root {
+  --z-tooltip: 100;
+}
+
 /* ── Chip with counter ─────────────────────────────────────── */
 .chip-with-count {
   position: relative;
@@ -49,7 +54,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   max-height: 300px;
   overflow-y: auto;
-  z-index: 100;
+  z-index: var(--z-tooltip);
   animation: slideDown 0.2s ease;
 }
 
