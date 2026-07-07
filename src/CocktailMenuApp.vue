@@ -29,7 +29,7 @@
           :suggestions="suggestions"
           :randomLogo="randomLogo"
           @logo-click="handleLogoClick"
-          @open-new-cocktail="openNewCreateCocktailModal"
+          @open-new-cocktail="openNewCocktailFormModal"
           @toggle-locale="toggleLocale"
           @toggle-unit="toggleUnit"
           @scroll-to-cocktail="scrollToCocktailCard"
@@ -131,9 +131,9 @@
           @new-card="openNewCardModal"
           @toggle-card-visibility="handleToggleCardVisibility"
           @toggle-favorite="toggleFavorite"
-          @edit-cocktail="openEditCreateCocktailModal"
+          @edit-cocktail="openEditCocktailFormModal"
           @delete-cocktail="handleDeleteCocktail"
-          @new-cocktail="openNewCreateCocktailModal"
+          @new-cocktail="openNewCocktailFormModal"
           @toggle-family="toggleFamily"
           @toggle-sub-spirit="toggleSubSpirit"
           @toggle-profile="toggleProfile"
@@ -172,12 +172,13 @@
           @close="showCatalogModal = false"
           @imported="handleCatalogImport"
         />
-        <CreateCocktailModal
-          v-if="showCreateCocktailModal"
+        <CocktailFormModal
+          v-if="showCocktailFormModal"
           :cocktail="editingCocktail"
+          :locale="locale"
           :bar-id="activeBarId"
           @save="handleSaveCocktail"
-          @close="closeCreateCocktailModal"
+          @close="closeCocktailFormModal"
         />
         <MenuCardView
           v-if="viewingCard"
@@ -238,7 +239,7 @@ const AuthModal         = defineAsyncComponent(() => import('@/Components/Modals
 const DrinkerLoginModal = defineAsyncComponent(() => import('@/Components/Modals/DrinkerLoginModal.vue'))
 const MenuCardModal     = defineAsyncComponent(() => import('@/Components/Modals/MenuCardModal.vue'))
 const CatalogModal      = defineAsyncComponent(() => import('@/Components/Modals/CatalogModal.vue'))
-const CreateCocktailModal     = defineAsyncComponent(() => import('@/Components/Modals/CreateCocktailModal.vue'))
+const CocktailFormModal     = defineAsyncComponent(() => import('@/Components/Modals/CocktailFormModal.vue'))
 const CocktailDetailModal= defineAsyncComponent(() => import('@/Components/Modals/CocktailDetailModal.vue'))
 const MenuCardView      = defineAsyncComponent(() => import('@/Components/MenuCardView.vue'))
 const LegalNotice       = defineAsyncComponent(() => import('@/views/LegalNotice.vue'))
@@ -260,9 +261,9 @@ const {
   locale, unit,
   currentLegalPage, openLegalPage, closeLegalPage,
   toggleLocale, toggleUnit,
-  showAuthModal, showCreateCocktailModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
+  showAuthModal, showCocktailFormModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
   editingCocktail, editingCard, viewingCard, viewingCocktail, viewingCocktailRect,
-  openNewCreateCocktailModal, openEditCreateCocktailModal, closeCreateCocktailModal,
+  openNewCocktailFormModal, openEditCocktailFormModal, closeCocktailFormModal,
   openNewCardModal,    openEditCardModal,    closeCardModal,
   openCardView,        closeCardView,
   openCocktailDetailModal,    closeCocktailDetailModal,
@@ -481,7 +482,7 @@ async function handleSaveCocktail(data) {
       : await createCocktail(data)
 
     if (!result.success) throw new Error(result.error?.message || result.error || 'Erreur inconnue')
-    closeCreateCocktailModal()
+    closeCocktailFormModal()
     showToast(locale.value === 'fr' ? '🍸 Cocktail sauvegardé' : '🍸 Cocktail saved')
   } catch (err) {
     console.error('❌ handleSaveCocktail:', err)

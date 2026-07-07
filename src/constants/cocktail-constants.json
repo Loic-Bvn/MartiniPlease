@@ -1118,19 +1118,19 @@
   },
   "ice_types": {
     "cubed": {
-      "name": "Ice Cubes",
+      "name": "cubed",
       "emoji": "🧊"
     },
     "crushed": {
-      "name": "Crushed Ice",
+      "name": "crushed",
       "emoji": "❄️"
     },
     "clear": {
-      "name": "Clear Ice",
+      "name": "clear",
       "emoji": "🧊"
     },
     "no_ice": {
-      "name": "No Ice",
+      "name": "no_ice",
       "emoji": "🌡️"
     }
   },

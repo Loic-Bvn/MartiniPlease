@@ -1,29 +1,36 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div ref="modalEl" class="modal-container modal-container--cocktail">
-      <div class="modal-header">
-        <div class="cocktail-title-row" style="flex: 1;">
-          <h2 class="modal-title" style="margin: 0;">{{ cocktail.name }}</h2>
-          <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
-        </div>
-        <button @click="$emit('close')" class="modal-close-btn"><X :size="20" /></button>
-      </div>
+    <!-- <div class="modal-header">
+      <button @click="$emit('close')" class="modal-close-btn"><X :size="20" /></button>
+    </div> -->
 
       <div class="modal-body cv-modal-body">
         <div class="cocktail-view-layout">
-          <div class="cv-image-col">
-            <div v-if="cocktail.image" class="image-preview-large">
-              <img :src="cocktail.image" alt="cocktail image" @error="imageError = true" v-if="!imageError" />
-              <div v-else class="image-missing">Image introuvable</div>
-            </div>
-            <div v-else class="image-missing">Pas d'image</div>
 
-            <div v-if="cocktail.profile?.length" class="profile-tags cv-profile-tags">
-              {{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}
+          <div class="cv-image-col">
+
+            <div class="cocktail-title-row">
+              <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
+                {{ cocktail.name }}
+              </h3>
+                <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
             </div>
+
+            <div v-if="cocktail.image && !imageError" class="image-preview-large">
+              <img :src="cocktail.image" alt="cocktail image" @error="imageError = true" />
+            </div>
+            <div v-else class="image-missing">
+              <Martini :size="40" />
+            </div>
+
+            <!-- <div class="profile-tags cv-profile-tags" :class="{ 'cv-value--na': !cocktail.profile?.length }">
+              {{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : 'Profil indisponible' }}
+            </div> -->
           </div>
 
           <div class="cv-content-col">
+            
             <!-- Onglets -->
             <div class="swipe-tabs" role="tablist">
               <button
@@ -47,6 +54,16 @@
                 Recette
                 <span class="swipe-tab-count">{{ (cocktail.recipe || []).length }}</span>
               </button>
+              <button
+                type="button"
+                role="tab"
+                :aria-selected="activeTab === 2"
+                class="swipe-tab"
+                :class="{ 'swipe-tab--active': activeTab === 2 }"
+                @click="goToTab(2)"
+              >
+                Description
+              </button>
               <span class="swipe-tab-indicator" :style="indicatorStyle"></span>
             </div>
 
@@ -64,33 +81,61 @@
               >
                 <!-- Panel 1 : infos -->
                 <div class="swipe-panel">
-                  <p v-if="cocktail.description" class="cocktail-description">{{ cocktail.description }}</p>
-                  <p v-else class="cocktail-description cocktail-description--empty">Aucune description disponible pour ce cocktail.</p>
+                  <!-- Préparation mise en avant : verre + glaçon + méthode -->
+                  <div class="cv-prep-block">
+                    <div class="cv-prep-item">
+                      <Martini :size="18" />
+                      <div class="cv-prep-text">
+                        <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Méthode' : 'Method' }}</span>
+                        <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.method }">{{ getDetailledMethodLabel(cocktail.method, locale) }}</span>
+                      </div>
+                    </div>
+                    <div class="cv-prep-item">
+                      <GlassWater :size="18" />
+                      <div class="cv-prep-text">
+                        <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Verre' : 'Glass' }}</span>
+                        <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.glass }">{{ getGlassLabel(cocktail.glass, locale) }}</span>
+                      </div>
+                    </div>
+                    <div class="cv-prep-item">
+                      <Snowflake :size="18" />
+                      <div class="cv-prep-text">
+                        <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Glaçon' : 'Ice' }}</span>
+                        <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.ice?.length }">{{ getDetailledIceLabel(cocktail.ice, locale) }}</span>
+                      </div>
+                    </div>
+
+                  </div>
 
                   <div class="cv-meta-list">
-                    <div v-if="cocktail.base_spirit" class="cv-meta-row">
-                      <span class="form-label">Spirit</span>
-                      <span>{{ getTypeLabel(cocktail.base_spirit, locale) }}</span>
+                    <div class="cv-meta-row">
+                      <span class="form-label">{{ props.locale === 'fr' ? 'Profiles' : 'Profiles' }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.profile?.length }">{{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
-                    <div v-if="cocktail.category" class="cv-meta-row">
+                    <div class="cv-meta-row">
+                      <span class="form-label">{{ props.locale === 'fr' ? 'Spiritueux de base' : 'Base Spirit' }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+                    </div>
+                    <!-- <div class="cv-meta-row">
                       <span class="form-label">Catégorie</span>
-                      <span>{{ cocktail.category }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.category }">{{ cocktail.category || 'Indisponible' }}</span>
+                    </div> -->
+                    <div class="cv-meta-row">
+                      <span class="form-label">{{ props.locale === 'fr' ? 'Créateur' : 'Creator' }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.creator || cocktail.creator === 'Unknown' }">{{ (cocktail.creator && cocktail.creator !== 'Unknown') ? cocktail.creator : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
-                    <div v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cv-meta-row">
-                      <span class="form-label">Créateur</span>
-                      <span>{{ cocktail.creator }}</span>
-                    </div>
-                    <div v-if="cocktail.ice?.length" class="cv-meta-row">
-                      <span class="form-label">Glace</span>
-                      <span>{{ formatList(cocktail.ice) }}</span>
-                    </div>
-                    <div v-if="cocktail.season?.length" class="cv-meta-row">
+                    <!-- <div class="cv-meta-row">
                       <span class="form-label">Saison</span>
-                      <span>{{ formatList(cocktail.season) }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.season?.length }">{{ cocktail.season?.length ? formatList(cocktail.season) : 'Indisponible' }}</span>
+                    </div> -->
+                    <div class="cv-meta-row">
+                      <span class="form-label">{{ props.locale === 'fr' ? 'Style' : 'Style' }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.cocktail_style }">{{ (cocktail.cocktail_style && cocktail.cocktail_style !== 'Unknown') ? cocktail.cocktail_style : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+
                     </div>
-                    <div v-if="cocktail.tags?.length" class="cv-meta-row">
-                      <span class="form-label">Tags</span>
-                      <span>{{ formatList(cocktail.tags) }}</span>
+                    <div class="cv-meta-row">
+                      <span class="form-label">{{ props.locale === 'fr' ? 'Tags' : 'Tags' }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.tags?.length }">{{ cocktail.tags?.length ? formatList(cocktail.tags) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                   </div>
                 </div>
@@ -115,72 +160,35 @@
                     </div>
                   </div>
                 </div>
+                <!-- Panel 3 : description -->
+                <div class="swipe-panel">
+                  <p v-if="cocktail.description" class="cocktail-description">{{ cocktail.description }}</p>
+                  <p v-else class="cocktail-description cocktail-description--empty">{{ props.locale === 'fr' ? 'Aucune description disponible pour ce cocktail.' : 'No description available for this cocktail.'}}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="modal-footer cv-modal-footer">
-        <div class="footer-left" style="display:flex; align-items:center; gap:6px; flex-wrap: wrap;">
-          <span v-if="cocktail.cocktail_style" class="badge-method">{{ styleLabel }}</span>
-          <span v-if="cocktail.method && isBartenderMode" class="badge-method">{{ methodLabel }}</span>
-          <span v-if="cocktail.glass && isBartenderMode" class="badge-method">{{ glassLabel }}</span>
-        </div>
+      <!-- <div class="modal-footer cv-modal-footer">
+        POSSIBLE ACTIONS : favoris, commande, édition, suppression, soumission au catalogue
+      </div> -->
 
-        <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
-          <button
-            v-if="hasDrinker && !isBartenderMode"
-            @click="handleFavorite"
-            :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
-            :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
-          >
-            <Heart :size="16" :fill="isFav ? 'currentColor' : 'none'" />
-          </button>
-          <button
-            v-if="hasDrinker && !isBartenderMode"
-            @click="handleHistoric"
-            class="btn-order-simple"
-            title="Commander"
-          >
-            <GlassWater :size="16" />
-          </button>
-
-          <template v-if="isBartenderMode">
-            <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
-              <Pencil :size="16" />
-            </button>
-            <button @click="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
-              <Trash2 :size="16" />
-            </button>
-            <button
-              v-if="!isSubmitted(cocktail.id)"
-              @click="handleSubmit"
-              class="btn-icon btn-icon--submit"
-              :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
-            >
-              <Upload :size="16" />
-            </button>
-            <span
-              v-else
-              class="btn-icon btn-icon--submitted"
-              :title="locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
-            >
-              <Bookmark :size="16" />
-            </span>
-          </template>
-
-          <button @click="$emit('close')" class="btn-modal-primary">Fermer</button>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, Heart, GlassWater, Pencil, Trash2, Upload, Bookmark } from 'lucide-vue-next'
-import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
+import { X, Heart, GlassWater, Pencil, Trash2, Upload, Bookmark, Martini, Snowflake } from 'lucide-vue-next'
+import { 
+  getTypeLabel,
+  getProfileLabel,
+  getGlassLabel,
+  getDetailledMethodLabel,
+  getDetailledIceLabel
+} from '@/constants/typeLabels.js'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
@@ -204,6 +212,9 @@ const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } =
 const { addOrder } = useOrders()
 const { isSubmitted, submitToCatalog } = useCatalog()
 const { showToast } = useToast()
+const makeable = computed(() =>
+  (props.cocktail.recipe || []).every(isAvailable)
+)
 
 // ── Disponibilité + favoris + commande (identique à CocktailCard) ──
 function isAvailable(ing) {
@@ -249,20 +260,26 @@ const recipeWithQty = computed(() =>
 )
 
 // ── Labels style / méthode / verre (identiques à CocktailCard) ──
-const STYLE_LABELS = {
-  sour: '🍋 Sour', fizz: '🫧 Fizz', highball: '🥃 Highball', tiki: '🌺 Tiki',
-  negroni: '🔴 Negroni', old_fashioned: '🟠 Old Fashioned', classic: '🎩 Classic',
-  modern: '✨ Modern', creamy: '🥛 Creamy', flip: '🥚 Flip', spritz: '🍾 Spritz',
-}
-const styleLabel = computed(() => STYLE_LABELS[props.cocktail.cocktail_style] || props.cocktail.cocktail_style)
+// const STYLE_LABELS = {
+//   sour: '🍋 Sour', fizz: '🫧 Fizz', highball: '🥃 Highball', tiki: '🌺 Tiki',
+//   negroni: '🔴 Negroni', old_fashioned: '🟠 Old Fashioned', classic: '🎩 Classic',
+//   modern: '✨ Modern', creamy: '🥛 Creamy', flip: '🥚 Flip', spritz: '🍾 Spritz',
+// }
+// const styleLabel = computed(() => {
+//   const s = props.cocktail.cocktail_style
+//   if (!s) return 'Indisponible'
+//   return STYLE_LABELS[s] || s
+// })
 
-const METHOD_LABELS = {
-  shake: '🍸 Shake', regal_shake: '🍸 Regal Shake', stir: '🥄 Stir', regal_stir: '🥄 Regal Stir',
-  build: '🫗 Build', blend: '🌀 Blend', swizzle: '🌿 Swizzle', throw: '🤹 Throw',
-}
-const methodLabel = computed(() => METHOD_LABELS[props.cocktail.method] || props.cocktail.method)
-
-const glassLabel = computed(() => props.cocktail.glass)
+// const METHOD_LABELS = {
+//   shake: 'Au shaker', regal_shake: '🍸 Regal Shake', stir: 'Verre à mélange', regal_stir: '🥄 Regal Stir',
+//   build: 'Au verre', blend: '🌀 Blend', swizzle: '🌿 Swizzle', throw: '🤹 Throw',
+// }
+// const methodLabel = computed(() => {
+//   const m = props.cocktail.method
+//   if (!m) return 'Indisponible'
+//   return METHOD_LABELS[m] || m
+// })
 
 function formatList(value = []) {
   if (!Array.isArray(value)) return ''
@@ -282,7 +299,7 @@ function goToTab(index) {
 }
 
 const trackStyle = computed(() => {
-  const base = -activeTab.value * 50
+  const base = -activeTab.value * (100 / 3)
   const offset = isDragging.value ? dragDeltaPercent.value : 0
   return {
     transform: `translateX(${base + offset}%)`,
@@ -321,12 +338,11 @@ function onTouchMove(e) {
 
   e.preventDefault()
   const viewportWidth = e.currentTarget.clientWidth || 1
-  let percent = (dx / viewportWidth) * 50
+  let percent = (dx / viewportWidth) * (100 / 3)
 
-  if ((activeTab.value === 0 && percent > 0) || (activeTab.value === 1 && percent < 0)) {
+  if ((activeTab.value === 0 && percent > 0) || (activeTab.value === 2 && percent < 0)) {
     percent *= 0.3
   }
-
   dragDeltaPercent.value = percent
 }
 
@@ -336,10 +352,10 @@ function onTouchEnd() {
     return
   }
   const threshold = 12
-  if (dragDeltaPercent.value <= -threshold && activeTab.value === 0) {
-    activeTab.value = 1
-  } else if (dragDeltaPercent.value >= threshold && activeTab.value === 1) {
-    activeTab.value = 0
+  if (dragDeltaPercent.value <= -threshold && activeTab.value < 2) {
+    activeTab.value += 1
+  } else if (dragDeltaPercent.value >= threshold && activeTab.value > 0) {
+    activeTab.value -= 1
   }
   isDragging.value = false
   dragDeltaPercent.value = 0
@@ -347,8 +363,8 @@ function onTouchEnd() {
 
 function onKeydown(e) {
   if (e.key === 'Escape') emit('close')
-  if (e.key === 'ArrowLeft') activeTab.value = 0
-  if (e.key === 'ArrowRight') activeTab.value = 1
+  if (e.key === 'ArrowLeft') activeTab.value = Math.max(0, activeTab.value - 1)
+  if (e.key === 'ArrowRight') activeTab.value = Math.min(2, activeTab.value + 1)
 }
 
 // ── FLIP : la modal "part" de la position/taille de la card cliquée ──
@@ -396,6 +412,11 @@ onBeforeUnmount(() => {
    ingredient-quantity, form-label, profile-tags, cocktail-abv-inline...).
    Seul le layout spécifique à cette vue (colonnes + swipe) est ajouté ici. */
 
+.modal-header {
+  padding: 0.5rem 0.75rem;
+  min-height: unset;
+}
+
 .cv-modal-body {
   overflow: hidden;
   min-height: 0;
@@ -417,7 +438,7 @@ onBeforeUnmount(() => {
 
 .cv-profile-tags {
   font-size: 0.78rem;
-  text-align: center;
+  text-align: left;
 }
 
 .cv-content-col {
@@ -447,12 +468,62 @@ onBeforeUnmount(() => {
   justify-content: center;
   height: 100%;
   min-height: 140px;
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius-lg);
-  background: var(--bg-input);
-  color: var(--text-dim);
-  font-size: 0.8rem;
-  text-align: center;
+  background: linear-gradient(135deg, var(--bg-raised), var(--bg-input));
+  color: var(--gold-dim);
   padding: 0.5rem;
+}
+
+/* ── Bloc préparation (verre + glaçon + méthode) ── */
+.cv-prep-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.cv-prep-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 100px;
+  color: var(--gold);
+}
+
+
+.cv-prep-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  line-height: 1.2;
+}
+
+.cv-prep-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+}
+
+.cv-prep-value {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  /* text-transform: capitalize; */
+}
+
+.cocktail-title-row {
+  height: 2.2rem;
+    display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
 }
 
 .cocktail-description {
@@ -465,6 +536,13 @@ onBeforeUnmount(() => {
 .cocktail-description--empty {
   color: var(--text-dim);
   font-style: italic;
+}
+
+.cv-value--na {
+  color: var(--text-dim);
+  font-style: italic;
+  font-weight: 400 !important;
+  text-transform: none !important;
 }
 
 .cv-meta-list {
@@ -500,6 +578,7 @@ onBeforeUnmount(() => {
 
 /* ── Onglets ── */
 .swipe-tabs {
+  height: 2.2rem;
   position: relative;
   display: flex;
   border-bottom: 1px solid var(--border);
@@ -511,7 +590,7 @@ onBeforeUnmount(() => {
   background: none;
   border: none;
   padding: 0.5rem 0.25rem;
-  margin-right: 1.25rem;
+  /* margin-right: 1.25rem; */
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -521,6 +600,10 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  -webkit-tap-highlight-color: transparent;
+  flex: 1 1 50%;
+  justify-content: center;
+  margin-right: 0;
 }
 
 .swipe-tab--active {
@@ -551,13 +634,23 @@ onBeforeUnmount(() => {
   overflow: hidden;
   flex: 1;
   min-height: 0;
+  width: 100%;
   touch-action: pan-y;
+  /* Empêche la sélection/surlignage tactile natif du navigateur pendant le
+     drag horizontal : sans ça, un léger déplacement avant la détection
+     d'axe déclenche la sélection de texte native, visible comme un
+     bandeau de couleur plein sur toute la largeur touchée. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .swipe-track {
   display: flex;
   width: 200%;
   height: 100%;
+  box-sizing: border-box;
 }
 
 .swipe-track--dragging {
@@ -567,6 +660,7 @@ onBeforeUnmount(() => {
 .swipe-panel {
   width: 50%;
   flex-shrink: 0;
+  box-sizing: border-box;
   overflow-y: auto;
   padding-top: 0.75rem;
   padding-right: 0.25rem;
@@ -581,4 +675,20 @@ onBeforeUnmount(() => {
     grid-template-columns: 1fr;
   }
 }
+
+.swipe-tab {
+  flex: 1 1 33.333%;
+  justify-content: center;
+  margin-right: 0;
+}
+.swipe-tab-indicator {
+  width: 33.333%;
+}
+.swipe-track {
+  width: 300%;
+}
+.swipe-panel {
+  width: 33.333%;
+}
+
 </style>

@@ -1,7 +1,9 @@
 # TODO
 
-## Bar management view
-- Le button manage bar ne reset pas le bar id -> la barre de recherche reste affichée ducoup
+## Cocktail detail modal
+- Mettre a jour les url de photo dans la DB (trouver un moyen de faire autrement ?)
+- Mettre un placeholder de photo si manquante
+- Ajouter une description pour les cocktails dans la db
 
 ## Form COCKTAIL CATALOG
 - Cassé :/
@@ -12,6 +14,3 @@
 - supprimer drop down saison
 - Dans la vue mes Recettes, offrir la possiblité de lire la recette (comme dans la vue Catalgoe Global)
 - Est ce que la vue 'mes recettes' est vraiment utile, une fleche permet de push les cocktails sur la modal CocktailCard
-
-
-Dans CocktailMenuApp.vue — le fichier est très long (~700 lignes de <script setup>). La logique de filtrage pourrait être extraite dans un useFilters.js composable.

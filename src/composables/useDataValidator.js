@@ -107,12 +107,9 @@ export function validateCocktail(cocktail) {
     cleaned.tags = tagsFiltered
   }
 
-  // Ice - optionnel
-  const iceFiltered = Array.isArray(cocktail.ice)
-    ? cocktail.ice.filter(i => i?.trim?.())
-    : []
-  if (iceFiltered.length > 0) {
-    cleaned.ice = iceFiltered
+  // Ice - optionnel (string)
+  if (cocktail.ice?.trim?.()) {
+    cleaned.ice = cocktail.ice.trim()
   }
 
   return cleaned

@@ -334,7 +334,8 @@ export const TYPE_LABELS = {
 }
 
 export function getTypeLabel(type, locale = 'fr') {
-  return TYPE_LABELS[locale]?.[type] ?? type
+  var unavailableCaption = (locale === 'fr' ? 'Indisponible' : 'Unavailable')
+    return TYPE_LABELS[locale]?.[type] ?? unavailableCaption
 }
 
 export const FAMILY_LABELS = {
@@ -441,7 +442,8 @@ export const FAMILY_LABELS = {
 }
 
 export function getFamilyLabel(key, locale = 'fr') {
-  return FAMILY_LABELS[locale]?.[key] ?? key
+  var unavailableCaption = (locale === 'fr' ? 'Indisponible' : 'Unavailable')
+  return FAMILY_LABELS[locale]?.[key] ?? unavailableCaption
 }
 
 export const PROFILE_LABELS = {
@@ -484,5 +486,109 @@ export const PROFILE_LABELS = {
 }
 
 export function getProfileLabel(profile, locale = 'fr') {
-  return PROFILE_LABELS[locale]?.[profile] ?? profile
+  var unavailableCaption = (locale === 'fr' ? 'Indisponible' : 'Unavailable')
+  return PROFILE_LABELS[locale]?.[profile] ?? unavailableCaption
+}
+
+// const METHOD_LABELS = {
+//   shake:       '🍸 Shake',
+//   regal_shake: '🍸 Regal Shake',
+//   stir:        '🥄 Stir',
+//   regal_stir:  '🥄 Regal Stir',
+//   build:       '🫗 Build',
+//   blend:       '🌀 Blend',
+//   swizzle:     '🌿 Swizzle',
+//   throw:       '🤹 Throw',
+// }
+
+// export function getMethodLabel(method, locale = 'fr') {
+//   return METHOD_LABELS[method] ?? method
+// }
+
+
+export const DETAILLED_METHOD_LABELS = {
+  fr: {
+    shake:       'Shaker',
+    regal_shake: 'Shaker',
+    stir:        'Verre à mélange',
+    regal_stir:  'Verre à mélange',
+    build:       'Au verre',
+    blend:       'Mixer',
+    swizzle:     'Au verre',
+    throw:       'Throw',
+  },
+  en: {
+    shake:       'Shaker',
+    regal_shake: 'Shaker',
+    stir:        'Mixing glass',
+    regal_stir:  'Mixing glass',
+    build:       'In glass',
+    blend:       'Mixer',
+    swizzle:     'In glass',
+    throw:       'Throw',
+  },
+}
+
+export function getDetailledMethodLabel(method, locale = 'fr') {
+  var unavailableCaption = (locale === 'fr' ? 'Indisponible' : 'Unavailable')
+  return DETAILLED_METHOD_LABELS[locale]?.[method] ?? unavailableCaption
+}
+
+
+export const DETAILLED_ICE_LABELS = {
+  fr: {
+    cubed:       'Glacons',
+    crushed:     'Glace pillée',
+    clear:       'Glace transparente',
+    no_ice:      'Sans glace',
+  },
+  en: {
+    cubed:       'Ice cubes',
+    crushed:     'Crushed ice',
+    clear:       'Clear ice',
+    no_ice:      'No ice',
+  },
+}
+
+export function getDetailledIceLabel(ice, locale = 'fr') {
+  var unavailableCaption = (locale === 'fr' ? 'Indisponible' : 'Unavailable')
+  return DETAILLED_ICE_LABELS[locale]?.[ice] ?? unavailableCaption
+}
+
+export const GLASS_LABELS = {
+  fr: {
+    rocks:           'Rocks',
+    coupe:           'Coupe',
+    martini:         'Martini',
+    highball:        'Highball',
+    collins:         'Collins',
+    nick_nora:       'Nick & Nora',
+    champagne_flute: 'Flûte',
+    wine:            'Verre à vin',
+    shot:            'Shot',
+    tiki:            'Tiki',
+    hurricane:       'Hurricane',
+    copper_mug:      'Tasse en cuivre',
+    snifter:         'Verre Ballon'
+  },
+  en: {
+    rocks:           'Rocks glass',
+    coupe:           'Coupe',
+    martini:         'Martini glass',
+    highball:        'Highball',
+    collins:         'Collins',
+    nick_nora:       'Nick & Nora',
+    champagne_flute: 'Champagne flute',
+    wine:            'Wine glass',
+    shot:            'Shot glass',
+    tiki:            'Tiki Cup',
+    hurricane:       'Hurricane glass',
+    copper_mug:      'Copper mug',
+    snifter:         'Snifter'
+  },
+}
+
+export function getGlassLabel(glass, locale = 'fr') {
+  var unavailableCaption = (locale === 'fr' ? 'Indisponible' : 'Unavailable')
+  return GLASS_LABELS[locale]?.[glass] ?? unavailableCaption
 }

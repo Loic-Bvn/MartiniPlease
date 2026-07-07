@@ -17,7 +17,7 @@ const currentLegalPage = ref(null)  // null | 'legal-notice' | 'privacy-policy' 
 
 // ── Modals ────────────────────────────────────────────────────────────────────
 const showAuthModal         = ref(false)
-const showCreateCocktailModal     = ref(false)
+const showCocktailFormModal     = ref(false)
 const showCardModal         = ref(false)
 const showCatalogModal      = ref(false)
 const showDrinkerLoginModal = ref(false)
@@ -58,18 +58,18 @@ export function useUIState() {
 
   // ── Modals cocktail ─────────────────────────────────────────────────────────
 
-  function openNewCreateCocktailModal() {
+  function openNewCocktailFormModal() {
     editingCocktail.value  = null
-    showCreateCocktailModal.value = true
+    showCocktailFormModal.value = true
   }
 
-  function openEditCreateCocktailModal(cocktail) {
+  function openEditCocktailFormModal(cocktail) {
     editingCocktail.value  = cocktail
-    showCreateCocktailModal.value = true
+    showCocktailFormModal.value = true
   }
 
-  function closeCreateCocktailModal() {
-    showCreateCocktailModal.value = false
+  function closeCocktailFormModal() {
+    showCocktailFormModal.value = false
     editingCocktail.value   = null
   }
 
@@ -116,7 +116,7 @@ export function useUIState() {
     unit,
     currentLegalPage,
     showAuthModal,
-    showCreateCocktailModal,
+    showCocktailFormModal,
     showCardModal,
     showCatalogModal,
     showDrinkerLoginModal,
@@ -132,9 +132,9 @@ export function useUIState() {
     toggleUnit,
     openLegalPage,
     closeLegalPage,
-    openNewCreateCocktailModal,
-    openEditCreateCocktailModal,
-    closeCreateCocktailModal,
+    openNewCocktailFormModal,
+    openEditCocktailFormModal,
+    closeCocktailFormModal,
     openNewCardModal,
     openEditCardModal,
     closeCardModal,
