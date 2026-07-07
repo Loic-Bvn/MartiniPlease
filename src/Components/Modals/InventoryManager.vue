@@ -146,12 +146,13 @@ function openAddModal(category) {
 
 const categoryMetadata = {
   spirits:   { label: 'Spiritueux',    icon: '🥃' },
-  liqueurs:  { label: 'Liqueurs',      icon: '🍷' },
+  licors:    { label: 'Liqueurs',      icon: '🍷' },
   modifiers: { label: 'Modificateurs', icon: '🍸' },
   juices:    { label: 'Jus',           icon: '🍊' },
   syrups:    { label: 'Sirops',        icon: '🍯' },
   bitters:   { label: 'Bitters',       icon: '💧' },
   mixers:    { label: 'Mixers',        icon: '🥤' },
+  garnish:   { label: 'Garniture',     icon: '🍋' },
   others:    { label: 'Autres',        icon: '📦' },
 }
 

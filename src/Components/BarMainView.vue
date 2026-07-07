@@ -247,8 +247,8 @@ function formatDate(iso) {
   })
 }
 
-function handleOpenCocktail(cocktail) {
-  emit('open-cocktail', cocktail)
+function handleOpenCocktail(cocktail, rect) {
+  emit('open-cocktail', cocktail, rect)
 }
 
 const t = computed(() => ({

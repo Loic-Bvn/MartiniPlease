@@ -29,7 +29,7 @@
           :suggestions="suggestions"
           :randomLogo="randomLogo"
           @logo-click="handleLogoClick"
-          @open-new-cocktail="openNewCocktailModal"
+          @open-new-cocktail="openNewCreateCocktailModal"
           @toggle-locale="toggleLocale"
           @toggle-unit="toggleUnit"
           @scroll-to-cocktail="scrollToCocktailCard"
@@ -125,15 +125,15 @@
           :hasActiveFilters="hasActiveFilters"
           :makeableCount="makeableCount"
           @view-card="openCardView"
-          @open-cocktail="openCocktailView"
+          @open-cocktail="openCocktailDetailModal"
           @edit-card="openEditCardModal"
           @delete-card="handleDeleteCard"
           @new-card="openNewCardModal"
           @toggle-card-visibility="handleToggleCardVisibility"
           @toggle-favorite="toggleFavorite"
-          @edit-cocktail="openEditCocktailModal"
+          @edit-cocktail="openEditCreateCocktailModal"
           @delete-cocktail="handleDeleteCocktail"
-          @new-cocktail="openNewCocktailModal"
+          @new-cocktail="openNewCreateCocktailModal"
           @toggle-family="toggleFamily"
           @toggle-sub-spirit="toggleSubSpirit"
           @toggle-profile="toggleProfile"
@@ -172,12 +172,12 @@
           @close="showCatalogModal = false"
           @imported="handleCatalogImport"
         />
-        <CocktailModal
-          v-if="showCocktailModal"
+        <CreateCocktailModal
+          v-if="showCreateCocktailModal"
           :cocktail="editingCocktail"
           :bar-id="activeBarId"
           @save="handleSaveCocktail"
-          @close="closeCocktailModal"
+          @close="closeCreateCocktailModal"
         />
         <MenuCardView
           v-if="viewingCard"
@@ -190,12 +190,15 @@
           @toggle-locale="toggleLocale"
           @toggle-unit="toggleUnit"
         />
-        <CocktailView
-          v-if="viewingCocktail"
-          :cocktail="viewingCocktail"
-          :locale="locale"
-          @close="closeCocktailView"
-        />
+        <Transition name="modal-fade">
+          <CocktailDetailModal
+            v-if="viewingCocktail"
+            :cocktail="viewingCocktail"
+            :locale="locale"
+            :origin-rect="viewingCocktailRect"
+            @close="closeCocktailDetailModal"
+          />
+        </Transition>
       </div>
     </div>
 
@@ -235,8 +238,8 @@ const AuthModal         = defineAsyncComponent(() => import('@/Components/Modals
 const DrinkerLoginModal = defineAsyncComponent(() => import('@/Components/Modals/DrinkerLoginModal.vue'))
 const MenuCardModal     = defineAsyncComponent(() => import('@/Components/Modals/MenuCardModal.vue'))
 const CatalogModal      = defineAsyncComponent(() => import('@/Components/Modals/CatalogModal.vue'))
-const CocktailModal     = defineAsyncComponent(() => import('@/Components/Modals/CocktailModal.vue'))
-const CocktailView      = defineAsyncComponent(() => import('@/Components/Modals/CocktailView.vue'))
+const CreateCocktailModal     = defineAsyncComponent(() => import('@/Components/Modals/CreateCocktailModal.vue'))
+const CocktailDetailModal= defineAsyncComponent(() => import('@/Components/Modals/CocktailDetailModal.vue'))
 const MenuCardView      = defineAsyncComponent(() => import('@/Components/MenuCardView.vue'))
 const LegalNotice       = defineAsyncComponent(() => import('@/views/LegalNotice.vue'))
 const PrivacyPolicy     = defineAsyncComponent(() => import('@/views/PrivacyPolicy.vue'))
@@ -257,12 +260,12 @@ const {
   locale, unit,
   currentLegalPage, openLegalPage, closeLegalPage,
   toggleLocale, toggleUnit,
-  showAuthModal, showCocktailModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
-  editingCocktail, editingCard, viewingCard, viewingCocktail,
-  openNewCocktailModal, openEditCocktailModal, closeCocktailModal,
+  showAuthModal, showCreateCocktailModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
+  editingCocktail, editingCard, viewingCard, viewingCocktail, viewingCocktailRect,
+  openNewCreateCocktailModal, openEditCreateCocktailModal, closeCreateCocktailModal,
   openNewCardModal,    openEditCardModal,    closeCardModal,
   openCardView,        closeCardView,
-  openCocktailView,    closeCocktailView,
+  openCocktailDetailModal,    closeCocktailDetailModal,
 } = useUIState()
 
 // ── Bar actif (bartender connecté OU invité via code) ─────────────────────────
@@ -478,7 +481,7 @@ async function handleSaveCocktail(data) {
       : await createCocktail(data)
 
     if (!result.success) throw new Error(result.error?.message || result.error || 'Erreur inconnue')
-    closeCocktailModal()
+    closeCreateCocktailModal()
     showToast(locale.value === 'fr' ? '🍸 Cocktail sauvegardé' : '🍸 Cocktail saved')
   } catch (err) {
     console.error('❌ handleSaveCocktail:', err)

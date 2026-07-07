@@ -17,7 +17,7 @@ const currentLegalPage = ref(null)  // null | 'legal-notice' | 'privacy-policy' 
 
 // ── Modals ────────────────────────────────────────────────────────────────────
 const showAuthModal         = ref(false)
-const showCocktailModal     = ref(false)
+const showCreateCocktailModal     = ref(false)
 const showCardModal         = ref(false)
 const showCatalogModal      = ref(false)
 const showDrinkerLoginModal = ref(false)
@@ -27,6 +27,7 @@ const editingCocktail = ref(null)
 const editingCard     = ref(null)
 const viewingCard     = ref(null)
 const viewingCocktail = ref(null)
+const viewingCocktailRect = ref(null)
 
 // ── Divers ────────────────────────────────────────────────────────────────────
 const burgerOpen = ref(false)
@@ -57,18 +58,18 @@ export function useUIState() {
 
   // ── Modals cocktail ─────────────────────────────────────────────────────────
 
-  function openNewCocktailModal() {
+  function openNewCreateCocktailModal() {
     editingCocktail.value  = null
-    showCocktailModal.value = true
+    showCreateCocktailModal.value = true
   }
 
-  function openEditCocktailModal(cocktail) {
+  function openEditCreateCocktailModal(cocktail) {
     editingCocktail.value  = cocktail
-    showCocktailModal.value = true
+    showCreateCocktailModal.value = true
   }
 
-  function closeCocktailModal() {
-    showCocktailModal.value = false
+  function closeCreateCocktailModal() {
+    showCreateCocktailModal.value = false
     editingCocktail.value   = null
   }
 
@@ -99,12 +100,14 @@ export function useUIState() {
     viewingCard.value = null
   }
 
-  function openCocktailView(cocktail) {
+  function openCocktailDetailModal(cocktail, originRect = null) {
     viewingCocktail.value = cocktail
+    viewingCocktailRect.value = originRect
   }
 
-  function closeCocktailView() {
+  function closeCocktailDetailModal() {
     viewingCocktail.value = null
+    viewingCocktailRect.value = null
   }
 
   return {
@@ -113,7 +116,7 @@ export function useUIState() {
     unit,
     currentLegalPage,
     showAuthModal,
-    showCocktailModal,
+    showCreateCocktailModal,
     showCardModal,
     showCatalogModal,
     showDrinkerLoginModal,
@@ -121,6 +124,7 @@ export function useUIState() {
     editingCard,
     viewingCard,
     viewingCocktail,
+    viewingCocktailRect,
     burgerOpen,
 
     // Actions
@@ -128,15 +132,15 @@ export function useUIState() {
     toggleUnit,
     openLegalPage,
     closeLegalPage,
-    openNewCocktailModal,
-    openEditCocktailModal,
-    closeCocktailModal,
+    openNewCreateCocktailModal,
+    openEditCreateCocktailModal,
+    closeCreateCocktailModal,
     openNewCardModal,
     openEditCardModal,
     closeCardModal,
     openCardView,
     closeCardView,
-    openCocktailView,
-    closeCocktailView,
+    openCocktailDetailModal,
+    closeCocktailDetailModal,
   }
 }

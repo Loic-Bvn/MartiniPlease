@@ -106,7 +106,7 @@ export function getProfileOptions() {
     .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
 }
 /**
- * Convertir profiles en array pour chips (comme dans CocktailModal)
+ * Convertir profiles en array pour chips (comme dans CreateCocktailModal)
  */
 export function getProfilesAsArray() {
   const profiles = getProfiles()

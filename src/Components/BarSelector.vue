@@ -7,7 +7,7 @@
       
       <!-- Bouton créer nouveau bar -->
       <div class="bars-management-header">
-        <button v-if="!showNewBarInput" @click="showNewBarInput = true" class="btn-create-bar">
+        <button v-if="!showNewBarInput" @click="$emit('update:showNewBarInput', true)" class="btn-create-bar">
           <Plus :size="16" />
           {{ locale === 'fr' ? 'Créer un nouveau bar' : 'Create new bar' }}
         </button>
@@ -19,13 +19,13 @@
             :placeholder="locale === 'fr' ? 'Nom du bar...' : 'Bar name...'"
             class="new-bar-input"
             @keyup.enter="$emit('create-new-bar')"
-            @keyup.esc="showNewBarInput = false"
+            @keyup.esc="$emit('update:showNewBarInput', false)"
             autofocus
           />
           <button @click="$emit('create-new-bar')" class="btn-confirm" title="Créer">
             <Plus :size="14" />
           </button>
-          <button @click="showNewBarInput = false" class="btn-cancel" title="Annuler">
+          <button @click="$emit('update:showNewBarInput', false)" class="btn-cancel" title="Annuler">
             <X :size="14" />
           </button>
         </div>
@@ -199,8 +199,9 @@ const emit = defineEmits([
   'update:newBarName',
   'update:editingBarName',
   'update:editingBarCode',
-  'update:deleteConfirmationInput'
+  'update:deleteConfirmationInput',
+  'update:showNewBarInput'
 ])
 
-const showNewBarInput = ref(false)
+// const showNewBarInput = ref(false)
 </script>

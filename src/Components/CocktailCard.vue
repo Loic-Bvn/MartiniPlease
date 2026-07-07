@@ -1,5 +1,5 @@
 <template>
-  <div :class="['cocktail-card-compact', { 'cocktail-card--flipping': isFlipping }]" @click="handleOpen">
+  <div ref="cardEl" class="cocktail-card-compact" @click="handleOpen">
 
     <!-- Header -->
     <div class="card-header">
@@ -133,7 +133,7 @@ const props = defineProps({
   barId:           { type: String, default: '' },
 })
 const { showToast } = useToast()
-const isFlipping = ref(false)
+const cardEl = ref(null)
 
 const emit = defineEmits(['edit', 'delete', 'open'])
 
@@ -195,11 +195,10 @@ async function handleHistoric() {
 }
 
 function handleOpen() {
-  isFlipping.value = true
-  setTimeout(() => {
-    emit('open', props.cocktail)
-    isFlipping.value = false
-  }, 280)
+  const rect = cardEl.value?.getBoundingClientRect()
+  emit('open', props.cocktail, rect ? {
+    top: rect.top, left: rect.left, width: rect.width, height: rect.height,
+  } : null)
 }
 
 function formatQty(ing) {
@@ -278,32 +277,6 @@ async function handleSubmit() {
 
 <style scoped>
 .cocktail-card-compact {
-  transform-style: preserve-3d;
-  perspective: 1800px;
   will-change: transform, box-shadow;
-}
-
-.cocktail-card--flipping {
-  transform-origin: center center;
-  animation: cardFlipPulse 0.48s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.3),
-    0 8px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-@keyframes cardFlipPulse {
-  0% {
-    transform: perspective(1800px) rotateY(0deg) scale(1) translateZ(0);
-  }
-  35% {
-    transform: perspective(1800px) rotateY(72deg) scale(1.04) translateZ(24px);
-  }
-  70% {
-    transform: perspective(1800px) rotateY(108deg) scale(1.06) translateZ(40px);
-  }
-  100% {
-    transform: perspective(1800px) rotateY(180deg) scale(1.01) translateZ(0);
-  }
 }
 </style>
