@@ -137,10 +137,10 @@
                       <span :class="{ 'cv-value--na': !cocktail.cocktail_style }">{{ (cocktail.cocktail_style && cocktail.cocktail_style !== 'Unknown') ? cocktail.cocktail_style : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
 
                     </div>
-                    <div class="cv-meta-row">
+                    <!-- <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Tags' : 'Tags' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.tags?.length }">{{ cocktail.tags?.length ? formatList(cocktail.tags) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
 
