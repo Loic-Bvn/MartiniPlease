@@ -1,10 +1,5 @@
 # TODO
 
-## Cocktail detail modal
-- Mettre a jour les url de photo dans la DB (trouver un moyen de faire autrement ?)
-- Mettre un placeholder de photo si manquante
-- Ajouter une description pour les cocktails dans la db
-
 ## Form COCKTAIL CATALOG
 - Cassé :/
 - Rendre plus clair l'UI pour faire comprendre a l'utilisateur qu'il peut push et pull des recettes
@@ -14,3 +9,16 @@
 - supprimer drop down saison
 - Dans la vue mes Recettes, offrir la possiblité de lire la recette (comme dans la vue Catalgoe Global)
 - Est ce que la vue 'mes recettes' est vraiment utile, une fleche permet de push les cocktails sur la modal CocktailCard
+
+## Update du schema de donnée (objectif: limiter la dupplication de recettes)
+Je dois migrer la structure de ma base de données Supabase pour MartiniPlease (app cocktails multi-tenant Vue3/Supabase).
+
+Contexte : actuellement, les cocktails sont dupliqués en base — chaque bar a sa propre ligne avec un UID distinct pour un même cocktail (même nom, même recette actuellement), car ma table actuelle mélange contenu éditorial (nom, description, histoire, créateur) et données spécifiques au bar (prix, stock, dispo, ingrédients).
+
+Problème : cette duplication empêche de mutualiser l'enrichissement éditorial (description/histoire/créateur générés une fois) et créera une désync si un bartender modifie sa recette indépendamment des autres bars proposant le même cocktail.
+
+Structure cible :
+- `cocktails_catalog` : contenu éditorial partagé (id canonique, name, description_fr, description_en, creator, creation_year, creation_place, is_iba_official, source_url)
+- `bar_cocktails` : une ligne par bar (id = UID actuel, bar_id, cocktail_catalog_id FK, ingredients, price, stock, dispo...)
+
+Objectif : m'aider à écrire la migration Supabase (SQL + script de mapping UID existant → cocktail_catalog_id via nom normalisé), en gérant les cas où plusieurs UID pointent vers le même cocktail canonique, sans perte de données côté recettes/stock par bar. Je fournirai le schéma actuel et un export CSV des données existantes.

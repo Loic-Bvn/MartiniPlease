@@ -124,6 +124,10 @@
                       <span class="form-label">{{ props.locale === 'fr' ? 'Créateur' : 'Creator' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.creator || cocktail.creator === 'Unknown' }">{{ (cocktail.creator && cocktail.creator !== 'Unknown') ? cocktail.creator : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
+                    <div class="cv-meta-row">
+                      <span class="form-label">{{ props.locale === 'fr' ? 'Année' : 'Year' }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.creation_year }">{{ cocktail.creation_year || (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+                    </div>
                     <!-- <div class="cv-meta-row">
                       <span class="form-label">Saison</span>
                       <span :class="{ 'cv-value--na': !cocktail.season?.length }">{{ cocktail.season?.length ? formatList(cocktail.season) : 'Indisponible' }}</span>
@@ -162,7 +166,7 @@
                 </div>
                 <!-- Panel 3 : description -->
                 <div class="swipe-panel">
-                  <p v-if="cocktail.description" class="cocktail-description">{{ cocktail.description }}</p>
+                  <p v-if="props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en" class="cocktail-description">{{ props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en }}</p>
                   <p v-else class="cocktail-description cocktail-description--empty">{{ props.locale === 'fr' ? 'Aucune description disponible pour ce cocktail.' : 'No description available for this cocktail.'}}</p>
                 </div>
               </div>
