@@ -93,8 +93,7 @@
             <div class="form-field">
               <label class="form-label">Type de glace</label>
               <select v-model="form.ice" class="form-input">
-                <option value="">-- Aucun --</option>
-                <option v-for="opt in iceOptions" :key="opt.name" :value="opt.name">{{opt.emoji + " " +  opt.name }}</option>
+                <option v-for="opt in iceOptions">{{opt.emoji + " " + getDetailledIceLabel(opt.name, locale) }}</option>
               </select>
             </div>
           </div>
@@ -241,12 +240,58 @@
             <label class="form-label">Description / Notes</label>
             <textarea v-model="form.description" class="form-input form-textarea" placeholder="Conseils de préparation, anecdotes, accords..."></textarea>
           </div>
+
           <div class="form-field">
-            <label class="form-label">Image (URL)</label>
+            <label class="form-label">Image</label>
+
+            <!-- Bascule Lien / Upload -->
+            <div class="unit-switch image-mode-switch">
+              <button
+                type="button"
+                :class="['unit-btn', { active: imageMode === 'url' }]"
+                @click="imageMode = 'url'"
+              >Lien</button>
+              <button
+                type="button"
+                :class="['unit-btn', { active: imageMode === 'upload' }]"
+                @click="imageMode = 'upload'"
+              >Uploader</button>
+            </div>
+
             <div class="image-field-row">
-              <input v-model="form.image" type="text" class="form-input" placeholder="https://..." />
+              <!-- Mode URL -->
+              <input
+                v-if="imageMode === 'url'"
+                v-model="form.image"
+                type="text"
+                class="form-input"
+                placeholder="https://..."
+              />
+
+              <!-- Mode Upload -->
+              <template v-else>
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="form-input"
+                  @change="handleFileUpload"
+                  :disabled="uploadingImage"
+                />
+                <p v-if="uploadingImage" class="upload-hint">Upload en cours…</p>
+                <p v-if="uploadError" class="add-error">{{ uploadError }}</p>
+              </template>
+
+              <!-- Aperçu, commun aux deux modes -->
               <div v-if="form.image" class="image-preview">
-                <img :src="form.image" alt="preview" @error="form.image = ''" />
+                <img
+                  v-if="!imagePreviewError"
+                  :src="form.image"
+                  alt="preview"
+                  @error="imagePreviewError = true"
+                />
+                <div v-else class="image-preview-broken">
+                  Image introuvable — vérifie le lien ou réessaie l'upload
+                </div>
               </div>
             </div>
           </div>
@@ -267,9 +312,10 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import { X, Trash2, Plus } from 'lucide-vue-next'
 import { validateCocktail } from '@/composables/useDataValidator'
+import { supabase, supabaseImageBucket } from '@/lib/supabase'
 import { getGlassesAsOptions,
   getMethodsAsOptions,
   getCocktailCategoriesAsOptions,
@@ -280,6 +326,7 @@ import { getGlassesAsOptions,
   getBaseSpiritGroups,
   getSpiritToCategoryMap,
   getProfileOptions } from '@/lib/cocktail-constants'
+import { getDetailledIceLabel } from '../../constants/typeLabels'
 
 const categories = getBaseSpiritGroups()
 const spiritToCategoryMap = getSpiritToCategoryMap()
@@ -289,6 +336,7 @@ const INGREDIENTS_BY_CATEGORY = getIngredientsByCategory()
 
 const props = defineProps({ 
   cocktail: Object,
+  locale: { type: String, default: 'fr' },
   barId: { type: String, default: '' },
 })
 const emit = defineEmits(['save', 'close'])
@@ -298,6 +346,47 @@ const unit = ref('oz')
 
 // ── ABV auto/manuel ───────────────────────────────
 const abvAuto = ref(true)
+
+// ── Image : lien ou upload ───────────────────────
+const imageMode = ref('url')
+const imagePreviewError = ref(false)
+const uploadingImage = ref(false)
+const uploadError = ref('')
+
+// Réinitialise l'état "image cassée" à chaque changement de source,
+// pour laisser une nouvelle URL/upload une vraie chance de charger
+// (c'est l'absence de ce reset couplé à un @error qui vidait le champ
+// avant : il ne fallait JAMAIS toucher form.image depuis le handler d'erreur).
+watch(() => props.cocktail, () => {}, { immediate: false })
+
+async function handleFileUpload(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+
+  uploadError.value = ''
+  uploadingImage.value = true
+
+  try {
+    const ext = file.name.split('.').pop()
+    const path = `${props.barId || 'shared'}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+
+    const { error: storageErr } = await supabase.storage
+      .from(supabaseImageBucket)
+      .upload(path, file, { cacheControl: '3600', upsert: false })
+
+    if (storageErr) throw storageErr
+
+    const { data } = supabase.storage.from(supabaseImageBucket).getPublicUrl(path)
+    form.value.image = data.publicUrl
+    imagePreviewError.value = false
+  } catch (err) {
+    const message = err?.message || err?.error_description || JSON.stringify(err)
+    uploadError.value = `Échec de l'upload : ${message}. Vérifie que le bucket "${supabaseImageBucket}" existe et que le stockage Supabase est configuré.`
+  } finally {
+    uploadingImage.value = false
+    e.target.value = '' // permet de re-sélectionner le même fichier si besoin
+  }
+}
 
 // ── Catégories pour filtre recette ───────────────
 const recipeCategoryFilter = reactive({})
@@ -347,14 +436,6 @@ function autoFillCategory() {
 const profileOptions = getProfileOptions()
 
 // ── Formulaire ────────────────────────────────────
-// ice: string (une seule valeur) au lieu d'array
-const iceInitial = (() => {
-  const raw = props.cocktail?.ice
-  if (Array.isArray(raw) && raw.length > 0) return raw[0]
-  if (typeof raw === 'string') return raw
-  return ''
-})()
-
 const form = ref({
   id:             props.cocktail?.id             ?? null,
   name:           props.cocktail?.name           ?? '',
@@ -367,10 +448,10 @@ const form = ref({
   image:          props.cocktail?.image          ?? '',
   creator:        props.cocktail?.creator        ?? '',
   cocktail_style: props.cocktail?.cocktail_style ?? '',
+  ice:            props.cocktail?.ice            ?? '',
   season:  [...(props.cocktail?.season  ?? [])],
   profile: [...(props.cocktail?.profile ?? [])],
   tags:    [...(props.cocktail?.tags    ?? [])],
-  ice:     iceInitial,
   recipe: (props.cocktail?.recipe ?? [])
     .filter(i => i.Ingredient?.trim())
     .map(i => {
@@ -384,6 +465,12 @@ const form = ref({
         Dashes: i.Dashes ?? null,
       }
     }),
+})
+
+// Réinitialise l'aperçu cassé à chaque fois que l'image change
+// (nouvelle URL tapée, upload terminé, ou changement de mode)
+watch(() => form.value.image, () => {
+  imagePreviewError.value = false
 })
 
 // Détecter l'unité des données existantes
@@ -415,7 +502,7 @@ function removeRecipeLine(idx) {
 function handleSave() {
   try {
     const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
-    const iceArr = form.value.ice ? [form.value.ice] : []
+    // const iceArr = form.value.ice ? [form.value.ice] : []
 
     const cleanedRecipe = form.value.recipe
       .filter(ing => ing.Type)
@@ -432,7 +519,7 @@ function handleSave() {
       ...form.value,
       recipe: cleanedRecipe,
       abv: abvFinal,
-      ice: iceArr,
+      ice: form.value.ice,
     })
 
     if (!props.barId) {
@@ -445,6 +532,7 @@ function handleSave() {
     })
 
   } catch (err) {
+    console.error('❌ Save failed:', err)
     alert(`❌ ${err.message}`)
   }
 }
@@ -509,3 +597,30 @@ function normalizeNumber(val) {
   return isNaN(n) ? null : n
 }
 </script>
+
+<style scoped>
+.image-mode-switch {
+  margin-bottom: 0.5rem;
+  width: fit-content;
+}
+
+.upload-hint {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin: 0.4rem 0 0;
+}
+
+.image-preview-broken {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  padding: 0.75rem;
+  background: var(--bg-input);
+  border: 1px dashed var(--border-mid);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  text-align: center;
+}
+</style>

@@ -2,7 +2,9 @@
   <div class="section-card">
 
     <!-- HEADER TOGGLE -->
-    <button @click="show = !show" class="expand-actions-btn">
+    <!-- <button @click="show = !show" class="expand-actions-btn"> -->
+    <div @click="show = !show" class="expand-actions-btn" role="button" tabindex="0" @keydown.enter="show = !show">
+
       <ChevronDown :size="18" :class="{ rotated: show }" />
       <h2 class="section-title">
         {{ t.filterTitle }}
@@ -14,8 +16,9 @@
         {{ t.clearAll }}
       </button>
       <span v-else></span>
-    </button>
-
+    <!-- </button> -->
+    </div>
+    
     <!-- CONTENT -->
     <div v-if="show" class="filters-dropdown-content">
 

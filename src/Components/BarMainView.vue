@@ -72,6 +72,7 @@
           @edit-card="$emit('edit-card', $event)"
           @delete-card="$emit('delete-card', $event)"
           @new-card="$emit('new-card')"
+          @toggle-card-visibility="$emit('toggle-card-visibility', $event)"
         />
 
         <DrinkerPanel
@@ -124,6 +125,7 @@
             :bar-id="activeBarId"
             @edit="$emit('edit-cocktail', cocktail)"
             @delete="$emit('delete-cocktail', cocktail.id)"
+            @open="handleOpenCocktail"
           />
         </div>
       </div>
@@ -189,8 +191,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
-  'view-card', 'edit-card', 'delete-card', 'new-card',
-  'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail',
+  'view-card', 'edit-card', 'delete-card', 'new-card', 'toggle-card-visibility',
+  'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail', 'open-cocktail',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
   'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
   'set-abv-filter', 'set-season', 'clear-filters',
@@ -243,6 +245,10 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', {
     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
   })
+}
+
+function handleOpenCocktail(cocktail, rect) {
+  emit('open-cocktail', cocktail, rect)
 }
 
 const t = computed(() => ({

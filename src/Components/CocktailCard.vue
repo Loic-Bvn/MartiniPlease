@@ -1,5 +1,5 @@
 <template>
-  <div :class="['cocktail-card-compact']">
+  <div ref="cardEl" class="cocktail-card-compact" @click="handleOpen">
 
     <!-- Header -->
     <div class="card-header">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- Recette -->
-    <div class="recipe-compact">
+    <div class="recipe-compact" @click="handleOpen" title="Voir les détails">
       <div
         v-for="(ing, idx) in recipeWithQty"
         :key="ing.Type ? ing.Type + idx : idx"
@@ -68,7 +68,7 @@
       <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
         <button
           v-if="hasDrinker && !isBartenderMode"
-          @click="handleFavorite"
+          @click.stop="handleFavorite"
           :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
           :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
         >
@@ -76,7 +76,7 @@
         </button>
         <button
           v-if="hasDrinker && !isBartenderMode"
-          @click="handleHistoric"
+          @click.stop="handleHistoric"
           class="btn-order-simple"
           title="Commander"
         >
@@ -84,15 +84,15 @@
         </button>
 
         <template v-if="isBartenderMode">
-          <button @click="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
+          <button @click.stop="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
             <Pencil :size="16" />
           </button>
-          <button @click="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
+          <button @click.stop="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
             <Trash2 :size="16" />
           </button>
           <button
             v-if="!isSubmitted(cocktail.id)"
-            @click="handleSubmit"
+            @click.stop="handleSubmit"
             class="btn-icon btn-icon--submit"
             :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
           >
@@ -133,8 +133,9 @@ const props = defineProps({
   barId:           { type: String, default: '' },
 })
 const { showToast } = useToast()
+const cardEl = ref(null)
 
-defineEmits(['edit', 'delete'])
+const emit = defineEmits(['edit', 'delete', 'open'])
 
 const { barInventory }                             = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
@@ -191,6 +192,13 @@ async function handleHistoric() {
   } else {
     console.error('❌ Order failed:', result.error)
   }
+}
+
+function handleOpen() {
+  const rect = cardEl.value?.getBoundingClientRect()
+  emit('open', props.cocktail, rect ? {
+    top: rect.top, left: rect.left, width: rect.width, height: rect.height,
+  } : null)
 }
 
 function formatQty(ing) {
@@ -266,3 +274,9 @@ async function handleSubmit() {
 }
 
 </script>
+
+<style scoped>
+.cocktail-card-compact {
+  will-change: transform, box-shadow;
+}
+</style>

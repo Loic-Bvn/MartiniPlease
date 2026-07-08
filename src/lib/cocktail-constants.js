@@ -88,6 +88,7 @@ export function getMethods() {
  */
 export function getIceTypes() {
   const constants = loadedConstants || loadConstants()
+  console.log('Loaded ice types:', constants.ice_types)
   return constants.ice_types || {}
 }
 
@@ -106,7 +107,7 @@ export function getProfileOptions() {
     .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
 }
 /**
- * Convertir profiles en array pour chips (comme dans CocktailModal)
+ * Convertir profiles en array pour chips (comme dans CocktailFormModal)
  */
 export function getProfilesAsArray() {
   const profiles = getProfiles()
@@ -140,14 +141,14 @@ export function getSeasonsAsArray() {
 /**
  * Convertir ice_types en array pour chips
  */
-export function getIceTypesAsArray() {
-  const iceTypes = getIceTypes()
-  return Object.entries(iceTypes).map(([key, data]) => ({
-    key,
-    label: data.name,
-    icon: data.emoji
-  }))
-}
+// export function getIceTypesAsArray() {
+//   const iceTypes = getIceTypes()
+//   return Object.entries(iceTypes).map(([key, data]) => ({
+//     key,
+//     label: data.name,
+//     icon: data.emoji
+//   }))
+// }
 
 /**
  * Récupère les niveaux de difficulté
@@ -276,7 +277,7 @@ export const COCKTAIL_CONSTANTS = {
   // As arrays (pour chips/selects)
   PROFILES_ARRAY: getProfilesAsArray(),
   SEASONS_ARRAY: getSeasonsAsArray(),
-  ICE_TYPES_ARRAY: getIceTypesAsArray(),
+  // ICE_TYPES_ARRAY: getIceTypesAsArray(),
   GLASSES_OPTIONS: getGlassesAsOptions(),
   METHODS_OPTIONS: getMethodsAsOptions(),
   COCKTAIL_CATEGORIES_OPTIONS: getCocktailCategoriesAsOptions(),

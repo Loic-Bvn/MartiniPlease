@@ -24,6 +24,15 @@
         />
       </div>
 
+      <!-- Visibilité pour les drinkers -->
+      <div class="field-group field-group--checkbox">
+        <label class="field-label checkbox-label">
+          <input type="checkbox" v-model="isVisible" />
+          {{ t.visibleToDrinkers }}
+        </label>
+        <p class="field-hint">{{ t.visibilityHelp }}</p>
+      </div>
+
       <!-- Recherche cocktails -->
       <div class="field-group">
         <label class="field-label">
@@ -120,6 +129,8 @@ const t = computed(() => ({
   newTitle:            props.locale === 'fr' ? '🗂️ Nouvelle carte'            : '🗂️ New card',
   cardName:            props.locale === 'fr' ? 'Nom de la carte'              : 'Card name',
   cardNamePlaceholder: props.locale === 'fr' ? "Ex: Carte d'été, Carte du soir..." : 'Ex: Summer card, Evening card...',
+  visibleToDrinkers:   props.locale === 'fr' ? 'Afficher ce menu aux drinkers' : 'Show this menu to drinkers',
+  visibilityHelp:      props.locale === 'fr' ? 'Décochez pour masquer le menu aux drinkers' : 'Uncheck to hide the menu from drinkers',
   selectedCocktails:   props.locale === 'fr' ? 'Cocktails sélectionnés'       : 'Selected cocktails',
   searchPlaceholder:   props.locale === 'fr' ? 'Rechercher un cocktail...'    : 'Search a cocktail...',
   selected:            props.locale === 'fr' ? 'Sélectionnés'                 : 'Selected',
@@ -133,6 +144,7 @@ const t = computed(() => ({
 
 const isEditing   = computed(() => !!props.card)
 const cardName    = ref(props.card?.name || '')
+const isVisible   = ref(props.card?.is_visible !== false)
 const selectedIds = ref([...(props.card?.cocktail_ids || [])])
 const searchTerm  = ref('')
 const saving      = ref(false)
@@ -170,7 +182,8 @@ async function save() {
     const validated = validateMenuCard({
       id: props.card?.id,
       name: cardName.value.trim(),
-      cocktail_ids: selectedIds.value
+      cocktail_ids: selectedIds.value,
+      is_visible: isVisible.value,
     })
     saving.value = true
     emit('save', validated)

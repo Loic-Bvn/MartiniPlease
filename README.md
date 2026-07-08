@@ -110,10 +110,11 @@ cp .env.example .env.local
 
 Variables requises dans `.env.local` :
 
-| Variable               | Description                                      |
-|------------------------|--------------------------------------------------|
-| `VITE_SUPABASE_URL`    | URL du projet Supabase                          |
-| `VITE_SUPABASE_ANON_KEY` | Clé `anon` Supabase                           |
+| Variable                   | Description                                      |
+|----------------------------|--------------------------------------------------|
+| `VITE_SUPABASE_URL`        | URL du projet Supabase                          |
+| `VITE_SUPABASE_ANON_KEY`   | Clé `anon` Supabase                             |
+| `VITE_SUPABASE_STORAGE_BUCKET` | Nom du bucket Supabase pour les images     |
 
 ### Développement
 

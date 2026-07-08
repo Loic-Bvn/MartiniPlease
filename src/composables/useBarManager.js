@@ -209,7 +209,7 @@ export function useBarManager({ onBarSelected } = {}) {
    */
   function openBarsSelection() {
     bar.value = null
-    localStorage.removeItem('selectedBar')
+    localStorage.removeItem('selectedBarId')
     showBarsSelection.value = true
   }
 
