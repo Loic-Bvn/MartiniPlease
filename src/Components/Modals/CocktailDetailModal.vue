@@ -30,7 +30,7 @@
           </div>
 
           <div class="cv-content-col">
-            
+
             <!-- Onglets -->
             <div class="swipe-tabs" role="tablist">
               <button
@@ -157,7 +157,7 @@
                         <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
                         <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
                           {{ getTypeLabel(ing.Type, locale) }}
-                          <em v-if="ing.IsGarnish" class="cv-garnish-tag">garnish</em>
+                          <!-- <em v-if="ing.IsGarnish" class="cv-garnish-tag">garnish</em> -->
                         </span>
                       </div>
                       <span class="ingredient-quantity">{{ ing._qty }}</span>
@@ -186,7 +186,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { X, Heart, GlassWater, Pencil, Trash2, Upload, Bookmark, Martini, Snowflake } from 'lucide-vue-next'
-import { 
+import {
   getTypeLabel,
   getProfileLabel,
   getGlassLabel,
