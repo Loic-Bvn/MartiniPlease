@@ -84,14 +84,14 @@
                   <!-- Préparation mise en avant : verre + glaçon + méthode -->
                   <div class="cv-prep-block">
                     <div class="cv-prep-item">
-                      <Martini :size="18" />
+                      <GlassWater :size="18" />
                       <div class="cv-prep-text">
                         <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Méthode' : 'Method' }}</span>
                         <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.method }">{{ getDetailledMethodLabel(cocktail.method, locale) }}</span>
                       </div>
                     </div>
                     <div class="cv-prep-item">
-                      <GlassWater :size="18" />
+                      <Martini :size="18" />
                       <div class="cv-prep-text">
                         <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Verre' : 'Glass' }}</span>
                         <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.glass }">{{ getGlassLabel(cocktail.glass, locale) }}</span>
@@ -166,8 +166,8 @@
                 </div>
                 <!-- Panel 3 : description -->
                 <div class="swipe-panel">
-                  <p v-if="props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en" class="cocktail-description">{{ props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en }}</p>
-                  <p v-else class="cocktail-description cocktail-description--empty">{{ props.locale === 'fr' ? 'Aucune description disponible pour ce cocktail.' : 'No description available for this cocktail.'}}</p>
+                  <div v-if="props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en" class="cocktail-description">{{ props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en }}</div>
+                  <div v-else class="cocktail-description cocktail-description--empty">{{ props.locale === 'fr' ? 'Aucune description disponible pour ce cocktail.' : 'No description available for this cocktail.'}}</div>
                 </div>
               </div>
             </div>
@@ -535,6 +535,8 @@ onBeforeUnmount(() => {
   color: var(--text);
   line-height: 1.5;
   font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .cocktail-description--empty {
