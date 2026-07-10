@@ -1,10 +1,11 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div ref="modalEl" class="modal-container modal-container--cocktail">
-    <!-- <div class="modal-header">
-      <button @click="$emit('close')" class="modal-close-btn"><X :size="20" /></button>
-    </div> -->
-
+      <div class="modal-header modal-header--cocktail">
+        <button @click="$emit('close')" class="">
+          <X :size="20" />
+        </button>
+      </div>
       <div class="modal-body cv-modal-body">
         <div class="cocktail-view-layout">
 
@@ -157,7 +158,6 @@
                         <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
                         <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
                           {{ getTypeLabel(ing.Type, locale) }}
-                          <!-- <em v-if="ing.IsGarnish" class="cv-garnish-tag">garnish</em> -->
                         </span>
                       </div>
                       <span class="ingredient-quantity">{{ ing._qty }}</span>
@@ -174,10 +174,6 @@
           </div>
         </div>
       </div>
-
-      <!-- <div class="modal-footer cv-modal-footer">
-        POSSIBLE ACTIONS : favoris, commande, édition, suppression, soumission au catalogue
-      </div> -->
 
     </div>
   </div>
@@ -220,7 +216,6 @@ const makeable = computed(() =>
   (props.cocktail.recipe || []).every(isAvailable)
 )
 
-// ── Disponibilité + favoris + commande (identique à CocktailCard) ──
 function isAvailable(ing) {
   if (ing.Type === 'garnish') return true
   return barInventory.value.has(ing.Type)
@@ -247,7 +242,6 @@ async function handleSubmit() {
   await submitToCatalog(props.cocktail)
 }
 
-// ── Quantités (unité oz/ml, identique à CocktailCard) ──
 function formatQty(ing) {
   if (props.unit === 'ml') {
     if (ing.Ml) return `${ing.Ml}ml`
@@ -262,28 +256,6 @@ function formatQty(ing) {
 const recipeWithQty = computed(() =>
   (props.cocktail.recipe || []).map(ing => ({ ...ing, _qty: formatQty(ing) }))
 )
-
-// ── Labels style / méthode / verre (identiques à CocktailCard) ──
-// const STYLE_LABELS = {
-//   sour: '🍋 Sour', fizz: '🫧 Fizz', highball: '🥃 Highball', tiki: '🌺 Tiki',
-//   negroni: '🔴 Negroni', old_fashioned: '🟠 Old Fashioned', classic: '🎩 Classic',
-//   modern: '✨ Modern', creamy: '🥛 Creamy', flip: '🥚 Flip', spritz: '🍾 Spritz',
-// }
-// const styleLabel = computed(() => {
-//   const s = props.cocktail.cocktail_style
-//   if (!s) return 'Indisponible'
-//   return STYLE_LABELS[s] || s
-// })
-
-// const METHOD_LABELS = {
-//   shake: 'Au shaker', regal_shake: '🍸 Regal Shake', stir: 'Verre à mélange', regal_stir: '🥄 Regal Stir',
-//   build: 'Au verre', blend: '🌀 Blend', swizzle: '🌿 Swizzle', throw: '🤹 Throw',
-// }
-// const methodLabel = computed(() => {
-//   const m = props.cocktail.method
-//   if (!m) return 'Indisponible'
-//   return METHOD_LABELS[m] || m
-// })
 
 function formatList(value = []) {
   if (!Array.isArray(value)) return ''
@@ -410,28 +382,50 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Ce composant s'appuie au maximum sur les classes globales déjà définies
-   (modal-overlay, modal-container, modal-header, modal-body, modal-footer,
-   btn-modal-primary, badge-method, recipe-line, recipe-bullet, ingredient-name,
-   ingredient-quantity, form-label, profile-tags, cocktail-abv-inline...).
-   Seul le layout spécifique à cette vue (colonnes + swipe) est ajouté ici. */
-
 .modal-header {
   padding: 0.5rem 0.75rem;
   min-height: unset;
+  flex-shrink: 0;
+}
+
+.modal-header--cocktail {
+  justify-content: flex-end;
+}
+
+.modal-container--cocktail {
+  max-width: 780px;
+  max-height: 90vh;
+  width: 90%;
+  height: auto;
+  margin: 0 auto;
+  max-height: calc(100vh - 4vh);
+  max-height: calc(100dvh - 4vh);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2vh 1rem;
+  padding: 2dvh 1rem;
 }
 
 .cv-modal-body {
   overflow: hidden;
+  flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .cocktail-view-layout {
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 1.25rem;
-  height: 100%;
-  min-height: 0;
+  align-items: start;
+  align-content: start;
 }
 
 .cv-image-col {
@@ -449,17 +443,18 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
-.image-preview-large {
+.image-preview-large,
+.image-missing {
+  aspect-ratio: 3 / 4;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  aspect-ratio: 1 / 1;
-  background: var(--bg-input);
-  box-shadow: var(--shadow-sm);
 }
-
 .image-preview-large img {
   width: 100%;
   height: 100%;
@@ -470,16 +465,10 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  min-height: 140px;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--bg-raised), var(--bg-input));
   color: var(--gold-dim);
-  padding: 0.5rem;
 }
 
-/* ── Bloc préparation (verre + glaçon + méthode) ── */
 .cv-prep-block {
   display: flex;
   flex-wrap: wrap;
@@ -500,7 +489,6 @@ onBeforeUnmount(() => {
   color: var(--gold);
 }
 
-
 .cv-prep-text {
   display: flex;
   flex-direction: column;
@@ -520,12 +508,11 @@ onBeforeUnmount(() => {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text);
-  /* text-transform: capitalize; */
 }
 
 .cocktail-title-row {
   height: 2.2rem;
-    display: flex;
+  display: flex;
   align-items: center;
   border-bottom: 1px solid var(--border);
 }
@@ -589,6 +576,7 @@ onBeforeUnmount(() => {
   display: flex;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .swipe-tab {
@@ -596,7 +584,6 @@ onBeforeUnmount(() => {
   background: none;
   border: none;
   padding: 0.5rem 0.25rem;
-  /* margin-right: 1.25rem; */
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -607,9 +594,16 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.4rem;
   -webkit-tap-highlight-color: transparent;
-  flex: 1 1 50%;
+  flex: 1 1 33.333%;
   justify-content: center;
   margin-right: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.swipe-tab > span:first-child,
+.swipe-tab {
+  white-space: nowrap;
 }
 
 .swipe-tab--active {
@@ -629,7 +623,7 @@ onBeforeUnmount(() => {
   position: absolute;
   bottom: -1px;
   left: 0;
-  width: 50%;
+  width: 33.333%;
   height: 2px;
   background: var(--gold);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
@@ -641,11 +635,9 @@ onBeforeUnmount(() => {
   flex: 1;
   min-height: 0;
   width: 100%;
+  height: 100%;
+  max-height: 100%;
   touch-action: pan-y;
-  /* Empêche la sélection/surlignage tactile natif du navigateur pendant le
-     drag horizontal : sans ça, un léger déplacement avant la détection
-     d'axe déclenche la sélection de texte native, visible comme un
-     bandeau de couleur plein sur toute la largeur touchée. */
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
@@ -654,8 +646,10 @@ onBeforeUnmount(() => {
 
 .swipe-track {
   display: flex;
-  width: 200%;
+  align-items: stretch;
+  width: 300%;
   height: 100%;
+  min-height: 0;
   box-sizing: border-box;
 }
 
@@ -663,11 +657,18 @@ onBeforeUnmount(() => {
   transition: none !important;
 }
 
+/* Chaque panel (Infos / Recette / Description) est scrollable
+   individuellement, une seule couche de scroll pour tous. */
 .swipe-panel {
-  width: 50%;
+  width: 33.333%;
+  height: 100%;
   flex-shrink: 0;
   box-sizing: border-box;
   overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding-top: 0.75rem;
   padding-right: 0.25rem;
 }
@@ -676,25 +677,85 @@ onBeforeUnmount(() => {
   justify-content: space-between;
 }
 
+/* ═══════════════════════════════════════════
+   MEDIA QUERIES — toujours en dernier pour
+   garantir qu'elles surchargent les règles
+   générales ci-dessus
+   ═══════════════════════════════════════════ */
+
 @media (max-width: 768px) {
+
+  .modal-container--cocktail {
+    height: calc(100vh - 4vh);
+    height: calc(100dvh - 4vh);
+    max-height: calc(100vh - 4vh);
+    max-height: calc(100dvh - 4vh);
+    display: flex;
+    flex-direction: column;
+  }
+
   .cocktail-view-layout {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .cv-image-col {
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .cv-content-col {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .swipe-tab {
+    font-size: 0.68rem;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 0.15rem;
+  }
+
+  .cv-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .cv-prep-item {
+    min-width: 80px;
+  }
+
+  .swipe-viewport {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .image-preview-large,
+  .image-missing {
+    max-height: 180px;
+    width: 100%;
+  }
+
+  .image-preview-large::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .image-preview-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
-.swipe-tab {
-  flex: 1 1 33.333%;
-  justify-content: center;
-  margin-right: 0;
+@media (max-width: 540px) {
+  .modal-container--cocktail {
+    max-height: 95vh;
+    max-height: 95dvh;
+  }
 }
-.swipe-tab-indicator {
-  width: 33.333%;
-}
-.swipe-track {
-  width: 300%;
-}
-.swipe-panel {
-  width: 33.333%;
-}
-
 </style>
