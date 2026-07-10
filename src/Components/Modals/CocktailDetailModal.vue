@@ -1,32 +1,27 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div ref="modalEl" class="modal-container modal-container--cocktail">
-    <!-- <div class="modal-header">
-      <button @click="$emit('close')" class="modal-close-btn"><X :size="20" /></button>
-    </div> -->
+      <div class="modal-header">
+        <div class="cocktail-title-row">
+          <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
+            {{ cocktail.name }} - {{ cocktail.abv }}°
+          </h3>
+        </div>
 
+        <button type="button" @click="$emit('close')" class="password-modal-close">
+          <X :size="20" />
+        </button>
+      </div>
       <div class="modal-body cv-modal-body">
         <div class="cocktail-view-layout">
 
           <div class="cv-image-col">
-
-            <div class="cocktail-title-row">
-              <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-                {{ cocktail.name }}
-              </h3>
-                <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
-            </div>
-
             <div v-if="cocktail.image && !imageError" class="image-preview-large">
               <img :src="cocktail.image" alt="cocktail image" @error="imageError = true" />
             </div>
             <div v-else class="image-missing">
               <Martini :size="40" />
             </div>
-
-            <!-- <div class="profile-tags cv-profile-tags" :class="{ 'cv-value--na': !cocktail.profile?.length }">
-              {{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : 'Profil indisponible' }}
-            </div> -->
           </div>
 
           <div class="cv-content-col">
@@ -34,9 +29,12 @@
             <!-- Onglets -->
             <div class="swipe-tabs" role="tablist">
               <button
+                id="tab-infos"
                 type="button"
                 role="tab"
                 :aria-selected="activeTab === 0"
+                aria-controls="panel-infos"
+                :tabindex="activeTab === 0 ? 0 : -1"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 0 }"
                 @click="goToTab(0)"
@@ -44,9 +42,12 @@
                 Infos
               </button>
               <button
+                id="tab-recette"
                 type="button"
                 role="tab"
                 :aria-selected="activeTab === 1"
+                aria-controls="panel-recette"
+                :tabindex="activeTab === 1 ? 0 : -1"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 1 }"
                 @click="goToTab(1)"
@@ -55,9 +56,12 @@
                 <span class="swipe-tab-count">{{ (cocktail.recipe || []).length }}</span>
               </button>
               <button
+                id="tab-description"
                 type="button"
                 role="tab"
                 :aria-selected="activeTab === 2"
+                aria-controls="panel-description"
+                :tabindex="activeTab === 2 ? 0 : -1"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 2 }"
                 @click="goToTab(2)"
@@ -80,8 +84,7 @@
                 :style="trackStyle"
               >
                 <!-- Panel 1 : infos -->
-                <div class="swipe-panel">
-                  <!-- Préparation mise en avant : verre + glaçon + méthode -->
+                <div id="panel-infos" role="tabpanel" aria-labelledby="tab-infos" class="swipe-panel">
                   <div class="cv-prep-block">
                     <div class="cv-prep-item">
                       <GlassWater :size="18" />
@@ -104,22 +107,17 @@
                         <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.ice?.length }">{{ getDetailledIceLabel(cocktail.ice, locale) }}</span>
                       </div>
                     </div>
-
                   </div>
 
                   <div class="cv-meta-list">
                     <div class="cv-meta-row">
-                      <span class="form-label">{{ props.locale === 'fr' ? 'Profiles' : 'Profiles' }}</span>
+                      <span class="form-label">Profiles</span>
                       <span :class="{ 'cv-value--na': !cocktail.profile?.length }">{{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Spiritueux de base' : 'Base Spirit' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
-                    <!-- <div class="cv-meta-row">
-                      <span class="form-label">Catégorie</span>
-                      <span :class="{ 'cv-value--na': !cocktail.category }">{{ cocktail.category || 'Indisponible' }}</span>
-                    </div> -->
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Créateur' : 'Creator' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.creator || cocktail.creator === 'Unknown' }">{{ (cocktail.creator && cocktail.creator !== 'Unknown') ? cocktail.creator : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
@@ -128,24 +126,15 @@
                       <span class="form-label">{{ props.locale === 'fr' ? 'Année' : 'Year' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.creation_year }">{{ cocktail.creation_year || (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
-                    <!-- <div class="cv-meta-row">
-                      <span class="form-label">Saison</span>
-                      <span :class="{ 'cv-value--na': !cocktail.season?.length }">{{ cocktail.season?.length ? formatList(cocktail.season) : 'Indisponible' }}</span>
-                    </div> -->
                     <div class="cv-meta-row">
-                      <span class="form-label">{{ props.locale === 'fr' ? 'Style' : 'Style' }}</span>
+                      <span class="form-label">Style</span>
                       <span :class="{ 'cv-value--na': !cocktail.cocktail_style }">{{ (cocktail.cocktail_style && cocktail.cocktail_style !== 'Unknown') ? cocktail.cocktail_style : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
-
                     </div>
-                    <!-- <div class="cv-meta-row">
-                      <span class="form-label">{{ props.locale === 'fr' ? 'Tags' : 'Tags' }}</span>
-                      <span :class="{ 'cv-value--na': !cocktail.tags?.length }">{{ cocktail.tags?.length ? formatList(cocktail.tags) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
-                    </div> -->
                   </div>
                 </div>
 
                 <!-- Panel 2 : recette -->
-                <div class="swipe-panel">
+                <div id="panel-recette" role="tabpanel" aria-labelledby="tab-recette" class="swipe-panel">
                   <div class="recipe-rows">
                     <div v-if="(cocktail.recipe || []).length === 0" class="recipe-empty">Aucun ingrédient</div>
                     <div
@@ -157,15 +146,15 @@
                         <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
                         <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
                           {{ getTypeLabel(ing.Type, locale) }}
-                          <!-- <em v-if="ing.IsGarnish" class="cv-garnish-tag">garnish</em> -->
                         </span>
                       </div>
                       <span class="ingredient-quantity">{{ ing._qty }}</span>
                     </div>
                   </div>
                 </div>
+
                 <!-- Panel 3 : description -->
-                <div class="swipe-panel">
+                <div id="panel-description" role="tabpanel" aria-labelledby="tab-description" class="swipe-panel">
                   <div v-if="props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en" class="cocktail-description">{{ props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en }}</div>
                   <div v-else class="cocktail-description cocktail-description--empty">{{ props.locale === 'fr' ? 'Aucune description disponible pour ce cocktail.' : 'No description available for this cocktail.'}}</div>
                 </div>
@@ -175,17 +164,13 @@
         </div>
       </div>
 
-      <!-- <div class="modal-footer cv-modal-footer">
-        POSSIBLE ACTIONS : favoris, commande, édition, suppression, soumission au catalogue
-      </div> -->
-
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, Heart, GlassWater, Pencil, Trash2, Upload, Bookmark, Martini, Snowflake } from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake } from 'lucide-vue-next'
 import {
   getTypeLabel,
   getProfileLabel,
@@ -194,60 +179,37 @@ import {
   getDetailledIceLabel
 } from '@/constants/typeLabels.js'
 import { useInventory } from '@/composables/useInventory'
-import { useDrinker } from '@/composables/useDrinker'
-import { useOrders } from '@/composables/useOrders'
-import { useCatalog } from '@/composables/useCatalog'
-import { useToast } from '@/composables/useToast'
+
+const TAB_COUNT = 3
+const TAB_WIDTH = 100 / TAB_COUNT
 
 const props = defineProps({
-  cocktail:        Object,
+  cocktail: {
+    type: Object,
+    required: true,
+    default: () => ({ recipe: [] }),
+  },
   locale:          { type: String, default: 'fr' },
   originRect:      { type: Object, default: null },
   isBartenderMode: { type: Boolean, default: false },
   unit:            { type: String, default: 'oz' },
   barId:           { type: String, default: '' },
 })
-const emit = defineEmits(['close', 'edit', 'delete'])
+const emit = defineEmits(['close'])
 const imageError = ref(false)
 const modalEl = ref(null)
 
 const { barInventory } = useInventory()
-const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
-const { addOrder } = useOrders()
-const { isSubmitted, submitToCatalog } = useCatalog()
-const { showToast } = useToast()
+
 const makeable = computed(() =>
   (props.cocktail.recipe || []).every(isAvailable)
 )
 
-// ── Disponibilité + favoris + commande (identique à CocktailCard) ──
 function isAvailable(ing) {
   if (ing.Type === 'garnish') return true
   return barInventory.value.has(ing.Type)
 }
 
-const isFav = computed(() => isFavorite(props.cocktail.id))
-
-async function handleFavorite() {
-  await toggleFavorite(props.cocktail.id)
-}
-
-async function handleHistoric() {
-  if (!hasDrinker.value || !drinker.value || !props.barId) return
-  const result = await addOrder(drinker.value, props.cocktail.id, props.barId)
-  if (result.success) {
-    await quickRefreshHistory()
-    showToast('🍸 ' + props.cocktail.name + (props.locale === 'fr' ? ' commandé !' : ' ordered!'))
-  } else {
-    console.error('❌ Order failed:', result.error)
-  }
-}
-
-async function handleSubmit() {
-  await submitToCatalog(props.cocktail)
-}
-
-// ── Quantités (unité oz/ml, identique à CocktailCard) ──
 function formatQty(ing) {
   if (props.unit === 'ml') {
     if (ing.Ml) return `${ing.Ml}ml`
@@ -263,34 +225,7 @@ const recipeWithQty = computed(() =>
   (props.cocktail.recipe || []).map(ing => ({ ...ing, _qty: formatQty(ing) }))
 )
 
-// ── Labels style / méthode / verre (identiques à CocktailCard) ──
-// const STYLE_LABELS = {
-//   sour: '🍋 Sour', fizz: '🫧 Fizz', highball: '🥃 Highball', tiki: '🌺 Tiki',
-//   negroni: '🔴 Negroni', old_fashioned: '🟠 Old Fashioned', classic: '🎩 Classic',
-//   modern: '✨ Modern', creamy: '🥛 Creamy', flip: '🥚 Flip', spritz: '🍾 Spritz',
-// }
-// const styleLabel = computed(() => {
-//   const s = props.cocktail.cocktail_style
-//   if (!s) return 'Indisponible'
-//   return STYLE_LABELS[s] || s
-// })
-
-// const METHOD_LABELS = {
-//   shake: 'Au shaker', regal_shake: '🍸 Regal Shake', stir: 'Verre à mélange', regal_stir: '🥄 Regal Stir',
-//   build: 'Au verre', blend: '🌀 Blend', swizzle: '🌿 Swizzle', throw: '🤹 Throw',
-// }
-// const methodLabel = computed(() => {
-//   const m = props.cocktail.method
-//   if (!m) return 'Indisponible'
-//   return METHOD_LABELS[m] || m
-// })
-
-function formatList(value = []) {
-  if (!Array.isArray(value)) return ''
-  return value.map(item => typeof item === 'string' ? item : item?.name || item?.label || '').filter(Boolean).join(', ')
-}
-
-// ── Swipe infos / recette ──
+// ── Swipe infos / recette / description ──
 const activeTab = ref(0)
 const isDragging = ref(false)
 const dragDeltaPercent = ref(0)
@@ -303,7 +238,7 @@ function goToTab(index) {
 }
 
 const trackStyle = computed(() => {
-  const base = -activeTab.value * (100 / 3)
+  const base = -activeTab.value * TAB_WIDTH
   const offset = isDragging.value ? dragDeltaPercent.value : 0
   return {
     transform: `translateX(${base + offset}%)`,
@@ -342,21 +277,19 @@ function onTouchMove(e) {
 
   e.preventDefault()
   const viewportWidth = e.currentTarget.clientWidth || 1
-  let percent = (dx / viewportWidth) * (100 / 3)
+  let percent = (dx / viewportWidth) * TAB_WIDTH
 
-  if ((activeTab.value === 0 && percent > 0) || (activeTab.value === 2 && percent < 0)) {
+  if ((activeTab.value === 0 && percent > 0) || (activeTab.value === TAB_COUNT - 1 && percent < 0)) {
     percent *= 0.3
   }
   dragDeltaPercent.value = percent
 }
 
 function onTouchEnd() {
-  if (!isDragging.value) {
-    dragDeltaPercent.value = 0
-    return
-  }
+  dragDeltaPercent.value = wasDragging() ? dragDeltaPercent.value : 0
+  if (!isDragging.value) return
   const threshold = 12
-  if (dragDeltaPercent.value <= -threshold && activeTab.value < 2) {
+  if (dragDeltaPercent.value <= -threshold && activeTab.value < TAB_COUNT - 1) {
     activeTab.value += 1
   } else if (dragDeltaPercent.value >= threshold && activeTab.value > 0) {
     activeTab.value -= 1
@@ -365,10 +298,14 @@ function onTouchEnd() {
   dragDeltaPercent.value = 0
 }
 
+function wasDragging() {
+  return isDragging.value
+}
+
 function onKeydown(e) {
   if (e.key === 'Escape') emit('close')
   if (e.key === 'ArrowLeft') activeTab.value = Math.max(0, activeTab.value - 1)
-  if (e.key === 'ArrowRight') activeTab.value = Math.min(2, activeTab.value + 1)
+  if (e.key === 'ArrowRight') activeTab.value = Math.min(TAB_COUNT - 1, activeTab.value + 1)
 }
 
 // ── FLIP : la modal "part" de la position/taille de la card cliquée ──
@@ -410,76 +347,116 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Ce composant s'appuie au maximum sur les classes globales déjà définies
-   (modal-overlay, modal-container, modal-header, modal-body, modal-footer,
-   btn-modal-primary, badge-method, recipe-line, recipe-bullet, ingredient-name,
-   ingredient-quantity, form-label, profile-tags, cocktail-abv-inline...).
-   Seul le layout spécifique à cette vue (colonnes + swipe) est ajouté ici. */
-
 .modal-header {
   padding: 0.5rem 0.75rem;
   min-height: unset;
+  flex-shrink: 0;
+}
+
+.modal-close-btn {
+  appearance: none;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+  color: var(--gold);
+  border-color: var(--gold-dim, var(--border));
+}
+
+.modal-container--cocktail {
+  max-width: 780px;
+  max-height: 90vh;
+  width: 90%;
+  height: auto;
+  margin: 0 auto;
+  max-height: calc(100vh - 4vh);
+  max-height: calc(100dvh - 4vh);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2vh 1rem;
+  padding: 2dvh 1rem;
 }
 
 .cv-modal-body {
   overflow: hidden;
+  flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .cocktail-view-layout {
-  display: grid;
-  grid-template-columns: 200px 1fr;
+  display: flex;
+  flex-direction: row;
   gap: 1.25rem;
-  height: 100%;
+  flex: 1;
   min-height: 0;
+  height: 100%;
+  align-items: stretch;
 }
 
 .cv-image-col {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.cv-profile-tags {
-  font-size: 0.78rem;
-  text-align: left;
+  width: 200px;
+  flex-shrink: 0;
+  min-height: 0;
 }
 
 .cv-content-col {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
-.image-preview-large {
+.image-preview-large,
+.image-missing {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  aspect-ratio: 1 / 1;
-  background: var(--bg-input);
-  box-shadow: var(--shadow-sm);
 }
 
 .image-preview-large img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 40%;
+  display: block;
 }
 
 .image-missing {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  min-height: 140px;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--bg-raised), var(--bg-input));
   color: var(--gold-dim);
-  padding: 0.5rem;
 }
 
-/* ── Bloc préparation (verre + glaçon + méthode) ── */
 .cv-prep-block {
   display: flex;
   flex-wrap: wrap;
@@ -500,7 +477,6 @@ onBeforeUnmount(() => {
   color: var(--gold);
 }
 
-
 .cv-prep-text {
   display: flex;
   flex-direction: column;
@@ -520,14 +496,12 @@ onBeforeUnmount(() => {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text);
-  /* text-transform: capitalize; */
 }
 
 .cocktail-title-row {
   height: 2.2rem;
-    display: flex;
+  display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border);
 }
 
 .cocktail-description {
@@ -589,6 +563,7 @@ onBeforeUnmount(() => {
   display: flex;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .swipe-tab {
@@ -596,7 +571,6 @@ onBeforeUnmount(() => {
   background: none;
   border: none;
   padding: 0.5rem 0.25rem;
-  /* margin-right: 1.25rem; */
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -607,9 +581,16 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.4rem;
   -webkit-tap-highlight-color: transparent;
-  flex: 1 1 50%;
+  flex: 1 1 33.333%;
   justify-content: center;
   margin-right: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.swipe-tab > span:first-child,
+.swipe-tab {
+  white-space: nowrap;
 }
 
 .swipe-tab--active {
@@ -629,7 +610,7 @@ onBeforeUnmount(() => {
   position: absolute;
   bottom: -1px;
   left: 0;
-  width: 50%;
+  width: 33.333%;
   height: 2px;
   background: var(--gold);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
@@ -641,11 +622,9 @@ onBeforeUnmount(() => {
   flex: 1;
   min-height: 0;
   width: 100%;
+  height: 100%;
+  max-height: 100%;
   touch-action: pan-y;
-  /* Empêche la sélection/surlignage tactile natif du navigateur pendant le
-     drag horizontal : sans ça, un léger déplacement avant la détection
-     d'axe déclenche la sélection de texte native, visible comme un
-     bandeau de couleur plein sur toute la largeur touchée. */
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
@@ -654,8 +633,10 @@ onBeforeUnmount(() => {
 
 .swipe-track {
   display: flex;
-  width: 200%;
+  align-items: stretch;
+  width: 300%;
   height: 100%;
+  min-height: 0;
   box-sizing: border-box;
 }
 
@@ -664,12 +645,17 @@ onBeforeUnmount(() => {
 }
 
 .swipe-panel {
-  width: 50%;
+  width: 33.333%;
+  overflow-y: auto;
   flex-shrink: 0;
   box-sizing: border-box;
-  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding-top: 0.75rem;
   padding-right: 0.25rem;
+  scrollbar-width: thin;
 }
 
 .cv-modal-footer {
@@ -677,24 +663,75 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 768px) {
+
+  .modal-container--cocktail {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
   .cocktail-view-layout {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .cv-image-col {
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .cv-content-col {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .swipe-tab {
+    font-size: 0.68rem;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 0.15rem;
+  }
+
+  .cv-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    padding: 0.3rem 0;
+  }
+
+  .cv-prep-block {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .cv-prep-item {
+    min-width: 80px;
+  }
+
+  .swipe-viewport {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .image-preview-large,
+  .image-missing {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 300px;
+  }
+
+  .image-preview-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
-.swipe-tab {
-  flex: 1 1 33.333%;
-  justify-content: center;
-  margin-right: 0;
+@media (max-width: 540px) {
+  .modal-container--cocktail {
+    max-height: 95dvh;
+  }
 }
-.swipe-tab-indicator {
-  width: 33.333%;
-}
-.swipe-track {
-  width: 300%;
-}
-.swipe-panel {
-  width: 33.333%;
-}
-
 </style>
