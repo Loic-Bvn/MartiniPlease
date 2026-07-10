@@ -1,9 +1,7 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div ref="modalEl" class="modal-container modal-container--cocktail">
-      <!-- <div class="modal-header modal-header--cocktail"> -->
       <div class="modal-header">
-        
         <div class="cocktail-title-row">
           <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
             {{ cocktail.name }} - {{ cocktail.abv }}°
@@ -31,9 +29,12 @@
             <!-- Onglets -->
             <div class="swipe-tabs" role="tablist">
               <button
+                id="tab-infos"
                 type="button"
                 role="tab"
                 :aria-selected="activeTab === 0"
+                aria-controls="panel-infos"
+                :tabindex="activeTab === 0 ? 0 : -1"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 0 }"
                 @click="goToTab(0)"
@@ -41,9 +42,12 @@
                 Infos
               </button>
               <button
+                id="tab-recette"
                 type="button"
                 role="tab"
                 :aria-selected="activeTab === 1"
+                aria-controls="panel-recette"
+                :tabindex="activeTab === 1 ? 0 : -1"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 1 }"
                 @click="goToTab(1)"
@@ -52,9 +56,12 @@
                 <span class="swipe-tab-count">{{ (cocktail.recipe || []).length }}</span>
               </button>
               <button
+                id="tab-description"
                 type="button"
                 role="tab"
                 :aria-selected="activeTab === 2"
+                aria-controls="panel-description"
+                :tabindex="activeTab === 2 ? 0 : -1"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 2 }"
                 @click="goToTab(2)"
@@ -77,8 +84,7 @@
                 :style="trackStyle"
               >
                 <!-- Panel 1 : infos -->
-                <div class="swipe-panel">
-                  <!-- Préparation mise en avant : verre + glaçon + méthode -->
+                <div id="panel-infos" role="tabpanel" aria-labelledby="tab-infos" class="swipe-panel">
                   <div class="cv-prep-block">
                     <div class="cv-prep-item">
                       <GlassWater :size="18" />
@@ -101,22 +107,17 @@
                         <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.ice?.length }">{{ getDetailledIceLabel(cocktail.ice, locale) }}</span>
                       </div>
                     </div>
-
                   </div>
 
                   <div class="cv-meta-list">
                     <div class="cv-meta-row">
-                      <span class="form-label">{{ props.locale === 'fr' ? 'Profiles' : 'Profiles' }}</span>
+                      <span class="form-label">Profiles</span>
                       <span :class="{ 'cv-value--na': !cocktail.profile?.length }">{{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Spiritueux de base' : 'Base Spirit' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
-                    <!-- <div class="cv-meta-row">
-                      <span class="form-label">Catégorie</span>
-                      <span :class="{ 'cv-value--na': !cocktail.category }">{{ cocktail.category || 'Indisponible' }}</span>
-                    </div> -->
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Créateur' : 'Creator' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.creator || cocktail.creator === 'Unknown' }">{{ (cocktail.creator && cocktail.creator !== 'Unknown') ? cocktail.creator : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
@@ -125,24 +126,15 @@
                       <span class="form-label">{{ props.locale === 'fr' ? 'Année' : 'Year' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.creation_year }">{{ cocktail.creation_year || (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
-                    <!-- <div class="cv-meta-row">
-                      <span class="form-label">Saison</span>
-                      <span :class="{ 'cv-value--na': !cocktail.season?.length }">{{ cocktail.season?.length ? formatList(cocktail.season) : 'Indisponible' }}</span>
-                    </div> -->
                     <div class="cv-meta-row">
-                      <span class="form-label">{{ props.locale === 'fr' ? 'Style' : 'Style' }}</span>
+                      <span class="form-label">Style</span>
                       <span :class="{ 'cv-value--na': !cocktail.cocktail_style }">{{ (cocktail.cocktail_style && cocktail.cocktail_style !== 'Unknown') ? cocktail.cocktail_style : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
-
                     </div>
-                    <!-- <div class="cv-meta-row">
-                      <span class="form-label">{{ props.locale === 'fr' ? 'Tags' : 'Tags' }}</span>
-                      <span :class="{ 'cv-value--na': !cocktail.tags?.length }">{{ cocktail.tags?.length ? formatList(cocktail.tags) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
-                    </div> -->
                   </div>
                 </div>
 
                 <!-- Panel 2 : recette -->
-                <div class="swipe-panel">
+                <div id="panel-recette" role="tabpanel" aria-labelledby="tab-recette" class="swipe-panel">
                   <div class="recipe-rows">
                     <div v-if="(cocktail.recipe || []).length === 0" class="recipe-empty">Aucun ingrédient</div>
                     <div
@@ -160,8 +152,9 @@
                     </div>
                   </div>
                 </div>
+
                 <!-- Panel 3 : description -->
-                <div class="swipe-panel">
+                <div id="panel-description" role="tabpanel" aria-labelledby="tab-description" class="swipe-panel">
                   <div v-if="props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en" class="cocktail-description">{{ props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en }}</div>
                   <div v-else class="cocktail-description cocktail-description--empty">{{ props.locale === 'fr' ? 'Aucune description disponible pour ce cocktail.' : 'No description available for this cocktail.'}}</div>
                 </div>
@@ -177,7 +170,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, Heart, GlassWater, Pencil, Trash2, Upload, Bookmark, Martini, Snowflake } from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake } from 'lucide-vue-next'
 import {
   getTypeLabel,
   getProfileLabel,
@@ -186,28 +179,28 @@ import {
   getDetailledIceLabel
 } from '@/constants/typeLabels.js'
 import { useInventory } from '@/composables/useInventory'
-import { useDrinker } from '@/composables/useDrinker'
-import { useOrders } from '@/composables/useOrders'
-import { useCatalog } from '@/composables/useCatalog'
-import { useToast } from '@/composables/useToast'
+
+const TAB_COUNT = 3
+const TAB_WIDTH = 100 / TAB_COUNT
 
 const props = defineProps({
-  cocktail:        Object,
+  cocktail: {
+    type: Object,
+    required: true,
+    default: () => ({ recipe: [] }),
+  },
   locale:          { type: String, default: 'fr' },
   originRect:      { type: Object, default: null },
   isBartenderMode: { type: Boolean, default: false },
   unit:            { type: String, default: 'oz' },
   barId:           { type: String, default: '' },
 })
-const emit = defineEmits(['close', 'edit', 'delete'])
+const emit = defineEmits(['close'])
 const imageError = ref(false)
 const modalEl = ref(null)
 
 const { barInventory } = useInventory()
-const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
-const { addOrder } = useOrders()
-const { isSubmitted, submitToCatalog } = useCatalog()
-const { showToast } = useToast()
+
 const makeable = computed(() =>
   (props.cocktail.recipe || []).every(isAvailable)
 )
@@ -215,27 +208,6 @@ const makeable = computed(() =>
 function isAvailable(ing) {
   if (ing.Type === 'garnish') return true
   return barInventory.value.has(ing.Type)
-}
-
-const isFav = computed(() => isFavorite(props.cocktail.id))
-
-async function handleFavorite() {
-  await toggleFavorite(props.cocktail.id)
-}
-
-async function handleHistoric() {
-  if (!hasDrinker.value || !drinker.value || !props.barId) return
-  const result = await addOrder(drinker.value, props.cocktail.id, props.barId)
-  if (result.success) {
-    await quickRefreshHistory()
-    showToast('🍸 ' + props.cocktail.name + (props.locale === 'fr' ? ' commandé !' : ' ordered!'))
-  } else {
-    console.error('❌ Order failed:', result.error)
-  }
-}
-
-async function handleSubmit() {
-  await submitToCatalog(props.cocktail)
 }
 
 function formatQty(ing) {
@@ -253,12 +225,7 @@ const recipeWithQty = computed(() =>
   (props.cocktail.recipe || []).map(ing => ({ ...ing, _qty: formatQty(ing) }))
 )
 
-function formatList(value = []) {
-  if (!Array.isArray(value)) return ''
-  return value.map(item => typeof item === 'string' ? item : item?.name || item?.label || '').filter(Boolean).join(', ')
-}
-
-// ── Swipe infos / recette ──
+// ── Swipe infos / recette / description ──
 const activeTab = ref(0)
 const isDragging = ref(false)
 const dragDeltaPercent = ref(0)
@@ -271,7 +238,7 @@ function goToTab(index) {
 }
 
 const trackStyle = computed(() => {
-  const base = -activeTab.value * (100 / 3)
+  const base = -activeTab.value * TAB_WIDTH
   const offset = isDragging.value ? dragDeltaPercent.value : 0
   return {
     transform: `translateX(${base + offset}%)`,
@@ -310,21 +277,19 @@ function onTouchMove(e) {
 
   e.preventDefault()
   const viewportWidth = e.currentTarget.clientWidth || 1
-  let percent = (dx / viewportWidth) * (100 / 3)
+  let percent = (dx / viewportWidth) * TAB_WIDTH
 
-  if ((activeTab.value === 0 && percent > 0) || (activeTab.value === 2 && percent < 0)) {
+  if ((activeTab.value === 0 && percent > 0) || (activeTab.value === TAB_COUNT - 1 && percent < 0)) {
     percent *= 0.3
   }
   dragDeltaPercent.value = percent
 }
 
 function onTouchEnd() {
-  if (!isDragging.value) {
-    dragDeltaPercent.value = 0
-    return
-  }
+  dragDeltaPercent.value = wasDragging() ? dragDeltaPercent.value : 0
+  if (!isDragging.value) return
   const threshold = 12
-  if (dragDeltaPercent.value <= -threshold && activeTab.value < 2) {
+  if (dragDeltaPercent.value <= -threshold && activeTab.value < TAB_COUNT - 1) {
     activeTab.value += 1
   } else if (dragDeltaPercent.value >= threshold && activeTab.value > 0) {
     activeTab.value -= 1
@@ -333,10 +298,14 @@ function onTouchEnd() {
   dragDeltaPercent.value = 0
 }
 
+function wasDragging() {
+  return isDragging.value
+}
+
 function onKeydown(e) {
   if (e.key === 'Escape') emit('close')
   if (e.key === 'ArrowLeft') activeTab.value = Math.max(0, activeTab.value - 1)
-  if (e.key === 'ArrowRight') activeTab.value = Math.min(2, activeTab.value + 1)
+  if (e.key === 'ArrowRight') activeTab.value = Math.min(TAB_COUNT - 1, activeTab.value + 1)
 }
 
 // ── FLIP : la modal "part" de la position/taille de la card cliquée ──
@@ -382,10 +351,6 @@ onBeforeUnmount(() => {
   padding: 0.5rem 0.75rem;
   min-height: unset;
   flex-shrink: 0;
-}
-
-.modal-header--cocktail {
-  justify-content: flex-end;
 }
 
 .modal-close-btn {
@@ -457,11 +422,6 @@ onBeforeUnmount(() => {
   min-height: 0;
 }
 
-.cv-profile-tags {
-  font-size: 0.78rem;
-  text-align: left;
-}
-
 .cv-content-col {
   display: flex;
   flex-direction: column;
@@ -481,7 +441,7 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
- .image-preview-large img {
+.image-preview-large img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -684,8 +644,6 @@ onBeforeUnmount(() => {
   transition: none !important;
 }
 
-/* Chaque panel (Infos / Recette / Description) est scrollable
-   individuellement, une seule couche de scroll pour tous. */
 .swipe-panel {
   width: 33.333%;
   overflow-y: auto;
@@ -703,12 +661,6 @@ onBeforeUnmount(() => {
 .cv-modal-footer {
   justify-content: space-between;
 }
-
-/* ═══════════════════════════════════════════
-   MEDIA QUERIES — toujours en dernier pour
-   garantir qu'elles surchargent les règles
-   générales ci-dessus
-   ═══════════════════════════════════════════ */
 
 @media (max-width: 768px) {
 
