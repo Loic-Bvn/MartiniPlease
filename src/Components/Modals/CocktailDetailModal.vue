@@ -1,8 +1,16 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div ref="modalEl" class="modal-container modal-container--cocktail">
-      <div class="modal-header modal-header--cocktail">
-        <button @click="$emit('close')" class="">
+      <!-- <div class="modal-header modal-header--cocktail"> -->
+      <div class="modal-header">
+        
+        <div class="cocktail-title-row">
+          <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
+            {{ cocktail.name }} - {{ cocktail.abv }}°
+          </h3>
+        </div>
+
+        <button type="button" @click="$emit('close')" class="password-modal-close">
           <X :size="20" />
         </button>
       </div>
@@ -10,24 +18,12 @@
         <div class="cocktail-view-layout">
 
           <div class="cv-image-col">
-
-            <div class="cocktail-title-row">
-              <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-                {{ cocktail.name }}
-              </h3>
-                <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
-            </div>
-
             <div v-if="cocktail.image && !imageError" class="image-preview-large">
               <img :src="cocktail.image" alt="cocktail image" @error="imageError = true" />
             </div>
             <div v-else class="image-missing">
               <Martini :size="40" />
             </div>
-
-            <!-- <div class="profile-tags cv-profile-tags" :class="{ 'cv-value--na': !cocktail.profile?.length }">
-              {{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : 'Profil indisponible' }}
-            </div> -->
           </div>
 
           <div class="cv-content-col">
@@ -392,6 +388,26 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
 }
 
+.modal-close-btn {
+  appearance: none;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+  color: var(--gold);
+  border-color: var(--gold-dim, var(--border));
+}
+
 .modal-container--cocktail {
   max-width: 780px;
   max-height: 90vh;
@@ -402,6 +418,9 @@ onBeforeUnmount(() => {
   max-height: calc(100dvh - 4vh);
   box-sizing: border-box;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .modal-overlay {
@@ -421,17 +440,21 @@ onBeforeUnmount(() => {
 }
 
 .cocktail-view-layout {
-  display: grid;
-  grid-template-columns: 200px 1fr;
+  display: flex;
+  flex-direction: row;
   gap: 1.25rem;
-  align-items: start;
-  align-content: start;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  align-items: stretch;
 }
 
 .cv-image-col {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  width: 200px;
+  flex-shrink: 0;
+  min-height: 0;
 }
 
 .cv-profile-tags {
@@ -451,14 +474,19 @@ onBeforeUnmount(() => {
 
 .image-preview-large,
 .image-missing {
-  aspect-ratio: 3 / 4;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
-.image-preview-large img {
+
+ .image-preview-large img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 40%;
+  display: block;
 }
 
 .image-missing {
@@ -514,7 +542,6 @@ onBeforeUnmount(() => {
   height: 2.2rem;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border);
 }
 
 .cocktail-description {
@@ -661,16 +688,16 @@ onBeforeUnmount(() => {
    individuellement, une seule couche de scroll pour tous. */
 .swipe-panel {
   width: 33.333%;
-  height: 100%;
+  overflow-y: auto;
   flex-shrink: 0;
   box-sizing: border-box;
-  overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
   min-height: 0;
   padding-top: 0.75rem;
   padding-right: 0.25rem;
+  scrollbar-width: thin;
 }
 
 .cv-modal-footer {
@@ -686,10 +713,7 @@ onBeforeUnmount(() => {
 @media (max-width: 768px) {
 
   .modal-container--cocktail {
-    height: calc(100vh - 4vh);
-    height: calc(100dvh - 4vh);
-    max-height: calc(100vh - 4vh);
-    max-height: calc(100dvh - 4vh);
+    height: auto;
     display: flex;
     flex-direction: column;
   }
@@ -697,7 +721,7 @@ onBeforeUnmount(() => {
   .cocktail-view-layout {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
     flex: 1;
     min-height: 0;
   }
@@ -722,6 +746,12 @@ onBeforeUnmount(() => {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.15rem;
+    padding: 0.3rem 0;
+  }
+
+  .cv-prep-block {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .cv-prep-item {
@@ -735,14 +765,9 @@ onBeforeUnmount(() => {
 
   .image-preview-large,
   .image-missing {
-    max-height: 180px;
     width: 100%;
-  }
-
-  .image-preview-large::after {
-    content: "";
-    position: absolute;
-    inset: 0;
+    aspect-ratio: 3 / 4;
+    max-height: 300px;
   }
 
   .image-preview-large img {
@@ -754,7 +779,6 @@ onBeforeUnmount(() => {
 
 @media (max-width: 540px) {
   .modal-container--cocktail {
-    max-height: 95vh;
     max-height: 95dvh;
   }
 }
