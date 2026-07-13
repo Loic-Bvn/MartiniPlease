@@ -647,6 +647,8 @@ onBeforeUnmount(() => {
 .swipe-panel {
   width: 33.333%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   flex-shrink: 0;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -664,10 +666,18 @@ onBeforeUnmount(() => {
 
 @media (max-width: 768px) {
 
+  .modal-overlay {
+    padding: 3dvh 0.75rem;
+  }
+
   .modal-container--cocktail {
-    height: auto;
+    width: 100%;
+    height: calc(100dvh - 6dvh);
+    max-height: calc(100dvh - 6dvh);
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .cocktail-view-layout {
@@ -681,6 +691,7 @@ onBeforeUnmount(() => {
   .cv-image-col {
     width: 100%;
     flex-shrink: 0;
+    height: auto;
   }
 
   .cv-content-col {
@@ -715,11 +726,17 @@ onBeforeUnmount(() => {
     min-height: 0;
   }
 
+  /* image carrée qui remplit toute la largeur dispo (pas de marges
+     latérales) ; la hauteur suit via aspect-ratio, avec un plafond
+     généreux pour ne pas manger tout l'écran sur les téléphones larges */
   .image-preview-large,
   .image-missing {
+    flex: none;
     width: 100%;
-    aspect-ratio: 3 / 4;
-    max-height: 300px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    max-height: min(42dvh, 320px);
+    margin: 0 auto;
   }
 
   .image-preview-large img {
@@ -729,9 +746,22 @@ onBeforeUnmount(() => {
   }
 }
 
-@media (max-width: 540px) {
-  .modal-container--cocktail {
-    max-height: 95dvh;
+/* Écrans courts (petits téléphones, mode paysage) : on rogne l'image
+   en priorité pour garder de la place pour le contenu scrollable */
+@media (max-width: 768px) and (max-height: 700px) {
+  .image-preview-large,
+  .image-missing {
+    max-height: min(24dvh, 150px);
+  }
+
+  .cocktail-title-row {
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) and (max-height: 560px) {
+  .cv-image-col {
+    display: none;
   }
 }
 </style>
