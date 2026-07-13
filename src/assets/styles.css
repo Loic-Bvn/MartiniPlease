@@ -1918,7 +1918,7 @@ body {
 
 .modal-container--cocktail {
   max-width: 780px;
-  max-height: 90vh;
+  height: min(680px, 90vh); /* hauteur définie au lieu de max-height seule */
   width: 90%;
 }
 
@@ -2432,7 +2432,7 @@ body {
   .form-row { grid-template-columns: 1fr; }
   .recipe-columns-header,.recipe-row {grid-template-columns: 1fr 1fr 50px 40px 26px;}
   .modal-overlay { padding: 0.5rem; align-items: flex-end; }
-  .modal-container--cocktail { max-height: 95vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
+  /* .modal-container--cocktail { max-height: 95vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; } */
   .modal-container--menucard { max-height: 90vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .password-modal-content { padding: 1.25rem; }
 }
