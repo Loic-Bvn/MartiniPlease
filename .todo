@@ -1,6 +1,19 @@
 # TODO
 
-## Form COCKTAIL CATALOG
+## Form push cocktail
+- Bug au niveau de la selection des glacons
+
+## Pricing
+- Coté bartender:
+    - afficher cout de preparation en matiere premiere des cocktails (cout d'une unité x quantité de l'ingredient)
+    - cost_calculator, renseigner pour chaque ingrédient, le cout d'une unité
+- Coté drinker
+    - afficher cout cocktail (selon values set par bartender)
+
+## Batching
+- Ajouter modal pour calculer des gros volumes de cocktails + pricing du batch
+
+## Form COCKTAIL CATALOG (sharing recipes)
 - Cassé :/
 - Rendre plus clair l'UI pour faire comprendre a l'utilisateur qu'il peut push et pull des recettes
 - Remplacer l'affichage des ingredients par les types d'ingredients (comme dans les modalCard)
