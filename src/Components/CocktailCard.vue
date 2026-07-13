@@ -8,14 +8,16 @@
           <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
             {{ cocktail.name }}
           </h3>
-            <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
+            <!-- TODO: Handle price - Ajouter gestion tarifs cocktails (attention drinker/bartender mode)  -->
+            <!-- <span class="cocktail-price-inline">{{ cocktail.price ?? '14' }}€</span> -->
+          <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
         </div>
         <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
-            <!-- HIDE COCKTAIL CREATOR FOR NOW-->
-            <!--<span v-if="cocktail.creator && cocktail.creator !== 'Unknown'" class="cocktail-creator-meta">by {{ cocktail.creator }}</span>-->
             <span v-if="cocktail.profile?.length" class="profile-tags">
               <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
             </span>
+            <!-- TODO: Handle price - Ajouter gestion tarifs cocktails (attention drinker/bartender mode)  -->
+            <!-- <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span> -->
         </div>
       </div>
     </div>
@@ -41,25 +43,12 @@
     <!-- Footer : tags du cocktail -->
     <div class="card-footer">
       <div class="footer-left" style="display:flex; align-items:center; gap:6px;">
-        <!--<span v-if="makeable" class="badge-makeable" :title="t.makeable">
-          <Check :size="16" />
-        </span>
-        <span v-else class="badge-missing" :title="t.notMakeable">
-          <XIcon :size="16" />
-        </span>-->
         <span v-if="cocktail.cocktail_style" class="badge-method">
           {{ styleLabel }}
         </span>
-        <!--<span v-if="cocktail.abv > 0" class="badge-method">
-          {{ baseSpiritLabel }}
-        </span>
-        <span v-else class="badge-method">Mocktail</span>-->
         <span v-if="cocktail.method && isBartenderMode" class="badge-method">
           {{ methodLabel }}
         </span>
-        <!-- <span v-if="cocktail.ice && isBartenderMode" class="badge-method">
-          {{ iceLabel }}
-        </span> -->
         <span v-if="cocktail.glass && isBartenderMode" class="badge-method">
           {{ glassLabel }}
         </span>
@@ -72,23 +61,23 @@
           :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
           :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
         >
-          <Heart :size="16" :fill="isFav ? 'currentColor' : 'none'" />
+          <Heart :size="18" :fill="isFav ? 'currentColor' : 'none'" />
         </button>
         <button
           v-if="hasDrinker && !isBartenderMode"
           @click.stop="handleHistoric"
-          class="btn-order-simple"
+          class="btn-icon"
           title="Commander"
         >
-          <GlassWater :size="16" />
+          <HandPlatter :size="18" />
         </button>
 
         <template v-if="isBartenderMode">
           <button @click.stop="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
-            <Pencil :size="16" />
+            <Pencil :size="18" />
           </button>
           <button @click.stop="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
-            <Trash2 :size="16" />
+            <Trash2 :size="18" />
           </button>
           <button
             v-if="!isSubmitted(cocktail.id)"
@@ -96,14 +85,14 @@
             class="btn-icon btn-icon--submit"
             :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
           >
-            <Upload :size="16" />
+            <Upload :size="18" />
           </button>
           <span
             v-else
             class="btn-icon btn-icon--submitted"
             :title="locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
           >
-            <Bookmark :size="16" />
+            <Bookmark :size="18" />
           </span>
         </template>
       </div>
@@ -114,12 +103,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Pencil, Trash2, Heart, PlusIcon, XIcon, GlassWater, Loader2, Check} from 'lucide-vue-next'
+import { Upload, Bookmark, Pencil, Trash2, Heart, PlusIcon, XIcon, Send, Loader2, Check, HandPlatter} from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
-import { Upload, Bookmark } from 'lucide-vue-next'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 

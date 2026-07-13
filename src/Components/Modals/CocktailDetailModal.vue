@@ -1,16 +1,47 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div ref="modalEl" class="modal-container modal-container--cocktail">
-      <div class="modal-header">
+      <div class="modal-header" @touchstart="onHeaderTouchStart" @touchmove="onHeaderTouchMove" @touchend="onHeaderTouchEnd">
         <div class="cocktail-title-row">
           <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
+            <!-- TODO: Handle price -->
+            <!-- {{ cocktail.name }} - {{ cocktail.price ?? '14' }}€ -->
             {{ cocktail.name }} - {{ cocktail.abv }}°
           </h3>
         </div>
 
-        <button type="button" @click="$emit('close')" class="password-modal-close">
-          <X :size="20" />
-        </button>
+        <div class="modal-header-actions">
+          <button
+            v-if="hasDrinker && !isBartenderMode"
+            type="button"
+            @click="handleFavorite"
+            :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
+            :title="isFav ? (props.locale === 'fr' ? 'Retirer des favoris' : 'Remove from favorites') : (props.locale === 'fr' ? 'Ajouter aux favoris' : 'Add to favorites')"
+          >
+            <Heart :size="18" :fill="isFav ? 'currentColor' : 'none'" />
+          </button>
+          <button
+            v-if="hasDrinker && !isBartenderMode"
+            type="button"
+            @click="handleOrder"
+            :disabled="isOrdering"
+            class="btn-icon"
+            :title="props.locale === 'fr' ? 'Commander' : 'Order'"
+          >
+            <HandPlatter :size="18" />
+          </button>
+          <button
+            type="button"
+            @click="handleShare"
+            class="btn-icon"
+            :title="props.locale === 'fr' ? 'Partager' : 'Share'"
+          >
+            <Share2 :size="18" />
+          </button>
+          <button type="button" @click="$emit('close')" class="password-modal-close">
+            <X :size="20" />
+          </button>
+        </div>
       </div>
       <div class="modal-body cv-modal-body">
         <div class="cocktail-view-layout">
@@ -35,6 +66,7 @@
                 :aria-selected="activeTab === 0"
                 aria-controls="panel-infos"
                 :tabindex="activeTab === 0 ? 0 : -1"
+                ref="tabRefs0"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 0 }"
                 @click="goToTab(0)"
@@ -48,6 +80,7 @@
                 :aria-selected="activeTab === 1"
                 aria-controls="panel-recette"
                 :tabindex="activeTab === 1 ? 0 : -1"
+                ref="tabRefs1"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 1 }"
                 @click="goToTab(1)"
@@ -62,6 +95,7 @@
                 :aria-selected="activeTab === 2"
                 aria-controls="panel-description"
                 :tabindex="activeTab === 2 ? 0 : -1"
+                ref="tabRefs2"
                 class="swipe-tab"
                 :class="{ 'swipe-tab--active': activeTab === 2 }"
                 @click="goToTab(2)"
@@ -70,6 +104,18 @@
               </button>
               <span class="swipe-tab-indicator" :style="indicatorStyle"></span>
             </div>
+
+            <!-- Dots (affordance swipe mobile) -->
+            <!-- <div class="swipe-dots" aria-hidden="true">
+              <span
+                v-for="i in TAB_COUNT"
+                :key="i"
+                :class="['swipe-dot', { 'swipe-dot--active': activeTab === i - 1 }]"
+              ></span>
+            </div> -->
+
+            <!-- Annonce a11y du changement d'onglet -->
+            <span class="sr-only" aria-live="polite">{{ activeTabLabel }}</span>
 
             <!-- Piste swipable -->
             <div
@@ -83,7 +129,8 @@
                 :class="{ 'swipe-track--dragging': isDragging }"
                 :style="trackStyle"
               >
-                <!-- Panel 1 : infos -->
+
+              <!-- Global info - instructions -->
                 <div id="panel-infos" role="tabpanel" aria-labelledby="tab-infos" class="swipe-panel">
                   <div class="cv-prep-block">
                     <div class="cv-prep-item">
@@ -109,15 +156,21 @@
                     </div>
                   </div>
 
+                  <!-- Panel 1 : infos -->
                   <div class="cv-meta-list">
-                    <div class="cv-meta-row">
-                      <span class="form-label">Profiles</span>
-                      <span :class="{ 'cv-value--na': !cocktail.profile?.length }">{{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
-                    </div>
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Spiritueux de base' : 'Base Spirit' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
+                    <div class="cv-meta-row">
+                      <span class="form-label">Profiles</span>
+                      <span :class="{ 'cv-value--na': !cocktail.profile?.length }">{{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+                    </div>
+                    <!-- TODO: Handle price -->
+                    <!-- <div class="cv-meta-row">
+                      <span class="form-label">{{props.locale === 'fr' ? 'Degré' : 'ABV'}}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.abv }">{{ cocktail.abv ? cocktail.abv + '°' : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+                    </div> -->
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Créateur' : 'Creator' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.creator || cocktail.creator === 'Unknown' }">{{ (cocktail.creator && cocktail.creator !== 'Unknown') ? cocktail.creator : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
@@ -161,6 +214,14 @@
               </div>
             </div>
           </div>
+          <!-- Dots (affordance swipe mobile) -->
+          <div class="swipe-dots" aria-hidden="true">
+            <span
+              v-for="i in TAB_COUNT"
+              :key="i"
+              :class="['swipe-dot', { 'swipe-dot--active': activeTab === i - 1 }]"
+            ></span>
+          </div>
         </div>
       </div>
 
@@ -170,7 +231,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, GlassWater, Martini, Snowflake } from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter} from 'lucide-vue-next'
 import {
   getTypeLabel,
   getProfileLabel,
@@ -179,6 +240,9 @@ import {
   getDetailledIceLabel
 } from '@/constants/typeLabels.js'
 import { useInventory } from '@/composables/useInventory'
+import { useDrinker } from '@/composables/useDrinker'
+import { useOrders } from '@/composables/useOrders'
+import { useToast } from '@/composables/useToast'
 
 const TAB_COUNT = 3
 const TAB_WIDTH = 100 / TAB_COUNT
@@ -200,6 +264,59 @@ const imageError = ref(false)
 const modalEl = ref(null)
 
 const { barInventory } = useInventory()
+const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
+const { addOrder } = useOrders()
+const { showToast } = useToast()
+
+const isFav = computed(() => isFavorite(props.cocktail.id))
+const isOrdering = ref(false)
+
+async function handleFavorite() {
+  await toggleFavorite(props.cocktail.id)
+}
+
+async function handleOrder() {
+  if (isOrdering.value) return
+  if (!hasDrinker.value || !drinker.value || !props.barId) {
+    console.warn('⚠️ Impossible de commander : drinker ou barId manquant')
+    return
+  }
+  isOrdering.value = true
+  try {
+    const result = await addOrder(drinker.value, props.cocktail.id, props.barId)
+    if (result.success) {
+      await quickRefreshHistory()
+      showToast('🍸 ' + props.cocktail.name + (props.locale === 'fr' ? ' commandé !' : ' ordered!'))
+    } else {
+      console.error('❌ Order failed:', result.error)
+    }
+  } finally {
+    isOrdering.value = false
+  }
+}
+
+async function handleShare() {
+  const shareData = {
+    title: props.cocktail.name,
+    text: props.locale === 'fr'
+      ? `Découvre le cocktail ${props.cocktail.name} sur MartiniPlease`
+      : `Check out the ${props.cocktail.name} cocktail on MartiniPlease`,
+    url: window.location.href,
+  }
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData)
+    } else {
+      await navigator.clipboard.writeText(shareData.url)
+      showToast(props.locale === 'fr' ? 'Lien copié 🍸' : 'Link copied 🍸')
+    }
+  } catch (err) {
+    // AbortError = l'utilisateur a annulé le partage natif, on ignore
+    if (err?.name !== 'AbortError') {
+      console.error('❌ handleShare:', err)
+    }
+  }
+}
 
 const makeable = computed(() =>
   (props.cocktail.recipe || []).every(isAvailable)
@@ -233,8 +350,26 @@ let touchStartX = 0
 let touchStartY = 0
 let axisLocked = null
 
-function goToTab(index) {
+const tabRefs0 = ref(null)
+const tabRefs1 = ref(null)
+const tabRefs2 = ref(null)
+const tabRefsList = [tabRefs0, tabRefs1, tabRefs2]
+
+const tabLabels = computed(() => ({
+  fr: ['Infos', 'Recette', 'Description'],
+  en: ['Infos', 'Recipe', 'Description'],
+}))
+
+const activeTabLabel = computed(() => {
+  const labels = tabLabels.value[props.locale === 'fr' ? 'fr' : 'en']
+  return labels[activeTab.value]
+})
+
+function goToTab(index, { focusTab = true } = {}) {
   activeTab.value = index
+  if (focusTab) {
+    nextTick(() => tabRefsList[index]?.value?.focus())
+  }
 }
 
 const trackStyle = computed(() => {
@@ -302,10 +437,43 @@ function wasDragging() {
   return isDragging.value
 }
 
+// ── Swipe-down pour fermer (zone header uniquement, mobile) ──
+let headerTouchStartY = 0
+let headerTouchStartX = 0
+let isHeaderDragging = false
+
+function onHeaderTouchStart(e) {
+  // Ignore si le doigt démarre sur un bouton du header (favori/partage/fermer)
+  if (e.target.closest('button')) return
+  const t = e.touches[0]
+  headerTouchStartY = t.clientY
+  headerTouchStartX = t.clientX
+  isHeaderDragging = true
+}
+
+function onHeaderTouchMove(e) {
+  if (!isHeaderDragging) return
+  const t = e.touches[0]
+  const dy = t.clientY - headerTouchStartY
+  const dx = t.clientX - headerTouchStartX
+  // Annule si le geste est plutôt horizontal (pour ne pas gêner le swipe des onglets)
+  if (Math.abs(dx) > Math.abs(dy)) {
+    isHeaderDragging = false
+  }
+}
+
+function onHeaderTouchEnd(e) {
+  if (!isHeaderDragging) return
+  const t = e.changedTouches[0]
+  const dy = t.clientY - headerTouchStartY
+  isHeaderDragging = false
+  if (dy > 90) emit('close')
+}
+
 function onKeydown(e) {
   if (e.key === 'Escape') emit('close')
-  if (e.key === 'ArrowLeft') activeTab.value = Math.max(0, activeTab.value - 1)
-  if (e.key === 'ArrowRight') activeTab.value = Math.min(TAB_COUNT - 1, activeTab.value + 1)
+  if (e.key === 'ArrowLeft' && activeTab.value > 0) goToTab(activeTab.value - 1)
+  if (e.key === 'ArrowRight' && activeTab.value < TAB_COUNT - 1) goToTab(activeTab.value + 1)
 }
 
 // ── FLIP : la modal "part" de la position/taille de la card cliquée ──
@@ -351,6 +519,52 @@ onBeforeUnmount(() => {
   padding: 0.5rem 0.75rem;
   min-height: unset;
   flex-shrink: 0;
+}
+
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.swipe-dots {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0 0.1rem;
+}
+
+.swipe-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.swipe-dot--active {
+  background: var(--gold);
+  transform: scale(1.3);
+}
+
+@media (max-width: 768px) {
+  .swipe-dots {
+    display: flex;
+  }
 }
 
 .modal-close-btn {

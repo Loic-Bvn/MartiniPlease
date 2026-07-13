@@ -3268,7 +3268,7 @@ body {
 
 /* ── Cocktail Card Scoped Styles (CocktailCard) ────────── */
 .btn-icon--fav {
-  color: var(--text-secondary);
+  color: var(--text-dim);
   transition: color 0.15s;
 }
 .btn-icon--fav:hover {
