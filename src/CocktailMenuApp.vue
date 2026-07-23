@@ -190,6 +190,7 @@
           @close="closeCardView"
           @toggle-locale="toggleLocale"
           @toggle-unit="toggleUnit"
+          @open-cocktail="openCocktailDetailModal"
         />
         <Transition name="modal-fade">
           <CocktailDetailModal
