@@ -86,7 +86,6 @@
                 @click="goToTab(1)"
               >
                 Recette
-                <span class="swipe-tab-count">{{ (cocktail.recipe || []).length }}</span>
               </button>
               <button
                 id="tab-description"
