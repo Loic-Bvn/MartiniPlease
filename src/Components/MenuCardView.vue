@@ -53,6 +53,7 @@
             :bar-id="barId"
             @edit="$emit('edit-cocktail', cocktail)"
             @delete="$emit('delete-cocktail', cocktail.id)"
+            @open="handleOpenCocktail"
           />
           </div>
         </div>
@@ -84,8 +85,14 @@ const props = defineProps({
   barId:     { type: String, default: '' },
 })
 
-defineEmits(['close', 'toggle-locale', 'toggle-unit'])
-
+const emit = defineEmits([
+  'close',
+  'toggle-locale',
+  'toggle-unit',
+  'open-cocktail',
+  'edit-cocktail',
+  'delete-cocktail'
+])
 // Dark mode — même logique que ThemeToggle
 const isDark = ref(false)
 
@@ -184,5 +191,9 @@ async function handleHistoric(cocktail) {
       checkedIds.value = next
     }, 900)
   }
+}
+
+function handleOpenCocktail(cocktail, rect) {
+  emit('open-cocktail', cocktail, rect)
 }
 </script>

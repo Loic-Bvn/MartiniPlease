@@ -190,6 +190,7 @@
           @close="closeCardView"
           @toggle-locale="toggleLocale"
           @toggle-unit="toggleUnit"
+          @open-cocktail="openCocktailDetailModal"
         />
         <Transition name="modal-fade">
           <CocktailDetailModal
@@ -197,6 +198,8 @@
             :cocktail="viewingCocktail"
             :locale="locale"
             :origin-rect="viewingCocktailRect"
+            :isBartenderMode="isLoggedIn"
+            :bar-id="activeBarId"
             @close="closeCocktailDetailModal"
           />
         </Transition>
@@ -567,29 +570,59 @@ function scrollToCocktailCard(cocktailId) {
 // ── Deep link via hash ────────────────────────────────────────────────────────
 
 function openCardFromSlug(slug) {
-  if (!slug || !accessibleMenuCards.value.length) return
+  if (!slug || !accessibleMenuCards.value.length) return false
   const match = accessibleMenuCards.value.find(c => slugify(c.name) === slug)
-  if (match) openCardView(match)
+  if (!match) return false
+  openCardView(match)
+  return true
+}
+
+function openCocktailFromSlug(slug) {
+  if (!slug || !cocktails.value.length) return false
+  const match = cocktails.value.find(c => slugify(c.name) === slug)
+  if (!match) return false
+  openCocktailDetailModal(match)
+  return true
+}
+
+// Résout les segments 2 et 3 du hash une fois les données du bar chargées.
+// Le 2e segment est ambigu (carte OU cocktail direct) : on tente d'abord
+// la carte, puis le cocktail en repli.
+function applyDeepLink(cardSlug, cocktailSlug) {
+  if (cardSlug && cocktailSlug) {
+    openCardFromSlug(cardSlug)
+    openCocktailFromSlug(cocktailSlug)
+    return
+  }
+  if (cardSlug) {
+    const matchedCard = openCardFromSlug(cardSlug)
+    if (!matchedCard) openCocktailFromSlug(cardSlug)
+  }
 }
 
 async function handleHashRoute() {
-  const { inviteCode: code, cardSlug } = parseHash()
+  const { inviteCode: code, cardSlug, cocktailSlug } = parseHash()
   if (!code) return
   if (guestBar.value?.invite_code === code || inviteCode.value === code) {
-    if (cardSlug) openCardFromSlug(cardSlug)
+    applyDeepLink(cardSlug, cocktailSlug)
     return
   }
   inviteCodeInput.value = code
   await joinByCode()
-  if (cardSlug) openCardFromSlug(cardSlug)
+  applyDeepLink(cardSlug, cocktailSlug)
 }
 
-// Sync hash ↔ carte ouverte
-watch(viewingCard, (card) => {
+// Sync hash ↔ carte / cocktail ouverts
+function syncHash() {
   const code = inviteCode.value || guestBar.value?.invite_code
   if (!code) return
-  card ? setHash(code, slugify(card.name)) : setHash(code)
-})
+  const cardSlug     = viewingCard.value     ? slugify(viewingCard.value.name)     : null
+  const cocktailSlug = viewingCocktail.value ? slugify(viewingCocktail.value.name) : null
+  setHash(code, cardSlug, cocktailSlug)
+}
+
+watch(viewingCard, syncHash)
+watch(viewingCocktail, syncHash)
 
 // Écoute des commandes (bartender uniquement)
 watch([activeBarId, isLoggedIn], async ([newBarId, newIsLoggedIn]) => {
@@ -609,12 +642,15 @@ watch(currentBarId, async (newBarId) => {
 onMounted(async () => {
   await initAuth()
   await fetchPublicBars()
-  await handleHashRoute()
+  // On charge d'abord les données du bar (si bartender déjà connecté) pour
+  // que handleHashRoute puisse résoudre les slugs carte/cocktail du hash.
+  // (Le flux invité passe par joinByCode, qui charge lui-même les données.)
   if (currentBarId.value) {
     await Promise.all([
       loadBarData(currentBarId.value),
       initDrinker(currentBarId.value),
     ])
   }
+  await handleHashRoute()
 })
 </script>
