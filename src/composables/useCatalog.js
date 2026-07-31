@@ -21,9 +21,19 @@ async function hashCocktail(cocktail) {
   const payload = {}
   for (const field of HASH_FIELDS) {
     const val = cocktail[field]
-    if (typeof val === 'string')  payload[field] = val.trim().toLowerCase()
-    else if (val != null)         payload[field] = JSON.stringify(val)
-    else                          payload[field] = null
+
+    if (typeof val === 'string') {
+      payload[field] = val.trim().toLowerCase()
+    } else if (val != null) {
+      try {
+        payload[field] = JSON.stringify(val)
+      } catch (e) {
+        console.warn('⚠️ stringify failed for field:', field, val)
+        payload[field] = null
+      }
+    } else {
+      payload[field] = null
+    }
   }
   const bytes = new TextEncoder().encode(JSON.stringify(payload))
   const buf   = await crypto.subtle.digest('SHA-256', bytes)
@@ -60,13 +70,13 @@ export function useCatalog() {
     loading.value = true
     try {
       let query = supabase
-        .from('cocktail_catalog')
+        .from('cocktails_catalog') // DATABASE NAME FOR COCKTAIL CATALOG
         .select('*')
         .order('name')
 
       if (search) query = query.ilike('name', `%${search}%`)
       if (spirit) query = query.eq('base_spirit', spirit)
-      if (season) query = query.contains('season', [season])
+      // if (season) query = query.contains('season', [season])
 
       const { data, error } = await query
       if (error) throw error
@@ -78,7 +88,7 @@ export function useCatalog() {
 
   // ── Import d'un cocktail du catalog dans le bar ───────────────────────────
   // Copie les champs métier du catalog dans la table cocktails, en liant
-  // submitted_by_bar_id → cocktail_catalog.id pour tracer l'origine.
+  // submitted_by_bar_id → cocktails_catalog.id pour tracer l'origine.
   async function importCocktail(catalogCocktail) {
     const barId = currentBarId.value
     if (!barId) return { success: false, error: 'Non connecté' }
@@ -88,11 +98,11 @@ export function useCatalog() {
       const validated = validateCocktail(strippedData)
 
       const { data, error } = await supabase
-        .from('cocktails')
+        .from('cocktails_catalog') // DATABASE NAME FOR COCKTAILS
         .insert({
           ...validated,
           bar_id: barId,
-          submitted_by_bar_id: catalogCocktail.id, // FK → cocktail_catalog.id
+          submitted_by_bar_id: catalogCocktail.id, // FK → cocktails_catalog.id
         })
         .select()
         .single()
@@ -129,7 +139,7 @@ export function useCatalog() {
       const payload = omitEmpty(validated)
 
       const { data: catalogEntry, error } = await supabase
-        .from('cocktail_catalog')
+        .from('cocktails_catalog') // DATABASE NAME FOR COCKTAILS
         .insert(payload)
         .select()
         .single()

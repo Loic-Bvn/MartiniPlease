@@ -17,7 +17,7 @@ export function useCocktails() {
     loading.value = true
     try {
       const { data, error } = await supabase
-        .from('cocktails')
+        .from('bar_cocktails') // DATABASE NAME FOR COCKTAILS
         .select('*')
         .eq('bar_id', id)
         .order('name')
@@ -45,7 +45,7 @@ export function useCocktails() {
       const { id, ...dataWithoutId } = validated
 
       const { data, error } = await supabase
-        .from('cocktails')
+        .from('bar_cocktails')
         .insert({...dataWithoutId, bar_id: barId})
         .select()
         .single()
@@ -67,7 +67,7 @@ export function useCocktails() {
     try {
       const validated = validateCocktail(cocktailData)
       const { data, error } = await supabase
-        .from('cocktails')
+        .from('bar_cocktails')
         .update(validated)
         .eq('id', id)
         .eq('bar_id', barId) // 🔥 sécurité multi-tenant
@@ -90,7 +90,7 @@ export function useCocktails() {
 
     try {
       const { error } = await supabase
-        .from('cocktails')
+        .from('bar_cocktails')
         .delete()
         .eq('id', id)
         .eq('bar_id', barId) // 🔥 sécurité multi-tenant

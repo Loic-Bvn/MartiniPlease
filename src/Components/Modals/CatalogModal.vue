@@ -40,13 +40,6 @@
               <option v-for="s in cat.spirits" :key="s.key" :value="s.key">{{ s.label }}</option>
             </optgroup>
           </select>
-          <select v-model="filters.season" @change="doFetch" class="form-input catalog-filter-select">
-            <option value="">Toutes saisons</option>
-            <option value="spring">🌸 Printemps</option>
-            <option value="summer">☀️ Été</option>
-            <option value="fall">🍂 Automne</option>
-            <option value="winter">❄️ Hiver</option>
-          </select>
         </div>
 
         <div v-if="loading" class="loading-state">Chargement du catalog...</div>
