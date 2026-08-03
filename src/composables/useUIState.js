@@ -12,6 +12,10 @@ import { ref } from 'vue'
 const locale = ref('fr')   // 'fr' | 'en'
 const unit   = ref('oz')   // 'oz' | 'ml'
 
+// Vue des cartes cocktails : 'compact' (actuelle, sans photo) | 'standard' (avec photo)
+// Préférence mémorisée d'une session à l'autre.
+const cardView = ref(localStorage.getItem('cardView') || 'compact')
+
 // ── Page légale ───────────────────────────────────────────────────────────────
 const currentLegalPage = ref(null)  // null | 'legal-notice' | 'privacy-policy' | 'terms-of-use' | 'cookies-policy'
 
@@ -42,6 +46,16 @@ export function useUIState() {
 
   function toggleUnit() {
     unit.value = unit.value === 'oz' ? 'ml' : 'oz'
+  }
+
+  function setCardView(mode) {
+    if (mode !== 'compact' && mode !== 'standard') return
+    cardView.value = mode
+    localStorage.setItem('cardView', mode)
+  }
+
+  function toggleCardView() {
+    setCardView(cardView.value === 'compact' ? 'standard' : 'compact')
   }
 
   // ── Pages légales ───────────────────────────────────────────────────────────
@@ -114,6 +128,7 @@ export function useUIState() {
     // État
     locale,
     unit,
+    cardView,
     currentLegalPage,
     showAuthModal,
     showCocktailFormModal,
@@ -130,6 +145,8 @@ export function useUIState() {
     // Actions
     toggleLocale,
     toggleUnit,
+    setCardView,
+    toggleCardView,
     openLegalPage,
     closeLegalPage,
     openNewCocktailFormModal,

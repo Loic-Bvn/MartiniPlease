@@ -101,6 +101,7 @@
           :pendingOrdersCount="pendingOrdersCount"
           :locale="locale"
           :unit="unit"
+          :cardView="cardView"
           :barInventory="barInventory"
           :ingredients="ingredients"
           :searchTerm="searchTerm"
@@ -144,6 +145,7 @@
           @set-abv-filter="setAbvFilter"
           @set-season="setSeason"
           @clear-filters="clearFilters"
+          @set-card-view="setCardView"
         />
 
         <!-- Modals -->
@@ -276,9 +278,9 @@ const {
 
 // ── UI ────────────────────────────────────────────────────────────────────────
 const {
-  locale, unit,
+  locale, unit, cardView,
   currentLegalPage, openLegalPage, closeLegalPage,
-  toggleLocale, toggleUnit,
+  toggleLocale, toggleUnit, setCardView,
   showAuthModal, showCocktailFormModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
   editingCocktail, editingCard, viewingCard, viewingCocktail, viewingCocktailRect,
   openNewCocktailFormModal, openEditCocktailFormModal, closeCocktailFormModal,

@@ -15,3 +15,12 @@
 
 ## Batching
 - Ajouter modal pour calculer des gros volumes de cocktails + pricing du batch
+
+## Cocktail catalog
+- Ajouter une photo du cocktail sur la partie droite, apres les quantitées
+- Ajouter par quel bar a été proposé le cocktail
+- Corriger le probleme de filtre dropdown avec les profils 
+- Ajouter dans cocktailDetailModal le bouton pour proposer le cocktail au catalogue
+
+## Validation des inscriptions
+Lors de la création d'un bar par un nouvel utilisateur (nouvel EMAIL), forcer la validation par moi (via envoie d'un mail a loic.bienvenu.pro@gmail.com) et informer l'utilisateur (afin d'empecher la création de bar a tout va)

@@ -91,16 +91,40 @@
     </div>
 
     <div>
-      <h2 class="cocktails-header">
-        {{ filteredCocktails.length }}
-        {{ locale === 'fr'
-          ? `cocktail${filteredCocktails.length > 1 ? 's' : ''} trouvé${filteredCocktails.length > 1 ? 's' : ''}`
-          : `cocktail${filteredCocktails.length > 1 ? 's' : ''} found`
-        }}
-        <span v-if="showOnlyMakeable" class="cocktails-header-makeable">
-          ({{ makeableCount }} {{ locale === 'fr' ? 'réalisables' : 'available' }})
-        </span>
-      </h2>
+      <div class="cocktails-header-row">
+        <h2 class="cocktails-header">
+          {{ filteredCocktails.length }}
+          {{ locale === 'fr'
+            ? `cocktail${filteredCocktails.length > 1 ? 's' : ''} trouvé${filteredCocktails.length > 1 ? 's' : ''}`
+            : `cocktail${filteredCocktails.length > 1 ? 's' : ''} found`
+          }}
+          <span v-if="showOnlyMakeable" class="cocktails-header-makeable">
+            ({{ makeableCount }} {{ locale === 'fr' ? 'réalisables' : 'available' }})
+          </span>
+        </h2>
+
+        <div class="view-toggle" role="group" :aria-label="locale === 'fr' ? 'Affichage des cocktails' : 'Cocktail display'">
+          <button
+            type="button"
+            :class="['view-toggle-btn', { 'view-toggle-btn--active': cardView === 'compact' }]"
+            :title="locale === 'fr' ? 'Vue compacte' : 'Compact view'"
+            @click="$emit('set-card-view', 'compact')"
+          >
+            <Rows3 :size="16" />
+            <span class="view-toggle-label">{{ locale === 'fr' ? 'Compacte' : 'Compact' }}</span>
+          </button>
+          <button
+            type="button"
+            :class="['view-toggle-btn', { 'view-toggle-btn--active': cardView === 'standard' }]"
+            :title="locale === 'fr' ? 'Vue standard (avec photos)' : 'Standard view (with photos)'"
+            @click="$emit('set-card-view', 'standard')"
+          >
+            <GalleryVerticalEnd :size="16" />
+            <span class="view-toggle-label">{{ locale === 'fr' ? 'Standard' : 'Standard' }}</span>
+          </button>
+        </div>
+      </div>
+
       <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
       <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
         <div class="empty-state-icon">🍹</div>
@@ -115,7 +139,7 @@
           </button>
         </div>
       </div>
-      <div v-else class="cocktails-grid">
+      <div v-else :class="['cocktails-grid', { 'cocktails-grid--standard': cardView === 'standard' }]">
         <div v-for="cocktail in visibleCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
           <CocktailCard
             :cocktail="cocktail"
@@ -123,6 +147,7 @@
             :locale="locale"
             :unit="unit"
             :bar-id="activeBarId"
+            :view-mode="cardView"
             @edit="$emit('edit-cocktail', cocktail)"
             @delete="$emit('delete-cocktail', cocktail.id)"
             @open="handleOpenCocktail"
@@ -137,7 +162,7 @@
 
 <script setup>
 import { ref, computed, watch, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
-import { ChevronDown } from 'lucide-vue-next'
+import { ChevronDown, Rows3, GalleryVerticalEnd } from 'lucide-vue-next'
 const InventoryManager = defineAsyncComponent(() => import('@/Components/Modals/InventoryManager.vue'))
 import OrdersPanel      from '@/Components/OrdersPanel.vue'
 import FilterPanel      from '@/Components/FilterPanel.vue'
@@ -162,6 +187,7 @@ const props = defineProps({
   pendingOrdersCount: Number,
   locale:            String,
   unit:              String,
+  cardView:          { type: String, default: 'compact' }, // 'compact' | 'standard'
   barInventory:      Set,
   ingredients:       Array,
   searchTerm:        String,
@@ -195,7 +221,7 @@ const emit = defineEmits([
   'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail', 'open-cocktail',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
   'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
-  'set-abv-filter', 'set-season', 'clear-filters',
+  'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view',
 ])
 
 // ── État local (UI uniquement) ────────────────────────────────────────────────
