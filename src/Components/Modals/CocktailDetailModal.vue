@@ -30,6 +30,14 @@
           >
             <HandPlatter :size="18" />
           </button>
+          <!-- <button
+            v-if="!isSubmitted(cocktail.id) && cocktail.is_private"
+            @click.stop="handleSubmit"
+            class="btn-icon btn-icon--submit"
+            :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
+          >
+            <Upload :size="18" />
+          </button> -->
           <button
             type="button"
             @click="handleShare"

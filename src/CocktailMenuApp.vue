@@ -180,6 +180,8 @@
         />
         <CatalogModal
           v-if="showCatalogModal"
+          :locale="locale"
+          :unit="unit"
           @close="showCatalogModal = false"
           @imported="handleCatalogImport"
         />

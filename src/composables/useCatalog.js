@@ -10,6 +10,7 @@ const submitted      = ref(new Set()) // bar cocktail IDs déjà soumis au catal
 const loading        = ref(false)
 const snapshotHashes = ref({})        // { [bar_cocktail_id]: recipe_hash }
 const originMap      = ref({})        // { [bar_cocktail_id]: catalog_cocktail_id (parent) }
+let fetchToken = 0                    // ignore les réponses périmées si un fetch plus récent a été lancé entre-temps
 
 // ── Champs inclus dans le hash de comparaison ─────────────────────────────────
 const HASH_FIELDS = [
@@ -75,7 +76,8 @@ export function useCatalog() {
   const { currentBarId } = useAuth()
 
   // ── Lecture du catalog global ─────────────────────────────────────────────
-  async function fetchCatalog({ search = '', spirit = '' } = {}) {
+  async function fetchCatalog({ search = '', spirit = '', cocktailStyle = '', profiles = [] } = {}) {
+    const token = ++fetchToken
     loading.value = true
     try {
       let query = supabase
@@ -85,13 +87,20 @@ export function useCatalog() {
 
       if (search) query = query.ilike('name', `%${search}%`)
       if (spirit) query = query.eq('base_spirit', spirit)
-      // if (season) query = query.contains('season', [season])
+      if (cocktailStyle) query = query.eq('cocktail_style', cocktailStyle)
+      if (profiles.length > 0) query = query.overlaps('profile', profiles)
 
       const { data, error } = await query
       if (error) throw error
+
+      // Une requête plus récente a été lancée entre-temps (filtre changé
+      // rapidement) → on jette ce résultat périmé plutôt que d'écraser
+      // catalog.value avec une réponse qui ne correspond plus aux filtres actuels
+      if (token !== fetchToken) return
+
       catalog.value = data
     } finally {
-      loading.value = false
+      if (token === fetchToken) loading.value = false
     }
   }
 
@@ -157,24 +166,36 @@ export function useCatalog() {
     try {
       // Vérifie si la recette a changé depuis son dernier import/publication
       const modified = await isModified(barCocktail)
-      console.log('isModified', modified, barCocktail.id, barCocktail.name)
       if (!modified) {
         return {
           success: false,
           error: 'unchanged'
         }
       }
-      
+
       // Nettoyage des champs propres au bar
       const strippedData = stripBarFields(barCocktail)
-      
+
       // Validation
       const validated = validateCocktail(strippedData)
 
       // Supprime les valeurs vides
       const payload = omitEmpty(validated)
 
-      // Publication dans le catalogue
+      /*
+        Publication dans le catalogue
+
+        Cas 1 :
+        - cocktail créé par le bar
+        - catalog_id null
+        => nouvelle recette publique
+
+        Cas 2 :
+        - cocktail importé du catalogue
+        - catalog_id existant
+        => nouvelle version publique
+          (ancien cocktail conservé)
+      */
       const { data: catalogEntry, error } = await supabase
         .from('cocktails_catalog')
         .insert({
@@ -186,10 +207,12 @@ export function useCatalog() {
 
       if (error) throw error
 
+
       /*
         Mise à jour du cocktail du bar :
         - il n'est plus privé
         - il pointe vers sa version catalogue actuelle
+        - on trace qui l'a soumis
       */
       const { error: updateError } = await supabase
         .from('bar_cocktails')
@@ -237,6 +260,10 @@ export function useCatalog() {
   // Retourne true si le cocktail n'a pas de snapshot OU si son contenu a changé.
   async function isModified(barCocktail) {
     const isPrivate = barCocktail.is_private
+    // const storedHash = snapshotHashes.value[barCocktail.id]
+    // if (!storedHash) return true
+    // const currentHash = await hashCocktail(barCocktail)
+    // return currentHash !== storedHash
     return isPrivate
   }
 
