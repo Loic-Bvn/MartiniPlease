@@ -50,6 +50,7 @@ function stripBarFields(cocktail) {
     is_private,
     created_at,
     submitted_by_bar_id,
+    submitted_by_bar_name,
     ...fields
   } = cocktail
 
@@ -57,7 +58,7 @@ function stripBarFields(cocktail) {
 }
 
 function stripCatalogFields(cocktail) {
-  const { id, created_at, submitted_by_bar_id, ...fields } = cocktail
+  const { id, created_at, submitted_by_bar_id, submitted_by_bar_name, bars, ...fields } = cocktail
   return fields
 }
 
@@ -81,7 +82,7 @@ export function useCatalog() {
     loading.value = true
     try {
       let query = supabase
-        .from('cocktails_catalog') // DATABASE NAME FOR COCKTAIL CATALOG
+        .from('cocktails_catalog')
         .select('*')
         .order('name')
 
@@ -98,7 +99,7 @@ export function useCatalog() {
       // catalog.value avec une réponse qui ne correspond plus aux filtres actuels
       if (token !== fetchToken) return
 
-      catalog.value = data
+      catalog.value = data || []
     } finally {
       if (token === fetchToken) loading.value = false
     }
