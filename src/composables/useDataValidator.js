@@ -46,7 +46,7 @@ export function cleanRecipe(recipe) {
 /**
  * Valide & nettoie un cocktail avant INSERT/UPDATE
  */
-export function validateCocktail(cocktail) {
+export function validateCocktail(cocktail, options = {}) {  
   if (!cocktail.name?.trim()) {
     throw new Error('Cocktail name is required')
   }
@@ -110,6 +110,16 @@ export function validateCocktail(cocktail) {
   // Ice - optionnel (string)
   if (cocktail.ice?.trim?.()) {
     cleaned.ice = cocktail.ice.trim()
+  }
+
+  // is_private - conserve la valeur déjà présente sur l'objet en entrée.
+  if (typeof cocktail.is_private === 'boolean') {
+    cleaned.is_private = cocktail.is_private
+  }
+
+  // Cocktail modifié depuis le form bar, on le redétache du catalog
+  if (options.forBar) {
+    cleaned.is_private = true
   }
 
   return cleaned

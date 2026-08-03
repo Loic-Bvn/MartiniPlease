@@ -515,13 +515,15 @@ function handleSave() {
         Dashes: normalizeNumber(rest.Dashes),
       }))
 
-    const validated = validateCocktail({
+    var validated = validateCocktail({
       ...form.value,
       recipe: cleanedRecipe,
       abv: abvFinal,
       ice: form.value.ice,
+    },{
+      forBar: true
     })
-
+console.log('SAVE PAYLOAD', validated)
     if (!props.barId) {
       throw new Error('barId manquant')
     }

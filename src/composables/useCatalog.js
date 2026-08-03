@@ -42,7 +42,16 @@ async function hashCocktail(cocktail) {
 
 // ── Champs à exclure lors d'un transfert entre tables ────────────────────────
 function stripBarFields(cocktail) {
-  const { id, bar_id, created_at, submitted_by_bar_id, ...fields } = cocktail
+  const {
+    id,
+    bar_id,
+    catalog_id,
+    is_private,
+    created_at,
+    submitted_by_bar_id,
+    ...fields
+  } = cocktail
+
   return fields
 }
 
@@ -66,7 +75,7 @@ export function useCatalog() {
   const { currentBarId } = useAuth()
 
   // ── Lecture du catalog global ─────────────────────────────────────────────
-  async function fetchCatalog({ search = '', spirit = '', season = '' } = {}) {
+  async function fetchCatalog({ search = '', spirit = '' } = {}) {
     loading.value = true
     try {
       let query = supabase
@@ -86,9 +95,6 @@ export function useCatalog() {
     }
   }
 
-  // ── Import d'un cocktail du catalog dans le bar ───────────────────────────
-  // Copie les champs métier du catalog dans la table cocktails, en liant
-  // submitted_by_bar_id → cocktails_catalog.id pour tracer l'origine.
   async function importCocktail(catalogCocktail) {
     const barId = currentBarId.value
     if (!barId) return { success: false, error: 'Non connecté' }
@@ -98,74 +104,149 @@ export function useCatalog() {
       const validated = validateCocktail(strippedData)
 
       const { data, error } = await supabase
-        .from('cocktails_catalog') // DATABASE NAME FOR COCKTAILS
+        .from('bar_cocktails')
         .insert({
           ...validated,
           bar_id: barId,
-          submitted_by_bar_id: catalogCocktail.id, // FK → cocktails_catalog.id
+          catalog_id: catalogCocktail.id,
         })
         .select()
         .single()
 
       if (error) throw error
 
-      // Mise à jour des états locaux
-      imported.value = new Set([...imported.value, catalogCocktail.id])
-      originMap.value = { ...originMap.value, [data.id]: catalogCocktail.id }
+      imported.value = new Set([
+        ...imported.value,
+        catalogCocktail.id
+      ])
+
+      originMap.value = {
+        ...originMap.value,
+        [data.id]: catalogCocktail.id
+      }
 
       const hash = await hashCocktail(catalogCocktail)
-      snapshotHashes.value = { ...snapshotHashes.value, [data.id]: hash }
 
-      return { success: true, data }
+      snapshotHashes.value = {
+        ...snapshotHashes.value,
+        [data.id]: hash
+      }
+
+      return {
+        success: true,
+        data
+      }
+
     } catch (err) {
       console.error('❌ importCocktail:', err)
-      return { success: false, error: err.message || err }
+      return {
+        success: false,
+        error: err.message || err
+      }
     }
   }
 
-  // ── Soumission d'un cocktail bar au catalog global ────────────────────────
-  // Bloque si la recette est identique au dernier snapshot (pas de fork inutile).
+
   async function submitToCatalog(barCocktail) {
     const barId = currentBarId.value
-    if (!barId) return { success: false, error: 'Non connecté' }
+
+    if (!barId) {
+      return { success: false, error: 'Non connecté' }
+    }
 
     try {
+      // Vérifie si la recette a changé depuis son dernier import/publication
       const modified = await isModified(barCocktail)
-      if (!modified) return { success: false, error: 'unchanged' }
+      console.log('isModified', modified, barCocktail.id, barCocktail.name)
+      if (!modified) {
+        return {
+          success: false,
+          error: 'unchanged'
+        }
+      }
 
-      // Valider le cocktail avant soumission
+      
+      
+      console.log('before strip', barCocktail)
+      
+      // Nettoyage des champs propres au bar
       const strippedData = stripBarFields(barCocktail)
+
+      console.log('after strip', strippedData)
+      
+      // Validation
       const validated = validateCocktail(strippedData)
+
+      console.log('validated', validated)
+
+
+      // Supprime les valeurs vides
       const payload = omitEmpty(validated)
 
+      // Publication dans le catalogue
       const { data: catalogEntry, error } = await supabase
-        .from('cocktails_catalog') // DATABASE NAME FOR COCKTAILS
-        .insert(payload)
+        .from('cocktails_catalog')
+        .insert({
+          ...payload,
+          submitted_by_bar_id: barId
+        })
         .select()
         .single()
 
       if (error) throw error
 
-      // Mise à jour des états locaux
-      submitted.value = new Set([...submitted.value, barCocktail.id])
-      const hash = await hashCocktail(barCocktail)
-      snapshotHashes.value = { ...snapshotHashes.value, [barCocktail.id]: hash }
-      originMap.value = { ...originMap.value, [barCocktail.id]: catalogEntry.id }
 
-      return { success: true, data: catalogEntry }
+      /*
+        Mise à jour du cocktail du bar :
+        - il n'est plus privé
+        - il pointe vers sa version catalogue actuelle
+      */
+      const { error: updateError } = await supabase
+        .from('bar_cocktails')
+        .update({
+          catalog_id: catalogEntry.id,
+          is_private: false
+        })
+        .eq('id', barCocktail.id)
+
+      if (updateError) throw updateError
+
+
+      // Mise à jour cache local
+      submitted.value = new Set([
+        ...submitted.value,
+        barCocktail.id
+      ])
+
+      const hash = await hashCocktail(barCocktail)
+
+      snapshotHashes.value = {
+        ...snapshotHashes.value,
+        [barCocktail.id]: hash
+      }
+
+
+      return {
+        success: true,
+        data: catalogEntry
+      }
+
+
     } catch (err) {
       console.error('❌ submitToCatalog:', err)
-      return { success: false, error: err.message || err }
+
+      return {
+        success: false,
+        error: err.message || err
+      }
     }
   }
 
   // ── Détection de modification ─────────────────────────────────────────────
   // Retourne true si le cocktail n'a pas de snapshot OU si son contenu a changé.
   async function isModified(barCocktail) {
-    const storedHash = snapshotHashes.value[barCocktail.id]
-    if (!storedHash) return true
-    const currentHash = await hashCocktail(barCocktail)
-    return currentHash !== storedHash
+    const isPrivate = barCocktail.is_private
+    return isPrivate
   }
 
   // ── Suppression locale d'un import ───────────────────────────────────────
