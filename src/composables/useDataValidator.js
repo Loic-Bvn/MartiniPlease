@@ -63,12 +63,19 @@ export function validateCocktail(cocktail, options = {}) {
     'category',
     'glass',
     'method',
-    'difficulty',
-    'description',
     'image',
     'creator',
     'cocktail_style',
+    'creation_year',
   ]
+
+  // Description bilingue - colonnes séparées en DB (bar_cocktails.description_fr / description_en)
+  if (cocktail.description_fr?.trim?.()) {
+    cleaned.description_fr = cocktail.description_fr.trim()
+  }
+  if (cocktail.description_en?.trim?.()) {
+    cleaned.description_en = cocktail.description_en.trim()
+  }
 
   for (const field of optionalFields) {
     const value = cocktail[field]

@@ -164,21 +164,12 @@ export function useCatalog() {
           error: 'unchanged'
         }
       }
-
-      
-      
-      console.log('before strip', barCocktail)
       
       // Nettoyage des champs propres au bar
       const strippedData = stripBarFields(barCocktail)
-
-      console.log('after strip', strippedData)
       
       // Validation
       const validated = validateCocktail(strippedData)
-
-      console.log('validated', validated)
-
 
       // Supprime les valeurs vides
       const payload = omitEmpty(validated)
@@ -195,7 +186,6 @@ export function useCatalog() {
 
       if (error) throw error
 
-
       /*
         Mise à jour du cocktail du bar :
         - il n'est plus privé
@@ -205,7 +195,8 @@ export function useCatalog() {
         .from('bar_cocktails')
         .update({
           catalog_id: catalogEntry.id,
-          is_private: false
+          is_private: false,
+          submitted_by_bar_id: barId
         })
         .eq('id', barCocktail.id)
 
