@@ -1,5 +1,11 @@
 # TODO
 
+## Migrate Menu before merging ! 
+- Les menus font références a des cocktails présent dans la table 'cocktails', or on utilise 'bars_cocktail' depuis la migration
+
+## Cocktail catalog
+- Adjust view (proposé par)
+
 ## Allow bartender to customize features
 - Permettre au bartender d'activer/desactiver des features
     - Commander
