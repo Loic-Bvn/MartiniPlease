@@ -30,8 +30,8 @@
           :randomLogo="randomLogo"
           @logo-click="handleLogoClick"
           @open-new-cocktail="openNewCocktailFormModal"
-          @toggle-locale="toggleLocale"
-          @toggle-unit="toggleUnit"
+          @set-locale="setLocale"
+          @set-unit="setUnit"
           @scroll-to-cocktail="scrollToCocktailCard"
           @invite="handleInvite"
           @open-bars-selection="handleOpenBarsSelection"
@@ -203,8 +203,8 @@
           :unit="unit"
           :bar-id="activeBarId"
           @close="closeCardView"
-          @toggle-locale="toggleLocale"
-          @toggle-unit="toggleUnit"
+          @set-locale="setLocale"
+          @set-unit="setUnit"
           @open-cocktail="openCocktailDetailModal"
         />
         <Transition name="modal-fade">
@@ -280,7 +280,7 @@ const {
 const {
   locale, unit, cardView,
   currentLegalPage, openLegalPage, closeLegalPage,
-  toggleLocale, toggleUnit, setCardView,
+  toggleLocale, toggleUnit, setLocale, setUnit, setCardView,
   showAuthModal, showCocktailFormModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
   editingCocktail, editingCard, viewingCard, viewingCocktail, viewingCocktailRect,
   openNewCocktailFormModal, openEditCocktailFormModal, closeCocktailFormModal,

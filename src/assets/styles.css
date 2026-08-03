@@ -662,7 +662,8 @@ body {
   gap: 0.5rem;
 }
 
-.view-toggle {
+.view-toggle,
+.settings-switch {
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -673,29 +674,46 @@ body {
   flex-shrink: 0;
 }
 
+.header-settings-toggle {
+  align-self: center;
+}
+
 .view-toggle-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
-  padding: 0.35rem 0.65rem;
-  border: none;
-  border-radius: calc(var(--radius-lg) - 3px);
+  min-width: 2.05rem;
+  padding: 0.36rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-lg) - 4px);
   background: transparent;
   color: var(--text-dim);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .view-toggle-btn:hover {
   color: var(--text);
+  border-color: var(--border-mid);
 }
 
 .view-toggle-btn--active {
-  background: var(--bg-card);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 88%, white 12%), var(--bg-card));
   color: var(--gold);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--border-mid);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.settings-switch .view-toggle-btn {
+  min-width: 2.25rem;
+}
+
+.settings-switch .view-toggle-btn--active {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 90%, white 10%), var(--bg-card));
 }
 
 @media (max-width: 480px) {

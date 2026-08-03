@@ -40,8 +40,18 @@ export function useUIState() {
 
   // ── Locale & unité ──────────────────────────────────────────────────────────
 
+  function setLocale(nextLocale) {
+    if (nextLocale !== 'fr' && nextLocale !== 'en') return
+    locale.value = nextLocale
+  }
+
   function toggleLocale() {
     locale.value = locale.value === 'fr' ? 'en' : 'fr'
+  }
+
+  function setUnit(nextUnit) {
+    if (nextUnit !== 'oz' && nextUnit !== 'ml') return
+    unit.value = nextUnit
   }
 
   function toggleUnit() {
@@ -145,6 +155,8 @@ export function useUIState() {
     // Actions
     toggleLocale,
     toggleUnit,
+    setLocale,
+    setUnit,
     setCardView,
     toggleCardView,
     openLegalPage,

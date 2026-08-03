@@ -103,12 +103,16 @@
           </span>
         </h2>
 
-        <div class="view-toggle" role="group" :aria-label="locale === 'fr' ? 'Affichage des cocktails' : 'Cocktail display'">
+        <div
+          class="view-toggle"
+          role="group"
+          :aria-label="locale === 'fr' ? 'Affichage des cocktails' : 'Cocktail display'"
+          @click="$emit('set-card-view', cardView === 'compact' ? 'standard' : 'compact')"
+        >
           <button
             type="button"
             :class="['view-toggle-btn', { 'view-toggle-btn--active': cardView === 'compact' }]"
             :title="locale === 'fr' ? 'Vue compacte' : 'Compact view'"
-            @click="$emit('set-card-view', 'compact')"
           >
             <Rows3 :size="16" />
             <span class="view-toggle-label">{{ locale === 'fr' ? 'Compacte' : 'Compact' }}</span>
@@ -117,7 +121,6 @@
             type="button"
             :class="['view-toggle-btn', { 'view-toggle-btn--active': cardView === 'standard' }]"
             :title="locale === 'fr' ? 'Vue standard (avec photos)' : 'Standard view (with photos)'"
-            @click="$emit('set-card-view', 'standard')"
           >
             <GalleryVerticalEnd :size="16" />
             <span class="view-toggle-label">{{ locale === 'fr' ? 'Standard' : 'Standard' }}</span>

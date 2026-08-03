@@ -12,16 +12,55 @@
         <span class="cv-meta">{{ cardCocktails.length }} cocktail{{ cardCocktails.length > 1 ? 's' : '' }}</span>
       </div>
       <div class="cv-header-actions">
-        <button @click="$emit('toggle-locale')" class="btn-mode btn-mode-inactive">
-          {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
-        </button>
-        <button @click="$emit('toggle-unit')" class="btn-mode btn-mode-inactive">
-          {{ unit === 'oz' ? 'ml' : 'oz' }}
-        </button>
-        <button @click="toggleDark" class="btn-mode btn-mode-inactive">
-          <Sun v-if="isDark" :size="16" />
-          <Moon v-else :size="16" />
-        </button>
+        <div
+          class="settings-switch"
+          role="group"
+          aria-label="Language switch"
+          @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
+        >
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': locale === 'fr' }"
+            :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
+          >
+            <span>FR</span>
+          </button>
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': locale === 'en' }"
+            :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
+          >
+            <span>EN</span>
+          </button>
+        </div>
+
+        <div
+          class="settings-switch"
+          role="group"
+          aria-label="Unit switch"
+          @click="$emit('set-unit', unit === 'oz' ? 'ml' : 'oz')"
+        >
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': unit === 'oz' }"
+            :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
+          >
+            <span>oz</span>
+          </button>
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': unit === 'ml' }"
+            :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
+          >
+            <span>ml</span>
+          </button>
+        </div>
+
+        <ThemeToggle />
       </div>
     </div>
 
@@ -69,13 +108,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { ArrowLeft, Sun, Moon, GlassWater } from 'lucide-vue-next'
+import { ArrowLeft, GlassWater } from 'lucide-vue-next'
 import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
 import CocktailCard from '@/Components/CocktailCard.vue'
+import ThemeToggle from '@/Components/ThemeToggle.vue'
 
 const props = defineProps({
   card:      { type: Object, required: true },
@@ -87,8 +127,8 @@ const props = defineProps({
 
 const emit = defineEmits([
   'close',
-  'toggle-locale',
-  'toggle-unit',
+  'set-locale',
+  'set-unit',
   'open-cocktail',
   'edit-cocktail',
   'delete-cocktail'

@@ -37,14 +37,57 @@
               </button>
             </template>
 
-            <button @click="$emit('toggle-locale')" class="btn-mode btn-mode-inactive">
-              {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
-            </button>
-            <button v-if="activeBarId && !showBarsSelection" @click="$emit('toggle-unit')" class="btn-mode btn-mode-inactive" :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'">
-              {{ unit === 'oz' ? 'ml' : 'oz' }}
-            </button>
+            <div
+              class="settings-switch"
+              role="group"
+              aria-label="Language switch"
+              @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
+            >
+              <button
+                type="button"
+                class="view-toggle-btn"
+                :class="{ 'view-toggle-btn--active': locale === 'fr' }"
+                :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
+              >
+                <span>FR</span>
+              </button>
+              <button
+                type="button"
+                class="view-toggle-btn"
+                :class="{ 'view-toggle-btn--active': locale === 'en' }"
+                :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
+              >
+                <span>EN</span>
+              </button>
+            </div>
+
+            <div
+              v-if="activeBarId && !showBarsSelection"
+              class="settings-switch"
+              role="group"
+              aria-label="Unit switch"
+              @click="$emit('set-unit', unit === 'oz' ? 'ml' : 'oz')"
+            >
+              <button
+                type="button"
+                class="view-toggle-btn"
+                :class="{ 'view-toggle-btn--active': unit === 'oz' }"
+                :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
+              >
+                <span>oz</span>
+              </button>
+              <button
+                type="button"
+                class="view-toggle-btn"
+                :class="{ 'view-toggle-btn--active': unit === 'ml' }"
+                :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
+              >
+                <span>ml</span>
+              </button>
+            </div>
+
+            <ThemeToggle />
           </div>
-          <ThemeToggle />
 
         <div v-if="toastMessage" class="toast">
           {{ toastMessage }}
@@ -191,8 +234,8 @@ const props = defineProps({
 const emit = defineEmits([
   'logo-click',
   'open-new-cocktail',
-  'toggle-locale',
-  'toggle-unit',
+  'set-locale',
+  'set-unit',
   'scroll-to-cocktail',
   'invite',
   'open-bars-selection',
