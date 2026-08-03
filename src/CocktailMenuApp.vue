@@ -201,10 +201,12 @@
           :cocktails="cocktails"
           :locale="locale"
           :unit="unit"
+          :card-view="cardView"
           :bar-id="activeBarId"
           @close="closeCardView"
           @set-locale="setLocale"
           @set-unit="setUnit"
+          @set-card-view="setCardView"
           @open-cocktail="openCocktailDetailModal"
         />
         <Transition name="modal-fade">

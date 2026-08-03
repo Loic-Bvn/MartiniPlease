@@ -60,6 +60,30 @@
           </button>
         </div>
 
+        <div
+          class="settings-switch"
+          role="group"
+          aria-label="Card view switch"
+          @click="$emit('set-card-view', cardView === 'compact' ? 'standard' : 'compact')"
+        >
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': cardView === 'compact' }"
+            :title="locale === 'fr' ? 'Vue compacte' : 'Compact view'"
+          >
+            <span>{{ locale === 'fr' ? 'Compacte' : 'Compact' }}</span>
+          </button>
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': cardView === 'standard' }"
+            :title="locale === 'fr' ? 'Vue standard' : 'Standard view'"
+          >
+            <span>{{ locale === 'fr' ? 'Standard' : 'Standard' }}</span>
+          </button>
+        </div>
+
         <ThemeToggle />
       </div>
     </div>
@@ -79,7 +103,7 @@
           <span class="cv-group-count">{{ group.cocktails.length }}</span>
         </div>
 
-        <div class="cv-grid">
+        <div :class="['cv-grid', { 'cv-grid--standard': cardView === 'standard' }]">
           <div
             v-for="cocktail in group.cocktails"
             :key="cocktail.id"
@@ -90,6 +114,7 @@
             :locale="locale"
             :unit="unit"
             :bar-id="barId"
+            :view-mode="cardView"
             @edit="$emit('edit-cocktail', cocktail)"
             @delete="$emit('delete-cocktail', cocktail.id)"
             @open="handleOpenCocktail"
@@ -122,6 +147,7 @@ const props = defineProps({
   cocktails: { type: Array,  default: () => [] },
   locale:    { type: String, default: 'fr' },
   unit:      { type: String, default: 'oz' },
+  cardView:  { type: String, default: 'compact' },
   barId:     { type: String, default: '' },
 })
 
@@ -129,6 +155,7 @@ const emit = defineEmits([
   'close',
   'set-locale',
   'set-unit',
+  'set-card-view',
   'open-cocktail',
   'edit-cocktail',
   'delete-cocktail'

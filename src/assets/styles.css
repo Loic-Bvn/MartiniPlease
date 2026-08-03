@@ -898,7 +898,7 @@ body {
 }
 .ingredient-name {
   flex: 0 1 auto;
-  color: var(--text-dim);
+  color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1852,6 +1852,16 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
+}
+
+.cv-grid--standard {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 980px) {
+  .cv-grid--standard {
+    grid-template-columns: 1fr;
+  }
 }
 
 .cv-card {
