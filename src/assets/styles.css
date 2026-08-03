@@ -3093,6 +3093,11 @@ body {
 .modal-container--delete-bar {
   max-width: 400px;
 }
+
+.modal-container--confirm {
+  max-width: 400px;
+}
+
 .delete-warning {
   font-size: 1rem;
   font-weight: 600;
