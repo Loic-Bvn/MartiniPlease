@@ -64,6 +64,18 @@ export function useInventory() {
     }
   }
 
+  async function updateIngredientPricing(ingredientType, patch) {
+    // patch: { pricing_mode, bottle_price, bottle_volume_ml, price_per_ml }
+    const { error } = await supabase
+      .from('ingredients')
+      .update(patch)
+      .eq('type', ingredientType)
+      .eq('bar_id', currentBarId.value)
+    if (error) throw error
+    const ing = ingredients.value.find(i => i.type === ingredientType)
+    if (ing) Object.assign(ing, patch)
+  }
+
   async function toggleCategory(categoryKey, select) {
     const categoryIngredients = ingredients.value.filter(i => i.category === categoryKey)
     if (!categoryIngredients.length) return
@@ -208,6 +220,7 @@ export function useInventory() {
     loading,
     fetchIngredients,
     toggleIngredient,
+    updateIngredientPricing,
     toggleCategory,
     selectAll,
     deselectAll,

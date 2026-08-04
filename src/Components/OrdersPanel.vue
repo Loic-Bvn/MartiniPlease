@@ -2,7 +2,7 @@
   <div class="orders-panel">
 
     <!-- =========================
-         TABS
+        TABS
     ========================= -->
     <div class="orders-tabs">
       <button
@@ -29,7 +29,7 @@
     </div>
 
     <!-- =========================
-         CONTROLS (COMPLETED)
+        CONTROLS (COMPLETED)
     ========================= -->
     <div
       v-if="activeTab === 'completed' && completedOrders.length > 0"

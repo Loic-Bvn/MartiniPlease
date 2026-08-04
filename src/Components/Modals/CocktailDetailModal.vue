@@ -5,8 +5,8 @@
         <div class="cocktail-title-row">
           <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
             <!-- TODO: Handle price -->
-            <!-- {{ cocktail.name }} - {{ cocktail.price ?? '14' }}€ -->
-            {{ cocktail.name }} - {{ cocktail.abv }}°
+            {{ cocktail.name }} - {{ cocktail.price }}€
+            <!-- {{ cocktail.name }} - {{ cocktail.abv }}° -->
           </h3>
         </div>
 
@@ -184,10 +184,10 @@
                       <span :class="{ 'cv-value--na': !cocktail.profile?.length }">{{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                     <!-- TODO: Handle price -->
-                    <!-- <div class="cv-meta-row">
+                    <div class="cv-meta-row">
                       <span class="form-label">{{props.locale === 'fr' ? 'Degré' : 'ABV'}}</span>
                       <span :class="{ 'cv-value--na': !cocktail.abv }">{{ cocktail.abv ? cocktail.abv + '°' : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
-                    </div> -->
+                    </div>
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Créateur' : 'Creator' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.creator || cocktail.creator === 'Unknown' }">{{ (cocktail.creator && cocktail.creator !== 'Unknown') ? cocktail.creator : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>

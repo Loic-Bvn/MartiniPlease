@@ -124,6 +124,13 @@
               <input v-model="form.creation_year" type="text" class="form-input" placeholder="Ex: 1920" />
             </div>
           </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Prix</label>
+              <input v-model="form.price" type="text" class="form-input" />
+            </div>
+          </div>
         </section>
 
         <!-- ── Section : Profil gustatif ── -->
@@ -340,6 +347,14 @@ import { getGlassesAsOptions,
   getSpiritToCategoryMap,
   getProfileOptions } from '@/lib/cocktail-constants'
 import { getDetailledIceLabel } from '../../constants/typeLabels'
+import { useCocktailCost } from '@/composables/useCostCalculator'
+import { useInventory } from '@/composables/useInventory'
+
+const { ingredients } = useInventory()
+const { cost, margin } = useCocktailCost(
+  computed(() => cocktailData.value.recipe),
+  ingredients
+)
 
 const categories = getBaseSpiritGroups()
 const spiritToCategoryMap = getSpiritToCategoryMap()

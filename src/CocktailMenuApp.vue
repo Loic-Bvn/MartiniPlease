@@ -88,8 +88,9 @@
         />
 
         <!-- Main (bar chargé) -->
+        <PendingApproval v-if="isLoggedIn && bar && !isBarApproved" />
         <BarMainView
-          v-if="activeBarId && !showBarsSelection"
+          v-else-if="activeBarId && !showBarsSelection"
           :isLoggedIn="isLoggedIn"
           :activeBarId="activeBarId"
           :cocktails="cocktails"

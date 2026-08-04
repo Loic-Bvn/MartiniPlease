@@ -13,6 +13,16 @@
 // L'objet complet est refetché depuis Supabase à chaque rechargement.
 // Cela évite de servir des données périmées (nom, invite_code, is_public…)
 // depuis le cache localStorage.
+//
+// ── Validation des inscriptions (NOUVEAU) ────────────────────────────────────
+// Chaque bar a un `status` : 'pending' | 'approved' | 'rejected'.
+// - Un nouveau bar est créé en 'pending' (valeur par défaut en base).
+// - Toi (admin) passes le statut à 'approved' ou 'rejected' via Supabase Studio.
+// - Tant que le statut n'est pas 'approved', le front bloque l'accès aux
+//   fonctionnalités bartender (voir isBarApproved / isBarPending plus bas)
+//   et affiche un écran "en attente de validation" (voir PendingApproval.vue).
+// - La vraie barrière de sécurité doit être en RLS (voir sql/2026-08_migration.sql),
+//   ce garde-fou front est un confort UX, pas une protection suffisante seule.
 
 import { ref, computed } from 'vue'
 import { supabase }      from '@/lib/supabase'
@@ -55,6 +65,12 @@ export function useAuth() {
   const inviteCode      = computed(() => bar.value?.invite_code ?? '')
   const hasMultipleBars = computed(() => bars.value.length >= 1 && !bar.value)
   const isBarPublic     = computed(() => bar.value?.is_public  ?? false)
+
+  // ── Statut de validation (NOUVEAU) ────────────────────────────────────────
+  const barStatus     = computed(() => bar.value?.status ?? null)
+  const isBarApproved = computed(() => barStatus.value === 'approved')
+  const isBarPending  = computed(() => barStatus.value === 'pending')
+  const isBarRejected = computed(() => barStatus.value === 'rejected')
 
   // ── Initialisation ──────────────────────────────────────────────────────────
 
@@ -148,6 +164,11 @@ export function useAuth() {
   }
 
   // ── Inscription ─────────────────────────────────────────────────────────────
+  // Le bar est créé avec status='pending' par défaut (colonne en base).
+  // La notification email vers loic.bienvenu.pro@gmail.com est déclenchée
+  // côté serveur (DB Webhook Supabase → Edge Function), PAS ici : ça évite
+  // de dépendre du front pour un événement de sécurité, et ça marche même
+  // si l'utilisateur ferme l'onglet juste après l'inscription.
 
   async function signUp({ email, password, barName }) {
     authLoading.value = true
@@ -166,7 +187,7 @@ export function useAuth() {
       bar.value  = barData
       bars.value = []
       persistBarId(barData.id)
-      return { success: true }
+      return { success: true, data: barData }
     } catch (err) {
       authError.value = err.message
       return { success: false, error: err.message }
@@ -201,6 +222,8 @@ export function useAuth() {
   }
 
   // ── Création d'un nouveau bar (bartender déjà connecté) ─────────────────────
+  // Même logique de validation : status='pending' par défaut, notification
+  // email gérée côté serveur (DB Webhook), pas ici.
 
   async function createNewBar(barName) {
     if (!session.value) return { success: false, error: 'Non connecté' }
@@ -293,6 +316,10 @@ export function useAuth() {
     inviteCode,
     hasMultipleBars,
     isBarPublic,
+    barStatus,
+    isBarApproved,
+    isBarPending,
+    isBarRejected,
     initAuth,
     fetchBar,
     switchBar,
