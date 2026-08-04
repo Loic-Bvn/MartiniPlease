@@ -4264,3 +4264,51 @@ body {
   font-weight: 600;
   color: var(--gold);
 }
+
+.category-header {
+  cursor: pointer;
+}
+
+.category-chevron {
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+.category-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.ingredient-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.ingredient-pricing {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+.ingredient-pricing select,
+.ingredient-pricing input {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.ingredient-pricing input[type="number"] {
+  width: 5.5rem;
+}

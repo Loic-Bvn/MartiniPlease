@@ -139,6 +139,11 @@
                   </button>
                 </div>
 
+                <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
+                <label v-for="(label, key) in FEATURE_LABELS" :key="key" class="burger-item burger-item--toggle">
+                  <input type="checkbox" :checked="features[key]" @change="setFeature(key, $event.target.checked)" />
+                  <span>{{ label }}</span>
+                </label>
 
                 <button 
                   v-if="activeBarId && !showBarsSelection" 
@@ -212,8 +217,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link, Check, Folder, Martini, Key} from 'lucide-vue-next'
-
 import ThemeToggle from '@/Components/ThemeToggle.vue'
+import { useBarFeatures, FEATURE_LABELS } from '@/composables/useBarFeatures'
+
+const { features, setFeature } = useBarFeatures()
 
 const props = defineProps({
   isLoggedIn: Boolean,

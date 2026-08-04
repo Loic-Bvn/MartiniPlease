@@ -63,8 +63,9 @@
         :key="category.key"
         class="category-section"
       >
-        <div class="category-header">
+        <div class="category-header" @click="toggleExpanded(category.key)">
           <div class="category-title-row">
+            <component :is="isExpanded(category.key) ? ChevronDown : ChevronRight" :size="16" class="category-chevron" />
             <h3 class="category-title">
               <span class="category-icon">{{ category.icon }}</span>
               {{ category.label }}
@@ -74,29 +75,40 @@
             </span>
           </div>
           <button
-            @click="toggleCategory(category.key, !category.allSelected)"
+            @click.stop="toggleCategory(category.key, !category.allSelected)"
             class="btn-toggle-category"
           >
             {{ category.allSelected ? 'Tout désélectionner' : 'Tout sélectionner' }}
           </button>
         </div>
 
-        <div class="ingredients-grid">
-          <label
-            v-for="ing in category.ingredients"
-            :key="ing.id"
-            class="ingredient-item"
-          >
+        <div class="category-body" v-show="isExpanded(category.key)">
+          <div class="ingredient-item" v-for="ing in category.ingredients" :key="ing.type">
             <input
               type="checkbox"
-              :checked="ing.available"
-              @change="toggleIngredient(ing.type)"
               class="ingredient-checkbox"
+              :checked="hasIngredient(ing.type)"
+              @change="toggleIngredient(ing.type)"
             />
             <span class="ingredient-name">{{ ing.name }}</span>
-          </label>
+            <div class="ingredient-pricing" v-if="hasIngredient(ing.type)">
+              <select v-model="ing.pricing_mode" @change="updateIngredientPricing(ing.type, { pricing_mode: ing.pricing_mode })">
+                <option value="bottle">Bouteille</option>
+                <option value="ml">Au ml</option>
+              </select>
+              <template v-if="ing.pricing_mode === 'ml'">
+                <input type="number" step="0.001" v-model.number="ing.price_per_ml"
+                  @change="updateIngredientPricing(ing.type, { price_per_ml: ing.price_per_ml })" placeholder="€/ml" />
+              </template>
+              <template v-else>
+                <input type="number" step="0.5" v-model.number="ing.bottle_price"
+                  @change="updateIngredientPricing(ing.type, { bottle_price: ing.bottle_price })" placeholder="€ bouteille" />
+                <input type="number" step="10" v-model.number="ing.bottle_volume_ml"
+                  @change="updateIngredientPricing(ing.type, { bottle_volume_ml: ing.bottle_volume_ml })" placeholder="ml" />
+              </template>
+            </div>
+          </div>
 
-          <!-- Bouton "+" -->
           <button
             @click="openAddModal(category)"
             class="btn-add-ingredient"
@@ -124,10 +136,9 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { CheckSquare, Square, Search, Plus } from 'lucide-vue-next'
+import { CheckSquare, Square, Search, Plus, ChevronDown, ChevronRight  } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import AddIngredientModal from '@/Components/Modals/AddIngredientModal.vue'
-
 const {
   ingredients,
   loading,
@@ -135,6 +146,8 @@ const {
   toggleCategory,
   selectAll,
   deselectAll,
+  updateIngredientPricing,
+  hasIngredient,
 } = useInventory()
 
 const searchQuery    = ref('')
@@ -185,4 +198,17 @@ const searchResults = computed(() => {
     i.type.toLowerCase().includes(q)
   )
 })
+
+const expandedCategories = ref(new Set())
+
+function toggleExpanded(key) {
+  const next = new Set(expandedCategories.value)
+  if (next.has(key)) next.delete(key)
+  else next.add(key)
+  expandedCategories.value = next
+}
+
+function isExpanded(key) {
+  return expandedCategories.value.has(key)
+}
 </script>

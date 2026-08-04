@@ -26,10 +26,9 @@
         <div class="min-w-0 flex-1">
           <div class="cocktail-title-row">
             <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-              {{ cocktail.name }}
+              {{ cocktail.name }} <span v-if="cocktail.price"> - {{ cocktail.price }}€</span>
+              <!-- TODO: updater le v-if pour debloquer affichage prix  -->
             </h3>
-              <!-- TODO: Handle price - Ajouter gestion tarifs cocktails (attention drinker/bartender mode)  -->
-              <!-- <span class="cocktail-price-inline">{{ cocktail.price ?? '14' }}€</span> -->
             <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
           </div>
           <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">

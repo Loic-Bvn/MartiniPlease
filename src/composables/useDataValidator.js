@@ -92,6 +92,15 @@ export function validateCocktail(cocktail, options = {}) {
     }
   }
 
+  // Prix - champ numérique, ne pas utiliser .trim() dessus (contrairement aux
+  // optionalFields ci-dessus qui sont tous des chaînes)
+  if (cocktail.price !== null && cocktail.price !== undefined && cocktail.price !== '') {
+    const price = parseFloat(cocktail.price)
+    if (!isNaN(price) && price >= 0) {
+      cleaned.price = price
+    }
+  }
+
   // Arrays - profil, saisons, tags - les omettre si vides pour laisser les defaults BD s'appliquer
   const profileFiltered = Array.isArray(cocktail.profile)
     ? cocktail.profile.filter(p => p?.trim?.())

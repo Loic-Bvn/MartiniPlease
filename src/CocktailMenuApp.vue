@@ -268,7 +268,7 @@ import BarSelector       from '@/Components/BarSelector.vue'
 import BarMainView       from '@/Components/BarMainView.vue'
 import Footer            from '@/Components/Footer.vue'
 import ConfirmModal      from '@/Components/Modals/ConfirmModal.vue'
-
+import PendingApproval   from '@/Components/PendingApproval.vue'
 // Lazy-loaded — ne font pas partie du bundle initial
 const AuthModal         = defineAsyncComponent(() => import('@/Components/Modals/AuthModal.vue'))
 const DrinkerLoginModal = defineAsyncComponent(() => import('@/Components/Modals/DrinkerLoginModal.vue'))
@@ -288,7 +288,8 @@ const cardToDelete = ref(null)
 const {
   isLoggedIn, bar, bars, hasMultipleBars, isBarPublic,
   inviteCode, currentBarId, currentBarName,
-  initAuth, signOut, fetchBar,
+  isBarApproved,
+  initAuth, signOut, fetchBar, 
 } = useAuth()
 
 // ── UI ────────────────────────────────────────────────────────────────────────

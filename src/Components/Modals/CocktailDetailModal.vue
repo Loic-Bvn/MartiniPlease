@@ -5,7 +5,9 @@
         <div class="cocktail-title-row">
           <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
             <!-- TODO: Handle price -->
-            {{ cocktail.name }} - {{ cocktail.price }}€
+            {{ cocktail.name }}<span v-if="cocktail.price"> - {{ cocktail.price }}€</span>
+            <!-- TODO: updater le v-if pour debloquer affichage prix  -->
+
             <!-- {{ cocktail.name }} - {{ cocktail.abv }}° -->
           </h3>
         </div>
@@ -38,6 +40,16 @@
           >
             <Upload :size="18" />
           </button> -->
+
+          <button 
+            v-if="isBartenderMode"
+            @click="openBatch"
+            class="btn-icon"
+            title="Batch"
+          >
+            <Barrel :size="18" />
+          </button>
+
           <button
             v-if="props.isBartenderMode && props.cocktail.is_private && !isSubmitted(props.cocktail.id)"
             type="button"
@@ -243,12 +255,19 @@
       </div>
 
     </div>
+    <BatchCalculatorModal
+      v-if="showBatchModal"
+      :open="showBatchModal"
+      :cocktail="selectedCocktailForBatch"
+      :ingredients="ingredients"
+      @close="showBatchModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload } from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel} from 'lucide-vue-next'
 import {
   getTypeLabel,
   getProfileLabel,
@@ -261,6 +280,7 @@ import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
+import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
 
 const TAB_COUNT = 3
 const TAB_WIDTH = 100 / TAB_COUNT
@@ -281,7 +301,7 @@ const emit = defineEmits(['close'])
 const imageError = ref(false)
 const modalEl = ref(null)
 
-const { barInventory } = useInventory()
+const { barInventory, ingredients } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
 const { submitToCatalog, isSubmitted } = useCatalog()
@@ -290,6 +310,14 @@ const { showToast } = useToast()
 const isFav = computed(() => isFavorite(props.cocktail.id))
 const isOrdering = ref(false)
 const isSubmitting = ref(false)
+const showBatchModal = ref(false)
+const selectedCocktailForBatch = ref(null)
+
+function openBatch() {
+  selectedCocktailForBatch.value = props.cocktail
+  showBatchModal.value = true
+}
+
 
 async function handleFavorite() {
   await toggleFavorite(props.cocktail.id)

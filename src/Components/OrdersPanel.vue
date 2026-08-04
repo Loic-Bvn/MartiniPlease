@@ -54,7 +54,7 @@
     </div>
 
     <!-- =========================
-         PENDING
+        PENDING
     ========================= -->
     <div v-if="activeTab === 'pending'" class="orders-content">
 
@@ -241,6 +241,8 @@ import { User, GlassWater, Clock, Check, X, Loader2 } from 'lucide-vue-next'
 import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
 import { getTypeLabel } from '../constants/typeLabels.js'
+import { useBarFeatures } from '@/composables/useBarFeatures'
+const { isFeatureEnabled } = useBarFeatures()
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },

@@ -124,13 +124,6 @@
               <input v-model="form.creation_year" type="text" class="form-input" placeholder="Ex: 1920" />
             </div>
           </div>
-
-          <div class="form-row">
-            <div class="form-field">
-              <label class="form-label">Prix</label>
-              <input v-model="form.price" type="text" class="form-input" />
-            </div>
-          </div>
         </section>
 
         <!-- ── Section : Profil gustatif ── -->
@@ -251,6 +244,30 @@
               </button>
             </div>
           </div>
+        
+          <div class="form-row form-row--pricing">
+            <div class="form-field">
+              <label class="form-label">Prix de vente</label>
+              <input v-model.number="form.price" type="number" step="0.5" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">Coût matière</label>
+              <span v-if="cost.total > 0">{{ cost.total.toFixed(2) }}€</span>
+              <span v-else class="form-hint">
+                Aucun coût calculable — vérifie les prix des ingrédients dans le stock
+              </span>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Marge</label>
+              <span v-if="currentMargin">
+                {{ currentMargin.absolute.toFixed(2) }}€
+                ({{ currentMargin.percent.toFixed(0) }}%)
+              </span>
+              <span v-else class="form-hint">
+                {{ cost.total > 0 ? 'Renseigne un prix de vente pour voir la marge' : 'Renseigne un coût pour voir la marge' }}
+              </span>
+            </div>
+          </div>
         </section>
 
         <!-- ── Section : Description & Image ── -->
@@ -352,9 +369,10 @@ import { useInventory } from '@/composables/useInventory'
 
 const { ingredients } = useInventory()
 const { cost, margin } = useCocktailCost(
-  computed(() => cocktailData.value.recipe),
+  computed(() => form.value.recipe),
   ingredients
 )
+const currentMargin = computed(() => margin(form.value.price))
 
 const categories = getBaseSpiritGroups()
 const spiritToCategoryMap = getSpiritToCategoryMap()
@@ -549,10 +567,11 @@ function handleSave() {
       recipe: cleanedRecipe,
       abv: abvFinal,
       ice: form.value.ice,
+      price: form.value.price,
     },{
       forBar: true
     })
-console.log('SAVE PAYLOAD', validated)
+
     if (!props.barId) {
       throw new Error('barId manquant')
     }
@@ -638,6 +657,13 @@ const descriptionForLocale = computed({
 </script>
 
 <style scoped>
+.form-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 0.3rem;
+}
+
 .image-mode-switch {
   margin-bottom: 0.5rem;
   width: fit-content;

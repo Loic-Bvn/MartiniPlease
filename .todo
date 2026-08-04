@@ -1,5 +1,9 @@
 # TODO
 
+## Bartender tools
+- fix checkbox autoriser commande / partage
+- Ajouter checkbox pour affichage des prix coté drinker
+
 ## Allow bartender to customize features
 - Permettre au bartender d'activer/desactiver des features
     - Commander
@@ -14,16 +18,15 @@
     - afficher cout cocktail (selon values set par bartender)
 
 ## Batching
-- Ajouter modal pour calculer des gros volumes de cocktails + pricing du batch
+- Corriger affichage de la modal
+- On a une table en BDD qui sert a rien
 
 ## Validation des inscriptions
 Lors de la création d'un bar par un nouvel utilisateur (nouvel EMAIL), forcer la validation par moi (via envoie d'un mail a loic.bienvenu.pro@gmail.com) et informer l'utilisateur (afin d'empecher la création de bar a tout va)
 
-## Robusitification de l'app
+Systeme mit en place, pas d'email recu ---> a verifier
 
-## Age validation
-Ajouter validation d'age a l'entrée du site ?
---> plutot bandeau sanitaire affiché en perma
+## Robusitification de l'app
 
 ## Versionning
 Gerer la création de tag et l'hebergement pas version tagguée
