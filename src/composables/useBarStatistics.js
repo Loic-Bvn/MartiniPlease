@@ -7,7 +7,7 @@ export function useBarStatistics() {
     try {
       // Nombre de cocktails
       const { count: cocktailCount, error: cocktailError } = await supabase
-        .from('cocktails')
+        .from('bar_cocktails')
         .select('*', { count: 'exact', head: true })
         .eq('bar_id', barId)
 

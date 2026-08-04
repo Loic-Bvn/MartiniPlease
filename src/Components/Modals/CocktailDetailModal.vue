@@ -30,6 +30,24 @@
           >
             <HandPlatter :size="18" />
           </button>
+          <!-- <button
+            v-if="!isSubmitted(cocktail.id) && cocktail.is_private"
+            @click.stop="handleSubmit"
+            class="btn-icon btn-icon--submit"
+            :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
+          >
+            <Upload :size="18" />
+          </button> -->
+          <button
+            v-if="props.isBartenderMode && props.cocktail.is_private && !isSubmitted(props.cocktail.id)"
+            type="button"
+            :disabled="isSubmitting"
+            @click="handleSubmitToCatalog"
+            class="btn-icon"
+            :title="props.locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
+          >
+            <Upload :size="18" />
+          </button>
           <button
             type="button"
             @click="handleShare"
@@ -230,7 +248,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter} from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload } from 'lucide-vue-next'
 import {
   getTypeLabel,
   getProfileLabel,
@@ -241,6 +259,7 @@ import {
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
+import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 
 const TAB_COUNT = 3
@@ -265,10 +284,12 @@ const modalEl = ref(null)
 const { barInventory } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
+const { submitToCatalog, isSubmitted } = useCatalog()
 const { showToast } = useToast()
 
 const isFav = computed(() => isFavorite(props.cocktail.id))
 const isOrdering = ref(false)
+const isSubmitting = ref(false)
 
 async function handleFavorite() {
   await toggleFavorite(props.cocktail.id)
@@ -291,6 +312,31 @@ async function handleOrder() {
     }
   } finally {
     isOrdering.value = false
+  }
+}
+
+async function handleSubmitToCatalog() {
+  if (isSubmitting.value) return
+
+  isSubmitting.value = true
+  try {
+    const result = await submitToCatalog(props.cocktail)
+
+    if (result.success) {
+      showToast(props.locale === 'fr'
+        ? 'Cocktail proposé au catalogue ✅'
+        : 'Cocktail submitted to catalog ✅')
+    } else if (result.error === 'unchanged') {
+      showToast(props.locale === 'fr'
+        ? 'Ce cocktail est déjà à jour.'
+        : 'This cocktail is already up to date.')
+    } else {
+      showToast(props.locale === 'fr'
+        ? 'Impossible de proposer ce cocktail.'
+        : 'Unable to submit this cocktail.')
+    }
+  } finally {
+    isSubmitting.value = false
   }
 }
 

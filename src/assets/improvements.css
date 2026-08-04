@@ -344,7 +344,7 @@
     padding: 0.3rem 0.7rem;
   }
 
-  .cocktails-grid {
+  .cocktails-grid:not(.cocktails-grid--standard) {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
   }
 
@@ -395,7 +395,7 @@
 
 /* ── Cards grid responsive ═════════════════════════════════════ */
 @media (min-width: 1400px) {
-  .cocktails-grid {
+  .cocktails-grid:not(.cocktails-grid--standard) {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
   }
 }

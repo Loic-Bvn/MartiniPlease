@@ -1,7 +1,10 @@
 # TODO
 
-## Form push cocktail
-- Bug au niveau de la selection des glacons
+## Allow bartender to customize features
+- Permettre au bartender d'activer/desactiver des features
+    - Commander
+    - Partager
+    - Autres ?
 
 ## Pricing
 - Coté bartender:
@@ -13,25 +16,5 @@
 ## Batching
 - Ajouter modal pour calculer des gros volumes de cocktails + pricing du batch
 
-## Form COCKTAIL CATALOG (sharing recipes)
-- Cassé :/
-- Rendre plus clair l'UI pour faire comprendre a l'utilisateur qu'il peut push et pull des recettes
-- Remplacer l'affichage des ingredients par les types d'ingredients (comme dans les modalCard)
-- Supprimer les étoiles
-- Avoir un status qui indique si le cocktail est déja présent dans le bar
-- supprimer drop down saison
-- Dans la vue mes Recettes, offrir la possiblité de lire la recette (comme dans la vue Catalgoe Global)
-- Est ce que la vue 'mes recettes' est vraiment utile, une fleche permet de push les cocktails sur la modal CocktailCard
-
-## Update du schema de donnée (objectif: limiter la dupplication de recettes)
-Je dois migrer la structure de ma base de données Supabase pour MartiniPlease (app cocktails multi-tenant Vue3/Supabase).
-
-Contexte : actuellement, les cocktails sont dupliqués en base — chaque bar a sa propre ligne avec un UID distinct pour un même cocktail (même nom, même recette actuellement), car ma table actuelle mélange contenu éditorial (nom, description, histoire, créateur) et données spécifiques au bar (prix, stock, dispo, ingrédients).
-
-Problème : cette duplication empêche de mutualiser l'enrichissement éditorial (description/histoire/créateur générés une fois) et créera une désync si un bartender modifie sa recette indépendamment des autres bars proposant le même cocktail.
-
-Structure cible :
-- `cocktails_catalog` : contenu éditorial partagé (id canonique, name, description_fr, description_en, creator, creation_year, creation_place, is_iba_official, source_url)
-- `bar_cocktails` : une ligne par bar (id = UID actuel, bar_id, cocktail_catalog_id FK, ingredients, price, stock, dispo...)
-
-Objectif : m'aider à écrire la migration Supabase (SQL + script de mapping UID existant → cocktail_catalog_id via nom normalisé), en gérant les cas où plusieurs UID pointent vers le même cocktail canonique, sans perte de données côté recettes/stock par bar. Je fournirai le schéma actuel et un export CSV des données existantes.
+## Validation des inscriptions
+Lors de la création d'un bar par un nouvel utilisateur (nouvel EMAIL), forcer la validation par moi (via envoie d'un mail a loic.bienvenu.pro@gmail.com) et informer l'utilisateur (afin d'empecher la création de bar a tout va)

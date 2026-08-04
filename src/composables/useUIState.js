@@ -12,6 +12,10 @@ import { ref } from 'vue'
 const locale = ref('fr')   // 'fr' | 'en'
 const unit   = ref('oz')   // 'oz' | 'ml'
 
+// Vue des cartes cocktails : 'compact' (actuelle, sans photo) | 'standard' (avec photo)
+// Préférence mémorisée d'une session à l'autre.
+const cardView = ref(localStorage.getItem('cardView') || 'compact')
+
 // ── Page légale ───────────────────────────────────────────────────────────────
 const currentLegalPage = ref(null)  // null | 'legal-notice' | 'privacy-policy' | 'terms-of-use' | 'cookies-policy'
 
@@ -36,12 +40,32 @@ export function useUIState() {
 
   // ── Locale & unité ──────────────────────────────────────────────────────────
 
+  function setLocale(nextLocale) {
+    if (nextLocale !== 'fr' && nextLocale !== 'en') return
+    locale.value = nextLocale
+  }
+
   function toggleLocale() {
     locale.value = locale.value === 'fr' ? 'en' : 'fr'
   }
 
+  function setUnit(nextUnit) {
+    if (nextUnit !== 'oz' && nextUnit !== 'ml') return
+    unit.value = nextUnit
+  }
+
   function toggleUnit() {
     unit.value = unit.value === 'oz' ? 'ml' : 'oz'
+  }
+
+  function setCardView(mode) {
+    if (mode !== 'compact' && mode !== 'standard') return
+    cardView.value = mode
+    localStorage.setItem('cardView', mode)
+  }
+
+  function toggleCardView() {
+    setCardView(cardView.value === 'compact' ? 'standard' : 'compact')
   }
 
   // ── Pages légales ───────────────────────────────────────────────────────────
@@ -114,6 +138,7 @@ export function useUIState() {
     // État
     locale,
     unit,
+    cardView,
     currentLegalPage,
     showAuthModal,
     showCocktailFormModal,
@@ -130,6 +155,10 @@ export function useUIState() {
     // Actions
     toggleLocale,
     toggleUnit,
+    setLocale,
+    setUnit,
+    setCardView,
+    toggleCardView,
     openLegalPage,
     closeLegalPage,
     openNewCocktailFormModal,

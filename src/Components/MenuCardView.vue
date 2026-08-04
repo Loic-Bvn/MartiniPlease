@@ -12,16 +12,79 @@
         <span class="cv-meta">{{ cardCocktails.length }} cocktail{{ cardCocktails.length > 1 ? 's' : '' }}</span>
       </div>
       <div class="cv-header-actions">
-        <button @click="$emit('toggle-locale')" class="btn-mode btn-mode-inactive">
-          {{ locale === 'fr' ? '🇬🇧' : '🇫🇷' }}
-        </button>
-        <button @click="$emit('toggle-unit')" class="btn-mode btn-mode-inactive">
-          {{ unit === 'oz' ? 'ml' : 'oz' }}
-        </button>
-        <button @click="toggleDark" class="btn-mode btn-mode-inactive">
-          <Sun v-if="isDark" :size="16" />
-          <Moon v-else :size="16" />
-        </button>
+        <div
+          class="settings-switch"
+          role="group"
+          aria-label="Language switch"
+          @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
+        >
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': locale === 'fr' }"
+            :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
+          >
+            <span>FR</span>
+          </button>
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': locale === 'en' }"
+            :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
+          >
+            <span>EN</span>
+          </button>
+        </div>
+
+        <div
+          class="settings-switch"
+          role="group"
+          aria-label="Unit switch"
+          @click="$emit('set-unit', unit === 'oz' ? 'ml' : 'oz')"
+        >
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': unit === 'oz' }"
+            :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
+          >
+            <span>oz</span>
+          </button>
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': unit === 'ml' }"
+            :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
+          >
+            <span>ml</span>
+          </button>
+        </div>
+
+        <div
+          class="settings-switch"
+          role="group"
+          aria-label="Card view switch"
+          @click="$emit('set-card-view', cardView === 'compact' ? 'standard' : 'compact')"
+        >
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': cardView === 'compact' }"
+            :title="locale === 'fr' ? 'Vue compacte' : 'Compact view'"
+          >
+            <span>{{ locale === 'fr' ? 'Compacte' : 'Compact' }}</span>
+          </button>
+          <button
+            type="button"
+            class="view-toggle-btn"
+            :class="{ 'view-toggle-btn--active': cardView === 'standard' }"
+            :title="locale === 'fr' ? 'Vue standard' : 'Standard view'"
+          >
+            <span>{{ locale === 'fr' ? 'Standard' : 'Standard' }}</span>
+          </button>
+        </div>
+
+        <ThemeToggle />
       </div>
     </div>
 
@@ -40,7 +103,7 @@
           <span class="cv-group-count">{{ group.cocktails.length }}</span>
         </div>
 
-        <div class="cv-grid">
+        <div :class="['cv-grid', { 'cv-grid--standard': cardView === 'standard' }]">
           <div
             v-for="cocktail in group.cocktails"
             :key="cocktail.id"
@@ -48,9 +111,11 @@
           <CocktailCard
             :cocktail="cocktail"
             :isBartenderMode="isLoggedIn"
+            :show-cocktail-actions="false"
             :locale="locale"
             :unit="unit"
             :bar-id="barId"
+            :view-mode="cardView"
             @edit="$emit('edit-cocktail', cocktail)"
             @delete="$emit('delete-cocktail', cocktail.id)"
             @open="handleOpenCocktail"
@@ -69,26 +134,29 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { ArrowLeft, Sun, Moon, GlassWater } from 'lucide-vue-next'
+import { ArrowLeft, GlassWater } from 'lucide-vue-next'
 import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
 import CocktailCard from '@/Components/CocktailCard.vue'
+import ThemeToggle from '@/Components/ThemeToggle.vue'
 
 const props = defineProps({
   card:      { type: Object, required: true },
   cocktails: { type: Array,  default: () => [] },
   locale:    { type: String, default: 'fr' },
   unit:      { type: String, default: 'oz' },
+  cardView:  { type: String, default: 'compact' },
   barId:     { type: String, default: '' },
 })
 
 const emit = defineEmits([
   'close',
-  'toggle-locale',
-  'toggle-unit',
+  'set-locale',
+  'set-unit',
+  'set-card-view',
   'open-cocktail',
   'edit-cocktail',
   'delete-cocktail'

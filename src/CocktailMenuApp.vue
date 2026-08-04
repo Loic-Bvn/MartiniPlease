@@ -30,8 +30,8 @@
           :randomLogo="randomLogo"
           @logo-click="handleLogoClick"
           @open-new-cocktail="openNewCocktailFormModal"
-          @toggle-locale="toggleLocale"
-          @toggle-unit="toggleUnit"
+          @set-locale="setLocale"
+          @set-unit="setUnit"
           @scroll-to-cocktail="scrollToCocktailCard"
           @invite="handleInvite"
           @open-bars-selection="handleOpenBarsSelection"
@@ -84,6 +84,7 @@
           @update:editingBarName="editingBarName = $event"
           @update:editingBarCode="editingBarCode = $event"
           @update:deleteConfirmationInput="deleteConfirmationInput = $event"
+          @update:showNewBarInput="showNewBarInput = $event"
         />
 
         <!-- Main (bar chargé) -->
@@ -101,6 +102,7 @@
           :pendingOrdersCount="pendingOrdersCount"
           :locale="locale"
           :unit="unit"
+          :cardView="cardView"
           :barInventory="barInventory"
           :ingredients="ingredients"
           :searchTerm="searchTerm"
@@ -144,9 +146,32 @@
           @set-abv-filter="setAbvFilter"
           @set-season="setSeason"
           @clear-filters="clearFilters"
+          @set-card-view="setCardView"
         />
 
         <!-- Modals -->
+        <ConfirmModal
+          :open="!!cocktailToDelete"
+          :title="locale === 'fr' ? '⚠️ Supprimer le cocktail' : '⚠️ Delete cocktail'"
+          :message="locale === 'fr'
+            ? `Supprimer « ${cocktailToDelete?.name} » ? Cette action est irréversible.`
+            : `Delete “${cocktailToDelete?.name}”? This action cannot be undone.`"
+          :confirm-label="locale === 'fr' ? 'Supprimer' : 'Delete'"
+          :cancel-label="locale === 'fr' ? 'Annuler' : 'Cancel'"
+          @confirm="confirmDeleteCocktail"
+          @cancel="cocktailToDelete = null"
+        />
+        <ConfirmModal
+          :open="!!cardToDelete"
+          :title="locale === 'fr' ? '⚠️ Supprimer la carte' : '⚠️ Delete card'"
+          :message="locale === 'fr'
+            ? `Supprimer « ${cardToDelete?.name} » ? Cette action est irréversible.`
+            : `Delete “${cardToDelete?.name}”? This action cannot be undone.`"
+          :confirm-label="locale === 'fr' ? 'Supprimer' : 'Delete'"
+          :cancel-label="locale === 'fr' ? 'Annuler' : 'Cancel'"
+          @confirm="confirmDeleteCard"
+          @cancel="cardToDelete = null"
+        />
         <AuthModal
           v-if="showAuthModal"
           @close="showAuthModal = false"
@@ -169,6 +194,8 @@
         />
         <CatalogModal
           v-if="showCatalogModal"
+          :locale="locale"
+          :unit="unit"
           @close="showCatalogModal = false"
           @imported="handleCatalogImport"
         />
@@ -186,10 +213,12 @@
           :cocktails="cocktails"
           :locale="locale"
           :unit="unit"
+          :card-view="cardView"
           :bar-id="activeBarId"
           @close="closeCardView"
-          @toggle-locale="toggleLocale"
-          @toggle-unit="toggleUnit"
+          @set-locale="setLocale"
+          @set-unit="setUnit"
+          @set-card-view="setCardView"
           @open-cocktail="openCocktailDetailModal"
         />
         <Transition name="modal-fade">
@@ -213,6 +242,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
+import { supabase } from '@/lib/supabase'
 
 // ── Composables ───────────────────────────────────────────────────────────────
 import { useAuth }               from '@/composables/useAuth'
@@ -236,21 +266,22 @@ import WelcomePage       from '@/Components/WelcomePage.vue'
 import BarSelector       from '@/Components/BarSelector.vue'
 import BarMainView       from '@/Components/BarMainView.vue'
 import Footer            from '@/Components/Footer.vue'
+import ConfirmModal      from '@/Components/Modals/ConfirmModal.vue'
 
 // Lazy-loaded — ne font pas partie du bundle initial
 const AuthModal         = defineAsyncComponent(() => import('@/Components/Modals/AuthModal.vue'))
 const DrinkerLoginModal = defineAsyncComponent(() => import('@/Components/Modals/DrinkerLoginModal.vue'))
 const MenuCardModal     = defineAsyncComponent(() => import('@/Components/Modals/MenuCardModal.vue'))
 const CatalogModal      = defineAsyncComponent(() => import('@/Components/Modals/CatalogModal.vue'))
-const CocktailFormModal     = defineAsyncComponent(() => import('@/Components/Modals/CocktailFormModal.vue'))
+const CocktailFormModal = defineAsyncComponent(() => import('@/Components/Modals/CocktailFormModal.vue'))
 const CocktailDetailModal= defineAsyncComponent(() => import('@/Components/Modals/CocktailDetailModal.vue'))
 const MenuCardView      = defineAsyncComponent(() => import('@/Components/MenuCardView.vue'))
 const LegalNotice       = defineAsyncComponent(() => import('@/views/LegalNotice.vue'))
 const PrivacyPolicy     = defineAsyncComponent(() => import('@/views/PrivacyPolicy.vue'))
 const TermsOfUse        = defineAsyncComponent(() => import('@/views/TermsOfUse.vue'))
 const CookiesPolicy     = defineAsyncComponent(() => import('@/views/CookiesPolicy.vue'))
-
-import { supabase } from '@/lib/supabase'
+const cocktailToDelete = ref(null)
+const cardToDelete = ref(null)
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 const {
@@ -261,9 +292,9 @@ const {
 
 // ── UI ────────────────────────────────────────────────────────────────────────
 const {
-  locale, unit,
+  locale, unit, cardView,
   currentLegalPage, openLegalPage, closeLegalPage,
-  toggleLocale, toggleUnit,
+  toggleLocale, toggleUnit, setLocale, setUnit, setCardView,
   showAuthModal, showCocktailFormModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
   editingCocktail, editingCard, viewingCard, viewingCocktail, viewingCocktailRect,
   openNewCocktailFormModal, openEditCocktailFormModal, closeCocktailFormModal,
@@ -493,13 +524,28 @@ async function handleSaveCocktail(data) {
   }
 }
 
-async function handleDeleteCocktail(id) {
-  const msg = locale.value === 'fr' ? 'Supprimer ce cocktail ?' : 'Delete this cocktail?'
-  if (!confirm(msg)) return
+function handleDeleteCocktail(id) {
+  cocktailToDelete.value = cocktails.value.find(c => c.id === id) || { id }
+}
+
+async function confirmDeleteCocktail() {
+  const id = cocktailToDelete.value?.id
+  cocktailToDelete.value = null
+  if (!id) return
   const result = await deleteCocktail(id)
-  if (!result.success) {
-    showToast(`❌ ${result.error}`, 'error')
-  }
+  if (!result.success) showToast(`❌ ${result.error}`, 'error')
+}
+
+function handleDeleteCard(id) {
+  cardToDelete.value = menuCards.value.find(c => c.id === id) || { id }
+}
+
+async function confirmDeleteCard() {
+  const id = cardToDelete.value?.id
+  cardToDelete.value = null
+  if (!id) return
+  const result = await deleteMenuCard(id)
+  if (!result.success) showToast(`❌ ${result.error}`, 'error')
 }
 
 // ── CRUD cartes ───────────────────────────────────────────────────────────────
@@ -516,12 +562,6 @@ async function handleSaveCard(data) {
   closeCardModal()
 }
 
-async function handleDeleteCard(id) {
-  const msg = locale.value === 'fr' ? 'Supprimer cette carte ?' : 'Delete this card?'
-  if (!confirm(msg)) return
-  const result = await deleteMenuCard(id)
-  if (!result.success) showToast(`❌ ${result.error}`, 'error')
-}
 async function handleToggleCardVisibility(card) {
   if (!card?.id) return
 

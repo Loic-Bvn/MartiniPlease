@@ -1,100 +1,121 @@
 <template>
-  <div ref="cardEl" class="cocktail-card-compact" @click="handleOpen">
+  <div
+    ref="cardEl"
+    :class="['cocktail-card-compact', { 'cocktail-card-standard': viewMode === 'standard' }]"
+    @click="handleOpen"
+  >
 
-    <!-- Header -->
-    <div class="card-header">
-      <div class="min-w-0 flex-1">
-        <div class="cocktail-title-row">
-          <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-            {{ cocktail.name }}
-          </h3>
-            <!-- TODO: Handle price - Ajouter gestion tarifs cocktails (attention drinker/bartender mode)  -->
-            <!-- <span class="cocktail-price-inline">{{ cocktail.price ?? '14' }}€</span> -->
-          <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
+    <!-- Photo (vue standard uniquement) -->
+    <div v-if="viewMode === 'standard'" class="card-image-wrap">
+      <img
+        v-if="cocktail.image && !imageError"
+        :src="cocktail.image"
+        :alt="cocktail.name"
+        class="card-image"
+        loading="lazy"
+        @error="imageError = true"
+      />
+      <div v-else class="card-image-placeholder">
+        <Martini :size="28" />
+      </div>
+    </div>
+
+    <div class="card-content">
+      <!-- Header -->
+      <div class="card-header">
+        <div class="min-w-0 flex-1">
+          <div class="cocktail-title-row">
+            <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
+              {{ cocktail.name }}
+            </h3>
+              <!-- TODO: Handle price - Ajouter gestion tarifs cocktails (attention drinker/bartender mode)  -->
+              <!-- <span class="cocktail-price-inline">{{ cocktail.price ?? '14' }}€</span> -->
+            <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
+          </div>
+          <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
+              <span v-if="cocktail.profile?.length" class="profile-tags">
+                <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
+              </span>
+              <!-- TODO: Handle price - Ajouter gestion tarifs cocktails (attention drinker/bartender mode)  -->
+              <!-- <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span> -->
+          </div>
         </div>
-        <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
-            <span v-if="cocktail.profile?.length" class="profile-tags">
-              <em>{{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</em>
+      </div>
+
+      <!-- Recette -->
+      <div class="recipe-compact" @click="handleOpen" title="Voir les détails">
+        <div
+          v-for="(ing, idx) in recipeWithQty"
+          :key="ing.Type ? ing.Type + idx : idx"
+          class="recipe-line"
+        >
+          <div class="ingredient-info">
+            <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
             </span>
-            <!-- TODO: Handle price - Ajouter gestion tarifs cocktails (attention drinker/bartender mode)  -->
-            <!-- <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span> -->
+            <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
+              {{ getTypeLabel(ing.Type, locale) }}
+            </span>
+          </div>
+          <span class="ingredient-quantity">{{ ing._qty }}</span>
         </div>
       </div>
-    </div>
 
-    <!-- Recette -->
-    <div class="recipe-compact" @click="handleOpen" title="Voir les détails">
-      <div
-        v-for="(ing, idx) in recipeWithQty"
-        :key="ing.Type ? ing.Type + idx : idx"
-        class="recipe-line"
-      >
-        <div class="ingredient-info">
-          <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
+      <!-- Footer : tags du cocktail -->
+      <div class="card-footer">
+        <div class="footer-left" style="display:flex; align-items:center; gap:6px;">
+          <!-- <span v-if="cocktail.cocktail_style" class="badge-method">
+            {{ styleLabel }}
           </span>
-          <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-            {{ getTypeLabel(ing.Type, locale) }}
+          <span v-if="cocktail.method && isBartenderMode" class="badge-method">
+            {{ methodLabel }}
           </span>
+          <span v-if="cocktail.glass && isBartenderMode" class="badge-method">
+            {{ glassLabel }}
+          </span> -->
         </div>
-        <span class="ingredient-quantity">{{ ing._qty }}</span>
-      </div>
-    </div>
 
-    <!-- Footer : tags du cocktail -->
-    <div class="card-footer">
-      <div class="footer-left" style="display:flex; align-items:center; gap:6px;">
-        <span v-if="cocktail.cocktail_style" class="badge-method">
-          {{ styleLabel }}
-        </span>
-        <span v-if="cocktail.method && isBartenderMode" class="badge-method">
-          {{ methodLabel }}
-        </span>
-        <span v-if="cocktail.glass && isBartenderMode" class="badge-method">
-          {{ glassLabel }}
-        </span>
-      </div>
-
-      <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
-        <button
-          v-if="hasDrinker && !isBartenderMode"
-          @click.stop="handleFavorite"
-          :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
-          :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
-        >
-          <Heart :size="18" :fill="isFav ? 'currentColor' : 'none'" />
-        </button>
-        <button
-          v-if="hasDrinker && !isBartenderMode"
-          @click.stop="handleHistoric"
-          class="btn-icon"
-          title="Commander"
-        >
-          <HandPlatter :size="18" />
-        </button>
-
-        <template v-if="isBartenderMode">
-          <button @click.stop="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
-            <Pencil :size="18" />
-          </button>
-          <button @click.stop="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
-            <Trash2 :size="18" />
+        <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
+          <button
+            v-if="hasDrinker && !isBartenderMode"
+            @click.stop="handleFavorite"
+            :class="['btn-icon', isFav ? 'btn-icon--fav-active' : 'btn-icon--fav']"
+            :title="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+          >
+            <Heart :size="18" :fill="isFav ? 'currentColor' : 'none'" />
           </button>
           <button
-            v-if="!isSubmitted(cocktail.id)"
-            @click.stop="handleSubmit"
-            class="btn-icon btn-icon--submit"
-            :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
+            v-if="hasDrinker && !isBartenderMode"
+            @click.stop="handleHistoric"
+            class="btn-icon"
+            title="Commander"
           >
-            <Upload :size="18" />
+            <HandPlatter :size="18" />
           </button>
-          <span
-            v-else
-            class="btn-icon btn-icon--submitted"
-            :title="locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
-          >
-            <Bookmark :size="18" />
-          </span>
-        </template>
+
+          <template v-if="showCocktailActions && isBartenderMode">
+            <button @click.stop="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
+              <Pencil :size="18" />
+            </button>
+            <button @click.stop="$emit('delete', cocktail.id)" class="btn-icon btn-icon--delete">
+              <Trash2 :size="18" />
+            </button>
+            <button
+              v-if="!isSubmitted(cocktail.id) && cocktail.is_private"
+              @click.stop="handleSubmit"
+              class="btn-icon btn-icon--submit"
+              :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
+            >
+              <Upload :size="18" />
+            </button>
+            <span
+              v-else
+              class="btn-icon btn-icon--submitted"
+              :title="locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
+            >
+              <Bookmark :size="18" />
+            </span>
+          </template>
+        </div>
       </div>
     </div>
 
@@ -103,7 +124,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Upload, Bookmark, Pencil, Trash2, Heart, PlusIcon, XIcon, Send, Loader2, Check, HandPlatter} from 'lucide-vue-next'
+import { Upload, Bookmark, Pencil, Trash2, Heart, PlusIcon, XIcon, Send, Loader2, Check, HandPlatter, Martini} from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
@@ -114,14 +135,17 @@ import { useToast } from '@/composables/useToast'
 const { isSubmitted, submitToCatalog } = useCatalog()
 const isChecked = ref(false)
 const props = defineProps({
-  cocktail:        Object,
-  isBartenderMode: { type: Boolean, default: false },
-  locale:          { type: String, default: 'fr' },
-  unit:            { type: String, default: 'oz' },
-  barId:           { type: String, default: '' },
+  cocktail:            Object,
+  isBartenderMode:     { type: Boolean, default: false },
+  showCocktailActions: { type: Boolean, default: true },
+  locale:              { type: String, default: 'fr' },
+  unit:                { type: String, default: 'oz' },
+  barId:               { type: String, default: '' },
+  viewMode:            { type: String, default: 'compact' }, // 'compact' | 'standard'
 })
 const { showToast } = useToast()
 const cardEl = ref(null)
+const imageError = ref(false)
 
 const emit = defineEmits(['edit', 'delete', 'open'])
 

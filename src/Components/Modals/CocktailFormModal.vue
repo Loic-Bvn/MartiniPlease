@@ -92,9 +92,15 @@
             </div>
             <div class="form-field">
               <label class="form-label">Type de glace</label>
-              <select v-model="form.ice" class="form-input">
-                <option v-for="opt in iceOptions">{{opt.emoji + " " + getDetailledIceLabel(opt.name, locale) }}</option>
-              </select>
+                <select v-model="form.ice" class="form-input">
+                  <option
+                    v-for="(opt, key) in iceOptions"
+                    :key="key"
+                    :value="key"
+                  >
+                    {{ opt.emoji + " " + getDetailledIceLabel(opt.name, locale) }}
+                  </option>
+                </select>
             </div>
           </div>
 
@@ -109,6 +115,13 @@
                 <option value="">-- Choisir --</option>
                 <option v-for="s in cocktailStyleOptions" :key="s" :value="s">{{ s }}</option>
               </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Année de création</label>
+              <input v-model="form.creation_year" type="text" class="form-input" placeholder="Ex: 1920" />
             </div>
           </div>
         </section>
@@ -237,8 +250,8 @@
         <section class="form-section">
           <h3 class="form-section-title">Description & Image</h3>
           <div class="form-field">
-            <label class="form-label">Description / Notes</label>
-            <textarea v-model="form.description" class="form-input form-textarea" placeholder="Conseils de préparation, anecdotes, accords..."></textarea>
+            <label class="form-label">Description ({{ locale.toUpperCase() }})</label>
+            <textarea v-model="descriptionForLocale" class="form-input form-textarea" placeholder="Conseils de préparation, anecdotes, accords..."></textarea>
           </div>
 
           <div class="form-field">
@@ -444,9 +457,10 @@ const form = ref({
   glass:          props.cocktail?.glass          ?? '',
   method:         props.cocktail?.method         ?? '',
   abv:            props.cocktail?.abv            ?? 0,
-  description:    props.cocktail?.description    ?? '',
-  image:          props.cocktail?.image          ?? '',
+  description_fr: props.cocktail?.description_fr ?? '',
+  description_en: props.cocktail?.description_en ?? '',
   creator:        props.cocktail?.creator        ?? '',
+  creation_year: props.cocktail?.creation_year   ?? '',
   cocktail_style: props.cocktail?.cocktail_style ?? '',
   ice:            props.cocktail?.ice            ?? '',
   season:  [...(props.cocktail?.season  ?? [])],
@@ -515,13 +529,15 @@ function handleSave() {
         Dashes: normalizeNumber(rest.Dashes),
       }))
 
-    const validated = validateCocktail({
+    var validated = validateCocktail({
       ...form.value,
       recipe: cleanedRecipe,
       abv: abvFinal,
       ice: form.value.ice,
+    },{
+      forBar: true
     })
-
+console.log('SAVE PAYLOAD', validated)
     if (!props.barId) {
       throw new Error('barId manquant')
     }
@@ -596,6 +612,14 @@ function normalizeNumber(val) {
   const n = Number(val)
   return isNaN(n) ? null : n
 }
+
+const descriptionForLocale = computed({
+  get: () => props.locale === 'fr' ? form.value.description_fr : form.value.description_en,
+  set: (val) => {
+    if (props.locale === 'fr') form.value.description_fr = val
+    else form.value.description_en = val
+  }
+})
 </script>
 
 <style scoped>
