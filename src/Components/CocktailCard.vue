@@ -92,7 +92,7 @@
             <HandPlatter :size="18" />
           </button>
 
-          <template v-if="isBartenderMode">
+          <template v-if="showCocktailActions && isBartenderMode">
             <button @click.stop="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
               <Pencil :size="18" />
             </button>
@@ -135,12 +135,13 @@ import { useToast } from '@/composables/useToast'
 const { isSubmitted, submitToCatalog } = useCatalog()
 const isChecked = ref(false)
 const props = defineProps({
-  cocktail:        Object,
-  isBartenderMode: { type: Boolean, default: false },
-  locale:          { type: String, default: 'fr' },
-  unit:            { type: String, default: 'oz' },
-  barId:           { type: String, default: '' },
-  viewMode:        { type: String, default: 'compact' }, // 'compact' | 'standard'
+  cocktail:            Object,
+  isBartenderMode:     { type: Boolean, default: false },
+  showCocktailActions: { type: Boolean, default: true },
+  locale:              { type: String, default: 'fr' },
+  unit:                { type: String, default: 'oz' },
+  barId:               { type: String, default: '' },
+  viewMode:            { type: String, default: 'compact' }, // 'compact' | 'standard'
 })
 const { showToast } = useToast()
 const cardEl = ref(null)

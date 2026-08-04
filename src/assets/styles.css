@@ -119,6 +119,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .header-logo {
@@ -144,6 +145,10 @@ body {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   transition: color 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: min(100%, 26rem);
 }
 
 .header-brand:hover .header-title {
@@ -384,9 +389,11 @@ body {
 }
 
 .btn-new-cocktail {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
+  min-height: 2.5rem;
   padding: 0.5rem 0.875rem;
   background: var(--gold);
   color: #0f0e0c;
@@ -2514,8 +2521,8 @@ body {
   gap: 1rem;
 }
 .header-brand  { display: flex; align-items: center; gap: 0.875rem; flex-shrink: 0; }
-.header-right  { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; margin-left: auto; }
-.header-actions{ display: flex; align-items: center; gap: 0.4rem; }
+.header-right  { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; margin-left: auto; min-width: 0; }
+.header-actions{ display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
 
 /* Barre de recherche inline (> 860px) */
 .header-search-inline { flex: 1; min-width: 0; }
@@ -2532,9 +2539,30 @@ body {
 
 /* ── Tablette ≤ 860px ────────────────────────── */
 @media (max-width: 860px) {
-  .header-search-inline { display: none; }
-  .header-search-row { display: block; padding-top: 0.5rem; }
-  .header-search-row .search-container { width: 100%; }
+  .header-top {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .header-brand {
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+  .header-search-inline {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .header-right {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .header-search-row { display: none; }
   .side-by-side { grid-template-columns: 1fr; }
   .cocktails-grid:not(.cocktails-grid--standard) { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 }
@@ -2542,8 +2570,11 @@ body {
 /* ── Mobile ≤ 540px ──────────────────────────── */
 @media (max-width: 540px) {
   .header-container, .main-content { padding-left: 0.75rem; padding-right: 0.75rem; }
-  .header-title  { font-size: 0.85rem; letter-spacing: 2px; }
+  .header-title  { font-size: 0.85rem; letter-spacing: 2px; max-width: min(100%, 16rem); }
   .header-logo   { height: 30px; }
+  .header-right { gap: 0.375rem; }
+  .header-actions { gap: 0.3rem; }
+  .settings-switch { flex-shrink: 1; }
   .btn-mode-label, .btn-label-hide { display: none; }
   .btn-mode, .btn-new-card, .btn-new-cocktail { padding: 0.45rem 0.6rem; }
   .cocktails-grid:not(.cocktails-grid--standard) { grid-template-columns: 1fr; }

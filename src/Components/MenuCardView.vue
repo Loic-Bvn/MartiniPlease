@@ -111,6 +111,7 @@
           <CocktailCard
             :cocktail="cocktail"
             :isBartenderMode="isLoggedIn"
+            :show-cocktail-actions="false"
             :locale="locale"
             :unit="unit"
             :bar-id="barId"
