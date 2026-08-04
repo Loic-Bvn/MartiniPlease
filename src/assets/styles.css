@@ -2067,6 +2067,11 @@ body {
   width: 90%;
 }
 
+.modal-container--confirm {
+  max-width: 420px;
+  width: 90%;
+}
+
 .form-section {
   display: flex;
   flex-direction: column;

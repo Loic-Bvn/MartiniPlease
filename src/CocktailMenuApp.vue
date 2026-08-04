@@ -160,6 +160,17 @@
           @confirm="confirmDeleteCocktail"
           @cancel="cocktailToDelete = null"
         />
+        <ConfirmModal
+          :open="!!cardToDelete"
+          :title="locale === 'fr' ? '⚠️ Supprimer la carte' : '⚠️ Delete card'"
+          :message="locale === 'fr'
+            ? `Supprimer « ${cardToDelete?.name} » ? Cette action est irréversible.`
+            : `Delete “${cardToDelete?.name}”? This action cannot be undone.`"
+          :confirm-label="locale === 'fr' ? 'Supprimer' : 'Delete'"
+          :cancel-label="locale === 'fr' ? 'Annuler' : 'Cancel'"
+          @confirm="confirmDeleteCard"
+          @cancel="cardToDelete = null"
+        />
         <AuthModal
           v-if="showAuthModal"
           @close="showAuthModal = false"

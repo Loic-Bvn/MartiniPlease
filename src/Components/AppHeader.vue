@@ -106,7 +106,7 @@
             <transition name="fade-slide">
               <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
 
-                <div v-if="activeBarId" class="burger-header">
+                <div v-if="activeBarId && !showBarsSelection" class="burger-header">
                   <span class="burger-title">
                     <Martini :size="16" />
                     {{ activeBarName }}
@@ -117,7 +117,7 @@
                     {{ inviteCode }}
                   </span>
                 </div>
-                <div v-if="activeBarId" class="burger-divider" />
+                <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
 
                 <button 
                   v-if="activeBarId && !showBarsSelection" 
@@ -164,7 +164,7 @@
                   </div>
                 </button>
 
-                <div v-if="activeBarId" class="burger-divider" />
+                <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
 
                 <!-- SECTION : CATALOG -->
                 <button 
@@ -176,7 +176,7 @@
                   {{ locale === 'fr' ? 'Catalogue de recettes' : 'Recipe Catalog' }}
                 </button> 
 
-                <div v-if="activeBarId" class="burger-divider" />
+                <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
 
                 <!-- SECTION : DISCONNECT -->
                 <button 
