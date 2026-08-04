@@ -84,6 +84,7 @@
           @update:editingBarName="editingBarName = $event"
           @update:editingBarCode="editingBarCode = $event"
           @update:deleteConfirmationInput="deleteConfirmationInput = $event"
+          @update:showNewBarInput="showNewBarInput = $event"
         />
 
         <!-- Main (bar chargé) -->
