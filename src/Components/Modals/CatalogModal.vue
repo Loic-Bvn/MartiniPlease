@@ -40,7 +40,7 @@
             />
           </div>
           <select v-model="filters.spirit" @change="doFetch" class="form-input catalog-filter-select">
-            <option value="">{{ locale === 'fr' ? 'Tous les spirits' : 'All spirits' }}</option>
+            <option value="">{{ locale === 'fr' ? 'Tous les spiritueux' : 'All spirits' }}</option>
             <optgroup v-for="cat in spiritCategories" :key="cat.key" :label="cat.label">
               <option v-for="s in cat.spirits" :key="s.key" :value="s.key">{{ s.label }}</option>
             </optgroup>
@@ -72,14 +72,21 @@
         <!-- ── Liste ── -->
         <div v-else class="catalog-list">
           <div v-for="cocktail in catalog" :key="cocktail.id" class="catalog-item">
-            <div class="catalog-item-header">
-              <div class="catalog-item-title-row">
-                <span class="catalog-item-name">{{ cocktail.name }}</span>
-                <span v-if="cocktail.abv != null" class="catalog-item-abv">{{ cocktail.abv }}°</span>
-              </div>
-            </div>
+            <div class="catalog-item-body">
+              <div class="catalog-item-header">
+                <div class="catalog-item-title-row">
+                  <span class="catalog-item-name">{{ cocktail.name }}</span>
+                  <span v-if="cocktail.abv != null" class="catalog-item-abv"> - {{ cocktail.abv }}°</span>
+                </div>
 
-            <div class="catalog-item-content">
+                <div class="catalog-item-meta-block">
+                  <span class="catalog-item-meta">
+                    <span class="catalog-item-meta-label">{{ locale === 'fr' ? 'Proposé par' : 'Submitted by' }}</span>
+                    <span class="catalog-item-meta-value">{{ getSubmittedByLabel(cocktail) }}</span>
+                  </span>
+                </div>
+              </div>
+
               <div class="catalog-item-main-column">
                 <div v-if="cocktail.recipe?.length" class="recipe-compact catalog-item-recipe">
                   <div v-for="(ing, i) in cocktail.recipe" :key="i" class="recipe-line">
@@ -93,42 +100,35 @@
                   </div>
                 </div>
 
-                <div class="catalog-item-meta-block">
-                  <span class="catalog-item-meta">
-                    <span class="catalog-item-meta-label">{{ locale === 'fr' ? 'Proposé par' : 'Submitted by' }}</span>
-                    <span class="catalog-item-meta-value">{{ getSubmittedByLabel(cocktail) }}</span>
-                  </span>
-                </div>
-              </div>
+                <div class="catalog-item-footer-row">
+                  <div class="catalog-chip-row">
+                    <span v-if="cocktail.base_spirit" class="catalog-chip">{{ getTypeLabel(cocktail.base_spirit, locale) }}</span>
+                    <span v-if="cocktail.cocktail_style" class="catalog-chip">{{ STYLE_LABELS[cocktail.cocktail_style] || cocktail.cocktail_style }}</span>
+                  </div>
 
-              <div class="catalog-item-image-column">
-                <div v-if="cocktail.image" class="catalog-item-image-wrap">
-                  <img :src="cocktail.image" :alt="cocktail.name" class="catalog-item-image" loading="lazy" />
-                </div>
-                <div v-else class="catalog-item-image-wrap catalog-item-image-placeholder">
-                  <Martini :size="28" />
+                  <div class="catalog-item-image-actions">
+                    <button
+                      v-if="!isAlreadyInBar(cocktail.id)"
+                      @click="handleImport(cocktail)"
+                      :disabled="importing === cocktail.id"
+                      class="btn-modal-primary catalog-btn-import"
+                    >
+                      {{ importing === cocktail.id ? '⏳' : (locale === 'fr' ? '⬇ Importer' : '⬇ Import') }}
+                    </button>
+                    <span v-else class="catalog-badge catalog-badge--done">
+                      ✓ {{ locale === 'fr' ? 'Déjà dans votre bar' : 'Already in your bar' }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="catalog-item-footer">
-              <div class="catalog-chip-row">
-                <span v-if="cocktail.base_spirit" class="catalog-chip">{{ getTypeLabel(cocktail.base_spirit, locale) }}</span>
-                <span v-if="cocktail.cocktail_style" class="catalog-chip">{{ STYLE_LABELS[cocktail.cocktail_style] || cocktail.cocktail_style }}</span>
+            <div class="catalog-item-image-column">
+              <div v-if="cocktail.image" class="catalog-item-image-wrap">
+                <img :src="cocktail.image" :alt="cocktail.name" class="catalog-item-image" loading="lazy" />
               </div>
-
-              <div class="catalog-item-image-actions">
-                <button
-                  v-if="!isAlreadyInBar(cocktail.id)"
-                  @click="handleImport(cocktail)"
-                  :disabled="importing === cocktail.id"
-                  class="btn-modal-primary catalog-btn-import"
-                >
-                  {{ importing === cocktail.id ? '⏳' : (locale === 'fr' ? '⬇ Importer' : '⬇ Import') }}
-                </button>
-                <span v-else class="catalog-badge catalog-badge--done">
-                  ✓ {{ locale === 'fr' ? 'Déjà dans votre bar' : 'Already in your bar' }}
-                </span>
+              <div v-else class="catalog-item-image-wrap catalog-item-image-placeholder">
+                <Martini :size="28" />
               </div>
             </div>
           </div>
