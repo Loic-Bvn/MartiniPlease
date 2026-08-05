@@ -1,5 +1,12 @@
 # TODO
 
+- systeme de notes sur 5 ?
+
+## Bartender tools
+- fix checkbox autoriser commande / partage
+- Ajouter checkbox pour affichage des prix coté drinker
+- Bouton commander en mode drinker en fonctionne pas
+
 ## Allow bartender to customize features
 - Permettre au bartender d'activer/desactiver des features
     - Commander

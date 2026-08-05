@@ -1752,6 +1752,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   padding: 1rem 1.5rem;
   z-index: 10;
   box-shadow: var(--shadow-md);
@@ -1763,6 +1764,7 @@ body {
   gap: 0.4rem;
   width: 80px;
   justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .cv-back {
@@ -1788,6 +1790,8 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.15rem;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .cv-title {
@@ -1796,6 +1800,10 @@ body {
   color: var(--gold);
   letter-spacing: 1px;
   text-transform: uppercase;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cv-meta {
@@ -1803,6 +1811,46 @@ body {
   color: var(--text-dim);
   font-weight: 500;
   letter-spacing: 0.5px;
+}
+
+/* ── Menu carte : écrans étroits / mobile ──────
+   Sur mobile, les 3 switches (langue, unité, vue) + le thème
+   ne tiennent pas dans le header et finissaient par se recouvrir.
+   On retire langue/unité et on repasse le switch vue en icône seule. */
+@media (max-width: 640px) {
+  .cv-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .cv-back {
+    width: auto;
+    padding: 0.4rem;
+  }
+
+  .cv-back-label {
+    display: none;
+  }
+
+  .cv-title {
+    font-size: 0.85rem;
+  }
+
+  .cv-meta {
+    display: none;
+  }
+
+  .cv-header-actions {
+    width: auto;
+  }
+
+  .cv-lang-switch,
+  .cv-unit-switch {
+    display: none;
+  }
+
+  .cv-view-toggle .view-toggle-label {
+    display: none;
+  }
 }
 
 .cv-empty {
@@ -2493,6 +2541,11 @@ body {
   }
 
   .cocktails-grid:not(.cocktails-grid--standard) { grid-template-columns: 1fr; }
+
+  /* Vue standard sur mobile : priorité à la photo + l'ingrédient, on
+     masque les quantités pour ne pas surcharger la carte. */
+  .cocktail-card-standard .ingredient-quantity { display: none; }
+  .cocktail-card-standard .ingredient-info::after { display: none; }
   .chips-container { gap: 0.3rem; }
   .chip { padding: 0.25rem 0.6rem; font-size: 0.65rem; }
   
