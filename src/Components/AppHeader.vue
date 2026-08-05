@@ -93,7 +93,7 @@
           {{ toastMessage }}
         </div>
 
-          <!-- Menu burger tout à droite (bartender uniquement) --><!-- Menu burger tout à droite -->
+          <!-- Menu burger tout à droite (bartender uniquement) -->
           <div v-if="isLoggedIn" class="burger-wrapper">
             <button 
               @click="burgerOpen = !burgerOpen" 
@@ -140,10 +140,37 @@
                 </div>
 
                 <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
-                <label v-for="(label, key) in FEATURE_LABELS" :key="key" class="burger-item burger-item--toggle">
-                  <input type="checkbox" :checked="features[key]" @change="setFeature(key, $event.target.checked)" />
-                  <span>{{ label }}</span>
-                </label>
+
+                <button
+                  v-if="activeBarId && !showBarsSelection"
+                  @click="setFeature('order', !isFeatureEnabled('order'))"
+                  class="burger-item burger-item--toggle"
+                >
+                  <HandPlatter :size="15" />
+
+                  <span>{{ locale === 'fr' ? 'Autoriser commandes' : 'Allow orders' }}</span>
+
+                  <!-- Toggle -->
+                  <div class="toggle-switch" :class="{ 'on': isFeatureEnabled('order') }">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </button>
+
+
+                <button
+                  v-if="activeBarId && !showBarsSelection"
+                  @click="setFeature('showPrices', !isFeatureEnabled('showPrices'))"
+                  class="burger-item burger-item--toggle"
+                >
+                  <Euro :size="15" />
+
+                  <span>{{ locale === 'fr' ? 'Afficher prix' : 'Show prices' }}</span>
+
+                  <!-- Toggle -->
+                  <div class="toggle-switch" :class="{ 'on': isFeatureEnabled('showPrices') }">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </button>
 
                 <button 
                   v-if="activeBarId && !showBarsSelection" 
@@ -216,11 +243,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link, Check, Folder, Martini, Key} from 'lucide-vue-next'
+import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link, Check, Folder, Martini, Key, HandPlatter, Euro} from 'lucide-vue-next'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
-import { useBarFeatures, FEATURE_LABELS } from '@/composables/useBarFeatures'
+import { useBarFeatures } from '@/composables/useBarFeatures'
 
-const { features, setFeature } = useBarFeatures()
+const { isFeatureEnabled, setFeature } = useBarFeatures()
 
 const props = defineProps({
   isLoggedIn: Boolean,

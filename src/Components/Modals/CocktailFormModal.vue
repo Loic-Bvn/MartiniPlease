@@ -496,6 +496,8 @@ const form = ref({
   creation_year: props.cocktail?.creation_year   ?? '',
   cocktail_style: props.cocktail?.cocktail_style ?? '',
   ice:            props.cocktail?.ice            ?? '',
+  price:          props.cocktail?.price           ?? null,
+  image:          props.cocktail?.image           ?? '',
   season:  [...(props.cocktail?.season  ?? [])],
   profile: [...(props.cocktail?.profile ?? [])],
   tags:    [...(props.cocktail?.tags    ?? [])],

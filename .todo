@@ -2,26 +2,16 @@
 
 - systeme de notes sur 5 ?
 
+## Cocktail Form
+Rendre editable la valeur ingrédient dans la recette du cocktail
+Ajd on affiche le type (genre Rye) mais si on veut spécifier une référence, on peut pas -> permettre de renseigner des détails sur la bouteille/nom du produit (genre RittenHouse) -> mode expert ?
+-> Comment faire avec la gestion des ingrédients ? Faire des sous catégories par produit ?
+
+
 ## Bartender tools
-- fix checkbox autoriser commande / partage
-- Ajouter checkbox pour affichage des prix coté drinker
-- Bouton commander en mode drinker en fonctionne pas
-
-## Allow bartender to customize features
-- Permettre au bartender d'activer/desactiver des features
-    - Commander
-    - Partager
-    - Autres ?
-
-## Pricing
-- Coté bartender:
-    - afficher cout de preparation en matiere premiere des cocktails (cout d'une unité x quantité de l'ingredient)
-    - cost_calculator, renseigner pour chaque ingrédient, le cout d'une unité
-- Coté drinker
-    - afficher cout cocktail (selon values set par bartender)
+- Menu burger - autoriser la commande: remplacer la checkbox par un switch. Si autoriser commande == false, ne pas afficher le bouton commander coté drinkers
 
 ## Batching
-- Corriger affichage de la modal
 - On a une table en BDD qui sert a rien
 
 ## Validation des inscriptions
@@ -29,7 +19,7 @@ Lors de la création d'un bar par un nouvel utilisateur (nouvel EMAIL), forcer l
 
 Systeme mit en place, pas d'email recu ---> a verifier
 
-## Robusitification de l'app
+## Robustification de l'app
 
 ## Versionning
 Gerer la création de tag et l'hebergement pas version tagguée

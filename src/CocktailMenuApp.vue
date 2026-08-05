@@ -231,6 +231,7 @@
             :isBartenderMode="isLoggedIn"
             :bar-id="activeBarId"
             @close="closeCocktailDetailModal"
+            @edit="(c) => { closeCocktailDetailModal(); openEditCocktailFormModal(c) }"
           />
         </Transition>
       </div>

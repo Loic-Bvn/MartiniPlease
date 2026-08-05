@@ -135,11 +135,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { ArrowLeft, GlassWater, Rows3, GalleryVerticalEnd } from 'lucide-vue-next'
 import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
-import { useDrinker } from '@/composables/useDrinker'
-import { useOrders } from '@/composables/useOrders'
 import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
 import CocktailCard from '@/Components/CocktailCard.vue'
@@ -221,29 +219,7 @@ const groupedCocktails = computed(() => {
 })
 
 const { isLoggedIn } = useAuth()
-const { hasDrinker, drinker, quickRefreshHistory } = useDrinker()
-const checkedIds = ref(new Set())
-const { addOrder } = useOrders()
-const { showToast, toastMessage } = useToast()
-
-async function handleHistoric(cocktail) {
-  if (!cocktail?.id) return
-  if (checkedIds.value.has(cocktail.id)) return
-  if (!hasDrinker.value || !drinker.value || !props.barId) return
-
-  const result = await addOrder(drinker.value, cocktail.id, props.barId)
-
-  if (result.success) {
-    await quickRefreshHistory()
-    showToast('🍸 ' + cocktail.name + (props.locale === 'fr' ? ' commandé !' : ' ordered!'))
-    checkedIds.value = new Set([...checkedIds.value, cocktail.id])
-    setTimeout(() => {
-      const next = new Set(checkedIds.value)
-      next.delete(cocktail.id)
-      checkedIds.value = next
-    }, 900)
-  }
-}
+const { toastMessage } = useToast()
 
 function handleOpenCocktail(cocktail, rect) {
   emit('open-cocktail', cocktail, rect)

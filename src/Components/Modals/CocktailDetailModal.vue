@@ -4,11 +4,7 @@
       <div class="modal-header" @touchstart="onHeaderTouchStart" @touchmove="onHeaderTouchMove" @touchend="onHeaderTouchEnd">
         <div class="cocktail-title-row">
           <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-            <!-- TODO: Handle price -->
-            {{ cocktail.name }}<span v-if="cocktail.price"> - {{ cocktail.price }}€</span>
-            <!-- TODO: updater le v-if pour debloquer affichage prix  -->
-
-            <!-- {{ cocktail.name }} - {{ cocktail.abv }}° -->
+            {{ cocktail.name }}<span v-if="cocktail.price && showPrices"> - {{ cocktail.price }}€</span>
           </h3>
         </div>
 
@@ -23,7 +19,7 @@
             <Heart :size="18" :fill="isFav ? 'currentColor' : 'none'" />
           </button>
           <button
-            v-if="hasDrinker && !isBartenderMode"
+            v-if="hasDrinker && !isBartenderMode && isFeatureEnabled('order')"
             type="button"
             @click="handleOrder"
             :disabled="isOrdering"
@@ -40,6 +36,15 @@
           >
             <Upload :size="18" />
           </button> -->
+
+          <button
+            v-if="isBartenderMode"
+            @click="$emit('edit', cocktail)"
+            class="btn-icon btn-icon--edit"
+            :title="props.locale === 'fr' ? 'Modifier' : 'Edit'"
+          >
+            <Pencil :size="18" />
+          </button>
 
           <button 
             v-if="isBartenderMode"
@@ -60,6 +65,13 @@
           >
             <Upload :size="18" />
           </button>
+          <span
+            v-else-if="props.isBartenderMode && props.cocktail.is_private"
+            class="btn-icon btn-icon--submitted"
+            :title="props.locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
+          >
+            <Bookmark :size="18" />
+          </span>
           <button
             type="button"
             @click="handleShare"
@@ -267,7 +279,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel} from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil} from 'lucide-vue-next'
 import {
   getTypeLabel,
   getProfileLabel,
@@ -280,7 +292,11 @@ import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
+import { useBarFeatures } from '@/composables/useBarFeatures'
 import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
+
+const { isFeatureEnabled } = useBarFeatures()
+const showPrices = computed(() => isFeatureEnabled('showPrices'))
 
 const TAB_COUNT = 3
 const TAB_WIDTH = 100 / TAB_COUNT
@@ -297,7 +313,7 @@ const props = defineProps({
   unit:            { type: String, default: 'oz' },
   barId:           { type: String, default: '' },
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'edit'])
 const imageError = ref(false)
 const modalEl = ref(null)
 

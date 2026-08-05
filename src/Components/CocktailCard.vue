@@ -26,8 +26,7 @@
         <div class="min-w-0 flex-1">
           <div class="cocktail-title-row">
             <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-              {{ cocktail.name }} <span v-if="cocktail.price"> - {{ cocktail.price }}€</span>
-              <!-- TODO: updater le v-if pour debloquer affichage prix  -->
+              {{ cocktail.name }} <span v-if="cocktail.price && showPrices"> - {{ cocktail.price }}€</span>
             </h3>
             <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
           </div>
@@ -83,12 +82,13 @@
             <Heart :size="18" :fill="isFav ? 'currentColor' : 'none'" />
           </button>
           <button
-            v-if="hasDrinker && !isBartenderMode"
+            v-if="hasDrinker && !isBartenderMode && ordersEnabled"
             @click.stop="handleHistoric"
             class="btn-icon"
-            title="Commander"
+            :title="isChecked ? (locale === 'fr' ? 'Commandé !' : 'Ordered!') : (locale === 'fr' ? 'Commander' : 'Order')"
           >
-            <HandPlatter :size="18" />
+            <Check v-if="isChecked" :size="18" />
+            <HandPlatter v-else :size="18" />
           </button>
 
           <template v-if="showCocktailActions && isBartenderMode">
@@ -130,6 +130,12 @@ import { useOrders } from '@/composables/useOrders'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
+import { useBarFeatures } from '@/composables/useBarFeatures'
+
+const { isFeatureEnabled } = useBarFeatures()
+const showPrices = computed(() => isFeatureEnabled('showPrices'))
+const ordersEnabled = computed(() => isFeatureEnabled('order'))
+console.log("showPrices: " + isFeatureEnabled('showPrices'))
 
 const { isSubmitted, submitToCatalog } = useCatalog()
 const isChecked = ref(false)
@@ -176,7 +182,7 @@ async function handleFavorite() {
 }
 
 async function handleHistoric() {
-  
+
   if (isChecked.value) {
     console.warn('⚠️ Already checked, ignoring')
     return
@@ -196,10 +202,15 @@ async function handleHistoric() {
 
   // Créer une commande pour le bartender
   const result = await addOrder(drinker.value, props.cocktail.id, props.barId)
-  
+
   if (result.success) {
     await quickRefreshHistory()
     showToast('🍸 ' + props.cocktail.name + (props.locale === 'fr' ? ' commandé !' : ' ordered!'))
+    // Retour visuel (icône check) + garde-fou anti double-commande pendant 900ms
+    isChecked.value = true
+    setTimeout(() => {
+      isChecked.value = false
+    }, 900)
   } else {
     console.error('❌ Order failed:', result.error)
   }

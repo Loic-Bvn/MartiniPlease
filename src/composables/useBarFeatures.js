@@ -12,13 +12,13 @@ import { useToast } from '@/composables/useToast'
 // ou nouvelle feature ajoutée plus tard sans backfill).
 const FEATURE_DEFAULTS = {
   order: true,
-  share: true,
+  showPrices: false,
 }
 
 // Libellés pour l'UI de settings du bartender.
 export const FEATURE_LABELS = {
-  order: 'Commander',
-  share: 'Partager',
+  order: 'Autoriser les commandes',
+  showPrices: 'Afficher les prix sur les cartes',
 }
 
 export function useBarFeatures() {
@@ -36,7 +36,7 @@ export function useBarFeatures() {
 
   /**
    * Active/désactive une feature pour le bar courant.
-   * @param {string} key - ex: 'order', 'share'
+   * @param {string} key - ex: 'order', 'showPrices'
    * @param {boolean} value
    */
   async function setFeature(key, value) {
