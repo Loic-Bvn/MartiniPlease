@@ -5,7 +5,7 @@
     <div class="cv-header">
       <button @click="$emit('close')" class="cv-back">
         <ArrowLeft :size="18" />
-        {{ t.back }}
+        <span class="cv-back-label">{{ t.back }}</span>
       </button>
       <div class="cv-title-block">
         <h1 class="cv-title">{{ card.name }}</h1>
@@ -13,7 +13,7 @@
       </div>
       <div class="cv-header-actions">
         <div
-          class="settings-switch"
+          class="settings-switch cv-lang-switch"
           role="group"
           aria-label="Language switch"
           @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
@@ -37,7 +37,7 @@
         </div>
 
         <div
-          class="settings-switch"
+          class="settings-switch cv-unit-switch"
           role="group"
           aria-label="Unit switch"
           @click="$emit('set-unit', unit === 'oz' ? 'ml' : 'oz')"
@@ -61,7 +61,7 @@
         </div>
 
         <div
-          class="settings-switch"
+          class="settings-switch cv-view-toggle"
           role="group"
           aria-label="Card view switch"
           @click="$emit('set-card-view', cardView === 'compact' ? 'standard' : 'compact')"
@@ -72,7 +72,8 @@
             :class="{ 'view-toggle-btn--active': cardView === 'compact' }"
             :title="locale === 'fr' ? 'Vue compacte' : 'Compact view'"
           >
-            <span>{{ locale === 'fr' ? 'Compacte' : 'Compact' }}</span>
+            <Rows3 :size="16" />
+            <span class="view-toggle-label">{{ locale === 'fr' ? 'Compacte' : 'Compact' }}</span>
           </button>
           <button
             type="button"
@@ -80,7 +81,8 @@
             :class="{ 'view-toggle-btn--active': cardView === 'standard' }"
             :title="locale === 'fr' ? 'Vue standard' : 'Standard view'"
           >
-            <span>{{ locale === 'fr' ? 'Standard' : 'Standard' }}</span>
+            <GalleryVerticalEnd :size="16" />
+            <span class="view-toggle-label">{{ locale === 'fr' ? 'Standard' : 'Standard' }}</span>
           </button>
         </div>
 
@@ -133,8 +135,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { ArrowLeft, GlassWater } from 'lucide-vue-next'
+import { ref, computed } from 'vue'
+import { ArrowLeft, GlassWater, Rows3, GalleryVerticalEnd } from 'lucide-vue-next'
 import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
@@ -148,7 +150,7 @@ const props = defineProps({
   cocktails: { type: Array,  default: () => [] },
   locale:    { type: String, default: 'fr' },
   unit:      { type: String, default: 'oz' },
-  cardView:  { type: String, default: 'compact' },
+  cardView:  { type: String, default: 'standard' },
   barId:     { type: String, default: '' },
 })
 
@@ -161,24 +163,6 @@ const emit = defineEmits([
   'edit-cocktail',
   'delete-cocktail'
 ])
-// Dark mode — même logique que ThemeToggle
-const isDark = ref(false)
-
-onMounted(() => {
-  const saved = localStorage.getItem('theme')
-  if (saved) {
-    isDark.value = saved === 'dark'
-  } else {
-    isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
-})
-
-function toggleDark() {
-  isDark.value = !isDark.value
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-  document.documentElement.classList.toggle('dark', isDark.value)
-}
-
 const t = computed(() => ({
   back:    props.locale === 'fr' ? 'Retour'                          : 'Back',
   empty:   props.locale === 'fr' ? 'Aucun cocktail dans cette carte.' : 'No cocktail in this card.',

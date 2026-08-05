@@ -140,7 +140,7 @@ const props = defineProps({
   locale:              { type: String, default: 'fr' },
   unit:                { type: String, default: 'oz' },
   barId:               { type: String, default: '' },
-  viewMode:            { type: String, default: 'compact' }, // 'compact' | 'standard'
+  viewMode:            { type: String, default: 'standard' }, // 'compact' | 'standard'
 })
 const { showToast } = useToast()
 const cardEl = ref(null)
