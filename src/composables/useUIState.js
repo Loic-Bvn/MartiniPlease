@@ -12,9 +12,9 @@ import { ref } from 'vue'
 const locale = ref('fr')   // 'fr' | 'en'
 const unit   = ref('oz')   // 'oz' | 'ml'
 
-// Vue des cartes cocktails : 'compact' (actuelle, sans photo) | 'standard' (avec photo)
+// Vue des cartes cocktails : 'compact' (sans photo) | 'standard' (avec photo, défaut)
 // Préférence mémorisée d'une session à l'autre.
-const cardView = ref(localStorage.getItem('cardView') || 'compact')
+const cardView = ref(localStorage.getItem('cardView') || 'standard')
 
 // ── Page légale ───────────────────────────────────────────────────────────────
 const currentLegalPage = ref(null)  // null | 'legal-notice' | 'privacy-policy' | 'terms-of-use' | 'cookies-policy'

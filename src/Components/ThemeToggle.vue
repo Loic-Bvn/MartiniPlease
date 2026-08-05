@@ -25,28 +25,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
 import { Sun, Moon } from 'lucide-vue-next'
+import { useTheme } from '@/composables/useTheme'
 
-const isDark = ref(false)
-
-onMounted(() => {
-  const saved = localStorage.getItem('theme')
-  if (saved) {
-    isDark.value = saved === 'dark'
-  } else {
-    isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
-  applyTheme()
-})
-
-function setTheme(nextDark) {
-  isDark.value = nextDark
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-  applyTheme()
-}
-
-function applyTheme() {
-  document.documentElement.classList.toggle('dark', isDark.value)
-}
+// État partagé (singleton) : évite la désynchronisation entre les
+// différentes instances de ThemeToggle (header principal + vue carte).
+const { isDark, setTheme } = useTheme()
 </script>

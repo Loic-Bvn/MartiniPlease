@@ -190,7 +190,7 @@ const props = defineProps({
   pendingOrdersCount: Number,
   locale:            String,
   unit:              String,
-  cardView:          { type: String, default: 'compact' }, // 'compact' | 'standard'
+  cardView:          { type: String, default: 'standard' }, // 'compact' | 'standard'
   barInventory:      Set,
   ingredients:       Array,
   searchTerm:        String,
