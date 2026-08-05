@@ -1,15 +1,16 @@
 # TODO
 
+## Ingredient / Stock du bar
+- Reorganiser l'ordre des ingredients (aucun sens comme ca)
+- Set prix par defaut dans base
+
+## Suggestions
 - systeme de notes sur 5 ?
 
 ## Cocktail Form
 Rendre editable la valeur ingrédient dans la recette du cocktail
 Ajd on affiche le type (genre Rye) mais si on veut spécifier une référence, on peut pas -> permettre de renseigner des détails sur la bouteille/nom du produit (genre RittenHouse) -> mode expert ?
 -> Comment faire avec la gestion des ingrédients ? Faire des sous catégories par produit ?
-
-
-## Bartender tools
-- Menu burger - autoriser la commande: remplacer la checkbox par un switch. Si autoriser commande == false, ne pas afficher le bouton commander coté drinkers
 
 ## Batching
 - On a une table en BDD qui sert a rien

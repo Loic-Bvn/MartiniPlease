@@ -131,14 +131,12 @@ import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
+// const { showPrices, ordersEnabled } = useBarFeatures()
 
-const { isFeatureEnabled } = useBarFeatures()
-const showPrices = computed(() => isFeatureEnabled('showPrices'))
-const ordersEnabled = computed(() => isFeatureEnabled('order'))
-console.log("showPrices: " + isFeatureEnabled('showPrices'))
 
-const { isSubmitted, submitToCatalog } = useCatalog()
 const isChecked = ref(false)
+const cardEl = ref(null)
+const imageError = ref(false)
 const props = defineProps({
   cocktail:            Object,
   isBartenderMode:     { type: Boolean, default: false },
@@ -148,22 +146,23 @@ const props = defineProps({
   barId:               { type: String, default: '' },
   viewMode:            { type: String, default: 'standard' }, // 'compact' | 'standard'
 })
+const { isSubmitted, submitToCatalog } = useCatalog()
 const { showToast } = useToast()
-const cardEl = ref(null)
-const imageError = ref(false)
-
-const emit = defineEmits(['edit', 'delete', 'open'])
-
-const { barInventory }                             = useInventory()
+const { barInventory } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
+const baseSpiritLabel = computed(() => getTypeLabel(props.cocktail.base_spirit, props.locale))
+const { isFeatureEnabled } = useBarFeatures(props.barId)
+const showPrices = computed(() => isFeatureEnabled('showPrices'))
+const ordersEnabled = computed(() => isFeatureEnabled('order'))
+
+const emit = defineEmits(['edit', 'delete', 'open'])
 
 const t = computed(() => ({
   makeable: props.locale === 'fr' ? 'Disponible' : 'Available',
   notMakeable: props.locale === 'fr' ? 'Non disponible' : 'Not available',
 }))
 
-const baseSpiritLabel = computed(() => getTypeLabel(props.cocktail.base_spirit, props.locale))
 
 function isAvailable(ing) {
   if (ing.Type === 'garnish') return true
