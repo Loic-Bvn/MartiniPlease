@@ -135,7 +135,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { ArrowLeft, GlassWater, Rows3, GalleryVerticalEnd } from 'lucide-vue-next'
 import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { useToast } from '@/composables/useToast'
