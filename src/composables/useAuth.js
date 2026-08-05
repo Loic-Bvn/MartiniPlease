@@ -187,6 +187,14 @@ export function useAuth() {
       bar.value  = barData
       bars.value = []
       persistBarId(barData.id)
+
+      // Email de bienvenue — fire-and-forget, ne doit jamais bloquer l'inscription.
+      // Appelé uniquement ici (signUp), jamais dans createNewBar() : garantit
+      // qu'un même utilisateur ne reçoit ce mail qu'une seule fois.
+      supabase.functions
+        .invoke('send-welcome-email', { body: { email, barName } })
+        .catch(err => console.error('send-welcome-email:', err))
+
       return { success: true, data: barData }
     } catch (err) {
       authError.value = err.message

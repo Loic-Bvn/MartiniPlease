@@ -1,9 +1,5 @@
 # TODO
 
-## Ingredient / Stock du bar
-- Reorganiser l'ordre des ingredients (aucun sens comme ca)
-- Set prix par defaut dans base
-
 ## Suggestions
 - systeme de notes sur 5 ?
 
@@ -15,17 +11,9 @@ Ajd on affiche le type (genre Rye) mais si on veut spécifier une référence, o
 ## Batching
 - On a une table en BDD qui sert a rien
 
-## Validation des inscriptions
-Lors de la création d'un bar par un nouvel utilisateur (nouvel EMAIL), forcer la validation par moi (via envoie d'un mail a loic.bienvenu.pro@gmail.com) et informer l'utilisateur (afin d'empecher la création de bar a tout va)
-
-Systeme mit en place, pas d'email recu ---> a verifier
 
 ## Robustification de l'app
 
 ## Versionning
 Gerer la création de tag et l'hebergement pas version tagguée
 Afficher la version actuelle du site dans le footer
-
-## Bibliotheque de cocktials
-utiliser le bar MartiniPlease comme bibliotheque de cocktail a compelter pour agrandir le cocktail catalog
-(Renomer le bar demo en MartiniPlease ?)
