@@ -495,6 +495,19 @@ async function onAuthSuccess() {
   // explicitement pour que currentBarId soit déjà set
   await fetchBar()
   if (!currentBarId.value) return
+
+  // Filet de sécurité : signUp() crée le bar mais n'initialise pas ses
+  // ingrédients par défaut (contrairement à handleCreateNewBar). Comme
+  // initializeDefaultIngredients() est idempotente (elle vérifie s'il y a
+  // déjà des lignes avant d'insérer), on peut l'appeler ici à chaque
+  // connexion sans risque de doublons : elle ne popule que si la table
+  // ingredients est vide pour ce bar.
+  try {
+    await initializeDefaultIngredients(currentBarId.value)
+  } catch (err) {
+    console.error('⚠️ Error initializing ingredients:', err)
+  }
+
   await loadBarData(currentBarId.value)
 }
 

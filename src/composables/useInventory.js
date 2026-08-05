@@ -192,6 +192,10 @@ export function useInventory() {
         category: ing.category,
         family: ing.family,
         abv: ing.abv,
+        pricing_mode: ing.pricing_mode ?? 'bottle',
+        bottle_volume_ml: ing.bottle_volume_ml ?? null,
+        bottle_price: ing.bottle_price ?? null,
+        price_per_ml: ing.price_per_ml ?? null,
         bar_id: targetBarId,
         available: false,
       }))
