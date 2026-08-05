@@ -176,18 +176,31 @@ const totalCount = computed(() => ingredients.value.length)
 
 const categorizedIngredients = computed(() => {
   const groups = {}
+
   ingredients.value.forEach(ing => {
     if (!groups[ing.category]) groups[ing.category] = []
     groups[ing.category].push(ing)
   })
-  return Object.entries(groups).map(([key, ings]) => ({
-    key,
-    label: categoryMetadata[key]?.label || key,
-    icon:  categoryMetadata[key]?.icon  || '📦',
-    ingredients: ings,
-    selectedCount: ings.filter(i => i.available).length,
-    allSelected:   ings.every(i => i.available),
-  }))
+
+  const orderedKeys = [
+    ...Object.keys(categoryMetadata),
+    ...Object.keys(groups).filter(key => !categoryMetadata[key])
+  ]
+
+  return orderedKeys
+    .filter(key => groups[key])
+    .map(key => {
+      const ings = groups[key]
+
+      return {
+        key,
+        label: categoryMetadata[key]?.label || key,
+        icon: categoryMetadata[key]?.icon || '📦',
+        ingredients: ings,
+        selectedCount: ings.filter(i => i.available).length,
+        allSelected: ings.every(i => i.available),
+      }
+    })
 })
 
 const searchResults = computed(() => {
