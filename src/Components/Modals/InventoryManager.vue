@@ -11,6 +11,14 @@
           <Square :size="16" /> Tout désélectionner
         </button>
       </div>
+
+      <div class="inventory-stats">
+        <div class="stat">
+          <span class="stat-label">Sélectionnés :</span>
+          <span class="stat-value">{{ selectedCount }} / {{ totalCount }}</span>
+        </div>
+      </div>
+
     </div>
 
     <!-- Recherche -->
@@ -25,12 +33,12 @@
     </div>
 
     <!-- Stats -->
-    <div class="inventory-stats">
+    <!-- <div class="inventory-stats">
       <div class="stat">
         <span class="stat-label">Sélectionnés :</span>
         <span class="stat-value">{{ selectedCount }} / {{ totalCount }}</span>
       </div>
-    </div>
+    </div> -->
 
     <div v-if="loading" class="loading-state">
       Chargement...
@@ -83,7 +91,12 @@
         </div>
 
         <div class="category-body" v-show="isExpanded(category.key)">
-          <div class="ingredient-item" v-for="ing in category.ingredients" :key="ing.type">
+          <div
+            class="ingredient-item"
+            :class="{ 'ingredient-item--priced': hasIngredient(ing.type) }"
+            v-for="ing in category.ingredients"
+            :key="ing.type"
+          >
             <input
               type="checkbox"
               class="ingredient-checkbox"

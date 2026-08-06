@@ -3,7 +3,16 @@
 ## Suggestions
 - systeme de notes sur 5 ?
 
+## Ingredients
+- Impossible d'ajouter un ingredient (rework necessaire -> gestion des ref en +)
+
+## Onglet commande (bartender)
+- Améliorer affichage des commandes
+- ameliorer ergonomie (bouton pour tout valider par exemple)
+
 ## Cocktail Form
+Gérer les différentes références de bouteilles (par ex categorie rhum cubaiun, reference: havanna club 3 ans, bacardi, etc)
+-> element impactés: db ingredient, vue gestion des ingredients, vue création cocktail, vue affichage recette de cocktail (on aurait catégorie et référence a gérer suivant les infos qu'on veut afficher)
 Rendre editable la valeur ingrédient dans la recette du cocktail
 Ajd on affiche le type (genre Rye) mais si on veut spécifier une référence, on peut pas -> permettre de renseigner des détails sur la bouteille/nom du produit (genre RittenHouse) -> mode expert ?
 -> Comment faire avec la gestion des ingrédients ? Faire des sous catégories par produit ?
@@ -11,8 +20,8 @@ Ajd on affiche le type (genre Rye) mais si on veut spécifier une référence, o
 ## Batching
 - On a une table en BDD qui sert a rien
 
-
 ## Robustification de l'app
+- ?
 
 ## Versionning
 Gerer la création de tag et l'hebergement pas version tagguée
