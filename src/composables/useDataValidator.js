@@ -20,6 +20,12 @@ export function cleanRecipe(recipe) {
       if (typeValue) {
         cleaned.Type = typeValue
       }
+
+      // Reference est optionnelle - référence précise de bouteille choisie (nom, pas d'id)
+      const referenceValue = ing.Reference?.trim?.()
+      if (referenceValue) {
+        cleaned.Reference = referenceValue
+      }
       
       // Convertir Oz en nombre si présent
       if (ing.Oz !== null && ing.Oz !== undefined && ing.Oz !== '') {

@@ -11,14 +11,6 @@
           <Square :size="16" /> Tout désélectionner
         </button>
       </div>
-
-      <div class="inventory-stats">
-        <div class="stat">
-          <span class="stat-label">Sélectionnés :</span>
-          <span class="stat-value">{{ selectedCount }} / {{ totalCount }}</span>
-        </div>
-      </div>
-
     </div>
 
     <!-- Recherche -->
@@ -33,12 +25,12 @@
     </div>
 
     <!-- Stats -->
-    <!-- <div class="inventory-stats">
+    <div class="inventory-stats">
       <div class="stat">
         <span class="stat-label">Sélectionnés :</span>
         <span class="stat-value">{{ selectedCount }} / {{ totalCount }}</span>
       </div>
-    </div> -->
+    </div>
 
     <div v-if="loading" class="loading-state">
       Chargement...
@@ -91,34 +83,96 @@
         </div>
 
         <div class="category-body" v-show="isExpanded(category.key)">
-          <div
-            class="ingredient-item"
-            :class="{ 'ingredient-item--priced': hasIngredient(ing.type) }"
-            v-for="ing in category.ingredients"
-            :key="ing.type"
-          >
-            <input
-              type="checkbox"
-              class="ingredient-checkbox"
-              :checked="hasIngredient(ing.type)"
-              @change="toggleIngredient(ing.type)"
-            />
-            <span class="ingredient-name">{{ ing.name }}</span>
-            <div class="ingredient-pricing" v-if="hasIngredient(ing.type)">
-              <select v-model="ing.pricing_mode" @change="updateIngredientPricing(ing.type, { pricing_mode: ing.pricing_mode })">
-                <option value="bottle">Bouteille</option>
-                <option value="ml">Au ml</option>
-              </select>
-              <template v-if="ing.pricing_mode === 'ml'">
-                <input type="number" step="0.001" v-model.number="ing.price_per_ml"
-                  @change="updateIngredientPricing(ing.type, { price_per_ml: ing.price_per_ml })" placeholder="€/ml" />
-              </template>
-              <template v-else>
-                <input type="number" step="0.5" v-model.number="ing.bottle_price"
-                  @change="updateIngredientPricing(ing.type, { bottle_price: ing.bottle_price })" placeholder="€ bouteille" />
-                <input type="number" step="10" v-model.number="ing.bottle_volume_ml"
-                  @change="updateIngredientPricing(ing.type, { bottle_volume_ml: ing.bottle_volume_ml })" placeholder="ml" />
-              </template>
+          <div class="ingredient-item-wrap" v-for="ing in category.ingredients" :key="ing.type">
+            <div class="ingredient-item">
+              <input
+                type="checkbox"
+                class="ingredient-checkbox"
+                :checked="hasIngredient(ing.type)"
+                @change="toggleIngredient(ing.type)"
+              />
+              <span class="ingredient-name">{{ ing.name }}</span>
+              <button
+                v-if="(ing.references || []).length"
+                type="button"
+                class="badge-references"
+                @click.stop="toggleReferencesExpanded(ing.type)"
+                :title="'Gérer les références'"
+              >
+                {{ (ing.references || []).length }} réf.
+              </button>
+              <button
+                v-else
+                type="button"
+                class="btn-manage-references"
+                @click.stop="toggleReferencesExpanded(ing.type)"
+                title="Gérer les références"
+              >
+                <BookPlus :size="14" />
+              </button>
+              <div class="ingredient-pricing" v-if="hasIngredient(ing.type)">
+                <select v-model="ing.pricing_mode" @change="updateIngredientPricing(ing.type, { pricing_mode: ing.pricing_mode })">
+                  <option value="bottle">Bouteille</option>
+                  <option value="ml">Au ml</option>
+                </select>
+                <template v-if="ing.pricing_mode === 'ml'">
+                  <input type="number" step="0.001" v-model.number="ing.price_per_ml"
+                    @change="updateIngredientPricing(ing.type, { price_per_ml: ing.price_per_ml })" placeholder="€/ml" />
+                </template>
+                <template v-else>
+                  <input type="number" step="0.5" v-model.number="ing.bottle_price"
+                    @change="updateIngredientPricing(ing.type, { bottle_price: ing.bottle_price })" placeholder="€ bouteille" />
+                  <input type="number" step="10" v-model.number="ing.bottle_volume_ml"
+                    @change="updateIngredientPricing(ing.type, { bottle_volume_ml: ing.bottle_volume_ml })" placeholder="ml" />
+                </template>
+              </div>
+            </div>
+
+            <!-- Références (mode expert, opt-in, replié par défaut) -->
+            <div class="references-panel" v-show="isReferencesExpanded(ing.type)">
+              <div class="reference-row" v-for="ref in (ing.references || [])" :key="ref.id">
+                <input
+                  type="checkbox"
+                  :checked="ref.available"
+                  @change="toggleReferenceAvailable(ing.type, ref.id)"
+                />
+                <span class="reference-name">{{ ref.name }}</span>
+                <div class="reference-pricing" v-if="ref.available">
+                  <input type="number" step="0.5" :value="ref.abv"
+                    @change="updateReference(ing.type, ref.id, { abv: parseFloat($event.target.value) || null })" placeholder="% abv" class="reference-abv-input" />
+                  <select :value="ref.pricing_mode" @change="updateReference(ing.type, ref.id, { pricing_mode: $event.target.value })">
+                    <option value="bottle">Bouteille</option>
+                    <option value="ml">Au ml</option>
+                  </select>
+                  <template v-if="ref.pricing_mode === 'ml'">
+                    <input type="number" step="0.001" :value="ref.price_per_ml"
+                      @change="updateReference(ing.type, ref.id, { price_per_ml: parseFloat($event.target.value) || null })" placeholder="€/ml" />
+                  </template>
+                  <template v-else>
+                    <input type="number" step="0.5" :value="ref.bottle_price"
+                      @change="updateReference(ing.type, ref.id, { bottle_price: parseFloat($event.target.value) || null })" placeholder="€ bouteille" />
+                    <input type="number" step="10" :value="ref.bottle_volume_ml"
+                      @change="updateReference(ing.type, ref.id, { bottle_volume_ml: parseFloat($event.target.value) || null })" placeholder="ml" />
+                  </template>
+                </div>
+                <button type="button" class="btn-remove-reference" @click="removeReference(ing.type, ref.id)" title="Supprimer cette référence">
+                  <Trash2 :size="14" />
+                </button>
+              </div>
+
+              <!-- Formulaire d'ajout de référence -->
+              <form class="reference-add-form" @submit.prevent="handleAddReference(ing.type)">
+                <input
+                  type="text"
+                  v-model="newReferenceName[ing.type]"
+                  placeholder="Nom de la bouteille (ex. Havana Club 3 Años)"
+                  class="reference-add-input"
+                />
+                <button type="submit" class="btn-add-ingredient" :disabled="!newReferenceName[ing.type]?.trim()">
+                  <Plus :size="14" />
+                  <span>Ajouter une référence</span>
+                </button>
+              </form>
             </div>
           </div>
 
@@ -148,8 +202,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { CheckSquare, Square, Search, Plus, ChevronDown, ChevronRight  } from 'lucide-vue-next'
+import { ref, reactive, computed } from 'vue'
+import { CheckSquare, Square, Search, Plus, ChevronDown, ChevronRight, BookPlus, Trash2 } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import AddIngredientModal from '@/Components/Modals/AddIngredientModal.vue'
 const {
@@ -161,6 +215,10 @@ const {
   deselectAll,
   updateIngredientPricing,
   hasIngredient,
+  addReference,
+  updateReference,
+  removeReference,
+  toggleReferenceAvailable,
 } = useInventory()
 
 const searchQuery    = ref('')
@@ -168,6 +226,32 @@ const addModalTarget = ref(null)
 
 function openAddModal(category) {
   addModalTarget.value = category
+}
+
+// ── Références (mode expert, opt-in) ─────────────────────────────────
+const expandedReferences = ref(new Set())
+const newReferenceName   = reactive({})
+
+function toggleReferencesExpanded(type) {
+  const next = new Set(expandedReferences.value)
+  if (next.has(type)) next.delete(type)
+  else next.add(type)
+  expandedReferences.value = next
+}
+
+function isReferencesExpanded(type) {
+  return expandedReferences.value.has(type)
+}
+
+async function handleAddReference(type) {
+  const name = newReferenceName[type]?.trim()
+  if (!name) return
+  try {
+    await addReference(type, { name })
+    newReferenceName[type] = ''
+  } catch (err) {
+    console.error('❌ Erreur ajout référence:', err)
+  }
 }
 
 const categoryMetadata = {

@@ -238,8 +238,11 @@
                     >
                       <div class="ingredient-info">
                         <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
-                        <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-                          {{ getTypeLabel(ing.Type, locale) }}
+                        <span class="ingredient-name-col">
+                          <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
+                            {{ getTypeLabel(ing.Type, locale) }}
+                          </span>
+                          <span v-if="ing.Reference" class="ingredient-reference">{{ ing.Reference }}</span>
                         </span>
                       </div>
                       <span class="ingredient-quantity">{{ ing._qty }}</span>

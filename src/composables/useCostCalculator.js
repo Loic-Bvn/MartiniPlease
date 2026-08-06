@@ -43,9 +43,22 @@ function recipeLineMl(line) {
 }
 
 /**
+ * Résout l'objet de pricing effectif pour une ligne de recette : la
+ * référence précise choisie (si elle a un prix renseigné), sinon
+ * l'ingrédient générique du type.
+ */
+function resolvePricingSource(line, ingredient) {
+  if (line.Reference && ingredient) {
+    const ref = (ingredient.references || []).find(r => r.name === line.Reference)
+    if (ref && costPerMl(ref) > 0) return ref
+  }
+  return ingredient
+}
+
+/**
  * Calcule le coût matière d'un cocktail.
  *
- * @param {Array} recipe - `bar_cocktails.recipe` (jsonb array : Ingredient, Type, Oz/Ml, IsGarnish)
+ * @param {Array} recipe - `bar_cocktails.recipe` (jsonb array : Ingredient, Type, Reference, Oz/Ml, IsGarnish)
  * @param {Array} ingredients - `ingredients` du bar (avec pricing)
  * @param {object} [opts]
  * @param {boolean} [opts.includeGarnish=false] - inclure le coût des garnitures
@@ -69,7 +82,8 @@ export function calculateCocktailCost(recipe, ingredients, opts = {}) {
     if (!ml) continue
 
     const ingredient = line.Type ? byType.get(line.Type) : null
-    const unitCost = costPerMl(ingredient)
+    const pricingSource = resolvePricingSource(line, ingredient)
+    const unitCost = costPerMl(pricingSource)
     const lineCost = unitCost * ml
     const priced = unitCost > 0
 
@@ -78,6 +92,7 @@ export function calculateCocktailCost(recipe, ingredients, opts = {}) {
     lines.push({
       name: line.Ingredient,
       type: line.Type ?? null,
+      reference: line.Reference ?? null,
       ml,
       unitCost,
       lineCost,

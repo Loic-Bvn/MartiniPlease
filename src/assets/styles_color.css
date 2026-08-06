@@ -1535,7 +1535,7 @@ body {
 
 .recipe-columns-header {
   display: grid;
-  grid-template-columns: 1fr 110px 65px 32px;
+  grid-template-columns: 0.7fr 0.7fr 0.9fr 0.9fr 110px 65px 32px;
   gap: 0.5rem;
   padding: 0 0.1rem;
 }
@@ -1556,7 +1556,7 @@ body {
 
 .recipe-row {
   display: grid;
-  grid-template-columns: 1fr 110px 65px 32px;
+  grid-template-columns: 0.7fr 0.7fr 0.9fr 0.9fr 110px 65px 32px;
   gap: 0.5rem;
   align-items: center;
 }
@@ -1828,9 +1828,23 @@ body {
   .btn-control { flex: 1; padding: 0.5rem; font-size: 0.72rem; }
   .btn-toggle-category { width: 100%; }
   .form-row { grid-template-columns: 1fr; }
-  .recipe-columns-header, .recipe-row { grid-template-columns: 1fr 90px 55px 28px; }
+  .recipe-columns-header, .recipe-row { grid-template-columns: 0.7fr 0.7fr 0.8fr 0.8fr 90px 55px 28px; }
   .modal-overlay { padding: 0.5rem; align-items: flex-end; }
   .modal-container--cocktail { max-height: 95vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .modal-container--menucard { max-height: 90vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .password-modal-content { padding: 1.25rem; }
 }
+.ingredient-item-wrap { display: flex; flex-direction: column; gap: 0.35rem; }
+.badge-references, .btn-manage-references { display: inline-flex; align-items: center; gap: 0.25rem; border: 1px solid var(--orange); border-radius: 999px; background: var(--white); color: var(--orange); font-size: 0.68rem; font-weight: 600; padding: 0.12rem 0.5rem; cursor: pointer; white-space: nowrap; }
+.btn-manage-references { color: var(--dark); opacity: 0.6; padding: 0.2rem; border-radius: 3px; }
+.references-panel { display: flex; flex-direction: column; gap: 0.35rem; margin-left: 1.4rem; padding: 0.45rem 0.55rem; border-left: 2px solid var(--orange); background: var(--cream); border-radius: 3px; }
+.reference-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem; }
+.reference-name { flex: 1; min-width: 8rem; font-size: 0.82rem; color: var(--dark); }
+.reference-pricing { display: flex; align-items: center; gap: 0.3rem; margin-left: auto; }
+.reference-pricing select, .reference-pricing input { border: 1px solid var(--peach); border-radius: 3px; background: var(--white); color: var(--dark); padding: 0.22rem 0.35rem; font-size: 0.76rem; }
+.reference-pricing input[type="number"] { width: 4.6rem; }
+.btn-remove-reference { background: none; border: none; cursor: pointer; color: var(--dark); opacity: 0.5; padding: 0.2rem; display: flex; align-items: center; }
+.btn-remove-reference:hover { color: var(--danger); opacity: 1; }
+.reference-add-form { display: flex; align-items: center; gap: 0.35rem; padding-top: 0.25rem; }
+.reference-add-input { flex: 1; border: 1px solid var(--peach); border-radius: 3px; background: var(--white); color: var(--dark); padding: 0.3rem 0.45rem; font-size: 0.8rem; }
+.reference-abv-input { width: 3.5rem !important; }

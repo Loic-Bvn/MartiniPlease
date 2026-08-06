@@ -34,13 +34,27 @@ export function useInventory() {
       const rows = Array.isArray(data) ? data : []
       ingredients.value = rows
       barInventory.value = new Set(
-        rows.filter(i => i.available).map(i => i.type)
+        rows.filter(i => isIngredientAvailable(i)).map(i => i.type)
       )
     } catch (err) {
       console.error('❌ Erreur fetchIngredients:', err)
     } finally {
       loading.value = false
     }
+  }
+
+  // Un ingrédient est "disponible" au sens stock si le type générique est
+  // coché OU si au moins une référence précise est marquée disponible.
+  function isIngredientAvailable(ingredient) {
+    if (!ingredient) return false
+    if (ingredient.available) return true
+    return (ingredient.references || []).some(r => r.available)
+  }
+
+  function syncBarInventory(ingredient) {
+    if (isIngredientAvailable(ingredient)) barInventory.value.add(ingredient.type)
+    else                                    barInventory.value.delete(ingredient.type)
+    barInventory.value = new Set(barInventory.value)
   }
 
   async function toggleIngredient(ingredientType) {
@@ -56,9 +70,7 @@ export function useInventory() {
 
       if (error) throw error
       ingredient.available = newAvailable
-      if (newAvailable) barInventory.value.add(ingredientType)
-      else              barInventory.value.delete(ingredientType)
-      barInventory.value = new Set(barInventory.value)
+      syncBarInventory(ingredient)
     } catch (err) {
       console.error('❌ Erreur toggleIngredient:', err)
     }
@@ -89,8 +101,8 @@ export function useInventory() {
       if (error) throw error
       categoryIngredients.forEach(ing => {
         ing.available = select
-        if (select) barInventory.value.add(ing.type)
-        else        barInventory.value.delete(ing.type)
+        if (isIngredientAvailable(ing)) barInventory.value.add(ing.type)
+        else                            barInventory.value.delete(ing.type)
       })
       barInventory.value = new Set(barInventory.value)
     } catch (err) {
@@ -122,13 +134,101 @@ export function useInventory() {
 
       if (error) throw error
       ingredients.value.forEach(i => i.available = false)
-      barInventory.value = new Set()
+      barInventory.value = new Set(
+        ingredients.value.filter(i => isIngredientAvailable(i)).map(i => i.type)
+      )
     } catch (err) {
       console.error('❌ Erreur deselectAll:', err)
     }
   }
 
   function hasIngredient(type) { return barInventory.value.has(type) }
+
+  // ── Références (bouteilles précises par type d'ingrédient) ──────────
+  function genRefId() {
+    return (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`)
+  }
+
+  async function addReference(ingredientType, { name, available = true, pricing_mode = 'bottle', bottle_price = null, bottle_volume_ml = null, price_per_ml = null, abv = null }) {
+    const ingredient = ingredients.value.find(i => i.type === ingredientType)
+    if (!ingredient || !name?.trim()) return
+
+    const newRef = {
+      id: genRefId(),
+      name: name.trim(),
+      available,
+      is_default: (ingredient.references || []).length === 0,
+      pricing_mode,
+      bottle_price,
+      bottle_volume_ml,
+      price_per_ml,
+      abv,
+    }
+    const nextReferences = [...(ingredient.references || []), newRef]
+
+    const { error } = await supabase
+      .from('ingredients')
+      .update({ references: nextReferences })
+      .eq('type', ingredientType)
+      .eq('bar_id', currentBarId.value)
+
+    if (error) throw error
+    ingredient.references = nextReferences
+    syncBarInventory(ingredient)
+    return newRef
+  }
+
+  async function updateReference(ingredientType, referenceId, patch) {
+    const ingredient = ingredients.value.find(i => i.type === ingredientType)
+    if (!ingredient) return
+
+    const nextReferences = (ingredient.references || []).map(r =>
+      r.id === referenceId ? { ...r, ...patch } : r
+    )
+
+    const { error } = await supabase
+      .from('ingredients')
+      .update({ references: nextReferences })
+      .eq('type', ingredientType)
+      .eq('bar_id', currentBarId.value)
+
+    if (error) throw error
+    ingredient.references = nextReferences
+    syncBarInventory(ingredient)
+  }
+
+  async function removeReference(ingredientType, referenceId) {
+    const ingredient = ingredients.value.find(i => i.type === ingredientType)
+    if (!ingredient) return
+
+    const nextReferences = (ingredient.references || []).filter(r => r.id !== referenceId)
+
+    const { error } = await supabase
+      .from('ingredients')
+      .update({ references: nextReferences })
+      .eq('type', ingredientType)
+      .eq('bar_id', currentBarId.value)
+
+    if (error) throw error
+    ingredient.references = nextReferences
+    syncBarInventory(ingredient)
+  }
+
+  async function toggleReferenceAvailable(ingredientType, referenceId) {
+    const ingredient = ingredients.value.find(i => i.type === ingredientType)
+    if (!ingredient) return
+    const ref = (ingredient.references || []).find(r => r.id === referenceId)
+    if (!ref) return
+    await updateReference(ingredientType, referenceId, { available: !ref.available })
+  }
+
+  // Références disponibles pour un type — utilisé par CocktailFormModal
+  // pour proposer un select "Référence" optionnel.
+  function getAvailableReferences(type) {
+    const ingredient = ingredients.value.find(i => i.type === type)
+    if (!ingredient) return []
+    return (ingredient.references || []).filter(r => r.available)
+  }
 
   async function addIngredient({ name, type: typeArg, category, family = null, abv = null, available = true }) {
     const barId = currentBarId.value
@@ -231,5 +331,10 @@ export function useInventory() {
     hasIngredient,
     addIngredient,
     initializeDefaultIngredients,
+    addReference,
+    updateReference,
+    removeReference,
+    toggleReferenceAvailable,
+    getAvailableReferences,
   }
 }
