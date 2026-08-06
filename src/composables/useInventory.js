@@ -1,6 +1,6 @@
 // composables/useInventory.js
 // Gère le stock du bar — filtré par bar_id
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
 import ingredientsDatabase from '@/constants/ingredientsDatabase.json'
@@ -144,6 +144,14 @@ export function useInventory() {
 
   function hasIngredient(type) { return barInventory.value.has(type) }
 
+  // Map { type: ingredient } — utilisé pour résoudre le label des ingrédients
+  // custom (non présents dans la table statique TYPE_LABELS) via getTypeLabel().
+  const ingredientsByType = computed(() => {
+    const map = {}
+    for (const ing of ingredients.value) map[ing.type] = ing
+    return map
+  })
+
   // ── Références (bouteilles précises par type d'ingrédient) ──────────
   function genRefId() {
     return (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`)
@@ -220,6 +228,24 @@ export function useInventory() {
     const ref = (ingredient.references || []).find(r => r.id === referenceId)
     if (!ref) return
     await updateReference(ingredientType, referenceId, { available: !ref.available })
+  }
+
+  // Supprime complètement un ingrédient du bar (et ses références).
+  async function deleteIngredient(ingredientType) {
+    const ingredient = ingredients.value.find(i => i.type === ingredientType)
+    if (!ingredient) return
+
+    const { error } = await supabase
+      .from('ingredients')
+      .delete()
+      .eq('type', ingredientType)
+      .eq('bar_id', currentBarId.value)
+
+    if (error) throw error
+
+    ingredients.value = ingredients.value.filter(i => i.type !== ingredientType)
+    barInventory.value.delete(ingredientType)
+    barInventory.value = new Set(barInventory.value)
   }
 
   // Références disponibles pour un type — utilisé par CocktailFormModal
@@ -329,7 +355,9 @@ export function useInventory() {
     selectAll,
     deselectAll,
     hasIngredient,
+    ingredientsByType,
     addIngredient,
+    deleteIngredient,
     initializeDefaultIngredients,
     addReference,
     updateReference,

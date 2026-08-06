@@ -93,6 +93,14 @@
               />
               <span class="ingredient-name">{{ ing.name }}</span>
               <button
+                type="button"
+                class="btn-delete-ingredient"
+                @click.stop="handleDeleteIngredient(ing)"
+                title="Supprimer cet ingrédient"
+              >
+                <Trash2 :size="14" />
+              </button>
+              <button
                 v-if="(ing.references || []).length"
                 type="button"
                 class="badge-references"
@@ -205,6 +213,8 @@
 import { ref, reactive, computed } from 'vue'
 import { CheckSquare, Square, Search, Plus, ChevronDown, ChevronRight, BookPlus, Trash2 } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
+import { useToast } from '@/composables/useToast'
+import ConfirmModal      from '@/Components/Modals/ConfirmModal.vue'
 import AddIngredientModal from '@/Components/Modals/AddIngredientModal.vue'
 const {
   ingredients,
@@ -219,7 +229,9 @@ const {
   updateReference,
   removeReference,
   toggleReferenceAvailable,
+  deleteIngredient,
 } = useInventory()
+const { showToast } = useToast()
 
 const searchQuery    = ref('')
 const addModalTarget = ref(null)
@@ -251,6 +263,23 @@ async function handleAddReference(type) {
     newReferenceName[type] = ''
   } catch (err) {
     console.error('❌ Erreur ajout référence:', err)
+  }
+}
+
+async function handleDeleteIngredient(ing) {
+  const refCount = (ing.references || []).length
+  const warning = refCount
+    ? `Supprimer "${ing.name}" et ${refCount === 1 ? 'sa référence' : `ses ${refCount} références`} ? Les cocktails qui l'utilisent l'afficheront comme indisponible.`
+    : `Supprimer "${ing.name}" ? Les cocktails qui l'utilisent l'afficheront comme indisponible.`
+
+  if (!window.confirm(warning)) return
+
+  try {
+    await deleteIngredient(ing.type)
+    showToast(`🗑️ ${ing.name} supprimé`)
+  } catch (err) {
+    console.error('❌ Erreur suppression ingrédient:', err)
+    showToast('Erreur lors de la suppression.')
   }
 }
 

@@ -476,6 +476,8 @@ body {
 .reference-pricing input[type="number"] { width: 4.6rem; }
 .btn-remove-reference { background: none; border: none; cursor: pointer; color: var(--muted-2); padding: 0.2rem; display: flex; align-items: center; }
 .btn-remove-reference:hover { color: var(--danger); }
+.btn-delete-ingredient { background: none; border: none; cursor: pointer; color: var(--muted-2); padding: 0.2rem; display: flex; align-items: center; opacity: 0.7; }
+.btn-delete-ingredient:hover { color: var(--danger); opacity: 1; }
 .reference-add-form { display: flex; align-items: center; gap: 0.35rem; padding-top: 0.25rem; }
 .reference-add-input { flex: 1; border: 1px solid var(--border); border-radius: 3px; background: var(--surface); color: var(--accent); padding: 0.3rem 0.45rem; font-size: 0.8rem; }
 

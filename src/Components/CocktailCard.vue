@@ -51,7 +51,7 @@
             <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
             </span>
             <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-              {{ getTypeLabel(ing.Type, locale) }}
+              {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
             </span>
           </div>
           <span class="ingredient-quantity">{{ ing._qty }}</span>
@@ -148,10 +148,10 @@ const props = defineProps({
 })
 const { isSubmitted, submitToCatalog } = useCatalog()
 const { showToast } = useToast()
-const { barInventory } = useInventory()
+const { barInventory, ingredientsByType } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
-const baseSpiritLabel = computed(() => getTypeLabel(props.cocktail.base_spirit, props.locale))
+const baseSpiritLabel = computed(() => getTypeLabel(props.cocktail.base_spirit, props.locale, ingredientsByType.value))
 const { isFeatureEnabled } = useBarFeatures(props.barId)
 const showPrices = computed(() => isFeatureEnabled('showPrices'))
 const ordersEnabled = computed(() => isFeatureEnabled('order'))

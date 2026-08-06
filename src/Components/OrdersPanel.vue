@@ -109,7 +109,7 @@
               >
                 <div class="ingredient-info">
                 <span>
-                    {{ getTypeLabel(ing.Type, locale) }}
+                    {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
                 </span>
                 </div>
                 <span class="ingredient-quantity">
@@ -242,7 +242,9 @@ import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
 import { getTypeLabel } from '../constants/typeLabels.js'
 import { useBarFeatures } from '@/composables/useBarFeatures'
+import { useInventory } from '@/composables/useInventory'
 const { isFeatureEnabled } = useBarFeatures()
+const { ingredientsByType } = useInventory()
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },

@@ -4513,6 +4513,22 @@ body {
   color: var(--danger, #c0392b);
 }
 
+.btn-delete-ingredient {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--border-mid);
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+}
+
+.btn-delete-ingredient:hover {
+  color: var(--danger, #c0392b);
+  opacity: 1;
+}
+
 .reference-add-form {
   display: flex;
   align-items: center;

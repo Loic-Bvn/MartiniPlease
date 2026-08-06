@@ -201,7 +201,7 @@
                   <div class="cv-meta-list">
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Spiritueux de base' : 'Base Spirit' }}</span>
-                      <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale, ingredientsByType) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                     <div class="cv-meta-row">
                       <span class="form-label">Profiles</span>
@@ -240,7 +240,7 @@
                         <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
                         <span class="ingredient-name-col">
                           <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-                            {{ getTypeLabel(ing.Type, locale) }}
+                            {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
                           </span>
                           <span v-if="ing.Reference" class="ingredient-reference">{{ ing.Reference }}</span>
                         </span>
@@ -320,7 +320,7 @@ const emit = defineEmits(['close', 'edit'])
 const imageError = ref(false)
 const modalEl = ref(null)
 
-const { barInventory, ingredients } = useInventory()
+const { barInventory, ingredients, ingredientsByType } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
 const { submitToCatalog, isSubmitted } = useCatalog()
