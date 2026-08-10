@@ -1,34 +1,33 @@
 # TODO
 
-- systeme de notes sur 5 ?
-
-## Bartender tools
-- fix checkbox autoriser commande / partage
-- Ajouter checkbox pour affichage des prix coté drinker
-- Bouton commander en mode drinker en fonctionne pas
+## Fix
 
 # EN COURS
 ## Ingredients / Cocktail Form
-- Custom modal lors de la suppression d'un ingredient existant
-- Ajsuter la liste des ingredienst (mettre sur 2 colonnes, amliorer l'affichage degueu)
+- Ameliorer affichage (CSS) du stock des ingredients / references
+- Faire en sorte que l'affichage du prix soit direct apres on/off (obligé de recharger la page actuellement)
 
-# A SUIVRE
-## Validation par mail
-- Permettre des invitations "VIP" avec des codes d'invitations (permet de skip la validation manuel par admin)
+## Amelioration
+- Stocker stats du bar en base pour chargement "immédiats"
+- Ajouter des stats de commandes/favoris pour les trends
+- Detection du theme de l'appareil pour affichage sombre / clair (si theme sombre embarqué, utilisé celui du navigateur/dispositif)
 
-## Versionning
+### Validation mail
+Permettre des invitations "VIP" avec des codes d'invitations (permet de skip la validation manuel par admin)
+
+### Versionning
 Gerer la création de tag et l'hebergement pas version tagguée
 Afficher la version actuelle du site dans le footer
 
-## Onglet commande (bartender)
+### Onglet commande (bartender)
 - Améliorer affichage des commandes
 - ameliorer ergonomie (bouton pour tout valider par exemple)
 
-## Suggestions
+### Suggestions
 - systeme de notes sur 5 ?
 
-## Batching
+### Batching
 - On a une table en BDD qui sert a rien
 
-## Robustification de l'app
+## #Robustification de l'app
 - ?

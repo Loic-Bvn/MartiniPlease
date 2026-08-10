@@ -206,6 +206,17 @@
       @added="addModalTarget = null"
     />
 
+    <!-- Modal de confirmation de suppression -->
+    <ConfirmModal
+      :open="!!ingredientToDelete"
+      title="🗑️ Supprimer l'ingrédient"
+      :message="deleteWarningMessage"
+      confirm-label="Supprimer"
+      cancel-label="Annuler"
+      @confirm="confirmDeleteIngredient"
+      @cancel="cancelDeleteIngredient"
+    />
+
   </div>
 </template>
 
@@ -266,13 +277,29 @@ async function handleAddReference(type) {
   }
 }
 
-async function handleDeleteIngredient(ing) {
+// ── Suppression d'un ingrédient (custom modal, plus de window.confirm) ──
+const ingredientToDelete = ref(null)
+
+const deleteWarningMessage = computed(() => {
+  const ing = ingredientToDelete.value
+  if (!ing) return ''
   const refCount = (ing.references || []).length
-  const warning = refCount
+  return refCount
     ? `Supprimer "${ing.name}" et ${refCount === 1 ? 'sa référence' : `ses ${refCount} références`} ? Les cocktails qui l'utilisent l'afficheront comme indisponible.`
     : `Supprimer "${ing.name}" ? Les cocktails qui l'utilisent l'afficheront comme indisponible.`
+})
 
-  if (!window.confirm(warning)) return
+function handleDeleteIngredient(ing) {
+  ingredientToDelete.value = ing
+}
+
+function cancelDeleteIngredient() {
+  ingredientToDelete.value = null
+}
+
+async function confirmDeleteIngredient() {
+  const ing = ingredientToDelete.value
+  if (!ing) return
 
   try {
     await deleteIngredient(ing.type)
@@ -280,6 +307,8 @@ async function handleDeleteIngredient(ing) {
   } catch (err) {
     console.error('❌ Erreur suppression ingrédient:', err)
     showToast('Erreur lors de la suppression.')
+  } finally {
+    ingredientToDelete.value = null
   }
 }
 
