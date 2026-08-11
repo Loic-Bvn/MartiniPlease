@@ -4381,54 +4381,145 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 0.6rem;
-  padding-top: 0.5rem;
+  padding: 0.5rem 1rem 1rem; /* marges laterales + basse pour ne pas coller aux bords de la carte catégorie */
 }
 
 /* Scopée à .ingredient-item-wrap pour ne pas écraser le style plus simple
    de .ingredients-grid .ingredient-item (résultats de recherche). Avant ce
    fix, cette règle (plus bas dans le fichier = priorité en cascade)
    s'appliquait partout, d'où l'affichage cassé/incohérent. */
+/* Type / réf / champs / supprimer tenus sur une seule ligne dans la mesure
+   du possible : ingredient-pricing n'a plus de flex-basis:100%, donc il
+   reste inline tant que la largeur de la colonne le permet, et ne repasse
+   à la ligne (grâce à flex-wrap sur le parent) que si ça ne rentre plus. */
 .ingredient-item-wrap .ingredient-item {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem 0.7rem;
-  padding: 0.55rem 0.7rem;
+  gap: 0.4rem 0.6rem;
+  padding: 0.5rem 0.65rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-raised);
 }
 
+/* Nom tronqué (ellipsis + title au survol) : on ne lui laisse que la place
+   nécessaire pour ne pas pousser les champs à la ligne suivante. */
 .ingredient-name {
-  flex: 1 1 auto;
-  min-width: 6rem;
+  flex: 0 1 auto;
+  min-width: 3.2rem;
+  max-width: 8.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Conteneur commun aux champs de prix + bouton supprimer : c'est LUI qui
+   pousse à droite (margin-left:auto), pas .ingredient-pricing seul — ainsi
+   le bouton supprimer reste ancré à droite même quand l'ingrédient est
+   décoché et que .ingredient-pricing ne s'affiche plus. */
+.ingredient-item-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-left: auto;
 }
 
 .ingredient-pricing {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  flex-basis: 100%;
-  margin-left: 2.2rem; /* aligné sous le nom, après la checkbox */
+  gap: 0.3rem;
 }
 
-.ingredient-abv-input {
-  width: 4rem !important;
+/* Décocher un ingrédient/une référence ne doit pas faire "sauter" la
+   taille de la ligne (les champs restent dans le flux, pas de v-if) : on
+   les grise plutôt que de les cacher, pour indiquer visuellement qu'ils
+   sont inactifs tout en gardant le contexte (dernier prix renseigné,
+   ABV...) lisible. */
+.fields-disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
-.ingredient-pricing select,
-.ingredient-pricing input {
+.fields-disabled .field-unit input,
+.fields-disabled .pricing-mode-select {
+  cursor: not-allowed;
+}
+
+/* Sélecteur de mode de tarification (Btl / mL) : très compact, libellés
+   courts pour ne pas manger de largeur au détriment des champs de valeur. */
+.pricing-mode-select {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg-input);
   color: var(--text);
-  padding: 0.3rem 0.5rem;
-  font-size: 0.8rem;
+  padding: 0.25rem 0.15rem;
+  font-size: 0.72rem;
+  width: 3rem;
+  flex-shrink: 0;
 }
 
-.ingredient-pricing input[type="number"] {
-  width: 5.5rem;
+/* Champ avec unité affichée en suffixe DANS le champ (au lieu du texte
+   libre "€/ml" qui suivait l'input avant, hors de tout conteneur) :
+   ça évite un input trop large + un bout de texte qui flotte à côté,
+   et ça garde tout sur une seule ligne bien plus facilement. */
+.field-unit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.field-unit input {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  padding: 0.25rem 0.35rem;
+  font-size: 0.75rem;
+  width: 100%;
+  /* Les flèches natives up/down des inputs number se superposaient au
+     texte saisi et au suffixe d'unité vu l'étroitesse des champs.
+     On les masque : Chrome/Safari/Edge (webkit) puis Firefox (moz). */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.field-unit input::-webkit-outer-spin-button,
+.field-unit input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.field-unit-suffix {
+  position: absolute;
+  right: 0.3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Largeurs calées sur la longueur du suffixe, avec le padding-right de
+   l'input qui laisse juste la place nécessaire pour ne pas chevaucher. */
+.field-unit--currency { width: 2.9rem; }
+.field-unit--currency input { padding-right: 1.1rem; }
+
+.field-unit--volume { width: 3.2rem; }
+.field-unit--volume input { padding-right: 1.3rem; }
+
+.field-unit--percent { width: 2.7rem; }
+.field-unit--percent input { padding-right: 1rem; }
+
+.field-unit--rate { width: 3.9rem; }
+.field-unit--rate input { padding-right: 2.1rem; }
+
+.ingredient-abv-input {
+  width: 100% !important;
 }
 
 /* --- Phase 3 : références (bouteilles précises), mode expert opt-in --- */
@@ -4452,6 +4543,7 @@ body {
   padding: 0.15rem 0.55rem;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-manage-references {
@@ -4473,6 +4565,7 @@ body {
   gap: 0.4rem;
   margin-left: 1.6rem;
   padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
   border-left: 2px solid var(--gold-dim);
   background: var(--bg);
   border-radius: var(--radius-sm);
@@ -4494,34 +4587,35 @@ body {
 }
 
 .reference-name {
-  flex: 1;
-  min-width: 8rem;
+  flex: 0 1 auto;
+  min-width: 4rem;
+  max-width: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 0.85rem;
+}
+
+/* Même principe que .ingredient-item-actions : le conteneur pousse à
+   droite, pas .reference-pricing seul, pour garder le bouton supprimer
+   ancré à droite même quand la référence est décochée. */
+.reference-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-left: auto;
 }
 
 .reference-pricing {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-left: auto;
-}
-
-.reference-pricing select,
-.reference-pricing input {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--bg-input);
-  color: var(--text);
-  padding: 0.25rem 0.4rem;
-  font-size: 0.78rem;
-}
-
-.reference-pricing input[type="number"] {
-  width: 5rem;
+  flex-wrap: wrap;
+  gap: 0.3rem;
 }
 
 .reference-abv-input {
-  width: 4rem !important;
+  width: 100% !important;
 }
 
 .btn-remove-reference {
@@ -4547,6 +4641,7 @@ body {
   display: flex;
   align-items: center;
   opacity: 0.6;
+  flex-shrink: 0;
 }
 
 .btn-delete-ingredient:hover {

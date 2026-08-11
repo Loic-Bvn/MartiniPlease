@@ -60,16 +60,32 @@ export function useInventory() {
   async function toggleIngredient(ingredientType) {
     const ingredient = ingredients.value.find(i => i.type === ingredientType)
     if (!ingredient) return
-    const newAvailable = !ingredient.available
+
+    // On se base sur l'état RÉELLEMENT affiché par la case à cocher
+    // (disponible via le flag générique OU via au moins une référence),
+    // pas sur le seul flag `available` — sinon la case peut apparaître
+    // cochée (grâce à une référence) alors que cliquer dessus inversait
+    // le flag générique dans le mauvais sens.
+    const wasChecked = isIngredientAvailable(ingredient)
+    const newAvailable = !wasChecked
+
+    // Décocher l'ingrédient décoche aussi toutes ses références précises,
+    // sinon le stock resterait "disponible" via une référence orpheline
+    // et la case se réafficherait cochée toute seule.
+    const nextReferences = newAvailable
+      ? (ingredient.references || [])
+      : (ingredient.references || []).map(r => ({ ...r, available: false }))
+
     try {
       const { error } = await supabase
         .from('ingredients')
-        .update({ available: newAvailable })
+        .update({ available: newAvailable, references: nextReferences })
         .eq('type', ingredientType)
         .eq('bar_id', currentBarId.value)
 
       if (error) throw error
       ingredient.available = newAvailable
+      ingredient.references = nextReferences
       syncBarInventory(ingredient)
     } catch (err) {
       console.error('❌ Erreur toggleIngredient:', err)
@@ -227,7 +243,37 @@ export function useInventory() {
     if (!ingredient) return
     const ref = (ingredient.references || []).find(r => r.id === referenceId)
     if (!ref) return
-    await updateReference(ingredientType, referenceId, { available: !ref.available })
+
+    const turningOn = !ref.available
+
+    // Si on coche cette référence alors que rien n'était disponible avant
+    // (ni le flag générique de l'ingrédient, ni aucune autre référence),
+    // on coche aussi l'ingrédient parent — cohérent avec la case à cocher
+    // affichée sur la ligne de l'ingrédient, qui se serait cochée toute
+    // seule sans que le flag `available` ne soit réellement mis à jour.
+    const shouldCheckParent = turningOn && !isIngredientAvailable(ingredient)
+
+    const nextReferences = (ingredient.references || []).map(r =>
+      r.id === referenceId ? { ...r, available: turningOn } : r
+    )
+
+    const patch = { references: nextReferences }
+    if (shouldCheckParent) patch.available = true
+
+    try {
+      const { error } = await supabase
+        .from('ingredients')
+        .update(patch)
+        .eq('type', ingredientType)
+        .eq('bar_id', currentBarId.value)
+
+      if (error) throw error
+      ingredient.references = nextReferences
+      if (shouldCheckParent) ingredient.available = true
+      syncBarInventory(ingredient)
+    } catch (err) {
+      console.error('❌ Erreur toggleReferenceAvailable:', err)
+    }
   }
 
   // Supprime complètement un ingrédient du bar (et ses références).

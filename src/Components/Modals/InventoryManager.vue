@@ -27,8 +27,16 @@
     <!-- Stats -->
     <div class="inventory-stats">
       <div class="stat">
-        <span class="stat-label">Sélectionnés :</span>
+        <span class="stat-label">Ingrédients :</span>
         <span class="stat-value">{{ selectedCount }} / {{ totalCount }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Références :</span>
+        <span class="stat-value">{{ selectedReferencesCount }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Total sélectionné :</span>
+        <span class="stat-value">{{ selectedTotalCount }}</span>
       </div>
     </div>
 
@@ -70,8 +78,9 @@
               <span class="category-icon">{{ category.icon }}</span>
               {{ category.label }}
             </h3>
-            <span class="category-count">
+            <span class="category-count" :title="`${category.selectedCount} ingrédient(s) + ${category.selectedReferencesCount} référence(s)`">
               {{ category.selectedCount }} / {{ category.ingredients.length }}
+              <template v-if="category.selectedReferencesCount"> (+{{ category.selectedReferencesCount }} réf.)</template>
             </span>
           </div>
           <button
@@ -91,15 +100,7 @@
                 :checked="hasIngredient(ing.type)"
                 @change="toggleIngredient(ing.type)"
               />
-              <span class="ingredient-name">{{ ing.name }}</span>
-              <button
-                type="button"
-                class="btn-delete-ingredient"
-                @click.stop="handleDeleteIngredient(ing)"
-                title="Supprimer cet ingrédient"
-              >
-                <Trash2 :size="14" />
-              </button>
+              <span class="ingredient-name" :title="ing.name">{{ ing.name }}</span>
               <button
                 v-if="(ing.references || []).length"
                 type="button"
@@ -118,30 +119,52 @@
               >
                 <BookPlus :size="14" />
               </button>
-              <div class="ingredient-pricing" v-if="hasIngredient(ing.type)">
-                <select v-model="ing.pricing_mode" @change="updateIngredientPricing(ing.type, { pricing_mode: ing.pricing_mode })">
-                  <option value="bottle">Bouteille</option>
-                  <option value="ml">Au ml</option>
-                </select>
-                <template v-if="ing.pricing_mode === 'ml'">
-                  <input type="number" step="0.001" v-model.number="ing.price_per_ml"
-                    @change="updateIngredientPricing(ing.type, { price_per_ml: ing.price_per_ml })" placeholder="€/ml">€/ml</input>
-                </template>
-                <template v-else>
-                  <input type="number" step="0.5" v-model.number="ing.bottle_price"
-                    @change="updateIngredientPricing(ing.type, { bottle_price: ing.bottle_price })" placeholder="€ bouteille">€</input>
-                  <input type="number" step="10" v-model.number="ing.bottle_volume_ml"
-                    @change="updateIngredientPricing(ing.type, { bottle_volume_ml: ing.bottle_volume_ml })" placeholder="ml">ml</input>
-                </template>
-                <input
-                  v-if="hasAbv(category.key)"
-                  type="number" step="0.5" min="0" max="100"
-                  v-model.number="ing.abv"
-                  @change="updateIngredientPricing(ing.type, { abv: ing.abv })"
-                  placeholder="% abv"
-                  title="Titre alcoométrique par défaut de cet ingrédient"
-                  class="ingredient-abv-input"
-                >%</input>
+              <div class="ingredient-item-actions">
+                <div class="ingredient-pricing" :class="{ 'fields-disabled': !hasIngredient(ing.type) }">
+                  <span v-if="hasAbv(category.key)" class="field-unit field-unit--percent">
+                    <input
+                      type="number" step="0.5" min="0" max="100"
+                      v-model.number="ing.abv"
+                      @change="updateIngredientPricing(ing.type, { abv: ing.abv })"
+                      placeholder="40"
+                      title="Titre alcoométrique par défaut de cet ingrédient"
+                      class="ingredient-abv-input"
+                    />
+                    <span class="field-unit-suffix">%</span>
+                  </span>
+                  <select v-model="ing.pricing_mode" class="pricing-mode-select" title="Mode de tarification"
+                    @change="updateIngredientPricing(ing.type, { pricing_mode: ing.pricing_mode })">
+                    <option value="bottle">Btl</option>
+                    <option value="ml">mL</option>
+                  </select>
+                  <template v-if="ing.pricing_mode === 'ml'">
+                    <span class="field-unit field-unit--rate">
+                      <input type="number" step="0.001" v-model.number="ing.price_per_ml" title="Prix au ml"
+                        @change="updateIngredientPricing(ing.type, { price_per_ml: ing.price_per_ml })" placeholder="0.05" />
+                      <span class="field-unit-suffix">€/ml</span>
+                    </span>
+                  </template>
+                  <template v-else>
+                    <span class="field-unit field-unit--currency">
+                      <input type="number" step="0.5" v-model.number="ing.bottle_price" title="Prix bouteille"
+                        @change="updateIngredientPricing(ing.type, { bottle_price: ing.bottle_price })" placeholder="0" />
+                      <span class="field-unit-suffix">€</span>
+                    </span>
+                    <span class="field-unit field-unit--volume">
+                      <input type="number" step="10" v-model.number="ing.bottle_volume_ml" title="Volume bouteille"
+                        @change="updateIngredientPricing(ing.type, { bottle_volume_ml: ing.bottle_volume_ml })" placeholder="700" />
+                      <span class="field-unit-suffix">ml</span>
+                    </span>
+                  </template>
+                </div>
+                <button
+                  type="button"
+                  class="btn-delete-ingredient"
+                  @click.stop="handleDeleteIngredient(ing)"
+                  title="Supprimer cet ingrédient"
+                >
+                  <Trash2 :size="14" />
+                </button>
               </div>
             </div>
 
@@ -154,28 +177,43 @@
                   :checked="ref.available"
                   @change="toggleReferenceAvailable(ing.type, ref.id)"
                 />
-                <span class="reference-name">{{ ref.name }}</span>
-                <div class="reference-pricing" v-if="ref.available">
-                  <input type="number" step="0.5" :value="ref.abv"
-                    @change="updateReference(ing.type, ref.id, { abv: parseFloat($event.target.value) || null })" placeholder="% abv" class="reference-abv-input">%</input>
-                  <select :value="ref.pricing_mode" @change="updateReference(ing.type, ref.id, { pricing_mode: $event.target.value })">
-                    <option value="bottle">Bouteille</option>
-                    <option value="ml">Au ml</option>
-                  </select>
-                  <template v-if="ref.pricing_mode === 'ml'">
-                    <input type="number" step="0.001" :value="ref.price_per_ml"
-                      @change="updateReference(ing.type, ref.id, { price_per_ml: parseFloat($event.target.value) || null })" placeholder="€/ml">€/ml</input>
-                  </template>
-                  <template v-else>
-                    <input type="number" step="0.5" :value="ref.bottle_price"
-                      @change="updateReference(ing.type, ref.id, { bottle_price: parseFloat($event.target.value) || null })" placeholder="€ bouteille">€</input>
-                    <input type="number" step="10" :value="ref.bottle_volume_ml"
-                      @change="updateReference(ing.type, ref.id, { bottle_volume_ml: parseFloat($event.target.value) || null })" placeholder="ml">ml</input>
-                  </template>
+                <span class="reference-name" :title="ref.name">{{ ref.name }}</span>
+                <div class="reference-actions">
+                  <div class="reference-pricing" :class="{ 'fields-disabled': !ref.available }">
+                    <span class="field-unit field-unit--percent">
+                      <input type="number" step="0.5" :value="ref.abv" title="Titre alcoométrique"
+                        @change="updateReference(ing.type, ref.id, { abv: parseFloat($event.target.value) || null })" placeholder="40" class="reference-abv-input" />
+                      <span class="field-unit-suffix">%</span>
+                    </span>
+                    <select :value="ref.pricing_mode" class="pricing-mode-select" title="Mode de tarification"
+                      @change="updateReference(ing.type, ref.id, { pricing_mode: $event.target.value })">
+                      <option value="bottle">Btl</option>
+                      <option value="ml">mL</option>
+                    </select>
+                    <template v-if="ref.pricing_mode === 'ml'">
+                      <span class="field-unit field-unit--rate">
+                        <input type="number" step="0.001" :value="ref.price_per_ml" title="Prix au ml"
+                          @change="updateReference(ing.type, ref.id, { price_per_ml: parseFloat($event.target.value) || null })" placeholder="0.05" />
+                        <span class="field-unit-suffix">€/ml</span>
+                      </span>
+                    </template>
+                    <template v-else>
+                      <span class="field-unit field-unit--currency">
+                        <input type="number" step="0.5" :value="ref.bottle_price" title="Prix bouteille"
+                          @change="updateReference(ing.type, ref.id, { bottle_price: parseFloat($event.target.value) || null })" placeholder="0" />
+                        <span class="field-unit-suffix">€</span>
+                      </span>
+                      <span class="field-unit field-unit--volume">
+                        <input type="number" step="10" :value="ref.bottle_volume_ml" title="Volume bouteille"
+                          @change="updateReference(ing.type, ref.id, { bottle_volume_ml: parseFloat($event.target.value) || null })" placeholder="700" />
+                        <span class="field-unit-suffix">ml</span>
+                      </span>
+                    </template>
+                  </div>
+                  <button type="button" class="btn-remove-reference" @click="removeReference(ing.type, ref.id)" title="Supprimer cette référence">
+                    <Trash2 :size="14" />
+                  </button>
                 </div>
-                <button type="button" class="btn-remove-reference" @click="removeReference(ing.type, ref.id)" title="Supprimer cette référence">
-                  <Trash2 :size="14" />
-                </button>
               </div>
 
               <!-- Formulaire d'ajout de référence -->
@@ -346,6 +384,10 @@ function hasAbv(categoryKey) {
 const selectedCount = computed(() =>
   ingredients.value.filter(i => i.available).length
 )
+const selectedReferencesCount = computed(() =>
+  ingredients.value.reduce((sum, i) => sum + (i.references || []).filter(r => r.available).length, 0)
+)
+const selectedTotalCount = computed(() => selectedCount.value + selectedReferencesCount.value)
 const totalCount = computed(() => ingredients.value.length)
 
 const categorizedIngredients = computed(() => {
@@ -372,6 +414,7 @@ const categorizedIngredients = computed(() => {
         icon: categoryMetadata[key]?.icon || '📦',
         ingredients: ings,
         selectedCount: ings.filter(i => i.available).length,
+        selectedReferencesCount: ings.reduce((sum, i) => sum + (i.references || []).filter(r => r.available).length, 0),
         allSelected: ings.every(i => i.available),
       }
     })

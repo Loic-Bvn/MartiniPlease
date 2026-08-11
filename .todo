@@ -1,13 +1,13 @@
-# TODO
+# Fix
+### Cocktail form
+- Corriger sauvegarde d'un cocktail
+- Parfois il faut créer un cocktail en 2 fois, d'abord créer avec juste le nom, puis éditer le cocktail pour y ajouter des infos/ingredients. J'ai aussi l'impression qu'au bout d'un certains temps d'édition, il n'est plus possible de save le formulaire
+### Ingredients
+- Probleme dans le décompte des ingredients / références
+- Probleme avec les boutons tout (dé)sélectionner -> sont-ils pertinents ?
 
-## Fix
 
-# EN COURS
-## Ingredients / Cocktail Form
-- Ameliorer affichage (CSS) du stock des ingredients / references
- --> afficher type, ref, champs, delete sur la meme ligne dans la mesure du possible
-
-## Ameliorations
+# Ameliorations
 - Stocker stats du bar en base pour chargement "immédiats"
 - Ajouter des stats de commandes/favoris pour les trends
 - Detection du theme de l'appareil pour affichage sombre / clair (si theme sombre embarqué, utilisé celui du navigateur/dispositif)
@@ -22,6 +22,10 @@ Afficher la version actuelle du site dans le footer
 ### Onglet commande (bartender)
 - Améliorer affichage des commandes
 - ameliorer ergonomie (bouton pour tout valider par exemple)
+
+### Style
+- Simplifier le fichier style.css ?
+--> style général dans style.css et style specifique directement dans le fichier .vue ?
 
 ### Suggestions
 - systeme de notes sur 5 ?
