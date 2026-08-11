@@ -199,6 +199,7 @@
 
               <!-- Type d'ingrédient (lien stock / coût) -->
               <select v-model="ing.Type" @change="onIngredientChange(ing)" class="form-input">
+                <option value="" disabled>-- Type --</option>
                 <option
                   v-for="(item, typeKey) in getTypesByCategory(ing.Category)"
                   :key="typeKey"
@@ -621,6 +622,11 @@ function removeRecipeLine(idx) {
 function handleSave() {
   try {
     const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
+
+    const droppedLines = form.value.recipe.filter(ing => !ing.Type && (ing.Ingredient?.trim() || ing.Oz || ing.Ml))
+    if (droppedLines.length) {
+      throw new Error(`Choisis un Type pour : ${droppedLines.map(l => l.Ingredient || '(sans nom)').join(', ')}`)
+    }
 
     const cleanedRecipe = form.value.recipe
       .filter(ing => ing.Type)

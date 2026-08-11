@@ -210,7 +210,7 @@
                       </span>
                     </template>
                   </div>
-                  <button type="button" class="btn-remove-reference" @click="removeReference(ing.type, ref.id)" title="Supprimer cette référence">
+                  <button type="button" class="btn-remove-reference" @click="handleDeleteReference(ing, ref)" title="Supprimer cette référence">
                     <Trash2 :size="14" />
                   </button>
                 </div>
@@ -263,6 +263,17 @@
       cancel-label="Annuler"
       @confirm="confirmDeleteIngredient"
       @cancel="cancelDeleteIngredient"
+    />
+
+    <!-- Modal de confirmation de suppression d'une référence -->
+    <ConfirmModal
+      :open="!!referenceToDelete"
+      title="🗑️ Supprimer la référence"
+      :message="deleteReferenceWarningMessage"
+      confirm-label="Supprimer"
+      cancel-label="Annuler"
+      @confirm="confirmDeleteReference"
+      @cancel="cancelDeleteReference"
     />
 
   </div>
@@ -360,6 +371,38 @@ async function confirmDeleteIngredient() {
   }
 }
 
+// ── Suppression d'une référence (custom modal, plus de suppression directe) ──
+const referenceToDelete = ref(null)
+
+const deleteReferenceWarningMessage = computed(() => {
+  const target = referenceToDelete.value
+  if (!target) return ''
+  return `Supprimer la référence "${target.ref.name}" ? Les cocktails qui la spécifient l'afficheront comme indisponible.`
+})
+
+function handleDeleteReference(ing, ref) {
+  referenceToDelete.value = { type: ing.type, ref }
+}
+
+function cancelDeleteReference() {
+  referenceToDelete.value = null
+}
+
+async function confirmDeleteReference() {
+  const target = referenceToDelete.value
+  if (!target) return
+
+  try {
+    await removeReference(target.type, target.ref.id)
+    showToast(`🗑️ ${target.ref.name} supprimée`)
+  } catch (err) {
+    console.error('❌ Erreur suppression référence:', err)
+    showToast('Erreur lors de la suppression.')
+  } finally {
+    referenceToDelete.value = null
+  }
+}
+
 const categoryMetadata = {
   spirits:   { label: 'Spiritueux',    icon: '🥃' },
   licors:    { label: 'Liqueurs',      icon: '🍷' },
@@ -381,8 +424,13 @@ function hasAbv(categoryKey) {
   return ABV_EDITABLE_CATEGORIES.has(categoryKey)
 }
 
+function isIngredientAvailable(ing) {
+  if (ing.available) return true
+  return (ing.references || []).some(r => r.available)
+}
+
 const selectedCount = computed(() =>
-  ingredients.value.filter(i => i.available).length
+  ingredients.value.filter(isIngredientAvailable).length
 )
 const selectedReferencesCount = computed(() =>
   ingredients.value.reduce((sum, i) => sum + (i.references || []).filter(r => r.available).length, 0)
@@ -413,9 +461,9 @@ const categorizedIngredients = computed(() => {
         label: categoryMetadata[key]?.label || key,
         icon: categoryMetadata[key]?.icon || '📦',
         ingredients: ings,
-        selectedCount: ings.filter(i => i.available).length,
+        selectedCount: ings.filter(isIngredientAvailable).length,
         selectedReferencesCount: ings.reduce((sum, i) => sum + (i.references || []).filter(r => r.available).length, 0),
-        allSelected: ings.every(i => i.available),
+        allSelected: ings.every(isIngredientAvailable),
       }
     })
 })

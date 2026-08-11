@@ -108,17 +108,24 @@ export function useInventory() {
     const categoryIngredients = ingredients.value.filter(i => i.category === categoryKey)
     if (!categoryIngredients.length) return
     try {
-      const { error } = await supabase
-        .from('ingredients')
-        .update({ available: select })
-        .eq('category', categoryKey)
-        .eq('bar_id', currentBarId.value)
-
-      if (error) throw error
-      categoryIngredients.forEach(ing => {
+      const rows = categoryIngredients.map(ing => ({
+        id: ing.id,
+        name: ing.name,
+        type: ing.type,
+        category: ing.category,
+        available: select,
+        references: (ing.references || []).map(r => ({ ...r, available: select })),
+      }))
+      const batchSize = 200
+      for (let i = 0; i < rows.length; i += batchSize) {
+        const { error } = await supabase.from('ingredients').upsert(rows.slice(i, i + batchSize))
+        if (error) throw error
+      }
+      categoryIngredients.forEach((ing, idx) => {
         ing.available = select
-        if (isIngredientAvailable(ing)) barInventory.value.add(ing.type)
-        else                            barInventory.value.delete(ing.type)
+        ing.references = rows[idx].references
+        if (select) barInventory.value.add(ing.type)
+        else        barInventory.value.delete(ing.type)
       })
       barInventory.value = new Set(barInventory.value)
     } catch (err) {
@@ -128,13 +135,26 @@ export function useInventory() {
 
   async function selectAll() {
     try {
-      const { error } = await supabase
-        .from('ingredients')
-        .update({ available: true })
-        .eq('bar_id', currentBarId.value)
+      const rows = ingredients.value.map(ing => ({
+        id: ing.id,
+        name: ing.name,
+        type: ing.type,
+        category: ing.category,
+        available: true,
+        references: (ing.references || []).map(r => ({ ...r, available: true })),
+      }))
+      if (!rows.length) return
 
-      if (error) throw error
-      ingredients.value.forEach(i => i.available = true)
+      const batchSize = 200
+      for (let i = 0; i < rows.length; i += batchSize) {
+        const { error } = await supabase.from('ingredients').upsert(rows.slice(i, i + batchSize))
+        if (error) throw error
+      }
+
+      ingredients.value.forEach((ing, idx) => {
+        ing.available = true
+        ing.references = rows[idx].references
+      })
       barInventory.value = new Set(ingredients.value.map(i => i.type))
     } catch (err) {
       console.error('❌ Erreur selectAll:', err)
@@ -143,16 +163,33 @@ export function useInventory() {
 
   async function deselectAll() {
     try {
-      const { error } = await supabase
-        .from('ingredients')
-        .update({ available: false })
-        .eq('bar_id', currentBarId.value)
+      // Un seul aller-retour réseau (upsert par lot) plutôt qu'un update par
+      // ingrédient — sinon "Tout désélectionner" fait autant de requêtes
+      // séquentielles que d'ingrédients et devient très lent.
+      // L'upsert construit la ligne AVANT de résoudre le conflit : il faut donc
+      // fournir les colonnes NOT NULL sans défaut (name, type, category), sinon
+      // Postgres rejette avec une violation NOT NULL même si ça finit en UPDATE.
+      const rows = ingredients.value.map(ing => ({
+        id: ing.id,
+        name: ing.name,
+        type: ing.type,
+        category: ing.category,
+        available: false,
+        references: (ing.references || []).map(r => ({ ...r, available: false })),
+      }))
+      if (!rows.length) return
 
-      if (error) throw error
-      ingredients.value.forEach(i => i.available = false)
-      barInventory.value = new Set(
-        ingredients.value.filter(i => isIngredientAvailable(i)).map(i => i.type)
-      )
+      const batchSize = 200
+      for (let i = 0; i < rows.length; i += batchSize) {
+        const { error } = await supabase.from('ingredients').upsert(rows.slice(i, i + batchSize))
+        if (error) throw error
+      }
+
+      ingredients.value.forEach((ing, idx) => {
+        ing.available = false
+        ing.references = rows[idx].references
+      })
+      barInventory.value = new Set()
     } catch (err) {
       console.error('❌ Erreur deselectAll:', err)
     }
