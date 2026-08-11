@@ -17,6 +17,17 @@
           <button @click="openConsent" class="footer-link" :title="t.manageData">⚙️</button>
         </nav>
       </div>
+
+      <!--
+        Mention sanitaire obligatoire (loi Évin, art. L3323-4 CSP).
+        Placée dans le footer existant, visible sur toutes les pages où
+        Footer.vue est monté. Taille et contraste alignés sur les autres
+        mentions du footer (font-weight renforcé pour rester bien lisible,
+        comme l'exige le texte de loi).
+      -->
+      <p class="footer-sanitary">
+        {{ t.sanitary }}
+      </p>
     </div>
 
     <CookieConsentBanner
@@ -47,12 +58,14 @@ const t = computed(() => props.locale === 'fr' ? {
   terms: 'CGU',
   cookies: 'Cookies',
   manageData: 'Gérer les données',
+  sanitary: "L'abus d'alcool est dangereux pour la santé, à consommer avec modération.",
 } : {
   legal: 'Legal Notice',
   privacy: 'Privacy',
   terms: 'Terms',
   cookies: 'Cookies',
   manageData: 'Manage data',
+  sanitary: 'Excessive alcohol consumption is dangerous for your health, please drink responsibly.',
 })
 
 function navigateTo(page) {
@@ -102,5 +115,22 @@ function openConsent() {
   color: var(--border);
   font-size: 0.75rem;
   user-select: none;
+}
+
+/* Mention sanitaire — même taille que footer-text mais plus contrastée
+   (font-weight + couleur pleine, pas muted) pour rester "lisible" au sens
+   de la loi même si elle est en bas de page. */
+.footer-sanitary {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.dark .footer-sanitary {
+  color: var(--text);
+  border-color: var(--border-mid);
 }
 </style>

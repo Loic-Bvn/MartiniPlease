@@ -2,7 +2,7 @@
   <div class="orders-panel">
 
     <!-- =========================
-         TABS
+        TABS
     ========================= -->
     <div class="orders-tabs">
       <button
@@ -29,7 +29,7 @@
     </div>
 
     <!-- =========================
-         CONTROLS (COMPLETED)
+        CONTROLS (COMPLETED)
     ========================= -->
     <div
       v-if="activeTab === 'completed' && completedOrders.length > 0"
@@ -54,7 +54,7 @@
     </div>
 
     <!-- =========================
-         PENDING
+        PENDING
     ========================= -->
     <div v-if="activeTab === 'pending'" class="orders-content">
 
@@ -109,7 +109,7 @@
               >
                 <div class="ingredient-info">
                 <span>
-                    {{ getTypeLabel(ing.Type, locale) }}
+                    {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
                 </span>
                 </div>
                 <span class="ingredient-quantity">
@@ -241,6 +241,10 @@ import { User, GlassWater, Clock, Check, X, Loader2 } from 'lucide-vue-next'
 import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
 import { getTypeLabel } from '../constants/typeLabels.js'
+import { useBarFeatures } from '@/composables/useBarFeatures'
+import { useInventory } from '@/composables/useInventory'
+const { isFeatureEnabled } = useBarFeatures()
+const { ingredientsByType } = useInventory()
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },

@@ -4,9 +4,7 @@
       <div class="modal-header" @touchstart="onHeaderTouchStart" @touchmove="onHeaderTouchMove" @touchend="onHeaderTouchEnd">
         <div class="cocktail-title-row">
           <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-            <!-- TODO: Handle price -->
-            <!-- {{ cocktail.name }} - {{ cocktail.price ?? '14' }}€ -->
-            {{ cocktail.name }} - {{ cocktail.abv }}°
+            {{ cocktail.name }}<span v-if="cocktail.price && showPrices"> - {{ cocktail.price }}€</span>
           </h3>
         </div>
 
@@ -21,7 +19,7 @@
             <Heart :size="18" :fill="isFav ? 'currentColor' : 'none'" />
           </button>
           <button
-            v-if="hasDrinker && !isBartenderMode"
+            v-if="hasDrinker && !isBartenderMode && isFeatureEnabled('order')"
             type="button"
             @click="handleOrder"
             :disabled="isOrdering"
@@ -38,6 +36,25 @@
           >
             <Upload :size="18" />
           </button> -->
+
+          <button
+            v-if="isBartenderMode"
+            @click="$emit('edit', cocktail)"
+            class="btn-icon btn-icon--edit"
+            :title="props.locale === 'fr' ? 'Modifier' : 'Edit'"
+          >
+            <Pencil :size="18" />
+          </button>
+
+          <button 
+            v-if="isBartenderMode"
+            @click="openBatch"
+            class="btn-icon"
+            title="Batch"
+          >
+            <Barrel :size="18" />
+          </button>
+
           <button
             v-if="props.isBartenderMode && props.cocktail.is_private && !isSubmitted(props.cocktail.id)"
             type="button"
@@ -48,6 +65,13 @@
           >
             <Upload :size="18" />
           </button>
+          <span
+            v-else-if="props.isBartenderMode && props.cocktail.is_private"
+            class="btn-icon btn-icon--submitted"
+            :title="props.locale === 'fr' ? 'Déjà proposé' : 'Already submitted'"
+          >
+            <Bookmark :size="18" />
+          </span>
           <button
             type="button"
             @click="handleShare"
@@ -177,17 +201,17 @@
                   <div class="cv-meta-list">
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Spiritueux de base' : 'Base Spirit' }}</span>
-                      <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale, ingredientsByType) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                     <div class="cv-meta-row">
                       <span class="form-label">Profiles</span>
                       <span :class="{ 'cv-value--na': !cocktail.profile?.length }">{{ cocktail.profile?.length ? cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                     <!-- TODO: Handle price -->
-                    <!-- <div class="cv-meta-row">
+                    <div class="cv-meta-row">
                       <span class="form-label">{{props.locale === 'fr' ? 'Degré' : 'ABV'}}</span>
                       <span :class="{ 'cv-value--na': !cocktail.abv }">{{ cocktail.abv ? cocktail.abv + '°' : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
-                    </div> -->
+                    </div>
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Créateur' : 'Creator' }}</span>
                       <span :class="{ 'cv-value--na': !cocktail.creator || cocktail.creator === 'Unknown' }">{{ (cocktail.creator && cocktail.creator !== 'Unknown') ? cocktail.creator : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
@@ -214,8 +238,11 @@
                     >
                       <div class="ingredient-info">
                         <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
-                        <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-                          {{ getTypeLabel(ing.Type, locale) }}
+                        <span class="ingredient-name-col">
+                          <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
+                            {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
+                          </span>
+                          <span v-if="ing.Reference" class="ingredient-reference">{{ ing.Reference }}</span>
                         </span>
                       </div>
                       <span class="ingredient-quantity">{{ ing._qty }}</span>
@@ -243,12 +270,19 @@
       </div>
 
     </div>
+    <BatchCalculatorModal
+      v-if="showBatchModal"
+      :open="showBatchModal"
+      :cocktail="selectedCocktailForBatch"
+      :ingredients="ingredients"
+      @close="showBatchModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload } from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil} from 'lucide-vue-next'
 import {
   getTypeLabel,
   getProfileLabel,
@@ -261,6 +295,11 @@ import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
+import { useBarFeatures } from '@/composables/useBarFeatures'
+import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
+
+const { isFeatureEnabled } = useBarFeatures()
+const showPrices = computed(() => isFeatureEnabled('showPrices'))
 
 const TAB_COUNT = 3
 const TAB_WIDTH = 100 / TAB_COUNT
@@ -277,11 +316,11 @@ const props = defineProps({
   unit:            { type: String, default: 'oz' },
   barId:           { type: String, default: '' },
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'edit'])
 const imageError = ref(false)
 const modalEl = ref(null)
 
-const { barInventory } = useInventory()
+const { barInventory, ingredients, ingredientsByType } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
 const { submitToCatalog, isSubmitted } = useCatalog()
@@ -290,6 +329,14 @@ const { showToast } = useToast()
 const isFav = computed(() => isFavorite(props.cocktail.id))
 const isOrdering = ref(false)
 const isSubmitting = ref(false)
+const showBatchModal = ref(false)
+const selectedCocktailForBatch = ref(null)
+
+function openBatch() {
+  selectedCocktailForBatch.value = props.cocktail
+  showBatchModal.value = true
+}
+
 
 async function handleFavorite() {
   await toggleFavorite(props.cocktail.id)

@@ -445,10 +445,10 @@ body {
 .form-input:focus { outline: none; border-color: var(--gold); background: var(--bg); }
 .form-input option { background: var(--bg); color: var(--accent); }
 .form-textarea { resize: vertical; min-height: 70px; }
-.recipe-columns-header { display: grid; grid-template-columns: 1fr 110px 65px 32px; gap: 0.5rem; }
+.recipe-columns-header { display: grid; grid-template-columns: 0.7fr 0.7fr 0.9fr 0.9fr 110px 65px 32px; gap: 0.5rem; }
 .recipe-columns-header span { font-size: 0.62rem; font-weight: 600; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.5px; }
 .recipe-rows { display: flex; flex-direction: column; gap: 0.4rem; }
-.recipe-row { display: grid; grid-template-columns: 1fr 110px 65px 32px; gap: 0.5rem; align-items: center; }
+.recipe-row { display: grid; grid-template-columns: 0.7fr 0.7fr 0.9fr 0.9fr 110px 65px 32px; gap: 0.5rem; align-items: center; }
 .recipe-row .form-input { padding: 0.4rem 0.6rem; font-size: 0.82rem; }
 .recipe-empty { text-align: center; color: var(--muted-2); font-size: 0.82rem; padding: 1.25rem; background: var(--surface-2); border-radius: 2px; border: 1px dashed var(--border-2); font-style: italic; }
 .btn-add-ingredient { display: flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.7rem; background: rgba(74,124,89,0.08); color: var(--success); border: 1px solid rgba(74,124,89,0.3); border-radius: 2px; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
@@ -535,9 +535,26 @@ body {
   .btn-control { flex: 1; padding: 0.5rem; font-size: 0.72rem; }
   .btn-toggle-category { width: 100%; }
   .form-row { grid-template-columns: 1fr; }
-  .recipe-columns-header, .recipe-row { grid-template-columns: 1fr 90px 55px 28px; }
+  .recipe-columns-header, .recipe-row { grid-template-columns: 0.7fr 0.7fr 0.8fr 0.8fr 90px 55px 28px; }
   .modal-overlay { padding: 0.5rem; align-items: flex-end; }
   .modal-container--cocktail { max-height: 95vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .modal-container--menucard { max-height: 90vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .password-modal-content { padding: 1.25rem; }
 }
+.ingredient-item-wrap { display: flex; flex-direction: column; gap: 0.35rem; }
+.badge-references, .btn-manage-references { display: inline-flex; align-items: center; gap: 0.25rem; border: 1px solid var(--gold-dim); border-radius: 999px; background: var(--surface); color: var(--gold); font-size: 0.68rem; font-weight: 600; padding: 0.12rem 0.5rem; cursor: pointer; white-space: nowrap; }
+.btn-manage-references { color: var(--muted-2); border-color: var(--border-2); padding: 0.2rem; border-radius: 3px; }
+.references-panel { display: flex; flex-direction: column; gap: 0.35rem; margin-left: 1.4rem; padding: 0.45rem 0.55rem; border-left: 2px solid var(--gold-dim); background: var(--bg); border-radius: 3px; }
+.reference-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem; }
+.reference-name { flex: 1; min-width: 8rem; font-size: 0.82rem; }
+.reference-pricing { display: flex; align-items: center; gap: 0.3rem; margin-left: auto; }
+.reference-pricing select, .reference-pricing input { border: 1px solid var(--border); border-radius: 3px; background: var(--surface); color: var(--accent); padding: 0.22rem 0.35rem; font-size: 0.76rem; }
+.reference-pricing input[type="number"] { width: 4.6rem; }
+.btn-remove-reference { background: none; border: none; cursor: pointer; color: var(--muted-2); padding: 0.2rem; display: flex; align-items: center; }
+.btn-remove-reference:hover { color: var(--danger); }
+.btn-delete-ingredient { background: none; border: none; cursor: pointer; color: var(--muted-2); padding: 0.2rem; display: flex; align-items: center; opacity: 0.7; }
+.btn-delete-ingredient:hover { color: var(--danger); opacity: 1; }
+.reference-add-form { display: flex; align-items: center; gap: 0.35rem; padding-top: 0.25rem; }
+.reference-add-input { flex: 1; border: 1px solid var(--border); border-radius: 3px; background: var(--surface); color: var(--accent); padding: 0.3rem 0.45rem; font-size: 0.8rem; }
+
+.reference-abv-input { width: 3.5rem !important; }

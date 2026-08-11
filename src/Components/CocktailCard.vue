@@ -26,10 +26,8 @@
         <div class="min-w-0 flex-1">
           <div class="cocktail-title-row">
             <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-              {{ cocktail.name }}
+              {{ cocktail.name }} <span v-if="cocktail.price && showPrices"> - {{ cocktail.price }}€</span>
             </h3>
-              <!-- TODO: Handle price - Ajouter gestion tarifs cocktails (attention drinker/bartender mode)  -->
-              <!-- <span class="cocktail-price-inline">{{ cocktail.price ?? '14' }}€</span> -->
             <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
           </div>
           <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
@@ -53,7 +51,7 @@
             <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
             </span>
             <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-              {{ getTypeLabel(ing.Type, locale) }}
+              {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
             </span>
           </div>
           <span class="ingredient-quantity">{{ ing._qty }}</span>
@@ -84,12 +82,13 @@
             <Heart :size="18" :fill="isFav ? 'currentColor' : 'none'" />
           </button>
           <button
-            v-if="hasDrinker && !isBartenderMode"
+            v-if="hasDrinker && !isBartenderMode && ordersEnabled"
             @click.stop="handleHistoric"
             class="btn-icon"
-            title="Commander"
+            :title="isChecked ? (locale === 'fr' ? 'Commandé !' : 'Ordered!') : (locale === 'fr' ? 'Commander' : 'Order')"
           >
-            <HandPlatter :size="18" />
+            <Check v-if="isChecked" :size="18" />
+            <HandPlatter v-else :size="18" />
           </button>
 
           <template v-if="showCocktailActions && isBartenderMode">
@@ -131,9 +130,13 @@ import { useOrders } from '@/composables/useOrders'
 import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
+import { useBarFeatures } from '@/composables/useBarFeatures'
+// const { showPrices, ordersEnabled } = useBarFeatures()
 
-const { isSubmitted, submitToCatalog } = useCatalog()
+
 const isChecked = ref(false)
+const cardEl = ref(null)
+const imageError = ref(false)
 const props = defineProps({
   cocktail:            Object,
   isBartenderMode:     { type: Boolean, default: false },
@@ -143,22 +146,23 @@ const props = defineProps({
   barId:               { type: String, default: '' },
   viewMode:            { type: String, default: 'standard' }, // 'compact' | 'standard'
 })
+const { isSubmitted, submitToCatalog } = useCatalog()
 const { showToast } = useToast()
-const cardEl = ref(null)
-const imageError = ref(false)
-
-const emit = defineEmits(['edit', 'delete', 'open'])
-
-const { barInventory }                             = useInventory()
+const { barInventory, ingredientsByType } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
+const baseSpiritLabel = computed(() => getTypeLabel(props.cocktail.base_spirit, props.locale, ingredientsByType.value))
+const { isFeatureEnabled } = useBarFeatures(props.barId)
+const showPrices = computed(() => isFeatureEnabled('showPrices'))
+const ordersEnabled = computed(() => isFeatureEnabled('order'))
+
+const emit = defineEmits(['edit', 'delete', 'open'])
 
 const t = computed(() => ({
   makeable: props.locale === 'fr' ? 'Disponible' : 'Available',
   notMakeable: props.locale === 'fr' ? 'Non disponible' : 'Not available',
 }))
 
-const baseSpiritLabel = computed(() => getTypeLabel(props.cocktail.base_spirit, props.locale))
 
 function isAvailable(ing) {
   if (ing.Type === 'garnish') return true
@@ -177,7 +181,7 @@ async function handleFavorite() {
 }
 
 async function handleHistoric() {
-  
+
   if (isChecked.value) {
     console.warn('⚠️ Already checked, ignoring')
     return
@@ -197,10 +201,15 @@ async function handleHistoric() {
 
   // Créer une commande pour le bartender
   const result = await addOrder(drinker.value, props.cocktail.id, props.barId)
-  
+
   if (result.success) {
     await quickRefreshHistory()
     showToast('🍸 ' + props.cocktail.name + (props.locale === 'fr' ? ' commandé !' : ' ordered!'))
+    // Retour visuel (icône check) + garde-fou anti double-commande pendant 900ms
+    isChecked.value = true
+    setTimeout(() => {
+      isChecked.value = false
+    }, 900)
   } else {
     console.error('❌ Order failed:', result.error)
   }

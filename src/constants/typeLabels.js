@@ -333,9 +333,25 @@ export const TYPE_LABELS = {
   },
 }
 
-export function getTypeLabel(type, locale = 'fr') {
-  var unavailableCaption = (locale === 'fr' ? 'Indisponible' : 'Unavailable')
-    return TYPE_LABELS[locale]?.[type] ?? unavailableCaption
+/**
+ * Résout le libellé d'un type d'ingrédient.
+ * Ordre de résolution :
+ *   1. Table statique TYPE_LABELS (ingrédients "communs", traduits fr/en)
+ *   2. Map d'ingrédients du bar (DB), si fournie — ex: { [type]: { name, ... } }
+ *   3. Texte "Indisponible" / "Unavailable" en dernier recours
+ *
+ * @param {string} type - clé de l'ingrédient (ex: 'bourbon', ou un type custom du bar)
+ * @param {string} locale - 'fr' | 'en'
+ * @param {Object|null} dbIngredientsMap - optionnel, map { type: { name, ... } } issue de la DB (ex: useInventory)
+ */
+export function getTypeLabel(type, locale = 'fr', dbIngredientsMap = null) {
+  const staticLabel = TYPE_LABELS[locale]?.[type]
+  if (staticLabel) return staticLabel
+
+  const dbLabel = dbIngredientsMap?.[type]?.name
+  if (dbLabel) return dbLabel
+
+  return locale === 'fr' ? 'Indisponible' : 'Unavailable'
 }
 
 export const FAMILY_LABELS = {
@@ -489,22 +505,6 @@ export function getProfileLabel(profile, locale = 'fr') {
   var unavailableCaption = (locale === 'fr' ? 'Indisponible' : 'Unavailable')
   return PROFILE_LABELS[locale]?.[profile] ?? unavailableCaption
 }
-
-// const METHOD_LABELS = {
-//   shake:       '🍸 Shake',
-//   regal_shake: '🍸 Regal Shake',
-//   stir:        '🥄 Stir',
-//   regal_stir:  '🥄 Regal Stir',
-//   build:       '🫗 Build',
-//   blend:       '🌀 Blend',
-//   swizzle:     '🌿 Swizzle',
-//   throw:       '🤹 Throw',
-// }
-
-// export function getMethodLabel(method, locale = 'fr') {
-//   return METHOD_LABELS[method] ?? method
-// }
-
 
 export const DETAILLED_METHOD_LABELS = {
   fr: {

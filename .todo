@@ -1,27 +1,37 @@
-# TODO
+# Fix
+### Cocktail form
+- Corriger sauvegarde d'un cocktail
+- Parfois il faut créer un cocktail en 2 fois, d'abord créer avec juste le nom, puis éditer le cocktail pour y ajouter des infos/ingredients. J'ai aussi l'impression qu'au bout d'un certains temps d'édition, il n'est plus possible de save le formulaire
+### Ingredients
+- Probleme dans le décompte des ingredients / références
+- Probleme avec les boutons tout (dé)sélectionner -> sont-ils pertinents ?
 
+
+# Ameliorations
+- Stocker stats du bar en base pour chargement "immédiats"
+- Ajouter des stats de commandes/favoris pour les trends
+- Detection du theme de l'appareil pour affichage sombre / clair (si theme sombre embarqué, utilisé celui du navigateur/dispositif)
+
+### Validation mail
+Permettre des invitations "VIP" avec des codes d'invitations (permet de skip la validation manuel par admin)
+
+### Versionning
+Gerer la création de tag et l'hebergement pas version tagguée
+Afficher la version actuelle du site dans le footer
+
+### Onglet commande (bartender)
+- Améliorer affichage des commandes
+- ameliorer ergonomie (bouton pour tout valider par exemple)
+
+### Style
+- Simplifier le fichier style.css ?
+--> style général dans style.css et style specifique directement dans le fichier .vue ?
+
+### Suggestions
 - systeme de notes sur 5 ?
 
-## Bartender tools
-- fix checkbox autoriser commande / partage
-- Ajouter checkbox pour affichage des prix coté drinker
-- Bouton commander en mode drinker en fonctionne pas
+### Batching
+- On a une table en BDD qui sert a rien
 
-## Allow bartender to customize features
-- Permettre au bartender d'activer/desactiver des features
-    - Commander
-    - Partager
-    - Autres ?
-
-## Pricing
-- Coté bartender:
-    - afficher cout de preparation en matiere premiere des cocktails (cout d'une unité x quantité de l'ingredient)
-    - cost_calculator, renseigner pour chaque ingrédient, le cout d'une unité
-- Coté drinker
-    - afficher cout cocktail (selon values set par bartender)
-
-## Batching
-- Ajouter modal pour calculer des gros volumes de cocktails + pricing du batch
-
-## Validation des inscriptions
-Lors de la création d'un bar par un nouvel utilisateur (nouvel EMAIL), forcer la validation par moi (via envoie d'un mail a loic.bienvenu.pro@gmail.com) et informer l'utilisateur (afin d'empecher la création de bar a tout va)
+## #Robustification de l'app
+- ?

@@ -915,6 +915,23 @@ body {
   opacity: 0.5;
 }
 
+/* Phase 5 : référence précise affichée en sous-texte discret dans le detail modal */
+.ingredient-name-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ingredient-reference {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 
 .ingredient-quantity {
   font-weight: 600;
@@ -1180,7 +1197,9 @@ body {
 
 .category-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.625rem;
   padding: 0.875rem 1rem;
   background: var(--bg-raised);
@@ -1189,9 +1208,9 @@ body {
 
 .category-title-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .category-title {
@@ -2120,6 +2139,12 @@ body {
   width: 90%;
 }
 
+.modal-container--batch {
+  max-width: 640px;
+  width: 92%;
+  max-height: 90vh;
+}
+
 .form-section {
   display: flex;
   flex-direction: column;
@@ -2149,10 +2174,21 @@ body {
   gap: 0.75rem;
 }
 
+.form-row--pricing {
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+}
+
 .form-field {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.3;
 }
 
 .form-label {
@@ -2191,7 +2227,7 @@ body {
 .recipe-columns-header,
 .recipe-row {
   display: grid;
-  grid-template-columns: 1.2fr 1.4fr 90px 60px 32px;
+  grid-template-columns: 0.9fr 0.9fr 1.1fr 1.1fr 90px 60px 32px;
   gap: 0.4rem;
   align-items: center;
 }
@@ -2562,8 +2598,10 @@ body {
 
   .btn-control { padding: 0.5rem 0.75rem; font-size: 0.72rem; flex: 1; }
   .ingredients-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.4rem; }
+  .category-body { grid-template-columns: 1fr; }
   .inventory-header { flex-direction: column; align-items: stretch; }
   .inventory-controls { width: 100%; }
+  .category-header { flex-wrap: wrap; }
   .btn-toggle-category { width: 100%; }
   .form-row { grid-template-columns: 1fr; }
 }
@@ -2655,12 +2693,14 @@ body {
   .inventory-header { flex-direction: column; align-items: stretch; }
   .inventory-controls { width: 100%; }
   .btn-control { flex: 1; padding: 0.5rem; font-size: 0.72rem; }
+  .category-header { flex-wrap: wrap; }
   .btn-toggle-category { width: 100%; }
   .form-row { grid-template-columns: 1fr; }
-  .recipe-columns-header,.recipe-row {grid-template-columns: 1fr 1fr 50px 40px 26px;}
+  .recipe-columns-header,.recipe-row {grid-template-columns: 0.8fr 0.8fr 0.9fr 0.9fr 50px 40px 26px;}
   .modal-overlay { padding: 0.5rem; align-items: flex-end; }
   /* .modal-container--cocktail { max-height: 95vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; } */
   .modal-container--menucard { max-height: 90vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
+  .modal-container--batch { max-height: 90vh; width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
   .password-modal-content { padding: 1.25rem; }
 }
 
@@ -2823,6 +2863,15 @@ body {
 
 .burger-item--toggle svg {
   opacity: 0.7;
+}
+
+.burger-item--toggle input[type="checkbox"] {
+  margin-left: auto;
+  width: 15px;
+  height: 15px;
+  accent-color: #b07a2a;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 /* Optionnel mais très cool */
@@ -4316,4 +4365,303 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--gold);
+}
+
+.category-header {
+  cursor: pointer;
+}
+
+.category-chevron {
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+.category-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem 1rem; /* marges laterales + basse pour ne pas coller aux bords de la carte catégorie */
+}
+
+/* Scopée à .ingredient-item-wrap pour ne pas écraser le style plus simple
+   de .ingredients-grid .ingredient-item (résultats de recherche). Avant ce
+   fix, cette règle (plus bas dans le fichier = priorité en cascade)
+   s'appliquait partout, d'où l'affichage cassé/incohérent. */
+/* Type / réf / champs / supprimer tenus sur une seule ligne dans la mesure
+   du possible : ingredient-pricing n'a plus de flex-basis:100%, donc il
+   reste inline tant que la largeur de la colonne le permet, et ne repasse
+   à la ligne (grâce à flex-wrap sur le parent) que si ça ne rentre plus. */
+.ingredient-item-wrap .ingredient-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+/* Nom tronqué (ellipsis + title au survol) : on ne lui laisse que la place
+   nécessaire pour ne pas pousser les champs à la ligne suivante. */
+.ingredient-name {
+  flex: 0 1 auto;
+  min-width: 3.2rem;
+  max-width: 8.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Conteneur commun aux champs de prix + bouton supprimer : c'est LUI qui
+   pousse à droite (margin-left:auto), pas .ingredient-pricing seul — ainsi
+   le bouton supprimer reste ancré à droite même quand l'ingrédient est
+   décoché et que .ingredient-pricing ne s'affiche plus. */
+.ingredient-item-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+.ingredient-pricing {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+/* Décocher un ingrédient/une référence ne doit pas faire "sauter" la
+   taille de la ligne (les champs restent dans le flux, pas de v-if) : on
+   les grise plutôt que de les cacher, pour indiquer visuellement qu'ils
+   sont inactifs tout en gardant le contexte (dernier prix renseigné,
+   ABV...) lisible. */
+.fields-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.fields-disabled .field-unit input,
+.fields-disabled .pricing-mode-select {
+  cursor: not-allowed;
+}
+
+/* Sélecteur de mode de tarification (Btl / mL) : très compact, libellés
+   courts pour ne pas manger de largeur au détriment des champs de valeur. */
+.pricing-mode-select {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  padding: 0.25rem 0.15rem;
+  font-size: 0.72rem;
+  width: 3rem;
+  flex-shrink: 0;
+}
+
+/* Champ avec unité affichée en suffixe DANS le champ (au lieu du texte
+   libre "€/ml" qui suivait l'input avant, hors de tout conteneur) :
+   ça évite un input trop large + un bout de texte qui flotte à côté,
+   et ça garde tout sur une seule ligne bien plus facilement. */
+.field-unit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.field-unit input {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  padding: 0.25rem 0.35rem;
+  font-size: 0.75rem;
+  width: 100%;
+  /* Les flèches natives up/down des inputs number se superposaient au
+     texte saisi et au suffixe d'unité vu l'étroitesse des champs.
+     On les masque : Chrome/Safari/Edge (webkit) puis Firefox (moz). */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.field-unit input::-webkit-outer-spin-button,
+.field-unit input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.field-unit-suffix {
+  position: absolute;
+  right: 0.3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Largeurs calées sur la longueur du suffixe, avec le padding-right de
+   l'input qui laisse juste la place nécessaire pour ne pas chevaucher. */
+.field-unit--currency { width: 2.9rem; }
+.field-unit--currency input { padding-right: 1.1rem; }
+
+.field-unit--volume { width: 3.2rem; }
+.field-unit--volume input { padding-right: 1.3rem; }
+
+.field-unit--percent { width: 2.7rem; }
+.field-unit--percent input { padding-right: 1rem; }
+
+.field-unit--rate { width: 3.9rem; }
+.field-unit--rate input { padding-right: 2.1rem; }
+
+.ingredient-abv-input {
+  width: 100% !important;
+}
+
+/* --- Phase 3 : références (bouteilles précises), mode expert opt-in --- */
+.ingredient-item-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.badge-references,
+.btn-manage-references {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  background: var(--bg-raised);
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-manage-references {
+  color: var(--text-dim);
+  border-color: var(--border-mid);
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+}
+
+.badge-references:hover,
+.btn-manage-references:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.references-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-left: 1.6rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--gold-dim);
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+
+.reference-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.reference-checkbox {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: var(--gold);
+  flex-shrink: 0;
+}
+
+.reference-name {
+  flex: 0 1 auto;
+  min-width: 4rem;
+  max-width: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+/* Même principe que .ingredient-item-actions : le conteneur pousse à
+   droite, pas .reference-pricing seul, pour garder le bouton supprimer
+   ancré à droite même quand la référence est décochée. */
+.reference-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.reference-pricing {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.reference-abv-input {
+  width: 100% !important;
+}
+
+.btn-remove-reference {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--border-mid);
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.btn-remove-reference:hover {
+  color: var(--danger, #c0392b);
+}
+
+.btn-delete-ingredient {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--border-mid);
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.btn-delete-ingredient:hover {
+  color: var(--danger, #c0392b);
+  opacity: 1;
+}
+
+.reference-add-form {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 0.3rem;
+}
+
+.reference-add-input {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.82rem;
 }

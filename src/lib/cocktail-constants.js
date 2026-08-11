@@ -88,7 +88,6 @@ export function getMethods() {
  */
 export function getIceTypes() {
   const constants = loadedConstants || loadConstants()
-  console.log('Loaded ice types:', constants.ice_types)
   return constants.ice_types || {}
 }
 

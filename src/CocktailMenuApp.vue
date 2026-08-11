@@ -88,8 +88,9 @@
         />
 
         <!-- Main (bar chargé) -->
+        <PendingApproval v-if="isLoggedIn && bar && !isBarApproved" />
         <BarMainView
-          v-if="activeBarId && !showBarsSelection"
+          v-else-if="activeBarId && !showBarsSelection"
           :isLoggedIn="isLoggedIn"
           :activeBarId="activeBarId"
           :cocktails="cocktails"
@@ -230,6 +231,7 @@
             :isBartenderMode="isLoggedIn"
             :bar-id="activeBarId"
             @close="closeCocktailDetailModal"
+            @edit="(c) => { closeCocktailDetailModal(); openEditCocktailFormModal(c) }"
           />
         </Transition>
       </div>
@@ -267,7 +269,7 @@ import BarSelector       from '@/Components/BarSelector.vue'
 import BarMainView       from '@/Components/BarMainView.vue'
 import Footer            from '@/Components/Footer.vue'
 import ConfirmModal      from '@/Components/Modals/ConfirmModal.vue'
-
+import PendingApproval   from '@/Components/PendingApproval.vue'
 // Lazy-loaded — ne font pas partie du bundle initial
 const AuthModal         = defineAsyncComponent(() => import('@/Components/Modals/AuthModal.vue'))
 const DrinkerLoginModal = defineAsyncComponent(() => import('@/Components/Modals/DrinkerLoginModal.vue'))
@@ -287,7 +289,8 @@ const cardToDelete = ref(null)
 const {
   isLoggedIn, bar, bars, hasMultipleBars, isBarPublic,
   inviteCode, currentBarId, currentBarName,
-  initAuth, signOut, fetchBar,
+  isBarApproved,
+  initAuth, signOut, fetchBar, 
 } = useAuth()
 
 // ── UI ────────────────────────────────────────────────────────────────────────
@@ -492,6 +495,19 @@ async function onAuthSuccess() {
   // explicitement pour que currentBarId soit déjà set
   await fetchBar()
   if (!currentBarId.value) return
+
+  // Filet de sécurité : signUp() crée le bar mais n'initialise pas ses
+  // ingrédients par défaut (contrairement à handleCreateNewBar). Comme
+  // initializeDefaultIngredients() est idempotente (elle vérifie s'il y a
+  // déjà des lignes avant d'insérer), on peut l'appeler ici à chaque
+  // connexion sans risque de doublons : elle ne popule que si la table
+  // ingredients est vide pour ce bar.
+  try {
+    await initializeDefaultIngredients(currentBarId.value)
+  } catch (err) {
+    console.error('⚠️ Error initializing ingredients:', err)
+  }
+
   await loadBarData(currentBarId.value)
 }
 

@@ -4,1147 +4,1803 @@
     "name": "Bourbon",
     "category": "spirits",
     "family": "Whiskey",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 40,
+    "price_per_ml": null
   },
   {
     "type": "rye",
     "name": "Rye Whiskey",
     "category": "spirits",
     "family": "Whiskey",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 40,
+    "price_per_ml": null
   },
   {
     "type": "scotch",
     "name": "Scotch Whisky",
     "category": "spirits",
     "family": "Whiskey",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 40,
+    "price_per_ml": null
   },
   {
     "type": "irish_whiskey",
     "name": "Irish Whiskey",
     "category": "spirits",
     "family": "Whiskey",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 40,
+    "price_per_ml": null
   },
   {
     "type": "peated_whisky",
     "name": "Islay Scotch",
     "category": "spirits",
     "family": "Whiskey",
-    "abv": 43.0
+    "abv": 43.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 50,
+    "price_per_ml": null
   },
   {
     "type": "whiskey",
     "name": "Whiskey",
     "category": "spirits",
     "family": "Whiskey",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 40,
+    "price_per_ml": null
   },
   {
     "type": "rum",
     "name": "Rum",
     "category": "spirits",
     "family": "Rum",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 30,
+    "price_per_ml": null
   },
   {
     "type": "rum_agricol",
     "name": "Rhum Agricole",
     "category": "spirits",
     "family": "Rum",
-    "abv": 50.0
+    "abv": 50.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 30,
+    "price_per_ml": null
   },
   {
     "type": "rum_cuban",
     "name": "Rhum Cubain",
     "category": "spirits",
     "family": "Rum",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 20,
+    "price_per_ml": null
   },
   {
     "type": "rum_jamaican",
     "name": "Rhum Jamaicain",
     "category": "spirits",
     "family": "Rum",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 30,
+    "price_per_ml": null
   },
   {
     "type": "rum_overproof",
     "name": "Overproof Rhum",
     "category": "spirits",
     "family": "Rum",
-    "abv": 63.0
+    "abv": 63.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 40,
+    "price_per_ml": null
   },
   {
     "type": "cachaca",
     "name": "Cachaça",
     "category": "spirits",
     "family": "Rum",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "tequila",
     "name": "Tequila",
     "category": "spirits",
     "family": "Agave",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 45,
+    "price_per_ml": null
   },
   {
     "type": "tequila_reposado",
     "name": "Tequila Reposado",
     "category": "spirits",
     "family": "Agave",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 45,
+    "price_per_ml": null
   },
   {
     "type": "mezcal",
     "name": "Mezcal",
     "category": "spirits",
     "family": "Agave",
-    "abv": 42.0
+    "abv": 42.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 50,
+    "price_per_ml": null
   },
   {
     "type": "gin",
     "name": "Gin",
     "category": "spirits",
     "family": "Gin",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "gin_dry",
     "name": "Dry Gin",
     "category": "spirits",
     "family": "Gin",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "gin_navy",
     "name": "Navy Strength Gin",
     "category": "spirits",
     "family": "Gin",
-    "abv": 57.0
+    "abv": 57.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 50,
+    "price_per_ml": null
   },
   {
     "type": "genever",
     "name": "Genièvre",
     "category": "spirits",
     "family": "Gin",
-    "abv": 35.0
+    "abv": 35.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "vodka",
     "name": "Vodka",
     "category": "spirits",
     "family": "Vodka",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "cognac",
     "name": "Cognac",
     "category": "spirits",
     "family": "Brandy",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 45,
+    "price_per_ml": null
   },
   {
     "type": "brandy",
     "name": "Brandy",
     "category": "spirits",
     "family": "Brandy",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 45,
+    "price_per_ml": null
   },
   {
     "type": "calvados",
     "name": "Calvados",
     "category": "spirits",
     "family": "Brandy",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 45,
+    "price_per_ml": null
   },
   {
     "type": "pisco",
     "name": "Pisco",
     "category": "spirits",
     "family": "Brandy",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 45,
+    "price_per_ml": null
   },
   {
     "type": "grappa",
     "name": "Grappa",
     "category": "spirits",
     "family": "Brandy",
-    "abv": 42.0
+    "abv": 42.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 45,
+    "price_per_ml": null
   },
   {
     "type": "absinthe",
     "name": "Absinthe",
     "category": "spirits",
     "family": "Absinthe",
-    "abv": 65.0
+    "abv": 65.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 55,
+    "price_per_ml": null
   },
   {
     "type": "aquavit",
     "name": "Aquavit",
     "category": "spirits",
     "family": "Aquavit",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "pastis",
     "name": "Pastis",
     "category": "spirits",
     "family": "Pastis",
-    "abv": 45.0
+    "abv": 45.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 20,
+    "price_per_ml": null
   },
   {
     "type": "aperol",
     "name": "Aperol",
     "category": "licors",
     "family": "Liqueur Amer",
-    "abv": 11.0
+    "abv": 11.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "campari",
     "name": "Campari",
     "category": "licors",
     "family": "Liqueur Amer",
-    "abv": 24.0
+    "abv": 24.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "cynar",
     "name": "Cynar",
     "category": "licors",
     "family": "Liqueur Amer",
-    "abv": 16.5
+    "abv": 16.5,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "fernet_branca",
     "name": "Fernet Branca",
     "category": "licors",
     "family": "Liqueur Amer",
-    "abv": 39.0
+    "abv": 39.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "amaro",
     "name": "Amaro",
     "category": "licors",
     "family": "Liqueur Amer",
-    "abv": 30.0
+    "abv": 30.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "suze",
     "name": "Suze",
     "category": "licors",
     "family": "Liqueur Amer",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "malort",
     "name": "Malört",
     "category": "licors",
     "family": "Liqueur Amer",
-    "abv": 35.0
+    "abv": 35.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "chartreuse_green",
     "name": "Chartreuse Verte",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 55.0
+    "abv": 55.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 50,
+    "price_per_ml": null
   },
   {
     "type": "chartreuse_yellow",
     "name": "Chartreuse Jaune",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 55,
+    "price_per_ml": null
   },
   {
     "type": "benedictine",
     "name": "Bénédictine",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "galliano",
     "name": "Galliano",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 42.3
+    "abv": 42.3,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "allspice",
     "name": "AllSpice Dram",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 22.0
+    "abv": 22.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "falernum",
     "name": "Falernum",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 11.0
+    "abv": 11.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "swedish_punsch",
     "name": "Swedish Punsch",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 26.0
+    "abv": 26.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "mint_licor",
     "name": "Liqueur Menthe",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 25.0
+    "abv": 25.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "sambuca",
     "name": "Sambuca",
     "category": "licors",
     "family": "Liqueur Herbes",
-    "abv": 38.0
+    "abv": 38.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "triple_sec",
     "name": "Triple Sec",
     "category": "licors",
     "family": "Liqueur Agrume",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "curacao",
     "name": "Curaçao",
     "category": "licors",
     "family": "Liqueur Agrume",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "limoncello",
     "name": "Limoncello",
     "category": "licors",
     "family": "Liqueur Agrume",
-    "abv": 26.0
+    "abv": 26.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "italicus",
     "name": "Italicus",
     "category": "licors",
     "family": "Liqueur Agrume",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 35,
+    "price_per_ml": null
   },
   {
     "type": "cherry_heering",
     "name": "Cherry Heering",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 24.0
+    "abv": 24.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "maraschino",
     "name": "Maraschino",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 32.0
+    "abv": 32.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "cassis_licor",
     "name": "Liqueur Cassis",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 16.0
+    "abv": 16.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "mure_licor",
     "name": "Liqueur Mûre",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 18.0
+    "abv": 18.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "sloe_gin",
     "name": "Sloe Gin",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 26.0
+    "abv": 26.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 30,
+    "price_per_ml": null
   },
   {
     "type": "elderflower_licor",
     "name": "Liqueur de Sureau",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 30,
+    "price_per_ml": null
   },
   {
     "type": "violet_licor",
     "name": "Liqueur de Violette",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "apricot_licor",
     "name": "Liqueur Abricot",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 25.0
+    "abv": 25.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "banana_licor",
     "name": "Liqueur Banane",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "mango_licor",
     "name": "Liqueur Mangue",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "peach_licor",
     "name": "Liqueur Pêche",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 18.0
+    "abv": 18.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "midori",
     "name": "Midori",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "pimms",
     "name": "Pimm's",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 25.0
+    "abv": 25.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "pear_licor",
     "name": "Liqueur de Poire",
     "category": "licors",
     "family": "Liqueur Fruits",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 22,
+    "price_per_ml": null
   },
   {
     "type": "amaretto",
     "name": "Amaretto",
     "category": "licors",
     "family": "Liqueur Noix",
-    "abv": 21.0
+    "abv": 21.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "frangelico",
     "name": "Frangelico",
     "category": "licors",
     "family": "Liqueur Noix",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "walnut_licor",
     "name": "Liqueur Noix",
     "category": "licors",
     "family": "Liqueur Noix",
-    "abv": 30.0
+    "abv": 30.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "pit_licor",
     "name": "Liqueur de Noyaux",
     "category": "licors",
     "family": "Liqueur Noix",
-    "abv": 25.0
+    "abv": 25.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 25,
+    "price_per_ml": null
   },
   {
     "type": "coffee_licor",
     "name": "Liqueur de Café",
     "category": "licors",
     "family": "Liqueur Dessert",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 30,
+    "price_per_ml": null
   },
   {
     "type": "baileys",
     "name": "Baileys",
     "category": "licors",
     "family": "Liqueur Dessert",
-    "abv": 17.0
+    "abv": 17.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 20,
+    "price_per_ml": null
   },
   {
     "type": "licor_43",
     "name": "Liqueur 43",
     "category": "licors",
     "family": "Liqueur Dessert",
-    "abv": 31.0
+    "abv": 31.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 20,
+    "price_per_ml": null
   },
   {
     "type": "chocolate_licor",
     "name": "Liqueur Chocolat",
     "category": "licors",
     "family": "Liqueur Dessert",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 20,
+    "price_per_ml": null
   },
   {
     "type": "drambuie",
     "name": "Drambuie",
     "category": "licors",
     "family": "Liqueur Dessert",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 20,
+    "price_per_ml": null
   },
   {
     "type": "dry_vermouth",
     "name": "Vermouth Dry",
     "category": "modifiers",
     "family": "Vermouth",
-    "abv": 18.0
+    "abv": 18.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 18,
+    "price_per_ml": null
   },
   {
     "type": "blanc_vermouth",
     "name": "Vermouth Blanc",
     "category": "modifiers",
     "family": "Vermouth",
-    "abv": 18.0
+    "abv": 18.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 18,
+    "price_per_ml": null
   },
   {
     "type": "sweet_vermouth",
     "name": "Vermouth Sweet",
     "category": "modifiers",
     "family": "Vermouth",
-    "abv": 16.0
+    "abv": 16.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 18,
+    "price_per_ml": null
   },
   {
     "type": "lillet",
     "name": "Lillet",
     "category": "modifiers",
     "family": "Vin Aromatisé",
-    "abv": 17.0
+    "abv": 17.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "cocchi_americano",
     "name": "Cocchi Americano",
     "category": "modifiers",
     "family": "Vin Aromatisé",
-    "abv": 16.5
+    "abv": 16.5,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 18,
+    "price_per_ml": null
   },
   {
     "type": "sherry",
     "name": "Xérès / Sherry",
     "category": "modifiers",
     "family": "Vin Fortifié",
-    "abv": 17.0
+    "abv": 17.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 18,
+    "price_per_ml": null
   },
   {
     "type": "porto",
     "name": "Porto",
     "category": "modifiers",
     "family": "Vin Fortifié",
-    "abv": 20.0
+    "abv": 20.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 18,
+    "price_per_ml": null
   },
   {
     "type": "sparkling_wine",
     "name": "Vin Pétillant",
     "category": "modifiers",
     "family": "Vin Pétillant",
-    "abv": 12.0
+    "abv": 12.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 15,
+    "price_per_ml": null
   },
   {
     "type": "sake",
     "name": "Saké",
     "category": "modifiers",
     "family": "Saké",
-    "abv": 15.0
+    "abv": 15.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 15,
+    "price_per_ml": null
   },
   {
     "type": "beer",
     "name": "Bière",
     "category": "modifiers",
     "family": "Bière",
-    "abv": 5.0
+    "abv": 5.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "ipa_beer",
     "name": "Bière IPA",
     "category": "modifiers",
     "family": "Bière",
-    "abv": 6.5
+    "abv": 6.5,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "stout_beer",
     "name": "Stout",
     "category": "modifiers",
     "family": "Bière",
-    "abv": 5.0
+    "abv": 5.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "red_wine",
     "name": "Vin Rouge",
     "category": "modifiers",
     "family": "Vin",
-    "abv": 13.0
+    "abv": 13.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "dry_white_wine",
     "name": "Vin Blanc Sec",
     "category": "modifiers",
     "family": "Vin",
-    "abv": 12.5
+    "abv": 12.5,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "sweet_white_wine",
     "name": "Vin Blanc Doux",
     "category": "modifiers",
     "family": "Vin",
-    "abv": 11.0
+    "abv": 11.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "rose_wine",
     "name": "Vin Rosé",
     "category": "modifiers",
     "family": "Vin",
-    "abv": 12.0
+    "abv": 12.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 750,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "lemon_juice",
     "name": "Jus de citron",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "lime_juice",
     "name": "Jus de Lime",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "orange_juice",
     "name": "Jus d'orange",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "grapefruit_juice",
     "name": "Jus de pamplemousse",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "pineapple_juice",
     "name": "Jus d'ananas",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "cranberry_juice",
     "name": "Jus de cranberry",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "apple_juice",
     "name": "Jus de pomme",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "passion_juice",
     "name": "Jus de passion",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "tomato_juice",
     "name": "Jus de tomate",
     "category": "juices",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 3,
+    "price_per_ml": null
   },
   {
     "type": "simple_syrup",
     "name": "Sirop simple",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "semi_simple_syrup",
     "name": "Sirop semi",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "rich_simple_syrup",
     "name": "Sirop riche",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "honey_syrup",
     "name": "Sirop de miel",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "grenadine",
     "name": "Grenadine",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "orgeat",
     "name": "Orgeat",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "agave_syrup",
     "name": "Sirop d'agave",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "cinnamon_syrup",
     "name": "Sirop de cannelle",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "passion_fruit_syrup",
     "name": "Sirop de passion",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "raspberry_syrup",
     "name": "Sirop de framboise",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "vanilla_syrup",
     "name": "Sirop de vanille",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "maple_syrup",
     "name": "Sirop d'érable",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "demerara_syrup",
     "name": "Sirop Demerara",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "coconut_syrup",
     "name": "Sirop de coco",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "guava_syrup",
     "name": "Sirop de Goyave",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "ginger_syrup",
     "name": "Sirop de Gingembre",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "hibiscus_syrup",
     "name": "Sirop d'Hibiscus",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "redcurrant_syrup",
     "name": "Sirop de Groseille",
     "category": "syrups",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 700,
+    "bottle_price": 10,
+    "price_per_ml": null
   },
   {
     "type": "angostura_bitters",
     "name": "Angostura Bitters",
     "category": "bitters",
     "family": "Bitters",
-    "abv": 44.7
+    "abv": 44.7,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 150,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "peychaud_bitters",
     "name": "Peychaud's Bitters",
     "category": "bitters",
     "family": "Bitters",
-    "abv": 35.0
+    "abv": 35.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 150,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "orange_bitters",
     "name": "Orange Bitters",
     "category": "bitters",
     "family": "Bitters",
-    "abv": 28.0
+    "abv": 28.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 150,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "chocolate_bitters",
     "name": "Chocolate Bitters",
     "category": "bitters",
     "family": "Bitters",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 150,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "celery_bitters",
     "name": "Celery Bitters",
     "category": "bitters",
     "family": "Bitters",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 150,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "walnut_bitters",
     "name": "Walnut Bitters",
     "category": "bitters",
     "family": "Bitters",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 150,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "bitters",
     "name": "Bitters",
     "category": "bitters",
     "family": "Bitters",
-    "abv": 40.0
+    "abv": 40.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 150,
+    "bottle_price": 12,
+    "price_per_ml": null
   },
   {
     "type": "club_soda",
     "name": "Eau gazeuse",
     "category": "mixers",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 2,
+    "price_per_ml": null
   },
   {
     "type": "tonic_water",
     "name": "Tonic",
     "category": "mixers",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 2,
+    "price_per_ml": null
   },
   {
     "type": "ginger_soda",
     "name": "Ginger Beer",
     "category": "mixers",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 2,
+    "price_per_ml": null
   },
   {
     "type": "cola",
     "name": "Cola",
     "category": "mixers",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 2,
+    "price_per_ml": null
   },
   {
     "type": "coconut_cream",
     "name": "Crème de coco",
     "category": "mixers",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 2,
+    "price_per_ml": null
   },
   {
     "type": "lemon_zest",
     "name": "Zeste Citron",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "lime_zest",
     "name": "Zeste Lime",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "orange_zest",
     "name": "Zeste Orange",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "grapefruit_zest",
     "name": "Zeste Pamplemousse",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "lemon_swath",
     "name": "Swath Citron",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "lime_swath",
     "name": "Swath Lime",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "orange_swath",
     "name": "Swath Orange",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "grapefruit_swath",
     "name": "Swath Pamplemousse",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "lime_wheel",
     "name": "Rondelle Lime",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "cocktail_cherry",
     "name": "Cerise",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "olive",
     "name": "Olive",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "nutmeg",
     "name": "Muscade",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "mint",
     "name": "Menthe",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "cucumber",
     "name": "Concombre",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "strawberry",
     "name": "Fraise",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "celery",
     "name": "Céleri",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "salt",
     "name": "Sel",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "sugar_rim",
     "name": "Sucre (bord)",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "dried_fruit",
     "name": "Fruits séchés",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "cinnamon_stick",
     "name": "Bâton de cannelle",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "grape",
     "name": "Raisin",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "orange_wheel",
     "name": "Rondelle Orange",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "lemon_wheel",
     "name": "Rondelle Citron",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "pineapple",
     "name": "Ananas",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "pineapple_fronds",
     "name": "Feuilles Ananas",
     "category": "garnish",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "aquafaba",
     "name": "Aquafaba",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "egg",
     "name": "Œuf entier",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "heavy_cream",
     "name": "Crème épaisse",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "milk",
     "name": "Lait",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "butter",
     "name": "Beurre",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "coffee",
     "name": "Café",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "cold_brew",
     "name": "Cold Brew",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "tea",
     "name": "Thé",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "matcha",
     "name": "Matcha",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "hot_sauce",
     "name": "Sauce piquante",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "worcestershire",
     "name": "Worcestershire",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "water",
     "name": "Eau",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   },
   {
     "type": "hot_water",
     "name": "Eau chaude",
     "category": "others",
     "family": null,
-    "abv": 0.0
+    "abv": 0.0,
+    "pricing_mode": "bottle",
+    "bottle_volume_ml": 1000,
+    "bottle_price": 5,
+    "price_per_ml": null
   }
 ]

@@ -169,7 +169,9 @@
           <!-- En-têtes colonnes -->
           <div class="recipe-columns-header">
             <span>Catégorie</span>
+            <span>Type</span>
             <span>Ingrédient</span>
+            <span>Référence</span>
             <span>{{ unit === 'oz' ? 'Oz' : 'Ml' }}</span>
             <span>Dash</span>
             <span></span>
@@ -187,16 +189,17 @@
               <!-- categorie l'ingrédient -->
               <select v-model="ing.Category" @change="onCategoryChange(ing)" class="form-input">
                 <option
-                  v-for="(_, catKey) in INGREDIENTS_BY_CATEGORY"
+                  v-for="(label, catKey) in CATEGORY_LABELS"
                   :key="catKey"
                   :value="catKey"
                 >
-                  {{ CATEGORY_LABELS[catKey] ?? catKey }}
+                  {{ label }}
                 </option>
               </select>
 
-              <!-- Nom de l'ingrédient -->
+              <!-- Type d'ingrédient (lien stock / coût) -->
               <select v-model="ing.Type" @change="onIngredientChange(ing)" class="form-input">
+                <option value="" disabled>-- Type --</option>
                 <option
                   v-for="(item, typeKey) in getTypesByCategory(ing.Category)"
                   :key="typeKey"
@@ -205,6 +208,32 @@
                   {{ item.name }}
                 </option>
               </select>
+
+              <!-- Nom de l'ingrédient (libre, éditable) -->
+              <input
+                type="text"
+                v-model="ing.Ingredient"
+                class="form-input"
+                placeholder="Nom du produit (ex. Havana Club 3 Años)"
+              />
+
+              <!-- Référence précise (optionnel, uniquement si le bar en a défini pour ce type) -->
+              <select
+                v-if="getAvailableReferences(ing.Type).length"
+                v-model="ing.Reference"
+                @change="onReferenceChange(ing)"
+                class="form-input"
+              >
+                <option value="">— N'importe quelle bouteille —</option>
+                <option
+                  v-for="ref in getAvailableReferences(ing.Type)"
+                  :key="ref.id"
+                  :value="ref.name"
+                >
+                  {{ ref.name }}
+                </option>
+              </select>
+              <span v-else class="form-input form-input--placeholder"></span>
 
               <!-- Quantité -->
               <!-- OZ -->
@@ -242,6 +271,30 @@
               <button type="button" @click="removeRecipeLine(idx)" class="btn-remove-ingredient">
                 <Trash2 :size="15" />
               </button>
+            </div>
+          </div>
+        
+          <div class="form-row form-row--pricing">
+            <div class="form-field">
+              <label class="form-label">Prix de vente</label>
+              <input v-model.number="form.price" type="number" step="0.5" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">Coût matière</label>
+              <span v-if="cost.total > 0">{{ cost.total.toFixed(2) }}€</span>
+              <span v-else class="form-hint">
+                Aucun coût calculable — vérifie les prix des ingrédients dans le stock
+              </span>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Marge</label>
+              <span v-if="currentMargin">
+                {{ currentMargin.absolute.toFixed(2) }}€
+                ({{ currentMargin.percent.toFixed(0) }}%)
+              </span>
+              <span v-else class="form-hint">
+                {{ cost.total > 0 ? 'Renseigne un prix de vente pour voir la marge' : 'Renseigne un coût pour voir la marge' }}
+              </span>
             </div>
           </div>
         </section>
@@ -333,19 +386,24 @@ import { getGlassesAsOptions,
   getMethodsAsOptions,
   getCocktailCategoriesAsOptions,
   getCocktailStyles,
-  getAllIngredients,
-  getIngredientsByCategory,
   getIceTypes,
   getBaseSpiritGroups,
   getSpiritToCategoryMap,
   getProfileOptions } from '@/lib/cocktail-constants'
 import { getDetailledIceLabel } from '../../constants/typeLabels'
+import { useCocktailCost } from '@/composables/useCostCalculator'
+import { useInventory } from '@/composables/useInventory'
+
+// ── Ingrédients : source unique = DB (plus de JSON statique) ─────
+const { ingredients, getAvailableReferences } = useInventory()
+const { cost, margin } = useCocktailCost(
+  computed(() => form.value.recipe),
+  ingredients
+)
+const currentMargin = computed(() => margin(form.value.price))
 
 const categories = getBaseSpiritGroups()
 const spiritToCategoryMap = getSpiritToCategoryMap()
-
-const INGREDIENTS_MAP = getAllIngredients()
-const INGREDIENTS_BY_CATEGORY = getIngredientsByCategory()
 
 const props = defineProps({ 
   cocktail: Object,
@@ -366,10 +424,6 @@ const imagePreviewError = ref(false)
 const uploadingImage = ref(false)
 const uploadError = ref('')
 
-// Réinitialise l'état "image cassée" à chaque changement de source,
-// pour laisser une nouvelle URL/upload une vraie chance de charger
-// (c'est l'absence de ce reset couplé à un @error qui vidait le champ
-// avant : il ne fallait JAMAIS toucher form.image depuis le handler d'erreur).
 watch(() => props.cocktail, () => {}, { immediate: false })
 
 async function handleFileUpload(e) {
@@ -397,13 +451,14 @@ async function handleFileUpload(e) {
     uploadError.value = `Échec de l'upload : ${message}. Vérifie que le bucket "${supabaseImageBucket}" existe et que le stockage Supabase est configuré.`
   } finally {
     uploadingImage.value = false
-    e.target.value = '' // permet de re-sélectionner le même fichier si besoin
+    e.target.value = ''
   }
 }
 
 // ── Catégories pour filtre recette ───────────────
 const recipeCategoryFilter = reactive({})
 
+// Catégories structurelles fixes (taxonomie du domaine, pas des données de stock)
 const CATEGORY_LABELS = {
   spirits:   '🥃 Spiritueux',
   licors:    '🍷 Liqueurs',
@@ -416,7 +471,7 @@ const CATEGORY_LABELS = {
   others:    '📦 Autres',
 }
 
-// ── Options depuis constantes centralisées ───────
+// ── Options depuis constantes centralisées (verres, méthodes, glace, styles) ──
 const glassOptions = computed(() => getGlassesAsOptions())
 const iceOptions = computed(() => getIceTypes())
 const methodOptions = computed(() => getMethodsAsOptions())
@@ -426,15 +481,48 @@ const cocktailStyleOptions = computed(() => getCocktailStyles())
 // ── Computed ─────────────────────────────────────
 const isNew = computed(() => !props.cocktail?.id)
 
+// ── Ingrédients : map plate type -> ingrédient, depuis la DB uniquement ──
+const ingredientsMap = computed(() => {
+  const map = {}
+  ingredients.value.forEach(i => { map[i.type] = i })
+  return map
+})
+
+// Ingrédients groupés par catégorie, depuis la DB uniquement
+function getTypesByCategory(cat) {
+  const result = {}
+  ingredients.value
+    // .filter(i => i.category === cat && i.available !== false)
+    .filter(i => i.category === cat)
+    .forEach(i => { result[i.type] = { name: i.name } })
+
+  return Object.fromEntries(
+    Object.entries(result).sort(([, a], [, b]) => a.name.localeCompare(b.name, 'fr'))
+  )
+}
+
 // ── ABV calculé automatiquement depuis la recette ──
+// Priorité : ABV de la référence choisie > ABV du stock du bar pour ce type.
+// Plus de fallback JSON statique.
+function resolveLineAbv(ing) {
+  const stockIngredient = ingredients.value.find(i => i.type === ing.Type)
+  if (!stockIngredient) return 0
+
+  if (ing.Reference) {
+    const ref = (stockIngredient.references || []).find(r => r.name === ing.Reference)
+    if (ref?.abv != null) return Number(ref.abv)
+  }
+
+  return stockIngredient.abv != null ? Number(stockIngredient.abv) : 0
+}
+
 const computedAbv = computed(() => {
   let totalMl = 0
   let totalAlcMl = 0
   form.value.recipe.forEach(ing => {
     const ml = parseFloat(ing.Ml) || (parseFloat(ing.Oz) || 0) * 29.5735
     if (!ml) return
-    const matched = INGREDIENTS_MAP[ing.Type]
-    const abv = matched?.abv ?? 0
+    const abv = resolveLineAbv(ing)
     totalMl += ml
     totalAlcMl += (ml * abv) / 100
   })
@@ -463,6 +551,8 @@ const form = ref({
   creation_year: props.cocktail?.creation_year   ?? '',
   cocktail_style: props.cocktail?.cocktail_style ?? '',
   ice:            props.cocktail?.ice            ?? '',
+  price:          props.cocktail?.price           ?? null,
+  image:          props.cocktail?.image           ?? '',
   season:  [...(props.cocktail?.season  ?? [])],
   profile: [...(props.cocktail?.profile ?? [])],
   tags:    [...(props.cocktail?.tags    ?? [])],
@@ -473,7 +563,8 @@ const form = ref({
       return {
         Ingredient: i.Ingredient ?? '',
         Type: type,
-        Category: findCategoryFromType(type), // 💥 clé du fix
+        Reference: i.Reference ?? '',
+        Category: findCategoryFromType(type),
         Oz: i.Oz ?? '',
         Ml: i.Ml ?? '',
         Dashes: i.Dashes ?? null,
@@ -481,8 +572,22 @@ const form = ref({
     }),
 })
 
+// ⚠️ IMPORTANT : findCategoryFromType() ci-dessus est appelée à l'initialisation
+// synchrone de `form`, donc AVANT que `ingredients` (useInventory) ait forcément
+// fini de charger si le fetch est asynchrone. Si tu constates que la Catégorie
+// des lignes de recette existantes reste vide à l'édition d'un cocktail,
+// ajoute ce watch pour re-hydrater une fois les ingrédients disponibles :
+//
+// watch(ingredients, (list) => {
+//   if (!list?.length) return
+//   form.value.recipe.forEach(ing => {
+//     if (!ing.Category && ing.Type) {
+//       ing.Category = findCategoryFromType(ing.Type)
+//     }
+//   })
+// }, { once: true })
+
 // Réinitialise l'aperçu cassé à chaque fois que l'image change
-// (nouvelle URL tapée, upload terminé, ou changement de mode)
 watch(() => form.value.image, () => {
   imagePreviewError.value = false
 })
@@ -502,6 +607,7 @@ function addRecipeLine() {
     Category: '',
     Type: '',
     Ingredient: '',
+    Reference: '',
     Oz: '',
     Ml: '',
     Dashes: null
@@ -516,13 +622,18 @@ function removeRecipeLine(idx) {
 function handleSave() {
   try {
     const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
-    // const iceArr = form.value.ice ? [form.value.ice] : []
+
+    const droppedLines = form.value.recipe.filter(ing => !ing.Type && (ing.Ingredient?.trim() || ing.Oz || ing.Ml))
+    if (droppedLines.length) {
+      throw new Error(`Choisis un Type pour : ${droppedLines.map(l => l.Ingredient || '(sans nom)').join(', ')}`)
+    }
 
     const cleanedRecipe = form.value.recipe
       .filter(ing => ing.Type)
       .map(({ Category, ...rest }) => ({
         Ingredient: rest.Ingredient,
         Type: rest.Type,
+        ...(rest.Reference?.trim() ? { Reference: rest.Reference.trim() } : {}),
         IsGarnish: Category === 'garnish',
         Oz: normalizeNumber(rest.Oz),
         Ml: normalizeNumber(rest.Ml),
@@ -534,10 +645,11 @@ function handleSave() {
       recipe: cleanedRecipe,
       abv: abvFinal,
       ice: form.value.ice,
+      price: form.value.price,
     },{
       forBar: true
     })
-console.log('SAVE PAYLOAD', validated)
+
     if (!props.barId) {
       throw new Error('barId manquant')
     }
@@ -556,27 +668,23 @@ console.log('SAVE PAYLOAD', validated)
 function onCategoryChange(ing) {
   ing.Type = ''
   ing.Ingredient = ''
+  ing.Reference = ''
+}
+
+function onReferenceChange(ing) {
+  if (ing.Reference) ing.Ingredient = ing.Reference
 }
 
 function onIngredientChange(ing) {
-  const meta = INGREDIENTS_MAP[ing.Type]
+  if (ing.Ingredient?.trim()) return // ne pas écraser une valeur déjà saisie
+  const meta = ingredientsMap.value[ing.Type]
   if (meta) {
     ing.Ingredient = meta.name
   }
 }
 
 function findCategoryFromType(type) {
-  for (const [catKey, items] of Object.entries(INGREDIENTS_BY_CATEGORY)) {
-    if (items[type]) return catKey
-  }
-  return ''
-}
-
-function getTypesByCategory(cat) {
-  const raw = INGREDIENTS_BY_CATEGORY[cat] || {}
-  return Object.fromEntries(
-    Object.entries(raw).sort(([, a], [, b]) => a.name.localeCompare(b.name, 'fr'))
-  )
+  return ingredientsMap.value[type]?.category ?? ''
 }
 
 function ozToMl(oz) {
@@ -623,6 +731,13 @@ const descriptionForLocale = computed({
 </script>
 
 <style scoped>
+.form-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 0.3rem;
+}
+
 .image-mode-switch {
   margin-bottom: 0.5rem;
   width: fit-content;
