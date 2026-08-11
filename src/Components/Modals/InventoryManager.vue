@@ -125,14 +125,23 @@
                 </select>
                 <template v-if="ing.pricing_mode === 'ml'">
                   <input type="number" step="0.001" v-model.number="ing.price_per_ml"
-                    @change="updateIngredientPricing(ing.type, { price_per_ml: ing.price_per_ml })" placeholder="€/ml" />
+                    @change="updateIngredientPricing(ing.type, { price_per_ml: ing.price_per_ml })" placeholder="€/ml">€/ml</input>
                 </template>
                 <template v-else>
                   <input type="number" step="0.5" v-model.number="ing.bottle_price"
-                    @change="updateIngredientPricing(ing.type, { bottle_price: ing.bottle_price })" placeholder="€ bouteille" />
+                    @change="updateIngredientPricing(ing.type, { bottle_price: ing.bottle_price })" placeholder="€ bouteille">€</input>
                   <input type="number" step="10" v-model.number="ing.bottle_volume_ml"
-                    @change="updateIngredientPricing(ing.type, { bottle_volume_ml: ing.bottle_volume_ml })" placeholder="ml" />
+                    @change="updateIngredientPricing(ing.type, { bottle_volume_ml: ing.bottle_volume_ml })" placeholder="ml">ml</input>
                 </template>
+                <input
+                  v-if="hasAbv(category.key)"
+                  type="number" step="0.5" min="0" max="100"
+                  v-model.number="ing.abv"
+                  @change="updateIngredientPricing(ing.type, { abv: ing.abv })"
+                  placeholder="% abv"
+                  title="Titre alcoométrique par défaut de cet ingrédient"
+                  class="ingredient-abv-input"
+                >%</input>
               </div>
             </div>
 
@@ -141,26 +150,27 @@
               <div class="reference-row" v-for="ref in (ing.references || [])" :key="ref.id">
                 <input
                   type="checkbox"
+                  class="reference-checkbox"
                   :checked="ref.available"
                   @change="toggleReferenceAvailable(ing.type, ref.id)"
                 />
                 <span class="reference-name">{{ ref.name }}</span>
                 <div class="reference-pricing" v-if="ref.available">
                   <input type="number" step="0.5" :value="ref.abv"
-                    @change="updateReference(ing.type, ref.id, { abv: parseFloat($event.target.value) || null })" placeholder="% abv" class="reference-abv-input" />
+                    @change="updateReference(ing.type, ref.id, { abv: parseFloat($event.target.value) || null })" placeholder="% abv" class="reference-abv-input">%</input>
                   <select :value="ref.pricing_mode" @change="updateReference(ing.type, ref.id, { pricing_mode: $event.target.value })">
                     <option value="bottle">Bouteille</option>
                     <option value="ml">Au ml</option>
                   </select>
                   <template v-if="ref.pricing_mode === 'ml'">
                     <input type="number" step="0.001" :value="ref.price_per_ml"
-                      @change="updateReference(ing.type, ref.id, { price_per_ml: parseFloat($event.target.value) || null })" placeholder="€/ml" />
+                      @change="updateReference(ing.type, ref.id, { price_per_ml: parseFloat($event.target.value) || null })" placeholder="€/ml">€/ml</input>
                   </template>
                   <template v-else>
                     <input type="number" step="0.5" :value="ref.bottle_price"
-                      @change="updateReference(ing.type, ref.id, { bottle_price: parseFloat($event.target.value) || null })" placeholder="€ bouteille" />
+                      @change="updateReference(ing.type, ref.id, { bottle_price: parseFloat($event.target.value) || null })" placeholder="€ bouteille">€</input>
                     <input type="number" step="10" :value="ref.bottle_volume_ml"
-                      @change="updateReference(ing.type, ref.id, { bottle_volume_ml: parseFloat($event.target.value) || null })" placeholder="ml" />
+                      @change="updateReference(ing.type, ref.id, { bottle_volume_ml: parseFloat($event.target.value) || null })" placeholder="ml">ml</input>
                   </template>
                 </div>
                 <button type="button" class="btn-remove-reference" @click="removeReference(ing.type, ref.id)" title="Supprimer cette référence">
@@ -322,6 +332,15 @@ const categoryMetadata = {
   mixers:    { label: 'Mixers',        icon: '🥤' },
   garnish:   { label: 'Garniture',     icon: '🍋' },
   others:    { label: 'Autres',        icon: '📦' },
+}
+
+// Catégories pour lesquelles l'ABV générique de l'ingrédient est éditable
+// (sert de valeur par défaut dans le calcul de coût/ABV tant qu'aucune
+// référence précise n'est renseignée)
+const ABV_EDITABLE_CATEGORIES = new Set(['spirits', 'licors', 'modifiers', 'mixers'])
+
+function hasAbv(categoryKey) {
+  return ABV_EDITABLE_CATEGORIES.has(categoryKey)
 }
 
 const selectedCount = computed(() =>

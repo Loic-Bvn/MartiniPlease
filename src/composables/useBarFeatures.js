@@ -22,6 +22,14 @@ export function useBarFeatures(publicBarId = null) {
   const currentBar = computed(() => {
 
     if (publicBarId) {
+      // Si le bartender consulte son propre bar (CocktailCard avec :bar-id),
+      // on privilégie l'état live du singleton useAuth plutôt que le cache
+      // public (publicBarsCache), qui n'est jamais invalidé par setFeature().
+      // Sans ça, un toggle de feature (ex: showPrices) ne se reflète qu'après
+      // un rechargement complet de la page.
+      if (bar.value?.id === publicBarId) {
+        return bar.value
+      }
       return loadedBar.value
     }
 

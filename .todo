@@ -5,9 +5,9 @@
 # EN COURS
 ## Ingredients / Cocktail Form
 - Ameliorer affichage (CSS) du stock des ingredients / references
-- Faire en sorte que l'affichage du prix soit direct apres on/off (obligé de recharger la page actuellement)
+ --> afficher type, ref, champs, delete sur la meme ligne dans la mesure du possible
 
-## Amelioration
+## Ameliorations
 - Stocker stats du bar en base pour chargement "immédiats"
 - Ajouter des stats de commandes/favoris pour les trends
 - Detection du theme de l'appareil pour affichage sombre / clair (si theme sombre embarqué, utilisé celui du navigateur/dispositif)

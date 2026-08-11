@@ -4392,11 +4392,16 @@ body {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.5rem 0.6rem;
+  gap: 0.5rem 0.7rem;
+  padding: 0.55rem 0.7rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-raised);
+}
+
+.ingredient-name {
+  flex: 1 1 auto;
+  min-width: 6rem;
 }
 
 .ingredient-pricing {
@@ -4404,7 +4409,12 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-left: auto;
+  flex-basis: 100%;
+  margin-left: 2.2rem; /* aligné sous le nom, après la checkbox */
+}
+
+.ingredient-abv-input {
+  width: 4rem !important;
 }
 
 .ingredient-pricing select,
@@ -4473,6 +4483,14 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.reference-checkbox {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: var(--gold);
+  flex-shrink: 0;
 }
 
 .reference-name {
