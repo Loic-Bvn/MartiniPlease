@@ -22,6 +22,15 @@
             @keyup.esc="$emit('update:showNewBarInput', false)"
             autofocus
           />
+          <input
+            :value="newBarInviteCode"
+            @input="$emit('update:newBarInviteCode', $event.target.value)"
+            type="text"
+            :placeholder="locale === 'fr' ? 'Code VIP (optionnel)' : 'VIP code (optional)'"
+            class="new-bar-input"
+            @keyup.enter="$emit('create-new-bar')"
+            @keyup.esc="$emit('update:showNewBarInput', false)"
+          />
           <button @click="$emit('create-new-bar')" class="btn-confirm" title="Créer">
             <Plus :size="14" />
           </button>
@@ -181,6 +190,7 @@ const props = defineProps({
   editingBarCode: String,
   updatingBarId: String,
   newBarName: String,
+  newBarInviteCode: String,
   showNewBarInput: Boolean,
   barToDelete: Object,
   deleteConfirmationInput: String,
@@ -197,6 +207,7 @@ const emit = defineEmits([
   'close-delete-modal',
   'delete-bar',
   'update:newBarName',
+  'update:newBarInviteCode',
   'update:editingBarName',
   'update:editingBarCode',
   'update:deleteConfirmationInput',

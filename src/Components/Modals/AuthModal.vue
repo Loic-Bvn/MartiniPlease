@@ -83,6 +83,15 @@
             autocomplete="new-password"
           />
         </div>
+        <div class="password-form-group">
+          <input
+            type="text"
+            v-model="inviteCode"
+            placeholder="Code VIP (optionnel)"
+            class="password-form-input"
+            autocomplete="off"
+          />
+        </div>
 
         <p v-if="authError" class="password-form-error">{{ authError }}</p>
 
@@ -107,10 +116,11 @@ const emit = defineEmits(['close', 'success'])
 
 const { signIn, signUp, authLoading, authError } = useAuth()
 
-const mode     = ref('login')
-const email    = ref('')
-const password = ref('')
-const barName  = ref('')
+const mode       = ref('login')
+const email      = ref('')
+const password   = ref('')
+const barName    = ref('')
+const inviteCode = ref('')
 
 async function handleLogin() {
   if (!email.value || !password.value) return
@@ -124,9 +134,10 @@ async function handleLogin() {
 async function handleSignup() {
   if (!email.value || !password.value || !barName.value) return
   const result = await signUp({
-    email:    email.value,
-    password: password.value,
-    barName:  barName.value,
+    email:      email.value,
+    password:   password.value,
+    barName:    barName.value,
+    inviteCode: inviteCode.value,
   })
   if (result.success) {
     emit('success')

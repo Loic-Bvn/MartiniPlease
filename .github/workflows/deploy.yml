@@ -1,8 +1,20 @@
 name: Deploy to GitHub Pages
 
+# Hébergement piloté par version taguée :
+#  - push d'un tag "vX.Y.Z" → déploiement auto de cette version (le cas normal)
+#  - déclenchement manuel (Actions → Run workflow) avec un tag en paramètre →
+#    permet de choisir explicitement quelle version x.y.z est publique,
+#    y compris pour revenir en arrière sur une version antérieure (rollback)
+#    sans avoir à créer un nouveau tag.
 on:
   push:
-    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag à héberger (ex: v1.4.0) — doit déjà exister'
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -12,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version || github.ref_name }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -23,6 +37,7 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_KEY }}
           VITE_BARTENDER_PASSWORD: ${{ secrets.VITE_BARTENDER_PASSWORD }}
+          VITE_APP_VERSION: ${{ inputs.version || github.ref_name }}
         run: |
           npm install
           npm run build
@@ -33,3 +48,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           cname: martiniplease.fr
+
+      - name: Create GitHub Release
+        # Uniquement pour un vrai push de tag. Un redéploiement manuel d'une
+        # version existante ne doit pas re-créer/écraser sa release.
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

@@ -170,7 +170,7 @@ export function useAuth() {
   // de dépendre du front pour un événement de sécurité, et ça marche même
   // si l'utilisateur ferme l'onglet juste après l'inscription.
 
-  async function signUp({ email, password, barName }) {
+  async function signUp({ email, password, barName, inviteCode }) {
     authLoading.value = true
     authError.value   = ''
     try {
@@ -188,6 +188,12 @@ export function useAuth() {
       bars.value = []
       persistBarId(barData.id)
 
+      // Code VIP (optionnel) — si valide, approuve le bar immédiatement,
+      // sans attendre la validation manuelle admin.
+      if (inviteCode?.trim()) {
+        await _tryRedeemInviteCode(inviteCode.trim(), barData.id)
+      }
+
       // Email de bienvenue — fire-and-forget, ne doit jamais bloquer l'inscription.
       // Appelé uniquement ici (signUp), jamais dans createNewBar() : garantit
       // qu'un même utilisateur ne reçoit ce mail qu'une seule fois.
@@ -195,7 +201,7 @@ export function useAuth() {
         .invoke('send-welcome-email', { body: { email, barName } })
         .catch(err => console.error('send-welcome-email:', err))
 
-      return { success: true, data: barData }
+      return { success: true, data: bar.value }
     } catch (err) {
       authError.value = err.message
       return { success: false, error: err.message }
@@ -233,7 +239,7 @@ export function useAuth() {
   // Même logique de validation : status='pending' par défaut, notification
   // email gérée côté serveur (DB Webhook), pas ici.
 
-  async function createNewBar(barName) {
+  async function createNewBar(barName, inviteCode) {
     if (!session.value) return { success: false, error: 'Non connecté' }
     authLoading.value = true
     authError.value   = ''
@@ -248,7 +254,12 @@ export function useAuth() {
       bars.value.push(barData)
       bar.value = barData
       persistBarId(barData.id)
-      return { success: true, data: barData }
+
+      if (inviteCode?.trim()) {
+        await _tryRedeemInviteCode(inviteCode.trim(), barData.id)
+      }
+
+      return { success: true, data: bar.value }
     } catch (err) {
       authError.value = err.message
       return { success: false, error: err.message }
@@ -294,6 +305,26 @@ export function useAuth() {
     } catch (err) {
       console.error('❌ updateInviteCode:', err)
       return { success: false, error: err.message }
+    }
+  }
+
+  // ── Code VIP ─────────────────────────────────────────────────────────────
+  // Appelle le RPC (SECURITY DEFINER) qui valide ET consomme le code de façon
+  // atomique côté DB. Ne bloque jamais la création du bar : un code invalide,
+  // expiré ou déjà épuisé laisse simplement le bar en 'pending' comme avant.
+  async function _tryRedeemInviteCode(code, barId) {
+    try {
+      const { data: redeemed, error } = await supabase
+        .rpc('redeem_vip_invite_code', { p_code: code, p_bar_id: barId })
+      if (error) {
+        console.error('❌ redeem_vip_invite_code:', error)
+        return
+      }
+      if (redeemed) {
+        _updateLocalBar(barId, { status: 'approved' })
+      }
+    } catch (err) {
+      console.error('❌ redeem_vip_invite_code:', err)
     }
   }
 

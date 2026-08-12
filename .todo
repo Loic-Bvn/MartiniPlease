@@ -1,19 +1,14 @@
 # Fix
-### Cocktail form
-- Corriger sauvegarde d'un cocktail
-- Parfois il faut créer un cocktail en 2 fois, d'abord créer avec juste le nom, puis éditer le cocktail pour y ajouter des infos/ingredients. J'ai aussi l'impression qu'au bout d'un certains temps d'édition, il n'est plus possible de save le formulaire
-### Ingredients
-- Probleme dans le décompte des ingredients / références
-- Probleme avec les boutons tout (dé)sélectionner -> sont-ils pertinents ?
-
+- Nothing to do for now
 
 # Ameliorations
+### Stats
 - Stocker stats du bar en base pour chargement "immédiats"
-- Ajouter des stats de commandes/favoris pour les trends
+- Ajouter des stats de commandes/favoris pour les trends ?
+
+### Theme
 - Detection du theme de l'appareil pour affichage sombre / clair (si theme sombre embarqué, utilisé celui du navigateur/dispositif)
 
-### Validation mail
-Permettre des invitations "VIP" avec des codes d'invitations (permet de skip la validation manuel par admin)
 
 ### Versionning
 Gerer la création de tag et l'hebergement pas version tagguée

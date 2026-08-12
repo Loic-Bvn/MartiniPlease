@@ -4,6 +4,7 @@
       <div class="flex flex-col md:flex-row justify-between items-center gap-3">
         <p class="footer-text">
           🍸 <span class="footer-brand">MartiniPlease</span> · © {{ currentYear }} Loïc B.
+          <span class="footer-version" :title="`Version ${appVersion}`">{{ appVersion }}</span>
         </p>
         <nav class="flex flex-wrap gap-x-3 gap-y-1 items-center justify-center">
           <a @click="navigateTo('legal-notice')" class="footer-link">{{ t.legal }}</a>
@@ -42,6 +43,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import CookieConsentBanner from './CookieConsentBanner.vue'
+import pkg from '../../package.json'
 
 const props = defineProps({
   locale: { type: String, default: 'fr' }
@@ -49,6 +51,12 @@ const props = defineProps({
 
 const currentYear = new Date().getFullYear()
 const showCookieConsent = ref(false)
+
+// En prod, injectée par le workflow de déploiement à partir du tag git poussé
+// (VITE_APP_VERSION=github.ref_name, ex. "v1.4.0") — voir .github/workflows/deploy.yml
+// et `npm run release`. En dev local (pas de build taggé), fallback sur la
+// version de package.json avec un suffixe explicite.
+const appVersion = import.meta.env.VITE_APP_VERSION || `v${pkg.version}-dev`
 
 const emit = defineEmits(['navigate-to-legal'])
 
@@ -115,6 +123,12 @@ function openConsent() {
   color: var(--border);
   font-size: 0.75rem;
   user-select: none;
+}
+.footer-version {
+  margin-left: 6px;
+  font-size: 0.7rem;
+  color: var(--text-dim, var(--text-muted));
+  opacity: 0.7;
 }
 
 /* Mention sanitaire — même taille que footer-text mais plus contrastée
