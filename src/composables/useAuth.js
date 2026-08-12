@@ -56,6 +56,14 @@ const bars        = ref([])      // tous les bars du compte
 const authLoading = ref(false)
 const authError   = ref('')
 
+// ── Reset mot de passe (NOUVEAU) ─────────────────────────────────────────────
+// Passe à `true` quand Supabase détecte un lien de récupération valide dans
+// l'URL (événement 'PASSWORD_RECOVERY' du client, cf. resetPasswordForEmail
+// plus bas). Le front affiche alors ResetPasswordView à la place de l'appli
+// normale, tant que ce flag n'est pas retombé à false (mot de passe changé,
+// ou déconnexion/annulation).
+const passwordRecoveryMode = ref(false)
+
 export function useAuth() {
   const { toastError } = useToast()
 
@@ -75,15 +83,30 @@ export function useAuth() {
   // ── Initialisation ──────────────────────────────────────────────────────────
 
   async function initAuth() {
+    // ⚠️  IMPORTANT : on enregistre onAuthStateChange AVANT tout appel async.
+    // Supabase traite l'URL de retour (lien de reset, OAuth…) dès la création
+    // du client, en tâche de fond — s'il termine et émet 'PASSWORD_RECOVERY'
+    // avant qu'on ait enregistré ce listener, on rate l'événement. getSession()
+    // attend cette même initialisation en interne, donc si on l'appelait en
+    // premier (comme avant), l'événement pouvait déjà être passé.
+    supabase.auth.onAuthStateChange(async (event, newSession) => {
+      // 'PASSWORD_RECOVERY' : l'utilisateur vient de cliquer le lien reçu par
+      // mail. Supabase a déjà établi une session temporaire (via le param
+      // ?code=... ou #access_token=... de l'URL, selon le flow) — on ne
+      // touche pas au routing "bar" habituel, on bascule juste en mode
+      // saisie du nouveau mot de passe. Voir ResetPasswordView.vue.
+      if (event === 'PASSWORD_RECOVERY') {
+        passwordRecoveryMode.value = true
+      }
+
+      session.value = newSession
+      if (newSession && !passwordRecoveryMode.value) await fetchBar()
+      else if (!newSession)                          _clearAuthState()
+    })
+
     const { data } = await supabase.auth.getSession()
     session.value = data.session
-    if (session.value) await fetchBar()
-
-    supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      session.value = newSession
-      if (newSession) await fetchBar()
-      else            _clearAuthState()
-    })
+    if (session.value && !passwordRecoveryMode.value) await fetchBar()
   }
 
   // ── Récupération des bars ───────────────────────────────────────────────────
@@ -228,6 +251,61 @@ export function useAuth() {
     }
   }
 
+  // ── Reset mot de passe (NOUVEAU) ─────────────────────────────────────────────
+  // Étape 1 : demande d'envoi du mail. Supabase gère l'envoi lui-même (via son
+  // propre système de templates email — cf. config Supabase Studio/Resend SMTP,
+  // voir TODO). `redirectTo` pointe vers la racine du site : au retour,
+  // onAuthStateChange reçoit l'événement 'PASSWORD_RECOVERY' (voir initAuth)
+  // qui bascule passwordRecoveryMode à true, quel que soit le flow retenu par
+  // Supabase (implicit #access_token= ou PKCE ?code=).
+  async function resetPasswordForEmail(email) {
+    authLoading.value = true
+    authError.value   = ''
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname,
+      })
+      if (error) throw error
+      return { success: true }
+    } catch (err) {
+      authError.value = err.message
+      return { success: false, error: err.message }
+    } finally {
+      authLoading.value = false
+    }
+  }
+
+  // Étape 2 : l'utilisateur est revenu depuis le mail (passwordRecoveryMode
+  // === true, session temporaire déjà active) et saisit son nouveau mot de
+  // passe. On le connecte "pour de bon" ensuite (fetchBar + sortie du mode
+  // recovery) — pas besoin de repasser par signIn().
+  async function updatePassword(newPassword) {
+    authLoading.value = true
+    authError.value   = ''
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) throw error
+
+      passwordRecoveryMode.value = false
+      await fetchBar()
+      return { success: true }
+    } catch (err) {
+      authError.value = err.message
+      return { success: false, error: err.message }
+    } finally {
+      authLoading.value = false
+    }
+  }
+
+  // Permet d'annuler (ex: bouton "annuler" sur ResetPasswordView) — déconnecte
+  // la session temporaire de récupération plutôt que de laisser l'utilisateur
+  // bloqué sur cet écran.
+  async function cancelPasswordRecovery() {
+    passwordRecoveryMode.value = false
+    await supabase.auth.signOut()
+    _clearAuthState()
+  }
+
   // ── Déconnexion ─────────────────────────────────────────────────────────────
 
   async function signOut() {
@@ -359,6 +437,7 @@ export function useAuth() {
     isBarApproved,
     isBarPending,
     isBarRejected,
+    passwordRecoveryMode,
     initAuth,
     fetchBar,
     switchBar,
@@ -370,5 +449,8 @@ export function useAuth() {
     createNewBar,
     updateBarName,
     updateInviteCode,
+    resetPasswordForEmail,
+    updatePassword,
+    cancelPasswordRecovery,
   }
 }

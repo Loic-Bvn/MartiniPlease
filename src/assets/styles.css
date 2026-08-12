@@ -1467,6 +1467,32 @@ body {
   font-weight: 500;
 }
 
+.password-forgot-link {
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: -0.5rem 0 1.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: left;
+}
+
+.password-forgot-link:hover { color: var(--gold-dim); }
+
+.password-reset-success {
+  color: var(--text);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
 .password-modal-buttons { display: flex; gap: 0.75rem; }
 
 .password-btn-cancel {
