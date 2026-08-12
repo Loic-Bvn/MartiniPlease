@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
 import { validateCocktail } from '@/composables/useDataValidator'
+import { track } from '@/lib/analytics'
 
 const catalog        = ref([])
 const imported       = ref(new Set()) // catalog IDs importés par ce bar
@@ -240,6 +241,8 @@ export function useCatalog() {
         [barCocktail.id]: hash
       }
 
+
+      track('cocktail_created', { barId })
 
       return {
         success: true,

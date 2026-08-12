@@ -6,6 +6,7 @@
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { validateDrinkerCreation } from '@/composables/useDataValidator'
+import { track } from '@/lib/analytics'
 
 const drinker    = ref(null)      // { id, pseudo, bar_id, token }
 const favorites  = ref(new Set()) // Set de cocktail_id
@@ -124,6 +125,7 @@ export function useDrinker() {
       if (error) { console.error('❌ removeFavorite:', error); return }
       favorites.value.delete(cocktailId)
       favorites.value = new Set(favorites.value)
+      track('favorite_toggled', { action: 'remove' })
     } else {
       // Ajouter
       const { error } = await supabase
@@ -137,6 +139,7 @@ export function useDrinker() {
       if (error) { console.error('❌ addFavorite:', error); return }
       favorites.value.add(cocktailId)
       favorites.value = new Set(favorites.value)
+      track('favorite_toggled', { action: 'add' })
     }
   }
 

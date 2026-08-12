@@ -13,6 +13,7 @@
 import { ref, computed } from 'vue'
 import { supabase }      from '@/lib/supabase'
 import { useToast }      from '@/composables/useToast'
+import { track }         from '@/lib/analytics'
 
 // ── État singleton ────────────────────────────────────────────────────────────
 const orders           = ref([])
@@ -160,6 +161,8 @@ export function useOrders() {
       } else if (histData && !histData[0]?.success) {
         console.warn('⚠️ History RPC failed:', histData[0]?.message)
       }
+
+      track('order_placed', { barId })
 
       return { success: true, data }
     } catch (err) {

@@ -1,3 +1,6 @@
+## TODO
+TAG new version
+
 # Fix
 - Nothing to do for now
 
@@ -21,3 +24,29 @@
 
 ## #Robustification de l'app
 - ?
+
+# TODO — Prochaine session
+## Reset mot de passe (priorité sécurité)
+- [ ] `useAuth.js` : ajouter `resetPasswordForEmail()` (Supabase Auth)
+- [ ] `AuthModal.vue` : lien "Mot de passe oublié ?" + formulaire email
+- [ ] Nouvelle vue/route pour la saisie du nouveau mot de passe (lien reçu par mail)
+- [ ] Vérifier config du template email de reset côté Supabase (Resend)
+- [ ] Connexion avec google
+
+## Monitoring & analytics
+- [ ] Intégrer Sentry (ou équivalent) — au minimum capter les erreurs JS non catchées et les erreurs Supabase
+- [ ] Décider d'un outil analytics léger, respectueux RGPD (Plausible/Umami) — cohérent avec le cookie banner déjà en place
+- [ ] Définir 3-4 événements clés à tracker (signup, création cocktail, commande passée, favoris)
+
+## Dette technique en cours
+- [ ] Finir la passe accessibilité (ARIA) commencée précédemment
+- [ ] Nettoyer les imports/composables morts identifiés (revue de code en cours)
+
+## QA avant élargissement du cercle VIP
+- [ ] Tester le thème (OS switch live) sur Firefox + Safari, pas seulement Chrome
+- [ ] Tester le flow multi-bar complet avec un code VIP sur un 2e bar
+- [ ] Vérifier RLS de `vip_invite_codes` (un compte non-owner ne doit rien pouvoir lire/écrire dessus)
+- [ ] Repasser sur mobile (iOS Safari + Android Chrome) l'ensemble des flows testés cette session
+
+## Idée non tranchée
+- [ ] Email de remerciement une fois le bar validé (mentionné il y a plusieurs sessions, jamais implémenté — actuellement seule `PendingApproval.vue` informe l'utilisateur côté UI)
