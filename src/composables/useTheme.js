@@ -12,10 +12,12 @@
 
 import { ref } from 'vue'
 
+const media = window.matchMedia('(prefers-color-scheme: dark)')
+
 function getInitialIsDark() {
     const saved = localStorage.getItem('theme')
     if (saved) return saved === 'dark'
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
+    return media.matches
 }
 
 const isDark = ref(getInitialIsDark())
@@ -24,6 +26,16 @@ applyTheme(isDark.value)
 function applyTheme(dark) {
     document.documentElement.classList.toggle('dark', dark)
 }
+
+// Si l'utilisateur n'a jamais choisi explicitement (pas de 'theme' en
+// localStorage), on suit le thème de l'OS en live — y compris s'il change
+// pendant que l'app est ouverte (bascule jour/nuit auto de l'appareil, etc).
+// Dès que l'utilisateur clique le toggle (setTheme), on sort de ce mode auto.
+media.addEventListener('change', (e) => {
+    if (localStorage.getItem('theme')) return
+    isDark.value = e.matches
+    applyTheme(isDark.value)
+})
 
 export function useTheme() {
     function setTheme(nextDark) {
@@ -36,9 +48,17 @@ export function useTheme() {
         setTheme(!isDark.value)
     }
 
+    // Repasse en mode "suit l'OS" (efface le choix explicite sauvegardé).
+    function useSystemTheme() {
+        localStorage.removeItem('theme')
+        isDark.value = media.matches
+        applyTheme(isDark.value)
+    }
+
     return {
         isDark,
         setTheme,
         toggleTheme,
+        useSystemTheme,
     }
 }

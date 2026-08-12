@@ -62,7 +62,6 @@
           :randomLogo="randomLogo"
           :locale="locale"
           :bars="bars"
-          :barStatsMap="barStatsMap"
           :editingBarId="editingBarId"
           :editingBarName="editingBarName"
           :editingBarCode="editingBarCode"
@@ -78,7 +77,6 @@
           @save-bar-edits="(id) => saveBarEdits(id, locale)"
           @cancel-edit-bar="cancelEditBar"
           @start-delete-bar="startDeleteBar"
-          @load-bar-stats="loadBarStats"
           @close-delete-modal="barToDelete = null"
           @delete-bar="() => handleDeleteBar(locale)"
           @update:newBarName="newBarName = $event"
@@ -332,11 +330,9 @@ const {
   editingBarId, editingBarName, editingBarCode, updatingBarId,
   newBarName, newBarInviteCode, showNewBarInput,
   barToDelete, deleteConfirmationInput,
-  barStatsMap,
   handleTogglePublic,
   startEditBar, cancelEditBar, saveBarEdits,
   startDeleteBar, handleDeleteBar,
-  loadBarStats,
   openBarsSelection,
 } = useBarManager({
   onBarSelected: async (b) => {

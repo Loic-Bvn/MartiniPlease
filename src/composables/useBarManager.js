@@ -10,7 +10,6 @@
 import { ref } from 'vue'
 import { supabase }         from '@/lib/supabase'
 import { useAuth }          from '@/composables/useAuth'
-import { useBarStatistics } from '@/composables/useBarStatistics'
 import { useToast }         from '@/composables/useToast'
 
 // ── État singleton ────────────────────────────────────────────────────────────
@@ -24,7 +23,6 @@ const newBarInviteCode        = ref('')
 const showNewBarInput         = ref(false)
 const barToDelete             = ref(null)
 const deleteConfirmationInput = ref('')
-const barStatsMap             = ref({})   // { [barId]: { cocktails: number, cards: number } }
 const togglingPublic          = ref(false)
 
 export function useBarManager({ onBarSelected } = {}) {
@@ -43,7 +41,6 @@ export function useBarManager({ onBarSelected } = {}) {
     selectBar: authSelectBar,
   } = useAuth()
 
-  const { getBarStats }   = useBarStatistics()
   const { showToast }     = useToast()
 
   // ── Sélection d'un bar ──────────────────────────────────────────────────────
@@ -193,12 +190,9 @@ export function useBarManager({ onBarSelected } = {}) {
     }
   }
 
-  // ── Stats ───────────────────────────────────────────────────────────────────
-
-  async function loadBarStats(barId) {
-    if (barStatsMap.value[barId]) return   // mise en cache simple
-    barStatsMap.value[barId] = await getBarStats(barId)
-  }
+  // Note : plus de chargement paresseux ici — BarSelector.vue lit maintenant
+  // directement `b.statistics` (déjà en mémoire via useAuth.bars), voir
+  // useBarStatistics.js pour le fallback si la colonne n'est pas peuplée.
 
   // ── Ouverture de l'écran de sélection ──────────────────────────────────────
 
@@ -227,7 +221,6 @@ export function useBarManager({ onBarSelected } = {}) {
     showNewBarInput,
     barToDelete,
     deleteConfirmationInput,
-    barStatsMap,
     togglingPublic,
 
     // Actions
@@ -239,7 +232,6 @@ export function useBarManager({ onBarSelected } = {}) {
     startDeleteBar,
     handleDeleteBar,
     handleTogglePublic,
-    loadBarStats,
     openBarsSelection,
   }
 }
