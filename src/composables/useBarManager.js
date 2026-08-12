@@ -20,6 +20,7 @@ const editingBarName          = ref('')
 const editingBarCode          = ref('')
 const updatingBarId           = ref(null)
 const newBarName              = ref('')
+const newBarInviteCode        = ref('')
 const showNewBarInput         = ref(false)
 const barToDelete             = ref(null)
 const deleteConfirmationInput = ref('')
@@ -59,14 +60,15 @@ export function useBarManager({ onBarSelected } = {}) {
     const name = newBarName.value.trim()
     if (!name) return { success: false }
 
-    const result = await createNewBar(name)
+    const result = await createNewBar(name, newBarInviteCode.value.trim())
     if (!result.success) {
       showToast(`❌ ${result.error}`)
       return result
     }
 
-    newBarName.value      = ''
-    showNewBarInput.value = false
+    newBarName.value       = ''
+    newBarInviteCode.value = ''
+    showNewBarInput.value  = false
 
     if (initIngredientsFn) {
       try {
@@ -221,6 +223,7 @@ export function useBarManager({ onBarSelected } = {}) {
     editingBarCode,
     updatingBarId,
     newBarName,
+    newBarInviteCode,
     showNewBarInput,
     barToDelete,
     deleteConfirmationInput,

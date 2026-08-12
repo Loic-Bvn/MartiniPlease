@@ -68,6 +68,7 @@
           :editingBarCode="editingBarCode"
           :updatingBarId="updatingBarId"
           :newBarName="newBarName"
+          :newBarInviteCode="newBarInviteCode"
           :showNewBarInput="showNewBarInput"
           :barToDelete="barToDelete"
           :deleteConfirmationInput="deleteConfirmationInput"
@@ -81,6 +82,7 @@
           @close-delete-modal="barToDelete = null"
           @delete-bar="() => handleDeleteBar(locale)"
           @update:newBarName="newBarName = $event"
+          @update:newBarInviteCode="newBarInviteCode = $event"
           @update:editingBarName="editingBarName = $event"
           @update:editingBarCode="editingBarCode = $event"
           @update:deleteConfirmationInput="deleteConfirmationInput = $event"
@@ -328,7 +330,7 @@ const { toastMessage, toastType, showToast } = useToast()
 const {
   showBarsSelection,
   editingBarId, editingBarName, editingBarCode, updatingBarId,
-  newBarName, showNewBarInput,
+  newBarName, newBarInviteCode, showNewBarInput,
   barToDelete, deleteConfirmationInput,
   barStatsMap,
   handleTogglePublic,
