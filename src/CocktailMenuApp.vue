@@ -1,6 +1,10 @@
 <template>
+  <!-- Reset mot de passe : prioritaire sur tout le reste, y compris les
+       pages légales, tant qu'on est en mode récupération (lien mail cliqué) -->
+  <ResetPasswordView v-if="passwordRecoveryMode" />
+
   <!-- Pages légales -->
-  <div v-if="currentLegalPage" class="min-h-screen bg-gray-900">
+  <div v-else-if="currentLegalPage" class="min-h-screen bg-gray-900">
     <LegalNotice   v-if="currentLegalPage === 'legal-notice'"   :locale="locale" @back="closeLegalPage" @navigate="openLegalPage" />
     <PrivacyPolicy v-if="currentLegalPage === 'privacy-policy'" :locale="locale" @back="closeLegalPage" />
     <TermsOfUse    v-if="currentLegalPage === 'terms-of-use'"   :locale="locale" @back="closeLegalPage" />
@@ -278,6 +282,7 @@ const CatalogModal      = defineAsyncComponent(() => import('@/Components/Modals
 const CocktailFormModal = defineAsyncComponent(() => import('@/Components/Modals/CocktailFormModal.vue'))
 const CocktailDetailModal= defineAsyncComponent(() => import('@/Components/Modals/CocktailDetailModal.vue'))
 const MenuCardView      = defineAsyncComponent(() => import('@/Components/MenuCardView.vue'))
+const ResetPasswordView = defineAsyncComponent(() => import('@/Components/ResetPasswordView.vue'))
 const LegalNotice       = defineAsyncComponent(() => import('@/views/LegalNotice.vue'))
 const PrivacyPolicy     = defineAsyncComponent(() => import('@/views/PrivacyPolicy.vue'))
 const TermsOfUse        = defineAsyncComponent(() => import('@/views/TermsOfUse.vue'))
@@ -290,6 +295,7 @@ const {
   isLoggedIn, bar, bars, hasMultipleBars, isBarPublic,
   inviteCode, currentBarId, currentBarName,
   isBarApproved,
+  passwordRecoveryMode,
   initAuth, signOut, fetchBar, 
 } = useAuth()
 

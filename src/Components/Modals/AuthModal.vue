@@ -4,7 +4,9 @@
 
       <div class="password-modal-header">
         <h2 class="password-modal-title">
-          {{ mode === 'login' ? '🍸 Connexion Bartender' : '🍾 Créer mon bar' }}
+          {{ mode === 'login' ? '🍸 Connexion Bartender'
+             : mode === 'reset' ? '🔑 Mot de passe oublié'
+             : '🍾 Créer mon bar' }}
         </h2>
         <button @click="$emit('close')" class="password-modal-close">
           <X :size="20" />
@@ -12,7 +14,7 @@
       </div>
 
       <!-- Tabs login / signup -->
-      <div class="auth-tabs">
+      <div class="auth-tabs" v-if="mode !== 'reset'">
         <button
           :class="['auth-tab', { active: mode === 'login' }]"
           @click="mode = 'login'; authError = ''"
@@ -46,10 +48,52 @@
 
         <p v-if="authError" class="password-form-error">{{ authError }}</p>
 
+        <button
+          type="button"
+          class="password-forgot-link"
+          @click="mode = 'reset'; authError = ''; resetSent = false"
+        >Mot de passe oublié ?</button>
+
         <div class="password-modal-buttons">
           <button type="button" @click="$emit('close')" class="password-btn-cancel">Annuler</button>
           <button type="submit" class="password-btn-submit" :disabled="authLoading">
             {{ authLoading ? '...' : 'Se connecter' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Formulaire reset mot de passe -->
+      <form v-else-if="mode === 'reset'" @submit.prevent="handleResetRequest" novalidate>
+        <p class="password-modal-description">
+          Indique ton email, on t'envoie un lien pour choisir un nouveau mot de passe.
+        </p>
+
+        <div v-if="!resetSent" class="password-form-group">
+          <input
+            type="email"
+            v-model="email"
+            placeholder="Email"
+            class="password-form-input"
+            autocomplete="email"
+          />
+        </div>
+        <p v-else class="password-reset-success">
+          📬 Si un compte existe pour cet email, un lien vient d'être envoyé. Pense à vérifier tes spams.
+        </p>
+
+        <p v-if="authError" class="password-form-error">{{ authError }}</p>
+
+        <div class="password-modal-buttons">
+          <button type="button" @click="mode = 'login'; authError = ''" class="password-btn-cancel">
+            {{ resetSent ? 'Retour' : 'Annuler' }}
+          </button>
+          <button
+            v-if="!resetSent"
+            type="submit"
+            class="password-btn-submit"
+            :disabled="authLoading"
+          >
+            {{ authLoading ? '...' : 'Envoyer le lien' }}
           </button>
         </div>
       </form>
@@ -114,13 +158,14 @@ import { useAuth } from '@/composables/useAuth'
 
 const emit = defineEmits(['close', 'success'])
 
-const { signIn, signUp, authLoading, authError } = useAuth()
+const { signIn, signUp, resetPasswordForEmail, authLoading, authError } = useAuth()
 
 const mode       = ref('login')
 const email      = ref('')
 const password   = ref('')
 const barName    = ref('')
 const inviteCode = ref('')
+const resetSent  = ref(false)
 
 async function handleLogin() {
   if (!email.value || !password.value) return
@@ -129,6 +174,15 @@ async function handleLogin() {
     emit('success')
     emit('close')
   }
+}
+
+async function handleResetRequest() {
+  if (!email.value) return
+  // Supabase ne renvoie pas d'erreur si l'email n'existe pas (pas d'énumération
+  // de comptes possible) : on ne voit une vraie erreur ici qu'en cas de souci
+  // réel (rate limit, email mal formé, etc.).
+  const result = await resetPasswordForEmail(email.value)
+  if (result.success) resetSent.value = true
 }
 
 async function handleSignup() {
