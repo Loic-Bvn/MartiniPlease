@@ -27,6 +27,7 @@
 import { ref, computed } from 'vue'
 import { supabase }      from '@/lib/supabase'
 import { useToast }      from '@/composables/useToast'
+import { track }         from '@/lib/analytics'
 
 // ── Clé localStorage ─────────────────────────────────────────────────────────
 const SELECTED_BAR_ID_KEY = 'selectedBarId'
@@ -223,6 +224,8 @@ export function useAuth() {
       supabase.functions
         .invoke('send-welcome-email', { body: { email, barName } })
         .catch(err => console.error('send-welcome-email:', err))
+
+      track('signup', { hasInviteCode: !!inviteCode?.trim() })
 
       return { success: true, data: bar.value }
     } catch (err) {
