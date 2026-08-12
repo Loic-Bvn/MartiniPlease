@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "release": "npm run release:patch",
+    "release:patch": "npm version patch -m \"chore(release): v%s\" && git push && git push --tags",
+    "release:minor": "npm version minor -m \"chore(release): v%s\" && git push && git push --tags",
+    "release:major": "npm version major -m \"chore(release): v%s\" && git push && git push --tags"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.0",
