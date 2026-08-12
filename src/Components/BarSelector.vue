@@ -95,13 +95,13 @@
               </div>
 
               <!-- Stats à droite -->
-              <div class="bar-stats" @mouseenter="$emit('load-bar-stats', b.id)">
+              <div class="bar-stats">
                 <div class="bar-stat">
-                  <div class="bar-stat-value">{{ barStatsMap[b.id]?.cocktails ?? '-' }}</div>
+                  <div class="bar-stat-value">{{ b.statistics?.cocktails ?? '-' }}</div>
                   <div class="bar-stat-label">Cocktails</div>
                 </div>
                 <div class="bar-stat">
-                  <div class="bar-stat-value">{{ barStatsMap[b.id]?.cards ?? '-' }}</div>
+                  <div class="bar-stat-value">{{ b.statistics?.cards ?? '-' }}</div>
                   <div class="bar-stat-label">{{ locale === 'fr' ? 'Cartes' : 'Cards' }}</div>
                 </div>
               </div>
@@ -113,6 +113,7 @@
                   <Check :size="18" /> {{ locale === 'fr' ? 'Sélectionner' : 'Select' }}
                 </button>
                 <button @click="$emit('start-edit-bar', b)" class="btn-action-small"><Pencil :size="14" /></button>
+                <button @click="viewingTrendsFor = b.id" class="btn-action-small" :title="locale === 'fr' ? 'Tendances' : 'Trends'">📈</button>
                 <button @click="$emit('start-delete-bar', b)" class="btn-action-small btn-action-small--danger"><Trash2 :size="14" /></button>
               </div>
             </div>
@@ -172,6 +173,12 @@
           </div>
         </div>
       </transition>
+      <TrendsModal
+        v-if="viewingTrendsFor"
+        :bar-id="viewingTrendsFor"
+        :locale="locale"
+        @close="viewingTrendsFor = null"
+      />
     </div>
   </div>
 </template>
@@ -179,12 +186,14 @@
 <script setup>
 import { ref } from 'vue'
 import { X, Plus, Pencil, Trash2, Check } from 'lucide-vue-next'
+import TrendsModal from './Modals/TrendsModal.vue'
+
+const viewingTrendsFor = ref(null)
 
 const props = defineProps({
   randomLogo: String,
   locale: String,
   bars: Array,
-  barStatsMap: Object,
   editingBarId: String,
   editingBarName: String,
   editingBarCode: String,
@@ -203,7 +212,6 @@ const emit = defineEmits([
   'save-bar-edits',
   'cancel-edit-bar',
   'start-delete-bar',
-  'load-bar-stats',
   'close-delete-modal',
   'delete-bar',
   'update:newBarName',

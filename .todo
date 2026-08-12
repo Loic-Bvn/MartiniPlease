@@ -3,16 +3,7 @@
 
 # Ameliorations
 ### Stats
-- Stocker stats du bar en base pour chargement "immédiats"
-- Ajouter des stats de commandes/favoris pour les trends ?
-
-### Theme
-- Detection du theme de l'appareil pour affichage sombre / clair (si theme sombre embarqué, utilisé celui du navigateur/dispositif)
-
-
-### Versionning
-Gerer la création de tag et l'hebergement pas version tagguée
-Afficher la version actuelle du site dans le footer
+- peaufiner les stats / affichages / usages
 
 ### Onglet commande (bartender)
 - Améliorer affichage des commandes
