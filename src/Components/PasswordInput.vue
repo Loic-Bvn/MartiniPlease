@@ -50,3 +50,42 @@ const visible = ref(false)
 
 <style scoped>
 .password-input-wrapper {
+  position: relative;
+}
+
+/* Laisse la place au bouton œil pour que le texte ne passe pas dessous */
+.password-input-wrapper :deep(.password-form-input) {
+  padding-right: 2.5rem;
+}
+
+.password-toggle-visibility {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+
+/* color: inherit + opacity plutôt qu'une var(--...) spécifique : évite de
+   dépendre des noms de variables (qui diffèrent selon le thème actif,
+   cf. assets/styles*.css) tout en restant lisible sur tous les fonds. */
+.password-toggle-visibility:hover,
+.password-toggle-visibility:focus-visible {
+  opacity: 1;
+}
+
+.password-toggle-visibility:focus-visible {
+  outline: 2px solid var(--gold-dim, currentColor);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+</style>
