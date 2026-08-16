@@ -15,20 +15,16 @@
       <template v-if="!done">
         <form @submit.prevent="handleSubmit" novalidate>
           <div class="password-form-group">
-            <input
-              type="password"
+            <PasswordInput
               v-model="newPassword"
               placeholder="Nouveau mot de passe (8 caractères min)"
-              class="password-form-input"
               autocomplete="new-password"
             />
           </div>
           <div class="password-form-group">
-            <input
-              type="password"
+            <PasswordInput
               v-model="confirmPassword"
               placeholder="Confirme le mot de passe"
-              class="password-form-input"
               autocomplete="new-password"
             />
           </div>
@@ -58,6 +54,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import PasswordInput from '@/Components/PasswordInput.vue'
 
 const { updatePassword, cancelPasswordRecovery, authLoading, authError } = useAuth()
 

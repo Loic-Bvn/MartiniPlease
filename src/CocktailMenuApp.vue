@@ -60,6 +60,11 @@
           @update:inviteCodeInput="inviteCodeInput = $event"
         />
 
+        <div v-if="isLoggedIn && barFetchError && !bar && !hasMultipleBars" class="bar-fetch-error">
+          <p>😕 Impossible de charger ton bar pour le moment.</p>
+          <button type="button" class="password-btn-submit" @click="fetchBar()">Réessayer</button>
+        </div>
+
         <!-- Sélecteur de bar -->
         <BarSelector
           v-if="(isLoggedIn && hasMultipleBars) || showBarsSelection"
@@ -296,6 +301,7 @@ const {
   inviteCode, currentBarId, currentBarName,
   isBarApproved,
   passwordRecoveryMode,
+  barFetchError,
   initAuth, signOut, fetchBar, 
 } = useAuth()
 

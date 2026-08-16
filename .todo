@@ -27,16 +27,10 @@ TAG new version
 
 # TODO — Prochaine session
 ## Reset mot de passe (priorité sécurité)
-- [ ] `useAuth.js` : ajouter `resetPasswordForEmail()` (Supabase Auth)
-- [ ] `AuthModal.vue` : lien "Mot de passe oublié ?" + formulaire email
-- [ ] Nouvelle vue/route pour la saisie du nouveau mot de passe (lien reçu par mail)
-- [ ] Vérifier config du template email de reset côté Supabase (Resend)
 - [ ] Connexion avec google
 
 ## Monitoring & analytics
-- [ ] Intégrer Sentry (ou équivalent) — au minimum capter les erreurs JS non catchées et les erreurs Supabase
-- [ ] Décider d'un outil analytics léger, respectueux RGPD (Plausible/Umami) — cohérent avec le cookie banner déjà en place
-- [ ] Définir 3-4 événements clés à tracker (signup, création cocktail, commande passée, favoris)
+- [ ] Fix sentry et umami
 
 ## Dette technique en cours
 - [ ] Finir la passe accessibilité (ARIA) commencée précédemment

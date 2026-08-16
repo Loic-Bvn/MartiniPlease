@@ -56,6 +56,12 @@ const bar         = ref(null)    // bar actif — hydraté depuis Supabase au d�
 const bars        = ref([])      // tous les bars du compte
 const authLoading = ref(false)
 const authError   = ref('')
+// Passe à true si fetchBar() échoue (ex: contention du lock Supabase Auth
+// "navigator.locks", multi-onglets…). Permet au template d'afficher un état
+// de secours avec bouton "Réessayer" plutôt que de rester bloqué en blanc
+// (isLoggedIn=true mais bar=null et bars=[] sans qu'aucune condition du
+// template ne matche). Remis à false au début de chaque tentative.
+const barFetchError = ref(false)
 
 // ── Reset mot de passe (NOUVEAU) ─────────────────────────────────────────────
 // Passe à `true` quand Supabase détecte un lien de récupération valide dans
@@ -121,6 +127,8 @@ export function useAuth() {
   async function fetchBar(barId = null) {
     if (!session.value) return
 
+    barFetchError.value = false
+
     const { data, error } = await supabase
       .from('bars')
       .select('*')
@@ -130,6 +138,7 @@ export function useAuth() {
     if (error) {
       console.error('❌ fetchBar:', error)
       toastError(`Impossible de charger les bars : ${error.message}`)
+      barFetchError.value = true
       return
     }
 
@@ -430,6 +439,7 @@ export function useAuth() {
     bars,
     authLoading,
     authError,
+    barFetchError,
     isLoggedIn,
     currentBarId,
     currentBarName,
