@@ -11,7 +11,16 @@ async function bootstrap() {
   const app = createApp(App)
   initMonitoring(app)
   const { initAuth } = useAuth()
-  await initAuth()
+  try {
+    await Promise.race([
+      initAuth(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('initAuth timeout (5s)')), 5000)
+      )
+    ])
+  } catch (err) {
+    console.error('❌ initAuth a échoué ou a expiré, montage de l\'app quand même:', err)
+  }
   app.mount('#app')
 }
 
