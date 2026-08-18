@@ -1,10 +1,10 @@
 <template>
   <div class="password-modal-overlay" @click.self="$emit('close')">
-    <div class="password-modal-content">
+    <div class="password-modal-content" role="dialog" aria-modal="true" aria-labelledby="drinker-login-modal-title">
 
       <div class="password-modal-header">
-        <h2 class="password-modal-title">🥂 {{ locale === 'fr' ? 'Bienvenue !' : 'Welcome!' }}</h2>
-        <button @click="$emit('close')" class="password-modal-close">
+        <h2 class="password-modal-title" id="drinker-login-modal-title">🥂 {{ locale === 'fr' ? 'Bienvenue !' : 'Welcome!' }}</h2>
+        <button @click="$emit('close')" class="password-modal-close" :aria-label="locale === 'fr' ? 'Fermer' : 'Close'">
           <X :size="20" />
         </button>
       </div>
@@ -50,14 +50,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { X } from 'lucide-vue-next'
 
-const props = defineProps({
+defineProps({
   locale: String,
 })
 
 const emit = defineEmits(['drinker-created', 'guest-mode', 'close'])
+
+function handleKeydown(e) {
+  if (e.key === 'Escape') emit('close')
+}
+onMounted(() => window.addEventListener('keydown', handleKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 const pseudoInput = ref('')
 const errorMessage = ref('')

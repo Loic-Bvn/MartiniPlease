@@ -237,13 +237,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { User, GlassWater, Clock, Check, X, Loader2 } from 'lucide-vue-next'
+import { User, GlassWater, Clock, Check, X } from 'lucide-vue-next'
 import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
 import { getTypeLabel } from '../constants/typeLabels.js'
-import { useBarFeatures } from '@/composables/useBarFeatures'
 import { useInventory } from '@/composables/useInventory'
-const { isFeatureEnabled } = useBarFeatures()
 const { ingredientsByType } = useInventory()
 
 const props = defineProps({
@@ -369,13 +367,6 @@ function formatCompletedTime(timestamp) {
   
 //   return `${displayAmount}${displayUnit}`
 // }
-
-function convertUnit(unit) {
-  // Juste convertir l'unité affichée
-  if (props.unit === 'oz' && unit === 'ml') return 'oz'
-  if (props.unit === 'ml' && unit === 'oz') return 'ml'
-  return unit
-}
 
 async function handleComplete(orderId) {
   completingId.value = orderId

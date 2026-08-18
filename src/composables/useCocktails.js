@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
-import { useCatalog } from '@/composables/useCatalog'
 import { validateCocktail } from '@/composables/useDataValidator'
 
 const cocktails = ref([])

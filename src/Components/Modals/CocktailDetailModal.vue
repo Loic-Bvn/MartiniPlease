@@ -1,9 +1,9 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div ref="modalEl" class="modal-container modal-container--cocktail">
+    <div ref="modalEl" class="modal-container modal-container--cocktail" role="dialog" aria-modal="true" aria-labelledby="cocktail-detail-title">
       <div class="modal-header" @touchstart="onHeaderTouchStart" @touchmove="onHeaderTouchMove" @touchend="onHeaderTouchEnd">
         <div class="cocktail-title-row">
-          <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
+          <h3 id="cocktail-detail-title" :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
             {{ cocktail.name }}<span v-if="cocktail.price && showPrices"> - {{ cocktail.price }}€</span>
           </h3>
         </div>

@@ -1,13 +1,13 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-container modal-container--menucard">
+    <div class="modal-container modal-container--menucard" role="dialog" aria-modal="true" aria-labelledby="menucard-modal-title">
 
       <!-- Header -->
       <div class="modal-header">
-        <h2 class="modal-title">
+        <h2 class="modal-title" id="menucard-modal-title">
           {{ isEditing ? t.editTitle : t.newTitle }}
         </h2>
-        <button @click="$emit('close')" class="btn-icon btn-icon--close">
+        <button @click="$emit('close')" class="btn-icon btn-icon--close" aria-label="Fermer">
           <X :size="20" />
         </button>
       </div>
@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { X, Search, Check } from 'lucide-vue-next'
 import { validateMenuCard } from '@/composables/useDataValidator'
 
@@ -123,6 +123,12 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['save', 'close'])
+
+function handleKeydown(e) {
+  if (e.key === 'Escape') emit('close')
+}
+onMounted(() => window.addEventListener('keydown', handleKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 const t = computed(() => ({
   editTitle:           props.locale === 'fr' ? '✏️ Modifier la carte'         : '✏️ Edit card',

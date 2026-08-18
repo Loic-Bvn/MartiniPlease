@@ -30,14 +30,11 @@ export function useBarManager({ onBarSelected } = {}) {
     session,
     bar,
     bars,
-    isLoggedIn,
-    fetchBar,
     toggleBarPublic,
     createNewBar,
     updateBarName,
     updateInviteCode,
     currentBarId,
-    signOut,
     selectBar: authSelectBar,
   } = useAuth()
 

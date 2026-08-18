@@ -135,9 +135,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { ArrowLeft, GlassWater, Rows3, GalleryVerticalEnd } from 'lucide-vue-next'
-import { getTypeLabel, getProfileLabel } from '@/constants/typeLabels.js'
+import { computed } from 'vue'
+import { ArrowLeft, Rows3, GalleryVerticalEnd } from 'lucide-vue-next'
 import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
 import CocktailCard from '@/Components/CocktailCard.vue'
@@ -180,21 +179,6 @@ const CATEGORY_ORDER = computed(() => [
   { key: 'Pastis',   label: 'Pastis',                icon: '⭐' },
   { key: null,       label: t.value.others,          icon: '🍸' },
 ])
-
-const METHOD_LABELS = {
-  shake:       '🍸 Shake',
-  regal_shake: '🍸 Regal Shake',
-  stir:        '🥄 Stir',
-  regal_stir:  '🥄 Regal Stir',
-  build:       '🫗 Build',
-  blend:       '🌀 Blend',
-  swizzle:     '🌿 Swizzle',
-  throw:       '🤹 Throw',
-}
-
-function methodLabel(method) {
-  return METHOD_LABELS[method] || method
-}
 
 const cardCocktails = computed(() =>
   (props.card.cocktail_ids || [])

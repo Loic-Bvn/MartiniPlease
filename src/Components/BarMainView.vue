@@ -193,7 +193,6 @@ const props = defineProps({
   cardView:          { type: String, default: 'standard' }, // 'compact' | 'standard'
   barInventory:      Set,
   ingredients:       Array,
-  searchTerm:        String,
   // Filtres (état en lecture seule — mutations via emit)
   selectedFamilies:   Array,
   selectedSubSpirits: Array,
