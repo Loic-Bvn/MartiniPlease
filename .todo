@@ -18,6 +18,8 @@ TAG new version using "npm run release:patch"
 
 ### Suggestions
 - systeme de notes sur 5 ?
+- Detection de recette via photo
+- Connexion avec google ?
 
 ### Batching
 - On a une table en BDD qui sert a rien
@@ -26,21 +28,9 @@ TAG new version using "npm run release:patch"
 - ?
 
 # TODO — Prochaine session
-## Reset mot de passe (priorité sécurité)
-- [ ] Connexion avec google
-
-## Monitoring & analytics
-- [ ] Fix sentry et umami
-
 ## Dette technique en cours
 - [ ] Finir la passe accessibilité (ARIA) commencée précédemment
 - [ ] Nettoyer les imports/composables morts identifiés (revue de code en cours)
-
-## QA avant élargissement du cercle VIP
-- [ ] Tester le thème (OS switch live) sur Firefox + Safari, pas seulement Chrome
-- [ ] Tester le flow multi-bar complet avec un code VIP sur un 2e bar
-- [ ] Vérifier RLS de `vip_invite_codes` (un compte non-owner ne doit rien pouvoir lire/écrire dessus)
-- [ ] Repasser sur mobile (iOS Safari + Android Chrome) l'ensemble des flows testés cette session
 
 ## Idée non tranchée
 - [ ] Email de remerciement une fois le bar validé (mentionné il y a plusieurs sessions, jamais implémenté — actuellement seule `PendingApproval.vue` informe l'utilisateur côté UI)
