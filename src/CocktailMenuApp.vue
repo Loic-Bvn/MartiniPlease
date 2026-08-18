@@ -65,6 +65,19 @@
           <button type="button" class="password-btn-submit" @click="fetchBar()">Réessayer</button>
         </div>
 
+        <!-- Filet de sécurité : connecté, mais aucun bar trouvé et pas d'erreur
+             explicite (ex: RLS qui filtre silencieusement, requête qui renvoie
+             0 ligne sans lever d'erreur…). Sans ce bloc, aucune condition du
+             template ne matche et l'utilisateur reste bloqué sur une page
+             vide sous le header. -->
+        <div
+          v-else-if="isLoggedIn && !bar && !hasMultipleBars && !barFetchError"
+          class="bar-fetch-error"
+        >
+          <p>😕 Aucun bar trouvé pour ce compte.</p>
+          <button type="button" class="password-btn-submit" @click="fetchBar()">Réessayer</button>
+        </div>
+
         <!-- Sélecteur de bar -->
         <BarSelector
           v-if="(isLoggedIn && hasMultipleBars) || showBarsSelection"
@@ -704,9 +717,20 @@ watch(currentBarId, async (newBarId) => {
 })
 
 // ── Montage ───────────────────────────────────────────────────────────────────
+// ⚠️  initAuth() est déjà appelée dans main.js AVANT le mount (avec un
+//     timeout de 5s pour ne pas bloquer indéfiniment le rendu si getSession()
+//     traîne — ex: contention du lock Supabase Auth sur un appareil ayant
+//     déjà une session persistée). Si ce timeout expire, l'app monte quand
+//     même MAIS ce premier appel à initAuth() continue de tourner en tâche
+//     de fond. Rappeler initAuth() ici créerait un second appel concurrent
+//     (double écouteur onAuthStateChange, double fetchBar() en course),
+//     dont la dernière résolution écrase l'état de l'autre — c'est cette
+//     course qui provoquait l'écran bloqué (isLoggedIn=true, bar=null) chez
+//     les utilisateurs déjà connectés. La réactivité (watch(currentBarId,…)
+//     ci-dessus) prend le relais dès que l'initAuth() de main.js termine,
+//     donc pas besoin de la rappeler ici.
 
 onMounted(async () => {
-  await initAuth()
   await fetchPublicBars()
   // On charge d'abord les données du bar (si bartender déjà connecté) pour
   // que handleHashRoute puisse résoudre les slugs carte/cocktail du hash.
