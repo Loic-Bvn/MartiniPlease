@@ -1,5 +1,5 @@
 ## TODO
-TAG new version
+TAG new version using "npm run release:patch"
 
 # Fix
 - Nothing to do for now
