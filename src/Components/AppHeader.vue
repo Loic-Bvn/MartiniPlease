@@ -243,7 +243,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Search, ChevronDown, X, Plus, BookOpen, Library, Pencil, Trash2, Eye, Lock, Unlock, LogOut, Heart, Menu, Globe, EyeOff, Link, Check, Folder, Martini, Key, HandPlatter, Euro} from 'lucide-vue-next'
+import { Search, Plus, Library, Lock, Unlock, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro} from 'lucide-vue-next'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 

@@ -2,14 +2,15 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
-import { useCatalog } from '@/composables/useCatalog'
 import { validateCocktail } from '@/composables/useDataValidator'
+import { useToast } from '@/composables/useToast'
 
 const cocktails = ref([])
 const loading   = ref(false)
 
 export function useCocktails() {
   const { currentBarId } = useAuth()
+  const { toastError }   = useToast()
 
   async function fetchCocktails(barId) {
     const id = barId ?? currentBarId.value
@@ -26,6 +27,7 @@ export function useCocktails() {
       cocktails.value = data
     } catch (err) {
       console.error('❌ Erreur fetchCocktails:', err)
+      toastError('Impossible de charger les cocktails. Réessaie ou recharge la page.')
     } finally {
       loading.value = false
     }
@@ -41,6 +43,11 @@ export function useCocktails() {
     }
 
     try {
+      // ⚠️  cocktailData a en général déjà été validé une fois en amont
+      //     (ex. CocktailFormModal appelle validateCocktail avec {forBar:true}
+      //     avant d'arriver ici). Cette 2e passe ne doit PAS changer les options
+      //     par rapport à la 1ère, sinon des champs comme is_private peuvent
+      //     être écrasés silencieusement (bug déjà rencontré une fois).
       const validated = validateCocktail(cocktailData)
       const { id, ...dataWithoutId } = validated
 
@@ -65,6 +72,7 @@ export function useCocktails() {
     if (!barId) return { success: false, error: 'Non connecté' }
     
     try {
+      // ⚠️  Voir le même avertissement dans createCocktail() juste au-dessus.
       const validated = validateCocktail(cocktailData)
       const { data, error } = await supabase
         .from('bar_cocktails')

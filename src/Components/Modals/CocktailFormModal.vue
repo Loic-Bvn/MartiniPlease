@@ -1,13 +1,13 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-container modal-container--cocktail">
+    <div class="modal-container modal-container--cocktail" role="dialog" aria-modal="true" aria-labelledby="cocktail-form-modal-title">
 
       <!-- Header -->
       <div class="modal-header">
-        <h2 class="modal-title">
+        <h2 class="modal-title" id="cocktail-form-modal-title">
           {{ isNew ? '✨ Nouveau cocktail' : '✏️ Modifier le cocktail' }}
         </h2>
-        <button @click="$emit('close')" class="modal-close-btn">
+        <button @click="$emit('close')" class="modal-close-btn" aria-label="Fermer">
           <X :size="20" />
         </button>
       </div>
@@ -378,7 +378,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch } from 'vue'
+import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { X, Trash2, Plus } from 'lucide-vue-next'
 import { validateCocktail } from '@/composables/useDataValidator'
 import { supabase, supabaseImageBucket } from '@/lib/supabase'
@@ -411,6 +411,12 @@ const props = defineProps({
   barId: { type: String, default: '' },
 })
 const emit = defineEmits(['save', 'close'])
+
+function handleKeydown(e) {
+  if (e.key === 'Escape') emit('close')
+}
+onMounted(() => window.addEventListener('keydown', handleKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 // ── Unité active (oz ou ml) ──────────────────────
 const unit = ref('oz')

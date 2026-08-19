@@ -14,10 +14,10 @@
 <template>
   <transition name="fade">
     <div v-if="open" class="modal-overlay" @click.self="$emit('close')">
-      <div class="modal-container modal-container--batch">
+      <div class="modal-container modal-container--batch" role="dialog" aria-modal="true" aria-labelledby="batch-modal-title">
         <div class="modal-header">
-          <h2 class="modal-title">🧪 Batch — {{ cocktail?.name }}</h2>
-          <button @click="$emit('close')" class="btn-icon btn-icon--close">
+          <h2 class="modal-title" id="batch-modal-title">🧪 Batch — {{ cocktail?.name }}</h2>
+          <button @click="$emit('close')" class="btn-icon btn-icon--close" aria-label="Fermer">
             <X :size="20" />
           </button>
         </div>
@@ -107,7 +107,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { X } from 'lucide-vue-next'
 import { calculateBatch } from '@/composables/useCostCalculator'
 
@@ -117,7 +117,13 @@ const props = defineProps({
   ingredients: { type: Array,   default: () => [] },
 })
 
-defineEmits(['close'])
+const emit = defineEmits(['close'])
+
+function handleKeydown(e) {
+  if (e.key === 'Escape' && props.open) emit('close')
+}
+onMounted(() => window.addEventListener('keydown', handleKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 const servings        = ref(20)
 const dilutionPercent = ref(20)

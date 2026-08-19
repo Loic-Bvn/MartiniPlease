@@ -128,7 +128,6 @@
           :cardView="cardView"
           :barInventory="barInventory"
           :ingredients="ingredients"
-          :searchTerm="searchTerm"
           :selectedFamilies="selectedFamilies"
           :selectedSubSpirits="selectedSubSpirits"
           :selectedSeasons="selectedSeasons"
@@ -279,8 +278,6 @@ import { useMenuCards }          from '@/composables/useMenuCards'
 import { useDrinker }            from '@/composables/useDrinker'
 import { useOrders }             from '@/composables/useOrders'
 import { useSearchSuggestions }  from '@/composables/useSearchSuggestions'
-import { useBarStatistics }      from '@/composables/useBarStatistics'
-import { useCatalog }            from '@/composables/useCatalog'
 import { useToast }              from '@/composables/useToast'
 import { parseHash, setHash, clearHash, buildShareUrl, slugify } from '@/composables/useRouter'
 
@@ -315,14 +312,14 @@ const {
   isBarApproved,
   passwordRecoveryMode,
   barFetchError,
-  initAuth, signOut, fetchBar, 
+  signOut, fetchBar,
 } = useAuth()
 
 // ── UI ────────────────────────────────────────────────────────────────────────
 const {
   locale, unit, cardView,
   currentLegalPage, openLegalPage, closeLegalPage,
-  toggleLocale, toggleUnit, setLocale, setUnit, setCardView,
+  setLocale, setUnit, setCardView,
   showAuthModal, showCocktailFormModal, showCardModal, showCatalogModal, showDrinkerLoginModal,
   editingCocktail, editingCard, viewingCard, viewingCocktail, viewingCocktailRect,
   openNewCocktailFormModal, openEditCocktailFormModal, closeCocktailFormModal,
@@ -346,7 +343,6 @@ const accessibleMenuCards = computed(() =>
     : menuCards.value.filter(card => card.is_visible !== false)
 )
 const { hasDrinker, drinkerPseudo, initDrinker, createDrinker, reconnectDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
-const { fetchSnapshots } = useCatalog()
 const { toastMessage, toastType, showToast } = useToast()
 
 // ── Gestion des bars ──────────────────────────────────────────────────────────

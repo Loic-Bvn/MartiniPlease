@@ -1,11 +1,11 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-container modal-container--catalog">
+    <div class="modal-container modal-container--catalog" role="dialog" aria-modal="true" aria-labelledby="catalog-modal-title">
 
       <!-- Header -->
       <div class="modal-header">
-        <h2 class="modal-title">📚 {{ locale === 'fr' ? 'Importer une recette' : 'Import a recipe' }}</h2>
-        <button @click="$emit('close')" class="modal-close-btn">
+        <h2 class="modal-title" id="catalog-modal-title">📚 {{ locale === 'fr' ? 'Importer une recette' : 'Import a recipe' }}</h2>
+        <button @click="$emit('close')" class="modal-close-btn" :aria-label="locale === 'fr' ? 'Fermer' : 'Close'">
           <X :size="20" />
         </button>
       </div>
@@ -140,7 +140,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { X, Search, Upload, Martini } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { useCatalog } from '@/composables/useCatalog'
@@ -154,6 +154,12 @@ const props = defineProps({
   unit:   { type: String, default: 'oz' },
 })
 const emit = defineEmits(['close', 'imported'])
+
+function handleKeydown(e) {
+  if (e.key === 'Escape') emit('close')
+}
+onMounted(() => window.addEventListener('keydown', handleKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 const { catalog, loading, fetchCatalog, importCocktail } = useCatalog()
 const { cocktails: barCocktails } = useCocktails()

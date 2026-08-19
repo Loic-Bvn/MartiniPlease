@@ -129,11 +129,30 @@ export function useAuth() {
 
     barFetchError.value = false
 
-    const { data, error } = await supabase
-      .from('bars')
-      .select('*')
-      .eq('owner_id', session.value.user.id)
-      .order('created_at')
+    // ⚠️  Timeout dur sur cette requête : c'est un appel PostgREST, pas un
+    // appel auth — il n'est PAS couvert par le contournement `noOpLock` de
+    // lib/supabase.js. Sans ça, une requête qui traîne (réseau) peut faire
+    // dépasser le timeout de 5s posé autour de initAuth() dans main.js sans
+    // jamais résoudre ni échouer ensuite : `isLoggedIn` passe à true mais
+    // `bar`/`barFetchError` restent bloqués dans un état intermédiaire que
+    // le template ne gère pas (ni le fallback erreur, ni le fallback "pas
+    // de bar" ne matchent tant que la requête est encore en vol).
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 8000)
+
+    let data, error
+    try {
+      ({ data, error } = await supabase
+        .from('bars')
+        .select('*')
+        .eq('owner_id', session.value.user.id)
+        .order('created_at')
+        .abortSignal(controller.signal))
+    } catch (err) {
+      error = err
+    } finally {
+      clearTimeout(timeoutId)
+    }
 
     if (error) {
       console.error('❌ fetchBar:', error)

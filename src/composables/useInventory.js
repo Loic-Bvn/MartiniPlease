@@ -3,6 +3,7 @@
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
 import ingredientsDatabase from '@/constants/ingredientsDatabase.json'
 
 const barInventory = ref(new Set())
@@ -11,6 +12,7 @@ const loading      = ref(false)
 
 export function useInventory() {
   const { currentBarId } = useAuth()
+  const { toastError }   = useToast()
 
   async function fetchIngredients(barId) {
     const id = barId ?? currentBarId.value
@@ -38,6 +40,7 @@ export function useInventory() {
       )
     } catch (err) {
       console.error('❌ Erreur fetchIngredients:', err)
+      toastError('Impossible de charger le stock. Réessaie ou recharge la page.')
     } finally {
       loading.value = false
     }
@@ -89,6 +92,7 @@ export function useInventory() {
       syncBarInventory(ingredient)
     } catch (err) {
       console.error('❌ Erreur toggleIngredient:', err)
+      toastError('Impossible de mettre à jour cet ingrédient.')
     }
   }
 
@@ -130,6 +134,7 @@ export function useInventory() {
       barInventory.value = new Set(barInventory.value)
     } catch (err) {
       console.error('❌ Erreur toggleCategory:', err)
+      toastError('Impossible de mettre à jour la catégorie.')
     }
   }
 
@@ -158,6 +163,7 @@ export function useInventory() {
       barInventory.value = new Set(ingredients.value.map(i => i.type))
     } catch (err) {
       console.error('❌ Erreur selectAll:', err)
+      toastError('Impossible de tout sélectionner.')
     }
   }
 
@@ -192,6 +198,7 @@ export function useInventory() {
       barInventory.value = new Set()
     } catch (err) {
       console.error('❌ Erreur deselectAll:', err)
+      toastError('Impossible de tout désélectionner.')
     }
   }
 
@@ -310,6 +317,7 @@ export function useInventory() {
       syncBarInventory(ingredient)
     } catch (err) {
       console.error('❌ Erreur toggleReferenceAvailable:', err)
+      toastError('Impossible de mettre à jour cette référence.')
     }
   }
 
@@ -423,6 +431,7 @@ export function useInventory() {
       return { success: true }
     } catch (err) {
       console.error('❌ Erreur initializeDefaultIngredients:', err)
+      toastError('Impossible d\'initialiser les ingrédients par défaut.')
       throw err
     }
   }

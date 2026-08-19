@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
 import { validateCocktail } from '@/composables/useDataValidator'
+import { useToast } from '@/composables/useToast'
 import { track } from '@/lib/analytics'
 
 const catalog        = ref([])
@@ -76,6 +77,7 @@ function omitEmpty(obj) {
 // ── Composable ────────────────────────────────────────────────────────────────
 export function useCatalog() {
   const { currentBarId } = useAuth()
+  const { toastError }   = useToast()
 
   // ── Lecture du catalog global ─────────────────────────────────────────────
   async function fetchCatalog({ search = '', spirit = '', cocktailStyle = '', profiles = [] } = {}) {
@@ -101,6 +103,11 @@ export function useCatalog() {
       if (token !== fetchToken) return
 
       catalog.value = data || []
+    } catch (err) {
+      console.error('❌ fetchCatalog:', err)
+      if (token === fetchToken) {
+        toastError('Impossible de charger le catalogue. Réessaie ou recharge la page.')
+      }
     } finally {
       if (token === fetchToken) loading.value = false
     }

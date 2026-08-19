@@ -123,7 +123,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Upload, Bookmark, Pencil, Trash2, Heart, PlusIcon, XIcon, Send, Loader2, Check, HandPlatter, Martini} from 'lucide-vue-next'
+import { Upload, Bookmark, Pencil, Trash2, Heart, Check, HandPlatter, Martini} from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
@@ -151,17 +151,11 @@ const { showToast } = useToast()
 const { barInventory, ingredientsByType } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
-const baseSpiritLabel = computed(() => getTypeLabel(props.cocktail.base_spirit, props.locale, ingredientsByType.value))
 const { isFeatureEnabled } = useBarFeatures(props.barId)
 const showPrices = computed(() => isFeatureEnabled('showPrices'))
 const ordersEnabled = computed(() => isFeatureEnabled('order'))
 
 const emit = defineEmits(['edit', 'delete', 'open'])
-
-const t = computed(() => ({
-  makeable: props.locale === 'fr' ? 'Disponible' : 'Available',
-  notMakeable: props.locale === 'fr' ? 'Non disponible' : 'Not available',
-}))
 
 
 function isAvailable(ing) {
@@ -269,14 +263,6 @@ const METHOD_LABELS = {
 }
 
 const methodLabel = computed(() => METHOD_LABELS[props.cocktail.method] || props.cocktail.method)
-
-const ICE_LABELS = {
-  // cubes:       'Cubes',
-  // clear:       'Clear',
-  // crushed:     'Crushed',
-  // none:        'None',
-}
-const iceLabel = computed(() => ICE_LABELS[props.cocktail.ice] || props.cocktail.ice)
 
 const GLASS_LABELS = {
   // rocks:       'Rocks',
