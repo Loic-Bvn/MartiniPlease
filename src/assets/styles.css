@@ -2245,6 +2245,13 @@ body {
 
 .form-input option { background: var(--bg-raised); }
 
+.form-input--placeholder:disabled {
+  color: var(--text-dim);
+  background: var(--bg-raised);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .form-textarea {
   resize: vertical;
   min-height: 70px;
