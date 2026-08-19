@@ -37,7 +37,7 @@
             </div>
             <div class="form-field">
               <label class="form-label">Catégorie</label>
-              <select v-model="form.category" class="form-input" :disabled=true>
+              <select v-model="form.category" class="form-input form-input--placeholder" :disabled=true>
                 <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">{{ cat.label }}</option>
               </select>
             </div>
@@ -112,7 +112,6 @@
             <div class="form-field">
               <label class="form-label">Style de cocktail</label>
               <select v-model="form.cocktail_style" class="form-input">
-                <option value="">-- Choisir --</option>
                 <option v-for="s in cocktailStyleOptions" :key="s" :value="s">{{ s }}</option>
               </select>
             </div>
@@ -169,7 +168,6 @@
           <!-- En-têtes colonnes -->
           <div class="recipe-columns-header">
             <span>Catégorie</span>
-            <span>Type</span>
             <span>Ingrédient</span>
             <span>Référence</span>
             <span>{{ unit === 'oz' ? 'Oz' : 'Ml' }}</span>
@@ -179,7 +177,7 @@
 
           <div class="recipe-rows">
             <div v-if="form.recipe.length === 0" class="recipe-empty">
-              Aucun ingrédient — cliquez sur Ajouter
+              Aucun ingrédient - cliquez sur Ajouter
             </div>
             <div
               v-for="(ing, idx) in form.recipe"
@@ -197,36 +195,26 @@
                 </option>
               </select>
 
-              <!-- Type d'ingrédient (lien stock / coût) -->
-              <select v-model="ing.Type" @change="onIngredientChange(ing)" class="form-input">
-                <option value="" disabled>-- Type --</option>
+              <!-- Ingrédient (lien stock / coût) -->
+              <select v-model="ing.Ingredient" class="form-input">
                 <option
-                  v-for="(item, typeKey) in getTypesByCategory(ing.Category)"
-                  :key="typeKey"
-                  :value="typeKey"
+                  v-for="(item, ingredientKey) in getIngredientsByCategory(ing.Category)"
+                  :key="ingredientKey"
+                  :value="ingredientKey"
                 >
                   {{ item.name }}
                 </option>
               </select>
 
-              <!-- Nom de l'ingrédient (libre, éditable) -->
-              <input
-                type="text"
-                v-model="ing.Ingredient"
-                class="form-input"
-                placeholder="Nom du produit (ex. Havana Club 3 Años)"
-              />
-
-              <!-- Référence précise (optionnel, uniquement si le bar en a défini pour ce type) -->
+              <!-- Speficic reference (only if bar has some for the specific ingredient) -->
               <select
-                v-if="getAvailableReferences(ing.Type).length"
+                v-if="getAvailableReferences(ing.Ingredient).length"
                 v-model="ing.Reference"
-                @change="onReferenceChange(ing)"
                 class="form-input"
               >
-                <option value="">— N'importe quelle bouteille —</option>
+                <option value=""></option>
                 <option
-                  v-for="ref in getAvailableReferences(ing.Type)"
+                  v-for="ref in getAvailableReferences(ing.Ingredient)"
                   :key="ref.id"
                   :value="ref.name"
                 >
@@ -234,7 +222,7 @@
                 </option>
               </select>
               <select v-else class="form-input form-input--placeholder" disabled>
-                <option value="">— Aucune référence disponible —</option>
+                <option value=""> / </option>
               </select>
 
               <!-- Quantité -->
@@ -285,7 +273,7 @@
               <label class="form-label">Coût matière</label>
               <span v-if="cost.total > 0">{{ cost.total.toFixed(2) }}€</span>
               <span v-else class="form-hint">
-                Aucun coût calculable — vérifie les prix des ingrédients dans le stock
+                Aucun coût calculable - vérifie les prix des ingrédients dans le stock
               </span>
             </div>
             <div class="form-field">
@@ -497,7 +485,7 @@ const ingredientsMap = computed(() => {
 })
 
 // Ingrédients groupés par catégorie, depuis la DB uniquement
-function getTypesByCategory(cat) {
+function getIngredientsByCategory(cat) {
   const result = {}
   ingredients.value
     // .filter(i => i.category === cat && i.available !== false)
@@ -509,11 +497,10 @@ function getTypesByCategory(cat) {
   )
 }
 
-// ── ABV calculé automatiquement depuis la recette ──
-// Priorité : ABV de la référence choisie > ABV du stock du bar pour ce type.
-// Plus de fallback JSON statique.
+// ABV computed from recipe
+// Prioritize ABV from reference before ABV from stock ingredient
 function resolveLineAbv(ing) {
-  const stockIngredient = ingredients.value.find(i => i.type === ing.Type)
+  const stockIngredient = ingredients.value.find(i => i.type === ing.Ingredient)
   if (!stockIngredient) return 0
 
   if (ing.Reference) {
@@ -567,12 +554,11 @@ const form = ref({
   recipe: (props.cocktail?.recipe ?? [])
     .filter(i => i.Ingredient?.trim())
     .map(i => {
-      const type = i.Type ?? ''
+      const ingredient = i.Ingredient ?? ''
       return {
-        Ingredient: i.Ingredient ?? '',
-        Type: type,
+        Ingredient: ingredient,
         Reference: i.Reference ?? '',
-        Category: findCategoryFromType(type),
+        Category: findCategoryFromIngredient(ingredient),
         Oz: i.Oz ?? '',
         Ml: i.Ml ?? '',
         Dashes: i.Dashes ?? null,
@@ -589,8 +575,8 @@ const form = ref({
 // watch(ingredients, (list) => {
 //   if (!list?.length) return
 //   form.value.recipe.forEach(ing => {
-//     if (!ing.Category && ing.Type) {
-//       ing.Category = findCategoryFromType(ing.Type)
+//     if (!ing.Category && ing.Ingredient) {
+//       ing.Category = findCategoryFromType(ing.Ingredient)
 //     }
 //   })
 // }, { once: true })
@@ -613,7 +599,6 @@ function toggleProfile(key) {
 function addRecipeLine() {
   form.value.recipe.push({
     Category: '',
-    Type: '',
     Ingredient: '',
     Reference: '',
     Oz: '',
@@ -631,16 +616,15 @@ function handleSave() {
   try {
     const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
 
-    const droppedLines = form.value.recipe.filter(ing => !ing.Type && (ing.Ingredient?.trim() || ing.Oz || ing.Ml))
+    const droppedLines = form.value.recipe.filter(ing => !ing.Ingredient && (ing.Ingredient?.trim() || ing.Oz || ing.Ml))
     if (droppedLines.length) {
       throw new Error(`Choisis un Type pour : ${droppedLines.map(l => l.Ingredient || '(sans nom)').join(', ')}`)
     }
 
     const cleanedRecipe = form.value.recipe
-      .filter(ing => ing.Type)
+      .filter(ing => ing.Ingredient)
       .map(({ Category, ...rest }) => ({
         Ingredient: rest.Ingredient,
-        Type: rest.Type,
         ...(rest.Reference?.trim() ? { Reference: rest.Reference.trim() } : {}),
         IsGarnish: Category === 'garnish',
         Oz: normalizeNumber(rest.Oz),
@@ -674,25 +658,14 @@ function handleSave() {
 }
 
 function onCategoryChange(ing) {
-  ing.Type = ''
   ing.Ingredient = ''
   ing.Reference = ''
 }
 
-function onReferenceChange(ing) {
-  if (ing.Reference) ing.Ingredient = ing.Reference
-}
 
-function onIngredientChange(ing) {
-  if (ing.Ingredient?.trim()) return // ne pas écraser une valeur déjà saisie
-  const meta = ingredientsMap.value[ing.Type]
-  if (meta) {
-    ing.Ingredient = meta.name
-  }
-}
 
-function findCategoryFromType(type) {
-  return ingredientsMap.value[type]?.category ?? ''
+function findCategoryFromIngredient(ing) {
+  return ingredientsMap.value[ing]?.category ?? ''
 }
 
 function ozToMl(oz) {

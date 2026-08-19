@@ -205,8 +205,8 @@ export function useInventory() {
   function hasIngredient(type) { return barInventory.value.has(type) }
 
   // Map { type: ingredient } — utilisé pour résoudre le label des ingrédients
-  // custom (non présents dans la table statique TYPE_LABELS) via getTypeLabel().
-  const ingredientsByType = computed(() => {
+  // custom (non présents dans la table statique TYPE_LABELS) via getIngredientLabel().
+  const ingredientsByIngredient = computed(() => {
     const map = {}
     for (const ing of ingredients.value) map[ing.type] = ing
     return map
@@ -447,7 +447,7 @@ export function useInventory() {
     selectAll,
     deselectAll,
     hasIngredient,
-    ingredientsByType,
+    ingredientsByIngredient,
     addIngredient,
     deleteIngredient,
     initializeDefaultIngredients,

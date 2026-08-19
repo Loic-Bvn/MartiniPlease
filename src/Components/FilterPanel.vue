@@ -143,7 +143,7 @@
       <!-- ACTIVE FILTERS TAGS -->
       <!-- <div v-if="hasActiveFilters" class="active-filters-bar">
         <span v-for="f in selectedFamilies" :key="f" class="filter-tag">
-          {{ allFamilyLabels[f] ?? f }}
+          {{ allLabels[f] ?? f }}
           <X @click="$emit('toggle-family', f)" :size="14" />
         </span>
         <span v-for="s in selectedSubSpirits" :key="s" class="filter-tag filter-tag--sub">
@@ -181,7 +181,7 @@ defineProps({
   profileFilters:     { type: Array,   default: () => []  },
   styleFilters:       { type: Array,   default: () => []  },
   activeSubSpirits:   { type: Array,   default: () => []  },
-  allFamilyLabels:    { type: Object,  default: () => ({}) },
+  allLabels:    { type: Object,  default: () => ({}) },
   allSubLabels:       { type: Object,  default: () => ({}) },
 })
 

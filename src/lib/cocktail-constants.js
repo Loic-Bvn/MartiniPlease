@@ -138,18 +138,6 @@ export function getSeasonsAsArray() {
 }
 
 /**
- * Convertir ice_types en array pour chips
- */
-// export function getIceTypesAsArray() {
-//   const iceTypes = getIceTypes()
-//   return Object.entries(iceTypes).map(([key, data]) => ({
-//     key,
-//     label: data.name,
-//     icon: data.emoji
-//   }))
-// }
-
-/**
  * Récupère les niveaux de difficulté
  */
 export function getDifficulties() {
@@ -276,7 +264,6 @@ export const COCKTAIL_CONSTANTS = {
   // As arrays (pour chips/selects)
   PROFILES_ARRAY: getProfilesAsArray(),
   SEASONS_ARRAY: getSeasonsAsArray(),
-  // ICE_TYPES_ARRAY: getIceTypesAsArray(),
   GLASSES_OPTIONS: getGlassesAsOptions(),
   METHODS_OPTIONS: getMethodsAsOptions(),
   COCKTAIL_CATEGORIES_OPTIONS: getCocktailCategoriesAsOptions(),

@@ -18,7 +18,7 @@ export function useCocktails() {
     loading.value = true
     try {
       const { data, error } = await supabase
-        .from('bar_cocktails') // DATABASE NAME FOR COCKTAILS
+        .from('bar_cocktails_debug') // DATABASE NAME FOR COCKTAILS
         .select('*')
         .eq('bar_id', id)
         .order('name')
@@ -52,7 +52,7 @@ export function useCocktails() {
       const { id, ...dataWithoutId } = validated
 
       const { data, error } = await supabase
-        .from('bar_cocktails')
+        .from('bar_cocktails_debug')
         .insert({...dataWithoutId, bar_id: barId})
         .select()
         .single()
@@ -75,7 +75,7 @@ export function useCocktails() {
       // ⚠️  Voir le même avertissement dans createCocktail() juste au-dessus.
       const validated = validateCocktail(cocktailData)
       const { data, error } = await supabase
-        .from('bar_cocktails')
+        .from('bar_cocktails_debug')
         .update(validated)
         .eq('id', id)
         .eq('bar_id', barId) // 🔥 sécurité multi-tenant
@@ -98,7 +98,7 @@ export function useCocktails() {
 
     try {
       const { error } = await supabase
-        .from('bar_cocktails')
+        .from('bar_cocktails_debug')
         .delete()
         .eq('id', id)
         .eq('bar_id', barId) // 🔥 sécurité multi-tenant

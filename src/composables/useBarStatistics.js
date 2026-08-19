@@ -23,7 +23,7 @@ export function useBarStatistics() {
     // encore backfillée. On recalcule à la volée comme avant.
     try {
       const { count: cocktailCount, error: cocktailError } = await supabase
-        .from('bar_cocktails')
+        .from('bar_cocktails_debug')
         .select('*', { count: 'exact', head: true })
         .eq('bar_id', barId)
       if (cocktailError) throw cocktailError

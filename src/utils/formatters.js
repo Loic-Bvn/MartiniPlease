@@ -18,11 +18,11 @@ export function getCocktailName(cocktails, id) {
 }
 
 /**
- * Retourne le label d'une famille à partir du map pré-calculé
- * @param {Object} allFamilyLabels - computed issu de useFilters
+ * Retourne le label à partir du map pré-calculé
+ * @param {Object} allLabels - computed issu de useFilters
  */
-export function getFamilyLabel(allFamilyLabels, key) {
-  return allFamilyLabels[key] ?? key
+export function getLabel(allLabels, key) {
+  return allLabels[key] ?? key
 }
 
 /**

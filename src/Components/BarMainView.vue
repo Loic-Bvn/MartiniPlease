@@ -47,7 +47,7 @@
           :style-filters="styleFilters"
           :seasons="seasons"
           :active-sub-spirits="activeSubSpirits"
-          :all-family-labels="allFamilyLabels"
+          :all-family-labels="allLabels"
           :all-sub-labels="allSubLabels"
           @toggle-family="$emit('toggle-family', $event)"
           @toggle-sub-spirit="$emit('toggle-sub-spirit', $event)"
@@ -210,7 +210,7 @@ const props = defineProps({
   styleFilters:       Array,
   seasons:            Array,
   activeSubSpirits:   Array,
-  allFamilyLabels:    Object,
+  allLabels:    Object,
   allSubLabels:       Object,
   // Résultats calculés par useFilters dans CocktailMenuApp
   filteredCocktails:  { type: Array,   default: () => [] },

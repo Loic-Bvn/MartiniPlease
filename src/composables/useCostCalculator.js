@@ -58,7 +58,7 @@ function resolvePricingSource(line, ingredient) {
 /**
  * Calcule le coût matière d'un cocktail.
  *
- * @param {Array} recipe - `bar_cocktails.recipe` (jsonb array : Ingredient, Type, Reference, Oz/Ml, IsGarnish)
+ * @param {Array} recipe - `bar_cocktails_debug.recipe` (jsonb array : Ingredient, Reference, Oz/Ml, IsGarnish)
  * @param {Array} ingredients - `ingredients` du bar (avec pricing)
  * @param {object} [opts]
  * @param {boolean} [opts.includeGarnish=false] - inclure le coût des garnitures
@@ -69,7 +69,7 @@ function resolvePricingSource(line, ingredient) {
  */
 export function calculateCocktailCost(recipe, ingredients, opts = {}) {
   const { includeGarnish = false } = opts
-  const byType = new Map(ingredients.map(i => [i.type, i]))
+  const byIngredient = new Map(ingredients.map(i => [i.ingredient, i]))
 
   const lines = []
   let total = 0
@@ -81,17 +81,17 @@ export function calculateCocktailCost(recipe, ingredients, opts = {}) {
     const ml = recipeLineMl(line)
     if (!ml) continue
 
-    const ingredient = line.Type ? byType.get(line.Type) : null
+    const ingredient = line.Ingredient ? byIngredient.get(line.Ingredient) : null
     const pricingSource = resolvePricingSource(line, ingredient)
     const unitCost = costPerMl(pricingSource)
     const lineCost = unitCost * ml
     const priced = unitCost > 0
 
-    if (!priced && line.Type) missingPrice.push(line.Ingredient)
+    if (!priced && line.Ingredient) missingPrice.push(line.Ingredient)
 
     lines.push({
       name: line.Ingredient,
-      type: line.Type ?? null,
+      Ingredient: line.Ingredient ?? null,
       reference: line.Reference ?? null,
       ml,
       unitCost,

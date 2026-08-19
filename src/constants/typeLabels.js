@@ -344,7 +344,7 @@ export const TYPE_LABELS = {
  * @param {string} locale - 'fr' | 'en'
  * @param {Object|null} dbIngredientsMap - optionnel, map { type: { name, ... } } issue de la DB (ex: useInventory)
  */
-export function getTypeLabel(type, locale = 'fr', dbIngredientsMap = null) {
+export function getIngredientLabel(type, locale = 'fr', dbIngredientsMap = null) {
   const staticLabel = TYPE_LABELS[locale]?.[type]
   if (staticLabel) return staticLabel
 

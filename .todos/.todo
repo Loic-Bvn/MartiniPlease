@@ -1,0 +1,34 @@
+## TODO
+TAG new version using "npm run release:patch"
+
+# Fix
+## Type to Ingredient migration
+- Broken price computation in cocktailForm
+- Rework AddIngredient modal
+- Check we dont call type instead of ingredients
+- Rework "family" has it is used to make groups inside spirits or licors groups (i.e: agave: tequila, tequila reposado, mezcal) 
+- Update family in db so it is lowercase AND english
+- Migrate bar_cocktails and cocktails_catalog db
+
+# Ameliorations
+### Stats
+- peaufiner les stats / affichages / usages
+
+### Onglet commande (bartender)
+- Améliorer affichage des commandes
+- ameliorer ergonomie (bouton pour tout valider par exemple)
+
+### Style
+- Simplifier le fichier style.css ?
+--> style général dans style.css et style specifique directement dans le fichier .vue ?
+
+### Suggestions
+- systeme de notes sur 5 ?
+- Detection de recette via photo (cf recipe_scanner.md)
+- Connexion avec google ?
+- Email de remerciement une fois le bar validé (mentionné il y a plusieurs sessions, jamais implémenté — actuellement seule `PendingApproval.vue` informe l'utilisateur côté UI)
+
+### Batching
+- On a une table en BDD qui sert a rien
+
+## #Robustification de l'app

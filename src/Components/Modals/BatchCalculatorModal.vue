@@ -5,7 +5,7 @@
 
   Props:
     - open: Boolean
-    - cocktail: objet bar_cocktails (name, recipe)
+    - cocktail: objet bar_cocktails_debug (name, recipe)
     - ingredients: liste des ingredients du bar (pour le pricing)
   Emits:
     - close

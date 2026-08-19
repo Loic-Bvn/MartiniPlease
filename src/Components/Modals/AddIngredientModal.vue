@@ -25,7 +25,7 @@
             ref="nameInput"
             v-model="form.name"
             type="text"
-            placeholder="ex : Hendrick's Gin"
+            placeholder="ex : Tequila Reposado"
             class="add-ing-input"
             @input="autoSlug"
             @keyup.enter="handleSubmit"
@@ -33,7 +33,7 @@
         </div>
 
         <!-- Type (slug) -->
-        <div class="add-ing-field">
+        <!-- <div class="add-ing-field">
           <label class="add-ing-label">
             Type / identifiant
             <span class="add-ing-hint">généré automatiquement</span>
@@ -45,11 +45,11 @@
             class="add-ing-input add-ing-input--mono"
             @keyup.enter="handleSubmit"
           />
-        </div>
+        </div>-->
 
         <!-- Family + ABV sur la même ligne -->
         <div class="add-ing-row">
-          <div class="add-ing-field">
+        <!--  <div class="add-ing-field">
             <label class="add-ing-label">Famille</label>
             <input
               v-model="form.family"
@@ -58,7 +58,7 @@
               class="add-ing-input"
               @keyup.enter="handleSubmit"
             />
-          </div>
+          </div>-->
           <div class="add-ing-field add-ing-field--abv">
             <label class="add-ing-label">ABV (%)</label>
             <input

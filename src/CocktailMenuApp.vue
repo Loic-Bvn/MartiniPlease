@@ -143,7 +143,7 @@
           :styleFilters="styleFilters"
           :seasons="seasons"
           :activeSubSpirits="activeSubSpirits"
-          :allFamilyLabels="allFamilyLabels"
+          :allLabels="allLabels"
           :allSubLabels="allSubLabels"
           :filteredCocktails="filteredCocktails"
           :hasActiveFilters="hasActiveFilters"
@@ -386,7 +386,7 @@ const {
   showOnlyMakeable, showOnlyFavorites, filterMode, abvFilter,
   selectedProfiles, selectedStyles,
   baseSpirits, liqueurFamilies, profileFilters, styleFilters, seasons,
-  allFamilyLabels, allSubLabels, activeSubSpirits,
+  allLabels, allSubLabels, activeSubSpirits,
   filteredCocktails, hasActiveFilters, makeableCount,
   toggleFamily, toggleSubSpirit, toggleProfile, toggleStyle,
   toggleFilterMode, toggleMakeable, toggleFavorites,

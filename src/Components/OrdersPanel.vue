@@ -109,7 +109,7 @@
               >
                 <div class="ingredient-info">
                 <span>
-                    {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
+                    {{ getIngredientLabel(ing.Ingredient, locale, ingredientsByIngredient) }}
                 </span>
                 </div>
                 <span class="ingredient-quantity">
@@ -240,9 +240,9 @@ import { ref, computed } from 'vue'
 import { User, GlassWater, Clock, Check, X } from 'lucide-vue-next'
 import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
-import { getTypeLabel } from '../constants/typeLabels.js'
+import { getIngredientLabel } from '../constants/typeLabels.js'
 import { useInventory } from '@/composables/useInventory'
-const { ingredientsByType } = useInventory()
+const { ingredientsByIngredient } = useInventory()
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },
