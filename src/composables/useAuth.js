@@ -97,11 +97,20 @@ export function useAuth() {
     // attend cette même initialisation en interne, donc si on l'appelait en
     // premier (comme avant), l'événement pouvait déjà être passé.
     supabase.auth.onAuthStateChange(async (event, newSession) => {
-      // 'PASSWORD_RECOVERY' : l'utilisateur vient de cliquer le lien reçu par
-      // mail. Supabase a déjà établi une session temporaire (via le param
-      // ?code=... ou #access_token=... de l'URL, selon le flow) — on ne
-      // touche pas au routing "bar" habituel, on bascule juste en mode
-      // saisie du nouveau mot de passe. Voir ResetPasswordView.vue.
+      // ⚠️  On ignore 'INITIAL_SESSION' ici : cet événement se déclenche en
+      // parallèle du `getSession()` explicite juste en dessous, et les deux
+      // finissent par résoudre le même token quasi simultanément au tout
+      // premier chargement. auth-js a son propre mécanisme de réentrance en
+      // mémoire (this.lockAcquired / pendingInLock dans _acquireLock) qui
+      // sert à sérialiser ces appels concurrents — mais il est bugué côté
+      // upstream (cf. discussion citée plus haut sur le contournement
+      // noOpLock) et peut deadlock silencieusement, SANS requête réseau
+      // visible, quand deux résolutions de session se chevauchent au
+      // démarrage. En ignorant l'événement initial ici, seul le
+      // `getSession()` explicite ci-dessous déclenche fetchBar() au
+      // démarrage — plus de double appel concurrent, plus de deadlock.
+      if (event === 'INITIAL_SESSION') return
+
       if (event === 'PASSWORD_RECOVERY') {
         passwordRecoveryMode.value = true
       }
@@ -129,25 +138,35 @@ export function useAuth() {
 
     barFetchError.value = false
 
-    // ⚠️  Timeout dur sur cette requête : c'est un appel PostgREST, pas un
-    // appel auth — il n'est PAS couvert par le contournement `noOpLock` de
-    // lib/supabase.js. Sans ça, une requête qui traîne (réseau) peut faire
-    // dépasser le timeout de 5s posé autour de initAuth() dans main.js sans
-    // jamais résoudre ni échouer ensuite : `isLoggedIn` passe à true mais
-    // `bar`/`barFetchError` restent bloqués dans un état intermédiaire que
-    // le template ne gère pas (ni le fallback erreur, ni le fallback "pas
-    // de bar" ne matchent tant que la requête est encore en vol).
+    // ⚠️  Contournement d'un bug d'init de GoTrueClient (bug upstream non
+    // résolu — cf. supabase-js issue #1594, comme le contournement noOpLock
+    // plus haut) : à froid (juste après un refresh), la résolution interne
+    // de session par le SDK peut rester bloquée indéfiniment AVANT même de
+    // déclencher un fetch réseau — confirmé par debug le 19/08 (aucune
+    // requête réseau, le SDK ne sort jamais de sa propre logique interne).
+    // On a déjà un access_token valide en main (`session.value`), donc pour
+    // CET appel précis on tape l'API REST de Supabase nous-mêmes, sans
+    // passer par `supabase.from()` — ça élimine toute dépendance au chemin
+    // d'auth interne buggé du SDK pour cette requête.
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 8000)
 
     let data, error
     try {
-      ({ data, error } = await supabase
-        .from('bars')
-        .select('*')
-        .eq('owner_id', session.value.user.id)
-        .order('created_at')
-        .abortSignal(controller.signal))
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/bars`
+        + `?select=*&owner_id=eq.${session.value.user.id}&order=created_at`
+      const res = await fetch(url, {
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${session.value.access_token}`,
+        },
+        signal: controller.signal,
+      })
+      if (!res.ok) {
+        error = new Error(`HTTP ${res.status}`)
+      } else {
+        data = await res.json()
+      }
     } catch (err) {
       error = err
     } finally {
