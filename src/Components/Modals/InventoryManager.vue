@@ -224,9 +224,15 @@
                   placeholder="Nom de la bouteille (ex. Havana Club 3 Años)"
                   class="reference-add-input"
                 />
-                <button type="submit" class="btn-add-ingredient" :disabled="!newReferenceName[ing.type]?.trim()">
+                <button
+                  type="submit"
+                  class="btn-add-ingredient btn-add-reference"
+                  :disabled="!newReferenceName[ing.type]?.trim()"
+                  aria-label="Ajouter une référence"
+                  title="Ajouter une référence"
+                >
                   <Plus :size="14" />
-                  <span>Ajouter une référence</span>
+                  <span class="btn-add-reference-label">Ajouter une référence</span>
                 </button>
               </form>
             </div>

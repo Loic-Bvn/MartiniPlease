@@ -413,3 +413,189 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PHONE UX FIXES — écran de téléphone uniquement (≤ 640px)
+   Ces règles n'affectent volontairement pas l'affichage desktop.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Recette du formulaire cocktail : cartes de labels ──────────
+   .recipe-field est neutre (display:contents) tant qu'on n'est pas
+   sur téléphone, donc la grille 7 colonnes desktop n'est pas
+   impactée : le <label>/<div> disparaît de la mise en page et seul
+   son contenu (select/input/bouton) reste un enfant direct de la
+   grille, exactement comme avant. */
+.recipe-field {
+  display: contents;
+}
+
+.recipe-field-label {
+  display: none;
+}
+
+/* Placeholder de la colonne "Référence" quand l'ingrédient n'en a
+   aucune de définie : un <span> vide, affiché pour garder les 7
+   colonnes alignées avec les autres lignes de la recette. .form-input
+   ne fixe pas de display, et un <span> reste "inline" par défaut —
+   ce qui annule son width:100% et casse l'alignement de la grille
+   dès qu'une ligne mélange des ingrédients avec et sans référence. */
+.form-input--placeholder {
+  display: block;
+}
+
+@media (max-width: 640px) {
+
+  /* — Formulaire cocktail : modal centrée, pas collée en bas — */
+  .modal-overlay {
+    align-items: center;
+  }
+
+  /* Les modals forcées en "bottom sheet" (coins plats) redeviennent
+     des cartes centrées classiques, cohérent avec .modal-overlay
+     recentrée ci-dessus. */
+  .modal-container--menucard,
+  .modal-container--batch {
+    border-radius: var(--radius-lg);
+  }
+
+  /* — Recette : une carte par ingrédient, un champ par ligne — */
+  .recipe-columns-header {
+    display: none;
+  }
+
+  .recipe-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-raised);
+  }
+
+  .recipe-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .recipe-field-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Placeholder de référence (pas de références pour ce type) :
+     utile pour l'alignement de la grille desktop, inutile en carte
+     empilée sur téléphone. */
+  .recipe-field--empty {
+    display: none;
+  }
+
+  .recipe-field--delete {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  /* — Gérer vos bars : stats qui ne chevauchent plus le badge — */
+  .bar-header {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .bar-title-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .welcome-card-title {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .bar-stats {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  /* — Stock du bar : un ingrédient par ligne dans chaque catégorie —
+     (règle déjà tentée plus haut dans styles.css mais neutralisée par
+     la déclaration .category-body plus bas dans ce même fichier ;
+     on la refixe ici, dans la feuille chargée en dernier.)
+     minmax(0, 1fr) et pas juste 1fr : sinon la colonne s'élargit pour
+     loger le contenu non compressible d'une référence ouverte (les
+     champs de prix), et comme .category-section a overflow:hidden,
+     le surplus est rogné à droite au lieu de passer à la ligne. */
+  .category-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Filet de sécurité : même si un enfant refuse de rétrécir, on
+     préfère un scroll horizontal contenu à une carte qui déborde et
+     se fait rogner par .category-section. */
+  .ingredient-item-wrap {
+    min-width: 0;
+  }
+
+  /* — Ajouter une référence : le bouton texte déborde du formulaire
+     étroit (input flex:1 + bouton non compressible). Sur téléphone,
+     on ne garde que le + ; le libellé reste accessible via
+     aria-label/title, .reference-add-form garde son gap réduit. */
+  .btn-add-reference-label {
+    display: none;
+  }
+
+  .btn-add-reference {
+    flex-shrink: 0;
+    padding: 0.35rem 0.5rem;
+  }
+
+  /* Le bouton + reste collé à droite du champ texte (input flex:1
+     occupe déjà tout l'espace restant, on le rend explicite). */
+  .reference-add-form {
+    justify-content: flex-end;
+  }
+
+  /* — Paramètres d'ingrédient / de référence : le nom passe déjà à
+     la ligne au-dessus (checkbox + nom + badge réfs), donc on laisse
+     les champs de prix et le bouton supprimer utiliser toute la
+     largeur de la carte au lieu de rester tassés à droite. */
+  .ingredient-item-actions,
+  .reference-actions {
+    flex-basis: 100%;
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .ingredient-pricing,
+  .reference-pricing {
+    flex: 1 1 auto;
+  }
+
+  /* — Bouton "gérer les références" : calé tout à droite de la
+     ligne nom/checkbox, donc juste au-dessus du bouton supprimer
+     (lui-même ancré à droite via .ingredient-item-actions). */
+  .badge-references,
+  .btn-manage-references {
+    margin-left: auto;
+  }
+
+  /* — Une référence = une carte : sur deux lignes désormais (nom
+     au-dessus, prix/suppression en dessous, pleine largeur), une
+     fine ligne de séparation suffit pour distinguer où l'une
+     s'arrête et où la suivante commence (pas besoin d'un encadré). */
+  .reference-row {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .reference-row:last-of-type {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}

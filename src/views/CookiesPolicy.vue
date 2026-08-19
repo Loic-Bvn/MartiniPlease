@@ -48,8 +48,8 @@ const currentDate = computed(() =>
 const t = computed(() => props.locale === 'fr' ? {
   back: 'Retour',
   title: 'Cookies & données locales',
-  noTracking: 'Pas de cookies de suivi',
-  noTrackingDesc: "MartiniPlease n'utilise aucun cookie de tracking, aucune analytics tierce, aucune publicité. Zéro partage réseaux sociaux.",
+  noTracking: 'Cookies de suivi',
+  noTrackingDesc: "MartiniPlease ne pose aucun cookie de suivi ni publicitaire, et ne fait aucun partage réseaux sociaux. Deux services tiers sont utilisés à des fins techniques : Umami (statistiques de fréquentation, sans cookie, sans identifiant persistant) et Sentry (suivi des erreurs techniques — reçoit l'adresse IP, le navigateur et la page concernée en cas d'erreur). Aucun des deux ne dépose de cookie sur votre appareil.",
   localStorage: 'localStorage uniquement',
   localStorageDesc: 'Le navigateur stocke localement vos préférences : thème clair/sombre, langue (FR/EN), unités de mesure (oz/ml), statut de consentement, bar sélectionné. Ces données restent sur votre appareil.',
   auth: 'Authentification',
@@ -61,8 +61,8 @@ const t = computed(() => props.locale === 'fr' ? {
 } : {
   back: 'Back',
   title: 'Cookies & Local Data',
-  noTracking: 'No Tracking Cookies',
-  noTrackingDesc: 'MartiniPlease uses no tracking cookies, no third-party analytics, no advertising. Zero social network sharing.',
+  noTracking: 'Tracking Cookies',
+  noTrackingDesc: "MartiniPlease sets no tracking or advertising cookies, and does no social network sharing. Two third-party services are used for technical purposes: Umami (visit statistics, cookieless, no persistent identifier) and Sentry (technical error monitoring — receives the IP address, browser and page involved when an error occurs). Neither sets a cookie on your device.",
   localStorage: 'localStorage Only',
   localStorageDesc: 'Your browser stores preferences locally: light/dark theme, language (FR/EN), units (oz/ml), consent status, selected bar. This data stays on your device.',
   auth: 'Authentication',

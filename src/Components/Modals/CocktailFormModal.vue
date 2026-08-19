@@ -187,90 +187,110 @@
               class="recipe-row"
             >
               <!-- categorie l'ingrédient -->
-              <select v-model="ing.Category" @change="onCategoryChange(ing)" class="form-input">
-                <option
-                  v-for="(label, catKey) in CATEGORY_LABELS"
-                  :key="catKey"
-                  :value="catKey"
-                >
-                  {{ label }}
-                </option>
-              </select>
+              <label class="recipe-field">
+                <span class="recipe-field-label">Catégorie</span>
+                <select v-model="ing.Category" @change="onCategoryChange(ing)" class="form-input">
+                  <option
+                    v-for="(label, catKey) in CATEGORY_LABELS"
+                    :key="catKey"
+                    :value="catKey"
+                  >
+                    {{ label }}
+                  </option>
+                </select>
+              </label>
 
               <!-- Type d'ingrédient (lien stock / coût) -->
-              <select v-model="ing.Type" @change="onIngredientChange(ing)" class="form-input">
-                <option value="" disabled>-- Type --</option>
-                <option
-                  v-for="(item, typeKey) in getTypesByCategory(ing.Category)"
-                  :key="typeKey"
-                  :value="typeKey"
-                >
-                  {{ item.name }}
-                </option>
-              </select>
+              <label class="recipe-field">
+                <span class="recipe-field-label">Type</span>
+                <select v-model="ing.Type" @change="onIngredientChange(ing)" class="form-input">
+                  <option value="" disabled>-- Type --</option>
+                  <option
+                    v-for="(item, typeKey) in getTypesByCategory(ing.Category)"
+                    :key="typeKey"
+                    :value="typeKey"
+                  >
+                    {{ item.name }}
+                  </option>
+                </select>
+              </label>
 
               <!-- Nom de l'ingrédient (libre, éditable) -->
-              <input
-                type="text"
-                v-model="ing.Ingredient"
-                class="form-input"
-                placeholder="Nom du produit (ex. Havana Club 3 Años)"
-              />
+              <label class="recipe-field">
+                <span class="recipe-field-label">Ingrédient</span>
+                <input
+                  type="text"
+                  v-model="ing.Ingredient"
+                  class="form-input"
+                  placeholder="Nom du produit (ex. Havana Club 3 Años)"
+                />
+              </label>
 
               <!-- Référence précise (optionnel, uniquement si le bar en a défini pour ce type) -->
-              <select
-                v-if="getAvailableReferences(ing.Type).length"
-                v-model="ing.Reference"
-                @change="onReferenceChange(ing)"
-                class="form-input"
-              >
-                <option value="">— N'importe quelle bouteille —</option>
-                <option
-                  v-for="ref in getAvailableReferences(ing.Type)"
-                  :key="ref.id"
-                  :value="ref.name"
+              <label v-if="getAvailableReferences(ing.Type).length" class="recipe-field">
+                <span class="recipe-field-label">Référence</span>
+                <select
+                  v-model="ing.Reference"
+                  @change="onReferenceChange(ing)"
+                  class="form-input"
                 >
-                  {{ ref.name }}
-                </option>
-              </select>
-              <span v-else class="form-input form-input--placeholder"></span>
+                  <option value="">— N'importe quelle bouteille —</option>
+                  <option
+                    v-for="ref in getAvailableReferences(ing.Type)"
+                    :key="ref.id"
+                    :value="ref.name"
+                  >
+                    {{ ref.name }}
+                  </option>
+                </select>
+              </label>
+              <div v-else class="recipe-field recipe-field--empty">
+                <span class="form-input form-input--placeholder"></span>
+              </div>
 
               <!-- Quantité -->
-              <!-- OZ -->
-              <input
-                v-if="unit === 'oz'"
-                v-model="ing.Oz"
-                @input="onOzChange(ing)"
-                type="number"
-                min="0"
-                class="form-input"
-                placeholder="—"
-              />
-
-              <!-- ML -->
-              <input
-                v-else
-                v-model="ing.Ml"
-                @input="onMlChange(ing)"
-                type="number"
-                min="0"
-                class="form-input"
-                placeholder="—"
-              />
+              <label class="recipe-field">
+                <span class="recipe-field-label">{{ unit === 'oz' ? 'Oz' : 'Ml' }}</span>
+                <!-- OZ -->
+                <input
+                  v-if="unit === 'oz'"
+                  v-model="ing.Oz"
+                  @input="onOzChange(ing)"
+                  type="number"
+                  min="0"
+                  class="form-input"
+                  placeholder="—"
+                />
+                <!-- ML -->
+                <input
+                  v-else
+                  v-model="ing.Ml"
+                  @input="onMlChange(ing)"
+                  type="number"
+                  min="0"
+                  class="form-input"
+                  placeholder="—"
+                />
+              </label>
 
               <!-- Dashes -->
-              <input
-                v-model.number="ing.Dashes"
-                type="number"
-                min="0"
-                class="form-input"
-                placeholder="—"
-              />
+              <label class="recipe-field">
+                <span class="recipe-field-label">Dash</span>
+                <input
+                  v-model.number="ing.Dashes"
+                  type="number"
+                  min="0"
+                  class="form-input"
+                  placeholder="—"
+                />
+              </label>
 
               <!-- Supprimer -->
-              <button type="button" @click="removeRecipeLine(idx)" class="btn-remove-ingredient">
-                <Trash2 :size="15" />
-              </button>
+              <div class="recipe-field recipe-field--delete">
+                <button type="button" @click="removeRecipeLine(idx)" class="btn-remove-ingredient" aria-label="Supprimer l'ingrédient">
+                  <Trash2 :size="15" />
+                </button>
+              </div>
             </div>
           </div>
         
