@@ -129,6 +129,22 @@ export function useAuth() {
 
     barFetchError.value = false
 
+    // 🔍 DEBUG TEMPORAIRE — à retirer une fois le bug "0 bar après refresh"
+    // diagnostiqué. Objectif : voir si le token utilisé pour la requête
+    // correspond bien au compte attendu, et s'il est expiré.
+    try {
+      const payload = JSON.parse(atob(session.value.access_token.split('.')[1]))
+      console.log('🔍 fetchBar debug', {
+        user_id: session.value.user.id,
+        token_sub: payload.sub,
+        token_exp: new Date(payload.exp * 1000).toISOString(),
+        now: new Date().toISOString(),
+        expired: payload.exp * 1000 < Date.now(),
+      })
+    } catch (e) {
+      console.log('🔍 fetchBar debug: impossible de décoder le token', e)
+    }
+
     // ⚠️  Timeout dur sur cette requête : c'est un appel PostgREST, pas un
     // appel auth — il n'est PAS couvert par le contournement `noOpLock` de
     // lib/supabase.js. Sans ça, une requête qui traîne (réseau) peut faire
@@ -153,6 +169,8 @@ export function useAuth() {
     } finally {
       clearTimeout(timeoutId)
     }
+
+    console.log('🔍 fetchBar result', { data, error })
 
     if (error) {
       console.error('❌ fetchBar:', error)
