@@ -97,11 +97,20 @@ export function useAuth() {
     // attend cette même initialisation en interne, donc si on l'appelait en
     // premier (comme avant), l'événement pouvait déjà être passé.
     supabase.auth.onAuthStateChange(async (event, newSession) => {
-      // 'PASSWORD_RECOVERY' : l'utilisateur vient de cliquer le lien reçu par
-      // mail. Supabase a déjà établi une session temporaire (via le param
-      // ?code=... ou #access_token=... de l'URL, selon le flow) — on ne
-      // touche pas au routing "bar" habituel, on bascule juste en mode
-      // saisie du nouveau mot de passe. Voir ResetPasswordView.vue.
+      // ⚠️  On ignore 'INITIAL_SESSION' ici : cet événement se déclenche en
+      // parallèle du `getSession()` explicite juste en dessous, et les deux
+      // finissent par résoudre le même token quasi simultanément au tout
+      // premier chargement. auth-js a son propre mécanisme de réentrance en
+      // mémoire (this.lockAcquired / pendingInLock dans _acquireLock) qui
+      // sert à sérialiser ces appels concurrents — mais il est bugué côté
+      // upstream (cf. discussion citée plus haut sur le contournement
+      // noOpLock) et peut deadlock silencieusement, SANS requête réseau
+      // visible, quand deux résolutions de session se chevauchent au
+      // démarrage. En ignorant l'événement initial ici, seul le
+      // `getSession()` explicite ci-dessous déclenche fetchBar() au
+      // démarrage — plus de double appel concurrent, plus de deadlock.
+      if (event === 'INITIAL_SESSION') return
+
       if (event === 'PASSWORD_RECOVERY') {
         passwordRecoveryMode.value = true
       }
