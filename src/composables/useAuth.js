@@ -138,48 +138,40 @@ export function useAuth() {
 
     barFetchError.value = false
 
-    // 🔍 DEBUG TEMPORAIRE — à retirer une fois le bug "0 bar après refresh"
-    // diagnostiqué. Objectif : voir si le token utilisé pour la requête
-    // correspond bien au compte attendu, et s'il est expiré.
-    try {
-      const payload = JSON.parse(atob(session.value.access_token.split('.')[1]))
-      console.log('🔍 fetchBar debug', {
-        user_id: session.value.user.id,
-        token_sub: payload.sub,
-        token_exp: new Date(payload.exp * 1000).toISOString(),
-        now: new Date().toISOString(),
-        expired: payload.exp * 1000 < Date.now(),
-      })
-    } catch (e) {
-      console.log('🔍 fetchBar debug: impossible de décoder le token', e)
-    }
-
-    // ⚠️  Timeout dur sur cette requête : c'est un appel PostgREST, pas un
-    // appel auth — il n'est PAS couvert par le contournement `noOpLock` de
-    // lib/supabase.js. Sans ça, une requête qui traîne (réseau) peut faire
-    // dépasser le timeout de 5s posé autour de initAuth() dans main.js sans
-    // jamais résoudre ni échouer ensuite : `isLoggedIn` passe à true mais
-    // `bar`/`barFetchError` restent bloqués dans un état intermédiaire que
-    // le template ne gère pas (ni le fallback erreur, ni le fallback "pas
-    // de bar" ne matchent tant que la requête est encore en vol).
+    // ⚠️  Contournement d'un bug d'init de GoTrueClient (bug upstream non
+    // résolu — cf. supabase-js issue #1594, comme le contournement noOpLock
+    // plus haut) : à froid (juste après un refresh), la résolution interne
+    // de session par le SDK peut rester bloquée indéfiniment AVANT même de
+    // déclencher un fetch réseau — confirmé par debug le 19/08 (aucune
+    // requête réseau, le SDK ne sort jamais de sa propre logique interne).
+    // On a déjà un access_token valide en main (`session.value`), donc pour
+    // CET appel précis on tape l'API REST de Supabase nous-mêmes, sans
+    // passer par `supabase.from()` — ça élimine toute dépendance au chemin
+    // d'auth interne buggé du SDK pour cette requête.
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 8000)
 
     let data, error
     try {
-      ({ data, error } = await supabase
-        .from('bars')
-        .select('*')
-        .eq('owner_id', session.value.user.id)
-        .order('created_at')
-        .abortSignal(controller.signal))
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/bars`
+        + `?select=*&owner_id=eq.${session.value.user.id}&order=created_at`
+      const res = await fetch(url, {
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${session.value.access_token}`,
+        },
+        signal: controller.signal,
+      })
+      if (!res.ok) {
+        error = new Error(`HTTP ${res.status}`)
+      } else {
+        data = await res.json()
+      }
     } catch (err) {
       error = err
     } finally {
       clearTimeout(timeoutId)
     }
-
-    console.log('🔍 fetchBar result', { data, error })
 
     if (error) {
       console.error('❌ fetchBar:', error)
