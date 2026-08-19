@@ -6,6 +6,7 @@
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { validateDrinkerCreation } from '@/composables/useDataValidator'
+import { useToast } from '@/composables/useToast'
 import { track } from '@/lib/analytics'
 
 const drinker    = ref(null)      // { id, pseudo, bar_id, token }
@@ -15,6 +16,7 @@ const history    = ref([])        // [{ cocktail_id, ordered_at }]
 const TOKEN_KEY = 'martini_drinker_token'
 
 export function useDrinker() {
+  const { toastError } = useToast()
 
   const hasDrinker    = computed(() => !!drinker.value)
   const drinkerPseudo = computed(() => drinker.value?.pseudo ?? '')
@@ -103,7 +105,11 @@ export function useDrinker() {
       .select('cocktail_id')
       .eq('drinker_id', drinker.value.id)
 
-    if (error) { console.error('❌ fetchFavorites:', error); return }
+    if (error) {
+      console.error('❌ fetchFavorites:', error)
+      toastError('Impossible de charger tes favoris.')
+      return
+    }
     favorites.value = new Set(data.map(f => f.cocktail_id))
   }
 
@@ -122,7 +128,11 @@ export function useDrinker() {
         .eq('drinker_id', drinker.value.id)
         .eq('cocktail_id', cocktailId)
 
-      if (error) { console.error('❌ removeFavorite:', error); return }
+      if (error) {
+        console.error('❌ removeFavorite:', error)
+        toastError('Impossible de retirer ce favori.')
+        return
+      }
       favorites.value.delete(cocktailId)
       favorites.value = new Set(favorites.value)
       track('favorite_toggled', { action: 'remove' })
@@ -136,7 +146,11 @@ export function useDrinker() {
           bar_id:      drinker.value.bar_id,
         })
 
-      if (error) { console.error('❌ addFavorite:', error); return }
+      if (error) {
+        console.error('❌ addFavorite:', error)
+        toastError('Impossible d\'ajouter ce favori.')
+        return
+      }
       favorites.value.add(cocktailId)
       favorites.value = new Set(favorites.value)
       track('favorite_toggled', { action: 'add' })
@@ -153,7 +167,11 @@ export function useDrinker() {
       .eq('drinker_id', drinker.value.id)
       .order('ordered_at', { ascending: false })
 
-    if (error) { console.error('❌ fetchHistory:', error); return }
+    if (error) {
+      console.error('❌ fetchHistory:', error)
+      toastError('Impossible de charger ton historique.')
+      return
+    }
     history.value = data
   }
 

@@ -3,12 +3,14 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
 
 const menuCards = ref([])
 const loading   = ref(false)
 
 export function useMenuCards() {
   const { currentBarId } = useAuth()
+  const { toastError }   = useToast()
 
   async function fetchMenuCards(barId) {
     const id = barId ?? currentBarId.value
@@ -25,6 +27,7 @@ export function useMenuCards() {
       menuCards.value = data
     } catch (err) {
       console.error('❌ Erreur fetchMenuCards:', err)
+      toastError('Impossible de charger les cartes de menu. Réessaie ou recharge la page.')
     } finally {
       loading.value = false
     }
