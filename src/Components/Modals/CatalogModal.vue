@@ -196,7 +196,7 @@ const hasActiveFilters = computed(() =>
   !!filters.value.search || !!filters.value.spirit || !!filters.value.cocktailStyle || !!filters.value.profile
 )
 
-// Cocktails du catalog déjà présents dans le bar, dérivé de bar_cocktails_debug.catalog_id
+// Cocktails du catalog déjà présents dans le bar, dérivé de bar_cocktails.catalog_id
 // (source de vérité en DB — contrairement à l'ancien Set "imported" qui ne
 // vivait que le temps de la session et oubliait tout à la réouverture de la modal)
 const importedCatalogIds = computed(() =>

@@ -2,13 +2,11 @@
 TAG new version using "npm run release:patch"
 
 # Fix
-## Type to Ingredient migration
+## Type > Ingredient migration
 - Broken price computation in cocktailForm
 - Rework AddIngredient modal
-- Check we dont call type instead of ingredients
-- Rework "family" has it is used to make groups inside spirits or licors groups (i.e: agave: tequila, tequila reposado, mezcal) 
-- Update family in db so it is lowercase AND english
-- Migrate bar_cocktails and cocktails_catalog db
+
+- Broken filter (ingredient principal cassé)
 
 # Ameliorations
 ### Stats

@@ -85,7 +85,7 @@ export function useCatalog() {
     loading.value = true
     try {
       let query = supabase
-        .from('cocktails_catalog_debug')
+        .from('cocktails_catalog')
         .select('*')
         .order('name')
 
@@ -122,7 +122,7 @@ export function useCatalog() {
       const validated = validateCocktail(strippedData)
 
       const { data, error } = await supabase
-        .from('bar_cocktails_debug')
+        .from('bar_cocktails')
         .insert({
           ...validated,
           bar_id: barId,
@@ -206,7 +206,7 @@ export function useCatalog() {
           (ancien cocktail conservé)
       */
       const { data: catalogEntry, error } = await supabase
-        .from('cocktails_catalog_debug')
+        .from('cocktails_catalog')
         .insert({
           ...payload,
           submitted_by_bar_id: barId
@@ -224,7 +224,7 @@ export function useCatalog() {
         - on trace qui l'a soumis
       */
       const { error: updateError } = await supabase
-        .from('bar_cocktails_debug')
+        .from('bar_cocktails')
         .update({
           catalog_id: catalogEntry.id,
           is_private: false,

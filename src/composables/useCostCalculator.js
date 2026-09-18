@@ -58,7 +58,7 @@ function resolvePricingSource(line, ingredient) {
 /**
  * Calcule le coût matière d'un cocktail.
  *
- * @param {Array} recipe - `bar_cocktails_debug.recipe` (jsonb array : Ingredient, Reference, Oz/Ml, IsGarnish)
+ * @param {Array} recipe - `bar_cocktails.recipe` (jsonb array : Ingredient, Reference, Oz/Ml, IsGarnish)
  * @param {Array} ingredients - `ingredients` du bar (avec pricing)
  * @param {object} [opts]
  * @param {boolean} [opts.includeGarnish=false] - inclure le coût des garnitures

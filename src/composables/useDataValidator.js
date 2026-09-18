@@ -69,7 +69,7 @@ export function validateCocktail(cocktail, options = {}) {
     'creation_year',
   ]
 
-  // Description bilingue - colonnes séparées en DB (bar_cocktails_debug.description_fr / description_en)
+  // Description bilingue - colonnes séparées en DB (bar_cocktails.description_fr / description_en)
   if (cocktail.description_fr?.trim?.()) {
     cleaned.description_fr = cocktail.description_fr.trim()
   }
