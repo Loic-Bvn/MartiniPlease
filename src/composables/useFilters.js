@@ -31,8 +31,10 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
 
   // ── Données de référence (dépendent de la locale) ─────────────────────────
 
-  const baseSpirits = computed(() => [
-    { key: 'Whiskey', label: getFL('Whiskey', locale?.value ?? 'fr'), subs: [
+  const baseSpirits = computed(() => {
+    const fr = locale?.value !== 'en'
+    return [
+    { key: 'whiskey', label: fr ? '🥃 Whiskey' : '🥃 Whiskey', subs: [
       { key: 'bourbon',       label: getFL('bourbon',       locale?.value ?? 'fr') },
       { key: 'rye',           label: getFL('rye',           locale?.value ?? 'fr') },
       { key: 'scotch',        label: getFL('scotch',        locale?.value ?? 'fr') },
@@ -40,7 +42,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
       { key: 'peated_whisky', label: getFL('peated_whisky', locale?.value ?? 'fr') },
       { key: 'whiskey',       label: getFL('whiskey',       locale?.value ?? 'fr') },
     ]},
-    { key: 'Rum', label: getFL('Rum', locale?.value ?? 'fr'), subs: [
+    { key: 'rum', label: fr ? '🍹 Rhum' : '🍹 Rum', subs: [
       { key: 'rum',           label: getFL('rum',           locale?.value ?? 'fr') },
       { key: 'rum_agricol',   label: getFL('rum_agricol',   locale?.value ?? 'fr') },
       { key: 'rum_jamaican',  label: getFL('rum_jamaican',  locale?.value ?? 'fr') },
@@ -48,37 +50,38 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
       { key: 'rum_overproof', label: getFL('rum_overproof', locale?.value ?? 'fr') },
       { key: 'cachaca',       label: getFL('cachaca',       locale?.value ?? 'fr') },
     ]},
-    { key: 'Agave', label: getFL('Agave', locale?.value ?? 'fr'), subs: [
+    { key: 'agave', label: '🌵 Agave', subs: [
       { key: 'tequila',          label: getFL('tequila',          locale?.value ?? 'fr') },
       { key: 'tequila_reposado', label: getFL('tequila_reposado', locale?.value ?? 'fr') },
       { key: 'mezcal',           label: getFL('mezcal',           locale?.value ?? 'fr') },
     ]},
-    { key: 'Gin', label: getFL('Gin', locale?.value ?? 'fr'), subs: [
+    { key: 'gin', label: '🌿 Gin', subs: [
       { key: 'gin',      label: getFL('gin',      locale?.value ?? 'fr') },
       { key: 'gin_dry',  label: getFL('gin_dry',  locale?.value ?? 'fr') },
       { key: 'gin_navy', label: getFL('gin_navy', locale?.value ?? 'fr') },
       { key: 'genever',  label: getFL('genever',  locale?.value ?? 'fr') },
     ]},
-    { key: 'Brandy', label: getFL('Brandy', locale?.value ?? 'fr'), subs: [
+    { key: 'brandy', label: '🍇 Brandy', subs: [
       { key: 'cognac',   label: getFL('cognac',   locale?.value ?? 'fr') },
       { key: 'calvados', label: getFL('calvados', locale?.value ?? 'fr') },
       { key: 'pisco',    label: getFL('pisco',    locale?.value ?? 'fr') },
       { key: 'grappa',   label: getFL('grappa',   locale?.value ?? 'fr') },
       { key: 'brandy',   label: getFL('brandy',   locale?.value ?? 'fr') },
     ]},
-    { key: 'Vodka',    label: getFL('Vodka',    locale?.value ?? 'fr'), subs: [] },
-    { key: 'Absinthe', label: getFL('Absinthe', locale?.value ?? 'fr'), subs: [] },
-    { key: 'Aquavit',  label: getFL('Aquavit',  locale?.value ?? 'fr'), subs: [] },
-  ])
+    { key: 'vodka',    label: '❄️ Vodka',    subs: [] },
+    { key: 'absinthe', label: '🌱 Absinthe', subs: [] },
+    { key: 'aquavit',  label: '🌾 Aquavit',  subs: [] },
+    { key: 'pastis',   label: '⭐ Pastis',   subs: [] },
+  ]})
 
   const liqueurFamilies = computed(() => [
-    { key: 'Liqueur Amer',    label: getFL('Liqueur Amer',    locale?.value ?? 'fr') },
-    { key: 'Liqueur Agrume',  label: getFL('Liqueur Agrume',  locale?.value ?? 'fr') },
-    { key: 'Liqueur Fruits',  label: getFL('Liqueur Fruits',  locale?.value ?? 'fr') },
-    { key: 'Liqueur Herbes',  label: getFL('Liqueur Herbes',  locale?.value ?? 'fr') },
-    { key: 'Liqueur Noix',    label: getFL('Liqueur Noix',    locale?.value ?? 'fr') },
-    { key: 'Liqueur Dessert', label: getFL('Liqueur Dessert', locale?.value ?? 'fr') },
-    { key: 'Liqueur Anisée',  label: getFL('Liqueur Anisée',  locale?.value ?? 'fr') },
+    { key: 'bitter_liqueur',  label: getFL('bitter_liqueur',  locale?.value ?? 'fr') },
+    { key: 'citrus_liqueur',  label: getFL('citrus_liqueur',  locale?.value ?? 'fr') },
+    { key: 'fruit_liqueur',   label: getFL('fruit_liqueur',   locale?.value ?? 'fr') },
+    { key: 'herbal_liqueur',  label: getFL('herbal_liqueur',  locale?.value ?? 'fr') },
+    { key: 'nut_liqueur',     label: getFL('nut_liqueur',     locale?.value ?? 'fr') },
+    { key: 'dessert_liqueur', label: getFL('dessert_liqueur', locale?.value ?? 'fr') },
+    { key: 'anise_liqueur',   label: getFL('anise_liqueur',   locale?.value ?? 'fr') },
   ])
 
   const profileFilters = computed(() => {
@@ -157,7 +160,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
   function isMakeable(cocktail) {
     const recipe = cocktail.recipe || []
     if (!recipe.length) return false
-    return recipe.every(ing => ing.Type === 'garnish' || barInventory?.value.has(ing.Type))
+    return recipe.every(ing => ing.Ingredient === 'garnish' || barInventory?.value.has(ing.Ingredient))
   }
 
   const makeableCount = computed(() =>
@@ -175,7 +178,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     if (query) {
       list = list.filter(c =>
         c.name.toLowerCase().includes(query) ||
-        (c.recipe && c.recipe.some(ing => ing.Type?.toLowerCase().includes(query)))
+        (c.recipe && c.recipe.some(ing => ing.Ingredient?.toLowerCase().includes(query)))
       )
     }
 
@@ -190,7 +193,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
           const subMatch    = !activeSubs.length     || activeSubs.includes(c.base_spirit)
           return familyMatch && subMatch
         } else {
-          const recipeTypes = (c.recipe || []).map(ing => ing.Type)
+          const recipeTypes = (c.recipe || []).map(ing => ing.Ingredient)
           if (activeSubs.length)
             return activeSubs.some(sub => recipeTypes.includes(sub))
           return activeFamilies.some(family => {

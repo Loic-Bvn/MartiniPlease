@@ -69,7 +69,7 @@ function resolvePricingSource(line, ingredient) {
  */
 export function calculateCocktailCost(recipe, ingredients, opts = {}) {
   const { includeGarnish = false } = opts
-  const byIngredient = new Map(ingredients.map(i => [i.ingredient, i]))
+  const byIngredient = new Map(ingredients.map(i => [i.type, i]))
 
   const lines = []
   let total = 0

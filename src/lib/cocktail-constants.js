@@ -7,6 +7,7 @@
  */
 
 import constantsData from '@/constants/cocktail-constants.json'
+import { getFamilyLabel } from '@/constants/typeLabels'
 
 // Cache pour éviter les re-imports
 let loadedConstants = null
@@ -192,6 +193,39 @@ export function getCocktailCategoriesAsOptions() {
 }
 
 /**
+ * Retourne les familles disponibles pour une catégorie d'ingrédient donnée
+ * (utilisé par AddIngredientModal pour proposer un select "Famille" au lieu
+ * d'un champ texte libre). Ex: getFamilyOptions('spirits') -> whiskey, rum,
+ * agave, gin, vodka, brandy, absinthe, aquavit, pastis...
+ *
+ * Seules les catégories où `family` a du sens (spirits, licors, modifiers,
+ * bitters) renvoient des options ; les autres (juices, syrups, mixers,
+ * garnish, others) renvoient un tableau vide.
+ *
+ * @param {string} category - clé de catégorie (ex: 'spirits', 'licors')
+ * @param {string} locale - 'fr' | 'en'
+ * @returns {Array<{key: string, label: string}>}
+ */
+export function getFamilyOptions(category, locale = 'fr') {
+  const constants = loadedConstants || loadConstants()
+  const items = constants.ingredients?.[category] || {}
+  // Pour les spirits, cocktail_categories est la source de vérité du label
+  // (déjà localisé/emoji), donc on la préfère à typeLabels.js pour éviter
+  // toute collision avec les libellés de sous-types d'ingrédients (ex:
+  // 'whiskey' comme famille vs 'whiskey' comme type de bouteille générique).
+  const categories = constants.cocktail_categories || {}
+
+  const keys = new Set()
+  Object.values(items).forEach(data => {
+    if (data?.family) keys.add(data.family)
+  })
+
+  return [...keys]
+    .map(key => ({ key, label: categories[key]?.label ?? getFamilyLabel(key, locale) }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+}
+
+/**
  * Retourne les spirits groupés par famille pour le dropdown
  * Format: [{ key, label, spirits: [{ key, label }] }]
  */
@@ -225,14 +259,14 @@ export function getBaseSpiritGroups() {
 
 /**
  * Retourne un mapping spiritKey -> categoryValue
- * Ex: { bourbon: 'Whiskey', gin: 'Gin', ... }
+ * Ex: { bourbon: 'whiskey', gin: 'gin', ... }
  */
 export function getSpiritToCategoryMap() {
   const constants = loadedConstants || loadConstants()
   const spirits = constants.ingredients?.spirits || {}
   const categories = constants.cocktail_categories || {}
 
-  // Inverser cocktail_categories : { Whiskey: 'Whiskey', Rum: 'Rum', ... }
+  // Inverser cocktail_categories : { whiskey: 'whiskey', rum: 'rum', ... }
   const familyToCategory = {}
   Object.values(categories).forEach(cat => { familyToCategory[cat.key] = cat.key })
 
