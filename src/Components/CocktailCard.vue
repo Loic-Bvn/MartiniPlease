@@ -44,14 +44,14 @@
       <div class="recipe-compact" @click="handleOpen" title="Voir les détails">
         <div
           v-for="(ing, idx) in recipeWithQty"
-          :key="ing.Type ? ing.Type + idx : idx"
+          :key="ing.Ingredient ? ing.Ingredient + idx : idx"
           class="recipe-line"
         >
           <div class="ingredient-info">
             <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
             </span>
             <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-              {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
+              {{ getIngredientLabel(ing.Ingredient, locale, ingredientsByIngredient) }}
             </span>
           </div>
           <span class="ingredient-quantity">{{ ing._qty }}</span>
@@ -127,7 +127,7 @@ import { Upload, Bookmark, Pencil, Trash2, Heart, Check, HandPlatter, Martini} f
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
-import { getTypeLabel, getProfileLabel } from '../constants/typeLabels.js'
+import { getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
@@ -148,7 +148,7 @@ const props = defineProps({
 })
 const { isSubmitted, submitToCatalog } = useCatalog()
 const { showToast } = useToast()
-const { barInventory, ingredientsByType } = useInventory()
+const { barInventory, ingredientsByIngredient } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
 const { isFeatureEnabled } = useBarFeatures(props.barId)
@@ -159,8 +159,8 @@ const emit = defineEmits(['edit', 'delete', 'open'])
 
 
 function isAvailable(ing) {
-  if (ing.Type === 'garnish') return true
-  return barInventory.value.has(ing.Type)
+  if (ing.Ingredient === 'garnish') return true
+  return barInventory.value.has(ing.Ingredient)
 }
 
 const makeable = computed(() => {

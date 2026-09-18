@@ -201,7 +201,7 @@
                   <div class="cv-meta-list">
                     <div class="cv-meta-row">
                       <span class="form-label">{{ props.locale === 'fr' ? 'Spiritueux de base' : 'Base Spirit' }}</span>
-                      <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getTypeLabel(cocktail.base_spirit, locale, ingredientsByType) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.base_spirit }">{{ cocktail.base_spirit ? getIngredientLabel(cocktail.base_spirit, locale, ingredientsByIngredient) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                     <div class="cv-meta-row">
                       <span class="form-label">Profiles</span>
@@ -233,14 +233,14 @@
                     <div v-if="(cocktail.recipe || []).length === 0" class="recipe-empty">Aucun ingrédient</div>
                     <div
                       v-for="(ing, idx) in recipeWithQty"
-                      :key="ing.Type ? ing.Type + idx : idx"
+                      :key="ing.Ingredient ? ing.Ingredient + idx : idx"
                       class="recipe-line cv-recipe-line"
                     >
                       <div class="ingredient-info">
                         <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
                         <span class="ingredient-name-col">
                           <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-                            {{ getTypeLabel(ing.Type, locale, ingredientsByType) }}
+                            {{ getIngredientLabel(ing.Ingredient, locale, ingredientsByIngredient) }}
                           </span>
                           <span v-if="ing.Reference" class="ingredient-reference">{{ ing.Reference }}</span>
                         </span>
@@ -284,7 +284,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil} from 'lucide-vue-next'
 import {
-  getTypeLabel,
+  getIngredientLabel,
   getProfileLabel,
   getGlassLabel,
   getDetailledMethodLabel,
@@ -320,7 +320,7 @@ const emit = defineEmits(['close', 'edit'])
 const imageError = ref(false)
 const modalEl = ref(null)
 
-const { barInventory, ingredients, ingredientsByType } = useInventory()
+const { barInventory, ingredients, ingredientsByIngredient } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
 const { addOrder } = useOrders()
 const { submitToCatalog, isSubmitted } = useCatalog()
@@ -415,8 +415,8 @@ const makeable = computed(() =>
 )
 
 function isAvailable(ing) {
-  if (ing.Type === 'garnish') return true
-  return barInventory.value.has(ing.Type)
+  if (ing.Ingredient === 'garnish') return true
+  return barInventory.value.has(ing.Ingredient)
 }
 
 function formatQty(ing) {

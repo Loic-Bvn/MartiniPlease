@@ -14,12 +14,6 @@ export function cleanRecipe(recipe) {
       const cleaned = {
         Ingredient: ing.Ingredient.trim(),
       }
-      
-      // Type est optionnel - on l'ajoute seulement si fourni
-      const typeValue = ing.Type?.trim()
-      if (typeValue) {
-        cleaned.Type = typeValue
-      }
 
       // Reference est optionnelle - référence précise de bouteille choisie (nom, pas d'id)
       const referenceValue = ing.Reference?.trim?.()

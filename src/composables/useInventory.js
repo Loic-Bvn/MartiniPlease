@@ -4,7 +4,6 @@ import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
-import ingredientsDatabase from '@/constants/ingredientsDatabase.json'
 
 const barInventory = ref(new Set())
 const ingredients  = ref([])
@@ -205,8 +204,8 @@ export function useInventory() {
   function hasIngredient(type) { return barInventory.value.has(type) }
 
   // Map { type: ingredient } — utilisé pour résoudre le label des ingrédients
-  // custom (non présents dans la table statique TYPE_LABELS) via getTypeLabel().
-  const ingredientsByType = computed(() => {
+  // custom (non présents dans la table statique TYPE_LABELS) via getIngredientLabel().
+  const ingredientsByIngredient = computed(() => {
     const map = {}
     for (const ing of ingredients.value) map[ing.type] = ing
     return map
@@ -383,6 +382,9 @@ export function useInventory() {
   }
 
   // Initialiser les ingrédients par défaut pour un nouveau bar
+  // Le seed vient désormais de la table ingredient_types (catalogue global
+  // en DB), plus de src/constants/ingredientsDatabase.json — voir
+  // supabase/migrates_ingredient_types.sql pour la fonction RPC.
   async function initializeDefaultIngredients(barId) {
     const targetBarId = barId ?? currentBarId.value
     if (!targetBarId) {
@@ -390,42 +392,11 @@ export function useInventory() {
     }
 
     try {
-      const { data: existingRows, error: fetchError } = await supabase
-        .from('ingredients')
-        .select('id')
-        .eq('bar_id', targetBarId)
-        .limit(1)
+      const { error } = await supabase.rpc('initialize_bar_ingredients', {
+        p_bar_id: targetBarId,
+      })
 
-      if (fetchError) throw fetchError
-
-      if (existingRows?.length) {
-        await fetchIngredients(targetBarId)
-        return { success: true }
-      }
-
-      const rows = ingredientsDatabase.map(ing => ({
-        type: ing.type,
-        name: ing.name,
-        category: ing.category,
-        family: ing.family,
-        abv: ing.abv,
-        pricing_mode: ing.pricing_mode ?? 'bottle',
-        bottle_volume_ml: ing.bottle_volume_ml ?? null,
-        bottle_price: ing.bottle_price ?? null,
-        price_per_ml: ing.price_per_ml ?? null,
-        bar_id: targetBarId,
-        available: false,
-      }))
-
-      const batchSize = 100
-      for (let index = 0; index < rows.length; index += batchSize) {
-        const batch = rows.slice(index, index + batchSize)
-        const { error } = await supabase
-          .from('ingredients')
-          .insert(batch)
-
-        if (error) throw error
-      }
+      if (error) throw error
 
       await fetchIngredients(targetBarId)
       return { success: true }
@@ -447,7 +418,7 @@ export function useInventory() {
     selectAll,
     deselectAll,
     hasIngredient,
-    ingredientsByType,
+    ingredientsByIngredient,
     addIngredient,
     deleteIngredient,
     initializeDefaultIngredients,

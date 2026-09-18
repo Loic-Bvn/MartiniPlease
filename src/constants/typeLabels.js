@@ -344,7 +344,7 @@ export const TYPE_LABELS = {
  * @param {string} locale - 'fr' | 'en'
  * @param {Object|null} dbIngredientsMap - optionnel, map { type: { name, ... } } issue de la DB (ex: useInventory)
  */
-export function getTypeLabel(type, locale = 'fr', dbIngredientsMap = null) {
+export function getIngredientLabel(type, locale = 'fr', dbIngredientsMap = null) {
   const staticLabel = TYPE_LABELS[locale]?.[type]
   if (staticLabel) return staticLabel
 
@@ -356,15 +356,6 @@ export function getTypeLabel(type, locale = 'fr', dbIngredientsMap = null) {
 
 export const FAMILY_LABELS = {
   fr: {
-    // Familles spiritueux
-    'Whiskey':        '🥃 Whiskey',
-    'Rum':            '🍹 Rhum',
-    'Agave':          '🌵 Agave',
-    'Gin':            '🌿 Gin',
-    'Brandy':         '🍇 Brandy',
-    'Vodka':          '❄️ Vodka',
-    'Absinthe':       '🌱 Absinthe',
-    'Aquavit':        '🌾 Aquavit',
     // Sous-types
     'bourbon':        '🌽 Bourbon',
     'rye':            '🌾 Rye',
@@ -391,13 +382,22 @@ export const FAMILY_LABELS = {
     'grappa':         '🍇 Grappa',
     'brandy':         '🍇 Brandy',
     // Liqueurs
-    'Liqueur Amer':    '🍊 Amer',
-    'Liqueur Agrume':  '🍋 Agrume',
-    'Liqueur Fruits':  '🍒 Fruits',
-    'Liqueur Herbes':  '🌿 Herbes',
-    'Liqueur Noix':    '🌰 Noix',
-    'Liqueur Dessert': '☕ Dessert',
-    'Liqueur Anisée':  '⭐ Anisée',
+    'bitter_liqueur':  '🍊 Amer',
+    'citrus_liqueur':  '🍋 Agrume',
+    'fruit_liqueur':   '🍒 Fruits',
+    'herbal_liqueur':  '🌿 Herbes',
+    'nut_liqueur':     '🌰 Noix',
+    'dessert_liqueur': '☕ Dessert',
+    'anise_liqueur':   '⭐ Anisée',
+    // Vins & assimilés
+    'vermouth':         '🍷 Vermouth',
+    'wine':             '🍷 Vin',
+    'aromatized_wine':  '🍷 Vin aromatisé',
+    'fortified_wine':   '🍷 Vin fortifié',
+    'sparkling_wine':   '🍾 Vin pétillant',
+    'beer':             '🍺 Bière',
+    'sake':             '🍶 Saké',
+    'bitters':          '💧 Bitters',
     // Saisons
     'all':    '🍸 Toutes',
     'spring': '🌸 Printemps',
@@ -406,15 +406,6 @@ export const FAMILY_LABELS = {
     'winter': '❄️ Hiver',
   },
   en: {
-    // Familles spiritueux
-    'Whiskey':        '🥃 Whiskey',
-    'Rum':            '🍹 Rum',
-    'Agave':          '🌵 Agave',
-    'Gin':            '🌿 Gin',
-    'Brandy':         '🍇 Brandy',
-    'Vodka':          '❄️ Vodka',
-    'Absinthe':       '🌱 Absinthe',
-    'Aquavit':        '🌾 Aquavit',
     // Sous-types
     'bourbon':        '🌽 Bourbon',
     'rye':            '🌾 Rye',
@@ -441,13 +432,22 @@ export const FAMILY_LABELS = {
     'grappa':         '🍇 Grappa',
     'brandy':         '🍇 Brandy',
     // Liqueurs
-    'Liqueur Amer':    '🍊 Bitter',
-    'Liqueur Agrume':  '🍋 Citrus',
-    'Liqueur Fruits':  '🍒 Fruit',
-    'Liqueur Herbes':  '🌿 Herbal',
-    'Liqueur Noix':    '🌰 Nut',
-    'Liqueur Dessert': '☕ Dessert',
-    'Liqueur Anisée':  '⭐ Anise',
+    'bitter_liqueur':  '🍊 Bitter',
+    'citrus_liqueur':  '🍋 Citrus',
+    'fruit_liqueur':   '🍒 Fruit',
+    'herbal_liqueur':  '🌿 Herbal',
+    'nut_liqueur':     '🌰 Nut',
+    'dessert_liqueur': '☕ Dessert',
+    'anise_liqueur':   '⭐ Anise',
+    // Wine & co
+    'vermouth':         '🍷 Vermouth',
+    'wine':             '🍷 Wine',
+    'aromatized_wine':  '🍷 Aromatized Wine',
+    'fortified_wine':   '🍷 Fortified Wine',
+    'sparkling_wine':   '🍾 Sparkling Wine',
+    'beer':             '🍺 Beer',
+    'sake':             '🍶 Sake',
+    'bitters':          '💧 Bitters',
     // Saisons
     'all':    '🍸 All',
     'spring': '🌸 Spring',

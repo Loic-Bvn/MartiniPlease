@@ -168,15 +168,15 @@ const t = computed(() => ({
 }))
 
 const CATEGORY_ORDER = computed(() => [
-  { key: 'Whiskey',  label: 'Whiskey',               icon: '🥃' },
-  { key: 'Rum',      label: props.locale === 'fr' ? 'Rhum'     : 'Rum',      icon: '🍹' },
-  { key: 'Agave',    label: 'Agave',                 icon: '🌵' },
-  { key: 'Gin',      label: 'Gin',                   icon: '🌿' },
-  { key: 'Vodka',    label: 'Vodka',                 icon: '❄️' },
-  { key: 'Brandy',   label: 'Brandy',                icon: '🍇' },
-  { key: 'Absinthe', label: 'Absinthe',              icon: '🌱' },
-  { key: 'Aquavit',  label: 'Aquavit',               icon: '🌾' },
-  { key: 'Pastis',   label: 'Pastis',                icon: '⭐' },
+  { key: 'whiskey',  label: 'Whiskey',               icon: '🥃' },
+  { key: 'rum',      label: props.locale === 'fr' ? 'Rhum'     : 'Rum',      icon: '🍹' },
+  { key: 'agave',    label: 'Agave',                 icon: '🌵' },
+  { key: 'gin',      label: 'Gin',                   icon: '🌿' },
+  { key: 'vodka',    label: 'Vodka',                 icon: '❄️' },
+  { key: 'brandy',   label: 'Brandy',                icon: '🍇' },
+  { key: 'absinthe', label: 'Absinthe',              icon: '🌱' },
+  { key: 'aquavit',  label: 'Aquavit',               icon: '🌾' },
+  { key: 'pastis',   label: 'Pastis',                icon: '⭐' },
   { key: null,       label: t.value.others,          icon: '🍸' },
 ])
 

@@ -93,7 +93,7 @@
                     <div class="ingredient-info">
                       <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
                       <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-                        {{ getTypeLabel(ing.Type, locale) }}
+                        {{ getIngredientLabel(ing.Ingredient, locale) }}
                       </span>
                     </div>
                     <span class="ingredient-quantity">{{ formatQty(ing) }}</span>
@@ -102,7 +102,7 @@
 
                 <div class="catalog-item-footer-row">
                   <div class="catalog-chip-row">
-                    <span v-if="cocktail.base_spirit" class="catalog-chip">{{ getTypeLabel(cocktail.base_spirit, locale) }}</span>
+                    <span v-if="cocktail.base_spirit" class="catalog-chip">{{ getIngredientLabel(cocktail.base_spirit, locale) }}</span>
                     <span v-if="cocktail.cocktail_style" class="catalog-chip">{{ STYLE_LABELS[cocktail.cocktail_style] || cocktail.cocktail_style }}</span>
                   </div>
 
@@ -146,7 +146,7 @@ import { supabase } from '@/lib/supabase'
 import { useCatalog } from '@/composables/useCatalog'
 import { useCocktails } from '@/composables/useCocktails'
 import { useInventory } from '@/composables/useInventory'
-import { getTypeLabel } from '../../constants/typeLabels.js'
+import { getIngredientLabel } from '../../constants/typeLabels.js'
 import { getBaseSpiritGroups, getCocktailStyles, getProfileOptions } from '@/lib/cocktail-constants'
 
 const props = defineProps({
@@ -264,8 +264,8 @@ function getSubmittedByLabel(cocktail) {
 }
 
 function isAvailable(ing) {
-  if (ing.Type === 'garnish') return true
-  return barInventory.value.has(ing.Type)
+  if (ing.Ingredient === 'garnish') return true
+  return barInventory.value.has(ing.Ingredient)
 }
 
 function formatQty(ing) {

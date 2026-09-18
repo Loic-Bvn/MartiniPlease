@@ -25,39 +25,26 @@
             ref="nameInput"
             v-model="form.name"
             type="text"
-            placeholder="ex : Hendrick's Gin"
+            placeholder="ex : Tequila Reposado"
             class="add-ing-input"
             @input="autoSlug"
             @keyup.enter="handleSubmit"
           />
         </div>
 
-        <!-- Type (slug) -->
-        <div class="add-ing-field">
-          <label class="add-ing-label">
-            Type / identifiant
-            <span class="add-ing-hint">généré automatiquement</span>
-          </label>
-          <input
-            v-model="form.type"
-            type="text"
-            placeholder="ex : hendricks_gin"
-            class="add-ing-input add-ing-input--mono"
-            @keyup.enter="handleSubmit"
-          />
-        </div>
-
         <!-- Family + ABV sur la même ligne -->
         <div class="add-ing-row">
-          <div class="add-ing-field">
-            <label class="add-ing-label">Famille</label>
-            <input
-              v-model="form.family"
-              type="text"
-              placeholder="ex : Gin"
-              class="add-ing-input"
-              @keyup.enter="handleSubmit"
-            />
+          <div v-if="familyOptions.length" class="add-ing-field">
+            <label class="add-ing-label">
+              Famille
+              <span class="add-ing-hint">pour grouper tes bouteilles</span>
+            </label>
+            <select v-model="form.family" class="add-ing-input">
+              <option value="">—</option>
+              <option v-for="opt in familyOptions" :key="opt.key" :value="opt.key">
+                {{ opt.label }}
+              </option>
+            </select>
           </div>
           <div class="add-ing-field add-ing-field--abv">
             <label class="add-ing-label">ABV (%)</label>
@@ -103,15 +90,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { X, Plus, Loader2 } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
+import { getFamilyOptions } from '@/lib/cocktail-constants'
 
 const props = defineProps({
   categoryKey:   { type: String, required: true },
   categoryLabel: { type: String, required: true },
   categoryIcon:  { type: String, default: '📦' },
+  locale:        { type: String, default: 'fr' },
 })
+
+// Famille n'a de sens que pour spirits/licors/modifiers/bitters — vide
+// (donc champ masqué) pour juices/syrups/mixers/garnish/others.
+const familyOptions = computed(() => getFamilyOptions(props.categoryKey, props.locale))
 
 const emit = defineEmits(['close', 'added'])
 

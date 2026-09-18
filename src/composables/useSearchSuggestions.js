@@ -22,7 +22,7 @@ export function useSearchSuggestions(cocktails) {
 
     const filtered = cocktails.value.filter(c =>
       c.name.toLowerCase().includes(query) ||
-      (c.recipe && c.recipe.some(ing => ing.Type?.toLowerCase().includes(query)))
+      (c.recipe && c.recipe.some(ing => ing.Ingredient?.toLowerCase().includes(query)))
     )
 
     return filtered.slice(0, 8).map(c => ({
