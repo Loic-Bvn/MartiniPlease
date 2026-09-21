@@ -28,14 +28,6 @@
           >
             <HandPlatter :size="18" />
           </button>
-          <!-- <button
-            v-if="!isSubmitted(cocktail.id) && cocktail.is_private"
-            @click.stop="handleSubmit"
-            class="btn-icon btn-icon--submit"
-            :title="locale === 'fr' ? 'Proposer au catalogue' : 'Submit to catalog'"
-          >
-            <Upload :size="18" />
-          </button> -->
 
           <button
             v-if="isBartenderMode"
@@ -46,7 +38,7 @@
             <Pencil :size="18" />
           </button>
 
-          <button 
+          <button
             v-if="isBartenderMode"
             @click="openBatch"
             class="btn-icon"
@@ -146,14 +138,30 @@
               <span class="swipe-tab-indicator" :style="indicatorStyle"></span>
             </div>
 
-            <!-- Dots (affordance swipe mobile) -->
-            <!-- <div class="swipe-dots" aria-hidden="true">
-              <span
-                v-for="i in TAB_COUNT"
-                :key="i"
-                :class="['swipe-dot', { 'swipe-dot--active': activeTab === i - 1 }]"
-              ></span>
-            </div> -->
+            <!-- Basic prep info -->
+            <div class="cv-prep-block">
+              <div class="cv-prep-item">
+                <GlassWater :size="18" />
+                <div class="cv-prep-text">
+                  <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Méthode' : 'Method' }}</span>
+                  <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.method }">{{ getDetailledMethodLabel(cocktail.method, locale) }}</span>
+                </div>
+              </div>
+              <div class="cv-prep-item">
+                <Martini :size="18" />
+                <div class="cv-prep-text">
+                  <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Verre' : 'Glass' }}</span>
+                  <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.glass }">{{ getGlassLabel(cocktail.glass, locale) }}</span>
+                </div>
+              </div>
+              <div class="cv-prep-item">
+                <Snowflake :size="18" />
+                <div class="cv-prep-text">
+                  <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Glaçon' : 'Ice' }}</span>
+                  <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.ice?.length }">{{ getDetailledIceLabel(cocktail.ice, locale) }}</span>
+                </div>
+              </div>
+            </div>
 
             <!-- Annonce a11y du changement d'onglet -->
             <span class="sr-only" aria-live="polite">{{ activeTabLabel }}</span>
@@ -173,29 +181,7 @@
 
               <!-- Global info - instructions -->
                 <div id="panel-infos" role="tabpanel" aria-labelledby="tab-infos" class="swipe-panel">
-                  <div class="cv-prep-block">
-                    <div class="cv-prep-item">
-                      <GlassWater :size="18" />
-                      <div class="cv-prep-text">
-                        <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Méthode' : 'Method' }}</span>
-                        <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.method }">{{ getDetailledMethodLabel(cocktail.method, locale) }}</span>
-                      </div>
-                    </div>
-                    <div class="cv-prep-item">
-                      <Martini :size="18" />
-                      <div class="cv-prep-text">
-                        <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Verre' : 'Glass' }}</span>
-                        <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.glass }">{{ getGlassLabel(cocktail.glass, locale) }}</span>
-                      </div>
-                    </div>
-                    <div class="cv-prep-item">
-                      <Snowflake :size="18" />
-                      <div class="cv-prep-text">
-                        <span class="cv-prep-label">{{ props.locale === 'fr' ? 'Glaçon' : 'Ice' }}</span>
-                        <span class="cv-prep-value" :class="{ 'cv-value--na': !cocktail.ice?.length }">{{ getDetailledIceLabel(cocktail.ice, locale) }}</span>
-                      </div>
-                    </div>
-                  </div>
+
 
                   <!-- Panel 1 : infos -->
                   <div class="cv-meta-list">
@@ -768,7 +754,6 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.75rem;
-  margin-bottom: 0.75rem;
   background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -961,7 +946,6 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding-top: 0.75rem;
   padding-right: 0.25rem;
   scrollbar-width: thin;
 }
