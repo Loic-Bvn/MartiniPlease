@@ -81,6 +81,40 @@ export function useMenuCards() {
     }
   }
 
+  /**
+   * Ajoute le cocktail au menu s'il n'y est pas, le retire sinon.
+   * Ne met à jour que cocktail_ids (nom et visibilité restent intacts).
+   * @returns {{ success: boolean, added?: boolean, data?: object, error?: any }}
+   */
+  async function toggleCocktailInMenuCard(menuCardId, cocktailId) {
+    const card = menuCards.value.find(c => c.id === menuCardId)
+    if (!card) return { success: false, error: 'Carte introuvable' }
+
+    const current = card.cocktail_ids || []
+    const added   = !current.includes(cocktailId)
+    const next    = added
+      ? [...current, cocktailId]
+      : current.filter(id => id !== cocktailId)
+
+    try {
+      const { data, error } = await supabase
+        .from('menu_cards')
+        .update({ cocktail_ids: next })
+        .eq('id', menuCardId)
+        .eq('bar_id', currentBarId.value)
+        .select()
+        .single()
+
+      if (error) throw error
+      const idx = menuCards.value.findIndex(c => c.id === menuCardId)
+      if (idx !== -1) menuCards.value[idx] = data
+      return { success: true, added, data }
+    } catch (err) {
+      console.error('❌ Erreur toggleCocktailInMenuCard:', err)
+      return { success: false, error: err }
+    }
+  }
+
   async function deleteMenuCard(id) {
     try {
       const { error } = await supabase
@@ -104,6 +138,7 @@ export function useMenuCards() {
     fetchMenuCards,
     createMenuCard,
     updateMenuCard,
+    toggleCocktailInMenuCard,
     deleteMenuCard,
   }
 }

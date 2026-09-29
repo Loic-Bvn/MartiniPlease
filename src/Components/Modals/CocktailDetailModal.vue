@@ -29,6 +29,13 @@
             <HandPlatter :size="18" />
           </button>
 
+          <AddToMenuButton
+            v-if="isBartenderMode"
+            :cocktail-id="cocktail.id"
+            :cocktail-name="cocktail.name"
+            :locale="props.locale"
+          />
+
           <button
             v-if="isBartenderMode"
             @click="$emit('edit', cocktail)"
@@ -283,6 +290,7 @@ import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
+import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 
 const { isFeatureEnabled } = useBarFeatures()
 const showPrices = computed(() => isFeatureEnabled('showPrices'))

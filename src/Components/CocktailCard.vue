@@ -92,6 +92,11 @@
           </button>
 
           <template v-if="showCocktailActions && isBartenderMode">
+            <AddToMenuButton
+              :cocktail-id="cocktail.id"
+              :cocktail-name="cocktail.name"
+              :locale="locale"
+            />
             <button @click.stop="$emit('edit', cocktail)" class="btn-icon btn-icon--edit">
               <Pencil :size="18" />
             </button>
@@ -131,6 +136,7 @@ import { getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
+import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 // const { showPrices, ordersEnabled } = useBarFeatures()
 
 
