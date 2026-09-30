@@ -15,6 +15,7 @@
 
 import { ref, computed } from 'vue'
 import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
+import { getCocktailCategory, isMocktail } from '@/lib/cocktail-constants'
 
 // ── État singleton ────────────────────────────────────────────────────────────
 const selectedFamilies   = ref([])
@@ -87,22 +88,22 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
   const profileFilters = computed(() => {
     const fr = locale?.value === 'fr'
     return [
-      { key: 'Smoky',      label: fr ? '🔥 Fumé'       : '🔥 Smoky'      },
-      { key: 'Bitter',     label: fr ? '🍫 Amer'        : '🍫 Bitter'     },
-      { key: 'Creamy',     label: fr ? '🥛 Crémeux'     : '🥛 Creamy'     },
-      { key: 'Tropical',   label: fr ? '🍍 Tropical'    : '🍍 Tropical'   },
-      { key: 'Floral',     label: fr ? '🌸 Floral'      : '🌸 Floral'     },
-      { key: 'Nutty',      label: fr ? '🌰 Noisetté'    : '🌰 Nutty'      },
-      { key: 'Spicy',      label: fr ? '🌶️ Épicé'      : '🌶️ Spicy'     },
-      { key: 'Herbal',     label: fr ? '🌿 Herbacé'     : '🌿 Herbal'     },
-      { key: 'Fruity',     label: fr ? '🍓 Fruité'      : '🍓 Fruity'     },
-      { key: 'Citrus',     label: fr ? '🍋 Agrume'      : '🍋 Citrus'     },
-      { key: 'Sour',       label: fr ? '🍋 Acidulé'     : '🍋 Sour'       },
-      { key: 'Dry',        label: fr ? '🧂 Sec'         : '🧂 Dry'        },
-      { key: 'Boozy',      label: fr ? '🥃 Corsé'       : '🥃 Boozy'      },
-      { key: 'Refreshing', label: fr ? '🧊 Frais'       : '🧊 Refreshing' },
-      { key: 'Rich',       label: fr ? '🍯 Riche'       : '🍯 Rich'       },
-      { key: 'Sweet',      label: fr ? '🍬 Sucré'       : '🍬 Sweet'      },
+      { key: 'smoky',      label: fr ? '🔥 Fumé'       : '🔥 Smoky'      },
+      { key: 'bitter',     label: fr ? '🍫 Amer'        : '🍫 Bitter'     },
+      { key: 'creamy',     label: fr ? '🥛 Crémeux'     : '🥛 Creamy'     },
+      { key: 'tropical',   label: fr ? '🍍 Tropical'    : '🍍 Tropical'   },
+      { key: 'floral',     label: fr ? '🌸 Floral'      : '🌸 Floral'     },
+      { key: 'nutty',      label: fr ? '🌰 Noiseté'    : '🌰 Nutty'      },
+      { key: 'spicy',      label: fr ? '🌶️ Épicé'      : '🌶️ Spicy'     },
+      { key: 'herbal',     label: fr ? '🌿 Herbacé'     : '🌿 Herbal'     },
+      { key: 'fruity',     label: fr ? '🍓 Fruité'      : '🍓 Fruity'     },
+      { key: 'citrus',     label: fr ? '🍋 Agrume'      : '🍋 Citrus'     },
+      { key: 'sour',       label: fr ? '🍋 Acidulé'     : '🍋 Sour'       },
+      { key: 'dry',        label: fr ? '🧂 Sec'         : '🧂 Dry'        },
+      { key: 'boozy',      label: fr ? '🥃 Corsé'       : '🥃 Boozy'      },
+      { key: 'refreshing', label: fr ? '🧊 Frais'       : '🧊 Refreshing' },
+      { key: 'rich',       label: fr ? '🍯 Riche'       : '🍯 Rich'       },
+      { key: 'sweet',      label: fr ? '🍬 Sucré'       : '🍬 Sweet'      },
     ]
   })
 
@@ -189,7 +190,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
 
       list = list.filter(c => {
         if (filterMode.value === 'main') {
-          const familyMatch = !activeFamilies.length || activeFamilies.includes(c.category)
+          const familyMatch = !activeFamilies.length || activeFamilies.includes(getCocktailCategory(c))          
           const subMatch    = !activeSubs.length     || activeSubs.includes(c.base_spirit)
           return familyMatch && subMatch
         } else {
@@ -223,7 +224,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
 
     // ABV
     if (abvFilter.value === 'mocktail')
-      list = list.filter(c => c.abv === 0 || c.abv === null)
+      list = list.filter(isMocktail)
     else if (abvFilter.value === 'low')
       list = list.filter(c => c.abv !== null && c.abv > 0 && c.abv < 15)
 

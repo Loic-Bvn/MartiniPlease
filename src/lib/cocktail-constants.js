@@ -279,6 +279,32 @@ export function getSpiritToCategoryMap() {
   return map
 }
 
+let _spiritToCategory = null
+/**
+ * Retourne la catégorie (famille) effective d'un cocktail.
+ * Priorité à base_spirit (source de vérité, ex: scotch -> whiskey),
+ * avec repli sur la colonne `category` si base_spirit est absent/inconnu.
+ * Évite qu'un cocktail dont `category` est vide ou obsolète disparaisse
+ * des filtres et des regroupements de cartes.
+ */
+export function getCocktailCategory(cocktail) {
+  if (!cocktail) return null
+  if (!_spiritToCategory) _spiritToCategory = getSpiritToCategoryMap()
+  return _spiritToCategory[cocktail.base_spirit] || cocktail.category || null
+}
+
+/**
+ * Un cocktail est un mocktail si son titre alcoométrique est exactement 0.
+ * (abv peut arriver en texte depuis Supabase, d'où le parseFloat.)
+ * Un abv absent (null/undefined/'') = inconnu, PAS un mocktail.
+ */
+export function isMocktail(cocktail) {
+  const raw = cocktail?.abv
+  if (raw === null || raw === undefined || raw === '') return false
+  const abv = parseFloat(raw)
+  return Number.isFinite(abv) && abv === 0
+}
+
 /**
  * Export des constants groupés pour usage simple
  */

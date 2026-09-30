@@ -97,7 +97,7 @@
 
     <!-- Cocktails groupés par catégorie -->
     <div v-else class="cv-content">
-      <div v-for="group in groupedCocktails" :key="group.category" class="cv-group">
+        <div v-for="group in groupedCocktails" :key="group.key ?? 'others'" class="cv-group">
 
         <div class="cv-group-header">
           <span class="cv-group-icon">{{ group.icon }}</span>
@@ -141,6 +141,7 @@ import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
 import CocktailCard from '@/Components/CocktailCard.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
+import { getCocktailCategory, isMocktail } from '@/lib/cocktail-constants'
 
 const props = defineProps({
   card:      { type: Object, required: true },
@@ -165,6 +166,7 @@ const t = computed(() => ({
   empty:   props.locale === 'fr' ? 'Aucun cocktail dans cette carte.' : 'No cocktail in this card.',
   garnish: props.locale === 'fr' ? 'garniture'                      : 'garnish',
   others:  props.locale === 'fr' ? 'Autres'                         : 'Others',
+  mocktails: props.locale === 'fr' ? 'Mocktails (sans alcool)' : 'Mocktails (alcohol-free)',
 }))
 
 const CATEGORY_ORDER = computed(() => [
@@ -177,6 +179,7 @@ const CATEGORY_ORDER = computed(() => [
   { key: 'absinthe', label: 'Absinthe',              icon: '🌱' },
   { key: 'aquavit',  label: 'Aquavit',               icon: '🌾' },
   { key: 'pastis',   label: 'Pastis',                icon: '⭐' },
+  { key: 'mocktail', label: t.value.mocktails,       icon: '🧃' },
   { key: null,       label: t.value.others,          icon: '🍸' },
 ])
 
@@ -188,13 +191,17 @@ const cardCocktails = computed(() =>
 
 const groupedCocktails = computed(() => {
   const order = CATEGORY_ORDER.value
+  // Familles de spirits uniquement (ni "mocktail" ni "Autres")
+  const spiritKeys = order.filter(o => o.key && o.key !== 'mocktail').map(o => o.key)
   const groups = []
   for (const cat of order) {
-    const matched = cardCocktails.value.filter(c =>
-      cat.key === null
-        ? !order.slice(0, -1).some(o => o.key === c.category)
-        : c.category === cat.key
-    )
+    const matched = cardCocktails.value.filter(c => {
+      if (cat.key === 'mocktail') return isMocktail(c)
+      if (isMocktail(c)) return false            // un mocktail n'apparait que dans sa section
+      return cat.key === null
+        ? !spiritKeys.includes(getCocktailCategory(c))
+        : getCocktailCategory(c) === cat.key
+    })
     if (matched.length) {
       groups.push({ ...cat, cocktails: matched })
     }
