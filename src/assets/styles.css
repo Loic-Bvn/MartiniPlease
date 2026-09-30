@@ -1093,6 +1093,7 @@ body {
 
 .recommendation-item,
 .similar-cocktail-item {
+  font-size: 0.8rem;
   width: 100%;
   display: flex;
   justify-content: space-between;

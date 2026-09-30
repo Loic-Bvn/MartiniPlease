@@ -3,8 +3,8 @@ TAG new version using "npm run release:patch"
 
 # Fonctionnalités côté Drinker
 ## Engagement & fidélisation
-- [x] **Gamification découverte** — badge de progression `X/Y cocktails essayés` sur le catalogue du bar, calculé depuis `history`
-- [x] **Carte de fidélité** — compteur de commandes par drinker, récompense/badge au Nème cocktail (ex. offert par le bartender)
+- [ ] **Gamification découverte** — badge de progression `X/Y cocktails essayés` sur le catalogue du bar, calculé depuis `history`
+- [ ] **Carte de fidélité** — compteur de commandes par drinker, récompense/badge au Nème cocktail (ex. offert par le bartender)
 
 ## Découverte & recommandations
 - [x] **Recommandations personnalisées** — matching simple sur `profile`/`base_spirit` des favoris pour suggérer "vous pourriez aimer"
@@ -12,7 +12,7 @@ TAG new version using "npm run release:patch"
 - [x] **Suggestion "surprise moi"** — picker aléatoire filtré par humeur/profil de saveur
 - [x] **Carte du moment** - affiche la liste des cocktails d'un menu selectionné en haut avant la liste des autres cocktails
 ## Social & partage
-- [x] **Partage liste de favoris** — lien public en lecture seule (cohérent avec l'angle contenu TikTok/Insta)
+- [ ] **Partage liste de favoris** — lien public en lecture seule (cohérent avec l'angle contenu TikTok/Insta)
 
 ## Valeur ajoutée pratique
 - [x] **Cocktail du moment** — mise en avant éditoriale par le bartender sur l'écran d'accueil drinker

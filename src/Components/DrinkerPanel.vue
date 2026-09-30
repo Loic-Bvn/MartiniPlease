@@ -16,7 +16,7 @@
         </button>
       </div>
 
-      <div class="loyalty-panel">
+      <!-- <div class="loyalty-panel">
         <div class="loyalty-panel-header">
           <span class="loyalty-panel-title">{{ locale === 'fr' ? 'Carte de fidélité' : 'Loyalty card' }}</span>
           <strong>{{ Math.min(history.length, loyaltyTarget) }} / {{ loyaltyTarget }}</strong>
@@ -30,13 +30,13 @@
         <p v-else class="loyalty-hint">
           {{ locale === 'fr' ? `Encore ${loyaltyTarget - history.length} commande${loyaltyTarget - history.length > 1 ? 's' : ''} pour atteindre la récompense.` : `${loyaltyTarget - history.length} more order${loyaltyTarget - history.length > 1 ? 's' : ''} to unlock the reward.` }}
         </p>
-      </div>
+      </div> -->
 
       <div v-if="tab === 'favorites'">
-        <button v-if="favorites.size" type="button" class="share-favorites-button" @click="$emit('share-favorites')">
+        <!-- <button v-if="favorites.size" type="button" class="share-favorites-button" @click="$emit('share-favorites')">
           <Share2 :size="15" />
           {{ locale === 'fr' ? 'Partager ma liste' : 'Share my list' }}
-        </button>
+        </button> -->
         <div v-if="favorites.size === 0" class="cards-empty">{{ locale === 'fr' ? 'Aucun favori pour l\'instant.' : 'No favorites yet.' }}</div>
         <div v-else class="cards-grid">
           <div v-for="cocktail in favoriteCocktails" :key="cocktail.id" class="menu-card-item">

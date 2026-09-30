@@ -93,20 +93,6 @@
           @set-season="$emit('set-season', $event)"
           @clear-filters="$emit('clear-filters')"
         />
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
-        <CardPanel
-          :is-logged-in="isLoggedIn"
-          :menu-cards="menuCards"
-          :locale="locale"
-          :t="t"
-          @view-card="$emit('view-card', $event)"
-          @edit-card="$emit('edit-card', $event)"
-          @delete-card="$emit('delete-card', $event)"
-          @new-card="$emit('new-card')"
-          @toggle-card-visibility="$emit('toggle-card-visibility', $event)"
-        />
 
         <DrinkerPanel
           v-if="hasDrinker"
@@ -124,6 +110,30 @@
           @open-cocktail="$emit('open-cocktail', $event)"
           @share-favorites="$emit('share-favorites')"
         />
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+        <CardPanel
+          :is-logged-in="isLoggedIn"
+          :menu-cards="menuCards"
+          :locale="locale"
+          :t="t"
+          @view-card="$emit('view-card', $event)"
+          @edit-card="$emit('edit-card', $event)"
+          @delete-card="$emit('delete-card', $event)"
+          @new-card="$emit('new-card')"
+          @toggle-card-visibility="$emit('toggle-card-visibility', $event)"
+        />
+
+        <button
+          v-if="hasDrinker && filteredCocktails.length"
+          type="button"
+          class="surprise-button"
+          @click="$emit('surprise-me')"
+        >
+          <Dices :size="16" />
+          {{ locale === 'fr' ? 'Surprise-moi' : 'Surprise Me' }}
+        </button>
       </div>
 
     </div>
@@ -165,7 +175,7 @@
           </button>
         </div>
       </div>
-      <div v-if="hasDrinker" class="engagement-strip">
+      <!-- <div v-if="hasDrinker" class="engagement-strip">
         <div class="engagement-progress">
           <span class="engagement-label">{{ locale === 'fr' ? 'Découverte du catalogue' : 'Catalogue discovery' }}</span>
           <strong>{{ triedCocktailCount }} / {{ cocktails.length }}</strong>
@@ -174,7 +184,7 @@
           </div>
         </div>
         <span class="engagement-hint">{{ locale === 'fr' ? 'cocktails essayés' : 'cocktails tried' }}</span>
-      </div>
+      </div> -->
       <section v-if="isLoggedIn || featuredMenuCocktails.length" class="featured-menu-section">
         <div class="featured-menu-heading">
           <h2>{{ locale === 'fr' ? 'Carte du moment' : 'Featured menu' }}</h2>
@@ -208,15 +218,6 @@
         <p v-else-if="featuredMenuCardId" class="featured-menu-empty">{{ locale === 'fr' ? 'Cette carte ne contient aucun cocktail dans les résultats actuels.' : 'This menu has no cocktails in the current results.' }}</p>
         <p v-else-if="isLoggedIn" class="featured-menu-empty">{{ locale === 'fr' ? 'Sélectionnez une carte pour l’afficher avant le catalogue.' : 'Choose a menu to feature before the catalogue.' }}</p>
       </section>
-        <button
-          v-if="hasDrinker && filteredCocktails.length"
-          type="button"
-          class="surprise-button"
-          @click="$emit('surprise-me')"
-        >
-          <Dices :size="16" />
-          {{ locale === 'fr' ? 'Surprise-moi' : 'Surprise me' }}
-        </button>
 
       <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
       <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
