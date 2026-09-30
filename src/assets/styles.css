@@ -1279,7 +1279,7 @@ body {
   border: 1px solid var(--border);
   border-top: 3px solid var(--gold);
   border-radius: var(--radius-md);
-  background: var(--bg-card);
+  background: var(--amber);
 }
 
 .featured-menu-heading {
@@ -1291,7 +1291,7 @@ body {
 }
 
 .featured-menu-heading h2 {
-  color: var(--gold);
+  color: var(--bg-raised);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 1px;
