@@ -177,7 +177,7 @@
       </div>
       <section v-if="isLoggedIn || featuredMenuCocktails.length" class="featured-menu-section">
         <div class="featured-menu-heading">
-          <h2>{{ locale === 'fr' ? 'Carte à l’affiche' : 'Featured menu' }}</h2>
+          <h2>{{ locale === 'fr' ? 'Carte du moment' : 'Featured menu' }}</h2>
           <select
             v-if="isLoggedIn"
             :value="featuredMenuCardId || ''"

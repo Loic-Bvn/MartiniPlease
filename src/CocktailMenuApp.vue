@@ -32,7 +32,10 @@
           :searchTerm="searchTerm"
           :suggestions="suggestions"
           :randomLogo="randomLogo"
+          :hasDrinker="hasDrinker"
           @logo-click="handleLogoClick"
+          @open-drinker-login="showDrinkerLoginModal = true"
+          @drinker-sign-out="handleDrinkerSignOut"
           @open-new-cocktail="openNewCocktailFormModal"
           @set-locale="setLocale"
           @set-unit="setUnit"
@@ -213,7 +216,6 @@
           v-if="showDrinkerLoginModal && activeBarId && !isLoggedIn"
           :locale="locale"
           @drinker-created="handleDrinkerCreated"
-          @guest-mode="showDrinkerLoginModal = false"
           @close="showDrinkerLoginModal = false"
         />
         <MenuCardModal
@@ -483,7 +485,6 @@ async function joinByCode() {
     initDrinker(data.id),
   ])
 
-  if (!hasDrinker.value) showDrinkerLoginModal.value = true
   setHash(code)
 }
 
@@ -513,6 +514,13 @@ async function handleSignOut() {
   await signOut()
   guestBar.value = null
   clearHash()
+}
+
+// Drinker sign-out: drop token/profile and reset filters (e.g. "favorites only")
+function handleDrinkerSignOut() {
+  clearDrinker()
+  clearFilters()
+  showToast(locale.value === 'fr' ? 'Tu es déconnecté(e)' : 'You are signed out')
 }
 
 function handleOpenBarsSelection() {

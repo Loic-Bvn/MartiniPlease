@@ -41,9 +41,6 @@
             : (locale === 'fr' ? "C'est parti" : 'Got it')
           }}
         </button>
-        <button @click="guestMode" class="password-btn-cancel">
-          {{ locale === 'fr' ? '👻 Mode invité' : '👻 Guest mode' }}
-        </button>
       </div>
     </div>
   </div>
@@ -57,7 +54,7 @@ defineProps({
   locale: String,
 })
 
-const emit = defineEmits(['drinker-created', 'guest-mode', 'close'])
+const emit = defineEmits(['drinker-created', 'close'])
 
 function handleKeydown(e) {
   if (e.key === 'Escape') emit('close')
@@ -76,9 +73,5 @@ async function submitPseudo() {
   isLoading.value = true
   emit('drinker-created', pseudo)
   // Note: isLoading sera réinitialisé après fermeture
-}
-
-function guestMode() {
-  emit('guest-mode')
 }
 </script>
