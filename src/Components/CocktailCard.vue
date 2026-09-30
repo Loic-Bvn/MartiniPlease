@@ -25,9 +25,17 @@
       <div class="card-header">
         <div class="min-w-0 flex-1">
           <div class="cocktail-title-row">
-            <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-              {{ cocktail.name }} <span v-if="cocktail.price && showPrices"> - {{ cocktail.price }}€</span>
-            </h3>
+            <div class="cocktail-title-main">
+              <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable', { 'cocktail-title--moment': isCocktailOfMoment }]">
+              <span class="cocktail-title-name-group">
+                <span>{{ cocktail.name }}</span>
+                <Star v-if="isCocktailOfMoment" :size="15" fill="currentColor" class="cocktail-moment-star" :aria-label="locale === 'fr' ? 'Cocktail du moment' : 'Cocktail of the moment'" />
+              </span>
+              </h3>
+              <span v-if="cocktail.price && showPrices" :class="['cocktail-price', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable', { 'cocktail-title--moment': isCocktailOfMoment }]">
+                - {{ cocktail.price }}€
+              </span>
+            </div>
             <span v-if="cocktail.abv != null" class="cocktail-abv-inline">{{ cocktail.abv }}°</span>
           </div>
           <div class="cocktail-meta-row cocktail-subtitle cocktail-subtitle--truncate">
@@ -128,7 +136,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Upload, Bookmark, Pencil, Trash2, Heart, Check, HandPlatter, Martini} from 'lucide-vue-next'
+import { Upload, Bookmark, Pencil, Trash2, Heart, Check, HandPlatter, Martini, Star} from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
@@ -151,6 +159,7 @@ const props = defineProps({
   unit:                { type: String, default: 'oz' },
   barId:               { type: String, default: '' },
   viewMode:            { type: String, default: 'standard' }, // 'compact' | 'standard'
+  isCocktailOfMoment:  { type: Boolean, default: false },
 })
 const { isSubmitted, submitToCatalog } = useCatalog()
 const { showToast } = useToast()

@@ -32,7 +32,10 @@
           :searchTerm="searchTerm"
           :suggestions="suggestions"
           :randomLogo="randomLogo"
+          :hasDrinker="hasDrinker"
           @logo-click="handleLogoClick"
+          @open-drinker-login="showDrinkerLoginModal = true"
+          @drinker-sign-out="handleDrinkerSignOut"
           @open-new-cocktail="openNewCocktailFormModal"
           @set-locale="setLocale"
           @set-unit="setUnit"
@@ -148,6 +151,12 @@
           :filteredCocktails="filteredCocktails"
           :hasActiveFilters="hasActiveFilters"
           :makeableCount="makeableCount"
+          :recommendations="recommendations"
+          :cocktail-of-moment="cocktailOfMoment"
+          :cocktail-of-moment-id="cocktailOfMomentId"
+          :featured-menu-card-id="featuredMenuCardId"
+          :shared-favorite-cocktails="sharedFavoriteCocktails"
+          :invite-code="inviteCode"
           @view-card="openCardView"
           @open-cocktail="openCocktailDetailModal"
           @edit-card="openEditCardModal"
@@ -169,6 +178,10 @@
           @set-season="setSeason"
           @clear-filters="clearFilters"
           @set-card-view="setCardView"
+          @surprise-me="handleSurpriseMe"
+          @set-cocktail-of-moment="handleSetCocktailOfMoment"
+          @set-featured-menu-card="handleSetFeaturedMenuCard"
+          @share-favorites="handleShareFavorites"
         />
 
         <!-- Modals -->
@@ -203,7 +216,6 @@
           v-if="showDrinkerLoginModal && activeBarId && !isLoggedIn"
           :locale="locale"
           @drinker-created="handleDrinkerCreated"
-          @guest-mode="showDrinkerLoginModal = false"
           @close="showDrinkerLoginModal = false"
         />
         <MenuCardModal
@@ -237,6 +249,7 @@
           :unit="unit"
           :card-view="cardView"
           :bar-id="activeBarId"
+          :cocktail-of-moment-id="cocktailOfMomentId"
           @close="closeCardView"
           @set-locale="setLocale"
           @set-unit="setUnit"
@@ -251,8 +264,11 @@
             :origin-rect="viewingCocktailRect"
             :isBartenderMode="isLoggedIn"
             :bar-id="activeBarId"
+            :cocktails="cocktails"
+            :cocktail-of-moment-id="cocktailOfMomentId"
             @close="closeCocktailDetailModal"
             @edit="(c) => { closeCocktailDetailModal(); openEditCocktailFormModal(c) }"
+            @open-cocktail="openCocktailDetailModal"
           />
         </Transition>
       </div>
@@ -278,8 +294,10 @@ import { useMenuCards }          from '@/composables/useMenuCards'
 import { useDrinker }            from '@/composables/useDrinker'
 import { useOrders }             from '@/composables/useOrders'
 import { useSearchSuggestions }  from '@/composables/useSearchSuggestions'
+import { useCocktailRecommendations } from '@/composables/useCocktailRecommendations'
 import { useToast }              from '@/composables/useToast'
-import { parseHash, setHash, clearHash, buildShareUrl, slugify } from '@/composables/useRouter'
+import { parseHash, setHash, clearHash, buildShareUrl, buildFavoritesShareUrl, slugify } from '@/composables/useRouter'
+import { useBarFeatures } from '@/composables/useBarFeatures'
 
 // ── Composants ────────────────────────────────────────────────────────────────
 import AppHeader         from '@/Components/AppHeader.vue'
@@ -344,6 +362,12 @@ const accessibleMenuCards = computed(() =>
 )
 const { hasDrinker, drinkerPseudo, initDrinker, createDrinker, reconnectDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { toastMessage, toastType, showToast } = useToast()
+const { features, setFeature } = useBarFeatures()
+const sharedFavoriteIds = ref([])
+const cocktailOfMomentId = computed(() => features.value.cocktailOfMomentId || guestBar.value?.features?.cocktailOfMomentId || null)
+const cocktailOfMoment = computed(() => cocktails.value.find(cocktail => cocktail.id === cocktailOfMomentId.value) || null)
+const featuredMenuCardId = computed(() => features.value.featuredMenuCardId || guestBar.value?.features?.featuredMenuCardId || null)
+const sharedFavoriteCocktails = computed(() => cocktails.value.filter(cocktail => sharedFavoriteIds.value.includes(cocktail.id)))
 
 // ── Gestion des bars ──────────────────────────────────────────────────────────
 const {
@@ -392,9 +416,16 @@ const {
   toggleFilterMode, toggleMakeable, toggleFavorites,
   setAbvFilter, setSeason, clearFilters,
 } = useFilters({ cocktails, barInventory, favorites, hasDrinker, locale, searchTerm })
+const { recommendations } = useCocktailRecommendations({ cocktails, favorites, history })
 
 // ── Commandes temps réel ──────────────────────────────────────────────────────
 const { pendingOrdersCount, initOrdersListener, stopOrdersListener } = useOrders()
+
+function handleSurpriseMe() {
+  const pool = filteredCocktails.value.length ? filteredCocktails.value : cocktails.value
+  if (!pool.length) return
+  openCocktailDetailModal(pool[Math.floor(Math.random() * pool.length)])
+}
 
 // ── Logo aléatoire ────────────────────────────────────────────────────────────
 const base = import.meta.env.BASE_URL
@@ -414,7 +445,7 @@ async function fetchPublicBars() {
   publicBarsLoading.value = true
   const { data, error } = await supabase
     .from('bars')
-    .select('id, name, invite_code')
+    .select('id, name, invite_code, features')
     .eq('is_public', true)
     .order('name')
   if (!error && data) publicBars.value = data
@@ -437,7 +468,7 @@ async function joinByCode() {
 
   const { data, error } = await supabase
     .from('bars')
-    .select('id, name, invite_code')
+    .select('id, name, invite_code, features')
     .eq('invite_code', code)
     .single()
 
@@ -454,7 +485,6 @@ async function joinByCode() {
     initDrinker(data.id),
   ])
 
-  if (!hasDrinker.value) showDrinkerLoginModal.value = true
   setHash(code)
 }
 
@@ -486,6 +516,13 @@ async function handleSignOut() {
   clearHash()
 }
 
+// Drinker sign-out: drop token/profile and reset filters (e.g. "favorites only")
+function handleDrinkerSignOut() {
+  clearDrinker()
+  clearFilters()
+  showToast(locale.value === 'fr' ? 'Tu es déconnecté(e)' : 'You are signed out')
+}
+
 function handleOpenBarsSelection() {
   openBarsSelection()
   clearHash()
@@ -503,6 +540,33 @@ async function handleInvite() {
   } catch (e) {
     console.error('Erreur copie lien', e)
     showToast(locale.value === 'fr' ? 'Impossible de copier le lien' : 'Copy failed', 'error')
+  }
+}
+
+async function handleShareFavorites() {
+  const code = inviteCode.value || guestBar.value?.invite_code
+  if (!code || !favorites.value.size) return
+  const url = buildFavoritesShareUrl(code, [...favorites.value])
+  try {
+    await navigator.clipboard.writeText(url)
+    showToast(locale.value === 'fr' ? 'Lien des favoris copié 🍸' : 'Favorites link copied 🍸')
+  } catch (error) {
+    console.error('Erreur copie favoris', error)
+    showToast(locale.value === 'fr' ? 'Impossible de copier le lien' : 'Copy failed', 'error')
+  }
+}
+
+async function handleSetCocktailOfMoment(cocktailId) {
+  const result = await setFeature('cocktailOfMomentId', cocktailId || null)
+  if (result.success) {
+    showToast(locale.value === 'fr' ? 'Cocktail du moment mis à jour' : 'Cocktail of the moment updated')
+  }
+}
+
+async function handleSetFeaturedMenuCard(menuCardId) {
+  const result = await setFeature('featuredMenuCardId', menuCardId || null)
+  if (result.success) {
+    showToast(locale.value === 'fr' ? 'Carte mise en avant mise à jour' : 'Featured menu updated')
   }
 }
 
@@ -676,14 +740,17 @@ function applyDeepLink(cardSlug, cocktailSlug) {
 }
 
 async function handleHashRoute() {
-  const { inviteCode: code, cardSlug, cocktailSlug } = parseHash()
+  const { inviteCode: code, cardSlug, cocktailSlug, favoriteIds } = parseHash()
   if (!code) return
   if (guestBar.value?.invite_code === code || inviteCode.value === code) {
+    sharedFavoriteIds.value = favoriteIds
     applyDeepLink(cardSlug, cocktailSlug)
     return
   }
   inviteCodeInput.value = code
   await joinByCode()
+  sharedFavoriteIds.value = favoriteIds
+  if (favoriteIds.length) setHash(code, 'favorites', favoriteIds.join(','))
   applyDeepLink(cardSlug, cocktailSlug)
 }
 

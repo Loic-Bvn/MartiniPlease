@@ -37,6 +37,30 @@
               </button>
             </template>
 
+            <!-- Drinker (not signed in) -->
+            <button
+              v-if="activeBarId && !isLoggedIn && !hasDrinker && !showBarsSelection"
+              type="button"
+              class="btn-new-cocktail"
+              :title="t.login"
+              :aria-label="t.login"
+              @click="$emit('open-drinker-login')"
+            >
+              <LogIn :size="15" /><span class="btn-label-hide"> {{ t.login }}</span>
+            </button>
+
+            <!-- Drinker (signed in) -->
+            <button
+              v-if="activeBarId && !isLoggedIn && hasDrinker && !showBarsSelection"
+              type="button"
+              class="btn-new-cocktail"
+              :title="t.logout"
+              :aria-label="t.logout"
+              @click="$emit('drinker-sign-out')"
+            >
+              <LogOut :size="15" /><span class="btn-label-hide"> {{ t.logout }}</span>
+            </button>
+
             <div
               class="settings-switch"
               role="group"
@@ -243,7 +267,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Search, Plus, Library, Lock, Unlock, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro} from 'lucide-vue-next'
+import { Search, Plus, Library, Lock, Unlock, LogIn, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro} from 'lucide-vue-next'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 
@@ -251,6 +275,7 @@ const { isFeatureEnabled, setFeature } = useBarFeatures()
 
 const props = defineProps({
   isLoggedIn: Boolean,
+  hasDrinker: Boolean,
   activeBarId: String,
   activeBarName: String,
   isBarPublic: Boolean,
@@ -268,6 +293,8 @@ const props = defineProps({
 const emit = defineEmits([
   'logo-click',
   'open-new-cocktail',
+  'open-drinker-login',
+  'drinker-sign-out',
   'set-locale',
   'set-unit',
   'scroll-to-cocktail',
@@ -288,6 +315,8 @@ function handleSearchBlur() {
 
 const t = computed(() => ({
   newCocktail: props.locale === 'fr' ? 'Nouveau cocktail' : 'New cocktail',
+  login: props.locale === 'fr' ? 'Se connecter' : 'Sign in',
+  logout: props.locale === 'fr' ? 'Se déconnecter' : 'Sign out',
   searchPlaceholder: props.locale === 'fr' ? 'Rechercher un cocktail ou un ingrédient...' : 'Search a cocktail or ingredient...',
   searchPlaceholderShort: props.locale === 'fr' ? 'Rechercher...' : 'Search...',
 }))

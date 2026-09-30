@@ -838,6 +838,18 @@ body {
   line-height: 1.3;
 }
 
+.cocktail-title-name-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 100%;
+}
+
+.cocktail-title-name-group > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .cocktail-subtitle {
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -1061,6 +1073,337 @@ body {
 
 .menu-card-item:hover {
   border-color: var(--gold-dim);
+}
+
+.recommendations-block,
+.similar-cocktails {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.recommendations-title,
+.similar-cocktails-title {
+  margin-bottom: 0.5rem;
+  color: var(--gold);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.recommendation-item,
+.similar-cocktail-item {
+  font-size: 0.8rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.recommendation-item:hover,
+.similar-cocktail-item:hover { color: var(--gold); }
+
+.recommendation-reason,
+.similar-cocktail-item span:last-child {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+}
+
+.recommendation-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  text-align: right;
+}
+
+/* Même gabarit que l'en-tête d'un .section-card (cf. CardPanel) */
+.surprise-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: calc(0.75rem + 1px) 1.25rem;
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.surprise-button:hover {
+  background: var(--bg-card);
+  border-color: var(--gold-dim);
+  color: var(--text);
+}
+
+.surprise-button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.surprise-icon {
+  flex-shrink: 0;
+  color: var(--gold);
+  transition: transform 0.4s ease;
+}
+
+.surprise-button:hover .surprise-icon { transform: rotate(180deg); }
+
+.surprise-title {
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.surprise-sub {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surprise-button, .surprise-icon { transition: none; }
+  .surprise-button:hover .surprise-icon { transform: none; }
+}
+
+.engagement-strip {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  max-width: 34rem;
+  margin: 0.75rem 0 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.engagement-progress {
+  flex: 1;
+  min-width: 0;
+}
+
+.engagement-label,
+.loyalty-panel-title {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.engagement-progress strong {
+  float: right;
+  color: var(--gold);
+  font-size: 0.72rem;
+}
+
+.engagement-progress-track {
+  height: 0.35rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg-input);
+}
+
+.engagement-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gold);
+  transition: width 0.35s ease;
+}
+
+.engagement-hint {
+  flex-shrink: 0;
+  padding-bottom: 0.05rem;
+  color: var(--text-dim);
+}
+
+.loyalty-panel {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.loyalty-panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.loyalty-panel-header strong { color: var(--gold); }
+
+.loyalty-hint,
+.loyalty-reward {
+  margin-top: 0.45rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.loyalty-reward { color: var(--success); font-weight: 700; }
+
+.featured-menu-section {
+  margin: 0.75rem 0 1.25rem;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--gold);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+
+.featured-menu-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.featured-menu-heading h2 {
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.featured-menu-select {
+  min-width: 10rem;
+  max-width: 18rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+}
+
+.featured-menu-empty {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .featured-menu-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .featured-menu-select { width: 100%; max-width: none; }
+}
+
+.cocktail-moment-panel,
+.shared-favorites-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.875rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: linear-gradient(105deg, var(--bg-raised), var(--bg-card));
+}
+
+.cocktail-moment-copy { min-width: 0; }
+
+.cocktail-title--moment { color: var(--gold) !important; }
+.cocktail-moment-star { display: block; flex-shrink: 0; }
+
+.cocktail-moment-kicker,
+.shared-favorites-heading span {
+  display: block;
+  color: var(--gold-dim);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.cocktail-moment-name {
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  padding: 0.2rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cocktail-moment-name:hover { color: var(--gold); }
+.cocktail-moment-empty { color: var(--text-muted); font-size: 0.9rem; }
+
+.cocktail-moment-select {
+  max-width: 15rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.shared-favorites-panel { display: block; }
+.shared-favorites-heading { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.65rem; }
+.shared-favorites-heading h2 { color: var(--text); font-size: 0.85rem; }
+.shared-favorites-list { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.shared-favorites-list button,
+.share-favorites-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.shared-favorites-list button { padding: 0.4rem 0.6rem; }
+.shared-favorites-list button:hover,
+.share-favorites-button:hover { border-color: var(--gold); color: var(--gold); }
+
+.share-favorites-button { margin-bottom: 0.75rem; padding: 0.45rem 0.65rem; color: var(--gold); }
+
+@media (max-width: 600px) {
+  .cocktail-moment-panel { align-items: stretch; flex-direction: column; }
+  .cocktail-moment-select { max-width: none; width: 100%; }
+  .shared-favorites-heading { align-items: flex-start; flex-direction: column; gap: 0.2rem; }
 }
 
 .menu-card-info {
@@ -4391,8 +4734,31 @@ body {
 
 .cocktail-title-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.cocktail-title-main {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.cocktail-title-main .cocktail-title {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.cocktail-price {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.3;
 }
 .cocktail-abv-inline {
   font-size: 0.78rem;
