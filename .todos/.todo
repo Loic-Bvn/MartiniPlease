@@ -1,11 +1,27 @@
 ## TODO
 TAG new version using "npm run release:patch"
 
+# Fonctionnalités côté Drinker
+## Engagement & fidélisation
+- [x] **Gamification découverte** — badge de progression `X/Y cocktails essayés` sur le catalogue du bar, calculé depuis `history`
+- [x] **Carte de fidélité** — compteur de commandes par drinker, récompense/badge au Nème cocktail (ex. offert par le bartender)
+
+## Découverte & recommandations
+- [x] **Recommandations personnalisées** — matching simple sur `profile`/`base_spirit` des favoris pour suggérer "vous pourriez aimer"
+- [x] **Cocktails similaires** — cross-sell dans `CocktailDetailModal` (même profil/spiritueux) pour encourager l'exploration
+- [x] **Suggestion "surprise moi"** — picker aléatoire filtré par humeur/profil de saveur
+
+## Social & partage
+- [x] **Partage liste de favoris** — lien public en lecture seule (cohérent avec l'angle contenu TikTok/Insta)
+
+## Valeur ajoutée pratique
+- [x] **Cocktail du moment** — mise en avant éditoriale par le bartender sur l'écran d'accueil drinker
+
+
 # Fix
 ## Type > Ingredient migration
 - Broken price computation in cocktailForm
 - Rework AddIngredient modal
-
 - Broken filter (ingredient principal cassé)
 
 # Ameliorations
@@ -25,6 +41,22 @@ TAG new version using "npm run release:patch"
 - Detection de recette via photo (cf recipe_scanner.md)
 - Connexion avec google ?
 - Email de remerciement une fois le bar validé (mentionné il y a plusieurs sessions, jamais implémenté — actuellement seule `PendingApproval.vue` informe l'utilisateur côté UI)
+- Fonctionnalités toute l'app:
+## Bartender / Ops
+- [ ] **Rôles staff/owner** — permissions différenciées (un serveur ne devrait pas pouvoir supprimer le bar)
+
+## Admin & multi-bar
+- [ ] **UI admin codes VIP** — actuellement géré à la main dans Supabase Studio (noté comme manque) ; interface simple création/désactivation
+
+## Technique / Infra
+- [ ] **Tests automatisés (CI)** — aucun test mentionné à ce jour, risque sur les migrations DB fréquentes
+
+## Business / Monétisation
+- [ ] **Liens fournisseurs sur les références** — passerelle naturelle avec l'idée de pack spiritueux par abonnement déjà en réflexion
+
+## Marketing / Contenu ?
+- [ ] **Génération de visuels réseaux sociaux** — export stylé (image + recette) d'un cocktail depuis les données déjà en base, pour alimenter l'angle TikTok/Insta déjà envisagé
+
 
 ### Batching
 - On a une table en BDD qui sert a rien

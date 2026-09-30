@@ -23,10 +23,12 @@ export function parseHash() {
   const hash = window.location.hash.replace(/^#\/?/, '')
   if (!hash) return { inviteCode: null, cardSlug: null, cocktailSlug: null }
   const parts = hash.split('/').filter(Boolean)
+  const isFavoritesRoute = parts[1] === 'favorites'
   return {
-    inviteCode:   parts[0]?.toUpperCase() || null,
-    cardSlug:     parts[1] || null,
-    cocktailSlug: parts[2] || null,
+    inviteCode:  parts[0]?.toUpperCase() || null,
+    cardSlug:    isFavoritesRoute ? null : (parts[1] || null),
+    cocktailSlug: isFavoritesRoute ? null : (parts[2] || null),
+    favoriteIds: isFavoritesRoute ? (parts[2]?.split(',').filter(Boolean) || []) : [],
   }
 }
 
@@ -52,4 +54,12 @@ export function buildShareUrl(inviteCode, cardSlug = null, cocktailSlug = null) 
   const base = inviteCode.toLowerCase()
   const segments = [base, cardSlug, cocktailSlug].filter(Boolean)
   return `${origin}${pathname}#/${segments.join('/')}`
+}
+
+export function buildFavoritesShareUrl(inviteCode, cocktailIds = []) {
+  const origin = window.location.origin
+  const pathname = window.location.pathname
+  const base = inviteCode.toLowerCase()
+  const ids = cocktailIds.filter(Boolean).join(',')
+  return `${origin}${pathname}#/${base}/favorites/${ids}`
 }
