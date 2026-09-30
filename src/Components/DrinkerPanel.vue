@@ -56,7 +56,7 @@
             @click="$emit('open-cocktail', cocktail)"
           >
             <span>{{ cocktail.name }}</span>
-            <span class="recommendation-reason">{{ cocktail.base_spirit || cocktail.profile?.[0] || '' }}</span>
+            <span class="recommendation-reason">{{ getIngredientLabel(cocktail.base_spirit, locale) }} - {{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</span>
           </button>
         </div>
       </div>
@@ -78,6 +78,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { ChevronDown, Heart, Share2 } from 'lucide-vue-next'
+import { getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
 
 const show = ref(false)
 const tab  = ref('favorites')
