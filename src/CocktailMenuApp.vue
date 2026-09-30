@@ -215,7 +215,9 @@
         <DrinkerLoginModal
           v-if="showDrinkerLoginModal && activeBarId && !isLoggedIn"
           :locale="locale"
+          :bar-id="activeBarId"
           @drinker-created="handleDrinkerCreated"
+          @drinker-selected="handleDrinkerSelected"
           @close="showDrinkerLoginModal = false"
         />
         <MenuCardModal
@@ -594,16 +596,29 @@ async function onAuthSuccess() {
   await loadBarData(currentBarId.value)
 }
 
-async function handleDrinkerCreated(pseudo) {
-  let result = await reconnectDrinker({ pseudo, barId: activeBarId.value })
-  if (!result.success) {
-    result = await createDrinker({ pseudo, barId: activeBarId.value })
-  }
+// Création d'un nouveau compte (échoue si le pseudo existe déjà dans ce bar)
+async function handleDrinkerCreated(pseudo, done) {
+  const result = await createDrinker({ pseudo, barId: activeBarId.value })
   if (result.success) {
     showDrinkerLoginModal.value = false
-  } else {
-    showToast(result.error || 'Erreur lors de la connexion', 'error')
+    return
   }
+  const isDuplicate = result.code === '23505'
+  done?.(isDuplicate
+    ? (locale.value === 'fr'
+        ? 'Ce pseudo existe déjà — sélectionne-le dans la liste.'
+        : 'This nickname already exists — pick it from the list.')
+    : (result.error || (locale.value === 'fr' ? 'Erreur lors de la création' : 'Creation failed')))
+}
+
+// Connexion à un compte existant du bar
+async function handleDrinkerSelected(pseudo, done) {
+  const result = await reconnectDrinker({ pseudo, barId: activeBarId.value })
+  if (result.success) {
+    showDrinkerLoginModal.value = false
+    return
+  }
+  done?.(locale.value === 'fr' ? 'Compte introuvable.' : 'Account not found.')
 }
 
 // ── CRUD cocktails ────────────────────────────────────────────────────────────

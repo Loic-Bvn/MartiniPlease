@@ -65,8 +65,23 @@ export function useDrinker() {
       return { success: true }
     } catch (err) {
       console.error('❌ createDrinker:', err)
-      return { success: false, error: err.message || err }
+      return { success: false, error: err.message || err, code: err.code }
     }
+  }
+
+  // Liste les drinkers inscrits dans un bar (id + pseudo uniquement, pas de token)
+  async function fetchBarDrinkers(barId) {
+    const { data, error } = await supabase
+      .from('drinker_profiles')
+      .select('id, pseudo')
+      .eq('bar_id', barId)
+      .order('pseudo', { ascending: true })
+
+    if (error) {
+      console.error('❌ fetchBarDrinkers:', error)
+      return []
+    }
+    return data
   }
 
   // Reconnexion via pseudo
@@ -217,6 +232,7 @@ export function useDrinker() {
     initDrinker,
     createDrinker,
     reconnectDrinker,
+    fetchBarDrinkers,
     clearDrinker,
     fetchFavorites,
     isFavorite,

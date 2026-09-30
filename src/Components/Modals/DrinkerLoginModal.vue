@@ -9,69 +9,167 @@
         </button>
       </div>
 
-      <p class="password-modal-description">
-        {{ locale === 'fr' 
-          ? 'Comment veux-tu être identifié(e) ? Rentre un pseudo pour sauvegarder tes favoris et ton historique.' 
-          : 'How would you like to be identified? Enter a nickname to save your favorites and history.' 
-        }}
-      </p>
-
-      <div class="password-form-group">
-        <input
-          v-model="pseudoInput"
-          type="text"
-          :placeholder="locale === 'fr' ? 'Ton pseudo...' : 'Your nickname...'"
-          class="password-form-input"
-          @keyup.enter="submitPseudo"
-          :maxlength="24"
-          autofocus
-        />
-      </div>
-
-      <p v-if="errorMessage" class="password-form-error">{{ errorMessage }}</p>
-
-      <div class="password-modal-buttons">
+      <div class="auth-tabs" role="tablist">
         <button
-          @click="submitPseudo"
-          class="password-btn-submit"
-          :disabled="!pseudoInput.trim() || isLoading"
-        >
-          {{ isLoading 
-            ? (locale === 'fr' ? '⏳ Chargement...' : '⏳ Loading...')
-            : (locale === 'fr' ? "C'est parti" : 'Got it')
-          }}
-        </button>
+          type="button"
+          role="tab"
+          :aria-selected="mode === 'select'"
+          :class="['auth-tab', { active: mode === 'select' }]"
+          @click="setMode('select')"
+        >{{ locale === 'fr' ? 'Sélectionner un compte' : 'Select an account' }}</button>
+        <button
+          type="button"
+          role="tab"
+          :aria-selected="mode === 'create'"
+          :class="['auth-tab', { active: mode === 'create' }]"
+          @click="setMode('create')"
+        >{{ locale === 'fr' ? 'Créer un compte' : 'Create an account' }}</button>
       </div>
+
+      <!-- Sélectionner un compte -->
+      <template v-if="mode === 'select'">
+        <p class="password-modal-description">
+          {{ locale === 'fr'
+            ? 'Retrouve ton profil parmi les clients de ce bar.'
+            : 'Find your profile among this bar\'s customers.'
+          }}
+        </p>
+
+        <div class="password-form-group">
+          <select
+            v-model="selectedPseudo"
+            class="password-form-input"
+            :disabled="loadingList || !drinkers.length"
+            :aria-label="locale === 'fr' ? 'Compte' : 'Account'"
+          >
+            <option value="" disabled>
+              {{ loadingList
+                ? (locale === 'fr' ? 'Chargement...' : 'Loading...')
+                : drinkers.length
+                  ? (locale === 'fr' ? 'Choisis ton pseudo...' : 'Choose your nickname...')
+                  : (locale === 'fr' ? 'Aucun compte pour l\'instant' : 'No account yet')
+              }}
+            </option>
+            <option v-for="d in drinkers" :key="d.id" :value="d.pseudo">{{ d.pseudo }}</option>
+          </select>
+        </div>
+
+        <p v-if="errorMessage" class="password-form-error">{{ errorMessage }}</p>
+
+        <div class="password-modal-buttons">
+          <button
+            @click="submitSelect"
+            class="password-btn-submit"
+            :disabled="!selectedPseudo || isLoading"
+          >
+            {{ isLoading
+              ? (locale === 'fr' ? '⏳ Chargement...' : '⏳ Loading...')
+              : (locale === 'fr' ? 'Me connecter' : 'Log in')
+            }}
+          </button>
+        </div>
+      </template>
+
+      <!-- Créer un compte -->
+      <template v-else>
+        <p class="password-modal-description">
+          {{ locale === 'fr'
+            ? 'Comment veux-tu être identifié(e) ? Rentre un pseudo pour sauvegarder tes favoris et ton historique.'
+            : 'How would you like to be identified? Enter a nickname to save your favorites and history.'
+          }}
+        </p>
+
+        <div class="password-form-group">
+          <input
+            ref="pseudoField"
+            v-model="pseudoInput"
+            type="text"
+            :placeholder="locale === 'fr' ? 'Ton pseudo...' : 'Your nickname...'"
+            class="password-form-input"
+            @keyup.enter="submitCreate"
+            :maxlength="24"
+          />
+        </div>
+
+        <p v-if="errorMessage" class="password-form-error">{{ errorMessage }}</p>
+
+        <div class="password-modal-buttons">
+          <button
+            @click="submitCreate"
+            class="password-btn-submit"
+            :disabled="!pseudoInput.trim() || isLoading"
+          >
+            {{ isLoading
+              ? (locale === 'fr' ? '⏳ Chargement...' : '⏳ Loading...')
+              : (locale === 'fr' ? "C'est parti" : 'Got it')
+            }}
+          </button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { X } from 'lucide-vue-next'
+import { useDrinker } from '@/composables/useDrinker'
 
-defineProps({
+const props = defineProps({
   locale: String,
+  barId: { type: String, required: true },
 })
 
-const emit = defineEmits(['drinker-created', 'close'])
+const emit = defineEmits(['drinker-created', 'drinker-selected', 'close'])
+
+const { fetchBarDrinkers } = useDrinker()
 
 function handleKeydown(e) {
   if (e.key === 'Escape') emit('close')
 }
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
+const mode = ref('select')
+const drinkers = ref([])
+const loadingList = ref(true)
+const selectedPseudo = ref('')
 const pseudoInput = ref('')
+const pseudoField = ref(null)
 const errorMessage = ref('')
 const isLoading = ref(false)
 
-async function submitPseudo() {
-  const pseudo = pseudoInput.value.trim()
-  if (!pseudo) return
+onMounted(async () => {
+  window.addEventListener('keydown', handleKeydown)
+  drinkers.value = await fetchBarDrinkers(props.barId)
+  loadingList.value = false
+  // Aucun compte dans le bar → on ouvre directement la création
+  if (!drinkers.value.length) setMode('create')
+})
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+
+function setMode(next) {
+  mode.value = next
+  errorMessage.value = ''
+  if (next === 'create') nextTick(() => pseudoField.value?.focus())
+}
+
+// Callback passé au parent : réinitialise le loading et affiche l'erreur éventuelle
+function done(err) {
+  isLoading.value = false
+  if (err) errorMessage.value = err
+}
+
+function submitSelect() {
+  if (!selectedPseudo.value || isLoading.value) return
   errorMessage.value = ''
   isLoading.value = true
-  emit('drinker-created', pseudo)
-  // Note: isLoading sera réinitialisé après fermeture
+  emit('drinker-selected', selectedPseudo.value, done)
+}
+
+function submitCreate() {
+  const pseudo = pseudoInput.value.trim()
+  if (!pseudo || isLoading.value) return
+  errorMessage.value = ''
+  isLoading.value = true
+  emit('drinker-created', pseudo, done)
 }
 </script>
