@@ -3,8 +3,12 @@
     <div ref="modalEl" class="modal-container modal-container--cocktail" role="dialog" aria-modal="true" aria-labelledby="cocktail-detail-title">
       <div class="modal-header" @touchstart="onHeaderTouchStart" @touchmove="onHeaderTouchMove" @touchend="onHeaderTouchEnd">
         <div class="cocktail-title-row">
-          <h3 id="cocktail-detail-title" :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable']">
-            {{ cocktail.name }}<span v-if="cocktail.price && showPrices"> - {{ cocktail.price }}€</span>
+          <h3 id="cocktail-detail-title" :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable', { 'cocktail-title--moment': cocktail.id === cocktailOfMomentId }]">
+            <span class="cocktail-title-name-group">
+              <span>{{ cocktail.name }}</span>
+              <Star v-if="cocktail.id === cocktailOfMomentId" :size="15" fill="currentColor" class="cocktail-moment-star" :aria-label="props.locale === 'fr' ? 'Cocktail du moment' : 'Cocktail of the moment'" />
+            </span>
+            <span v-if="cocktail.price && showPrices"> - {{ cocktail.price }}€</span>
           </h3>
         </div>
 
@@ -275,7 +279,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil} from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil, Star} from 'lucide-vue-next'
 import {
   getIngredientLabel,
   getProfileLabel,
@@ -309,6 +313,7 @@ const props = defineProps({
   isBartenderMode: { type: Boolean, default: false },
   unit:            { type: String, default: 'oz' },
   barId:           { type: String, default: '' },
+  cocktailOfMomentId: { type: String, default: null },
 })
 const emit = defineEmits(['close', 'edit'])
 const imageError = ref(false)

@@ -10,7 +10,7 @@ TAG new version using "npm run release:patch"
 - [x] **Recommandations personnalisées** — matching simple sur `profile`/`base_spirit` des favoris pour suggérer "vous pourriez aimer"
 - [x] **Cocktails similaires** — cross-sell dans `CocktailDetailModal` (même profil/spiritueux) pour encourager l'exploration
 - [x] **Suggestion "surprise moi"** — picker aléatoire filtré par humeur/profil de saveur
-
+- [x] **Carte du moment** - affiche la liste des cocktails d'un menu selectionné en haut avant la liste des autres cocktails
 ## Social & partage
 - [x] **Partage liste de favoris** — lien public en lecture seule (cohérent avec l'angle contenu TikTok/Insta)
 

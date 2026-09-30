@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <section v-if="cocktailOfMoment || isLoggedIn" class="cocktail-moment-panel">
+    <section v-if="isLoggedIn" class="cocktail-moment-panel">
       <div class="cocktail-moment-copy">
         <span class="cocktail-moment-kicker">{{ locale === 'fr' ? 'À découvrir maintenant' : 'Discover now' }}</span>
         <button v-if="cocktailOfMoment" type="button" class="cocktail-moment-name" @click="$emit('open-cocktail', cocktailOfMoment)">
@@ -175,6 +175,39 @@
         </div>
         <span class="engagement-hint">{{ locale === 'fr' ? 'cocktails essayés' : 'cocktails tried' }}</span>
       </div>
+      <section v-if="isLoggedIn || featuredMenuCocktails.length" class="featured-menu-section">
+        <div class="featured-menu-heading">
+          <h2>{{ locale === 'fr' ? 'Carte à l’affiche' : 'Featured menu' }}</h2>
+          <select
+            v-if="isLoggedIn"
+            :value="featuredMenuCardId || ''"
+            class="featured-menu-select"
+            :aria-label="locale === 'fr' ? 'Choisir la carte à afficher en premier' : 'Choose the menu to feature first'"
+            @change="$emit('set-featured-menu-card', $event.target.value || null)"
+          >
+            <option value="">{{ locale === 'fr' ? 'Aucune carte' : 'No menu' }}</option>
+            <option v-for="menuCard in menuCards" :key="menuCard.id" :value="menuCard.id">{{ menuCard.name }}</option>
+          </select>
+        </div>
+        <div v-if="featuredMenuCocktails.length" :class="['cocktails-grid', { 'cocktails-grid--standard': cardView === 'standard' }]">
+          <div v-for="cocktail in featuredMenuCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
+            <CocktailCard
+              :cocktail="cocktail"
+              :isBartenderMode="isLoggedIn"
+              :locale="locale"
+              :unit="unit"
+              :bar-id="activeBarId"
+              :view-mode="cardView"
+              :is-cocktail-of-moment="cocktail.id === cocktailOfMoment?.id"
+              @edit="$emit('edit-cocktail', cocktail)"
+              @delete="$emit('delete-cocktail', cocktail.id)"
+              @open="handleOpenCocktail"
+            />
+          </div>
+        </div>
+        <p v-else-if="featuredMenuCardId" class="featured-menu-empty">{{ locale === 'fr' ? 'Cette carte ne contient aucun cocktail dans les résultats actuels.' : 'This menu has no cocktails in the current results.' }}</p>
+        <p v-else-if="isLoggedIn" class="featured-menu-empty">{{ locale === 'fr' ? 'Sélectionnez une carte pour l’afficher avant le catalogue.' : 'Choose a menu to feature before the catalogue.' }}</p>
+      </section>
         <button
           v-if="hasDrinker && filteredCocktails.length"
           type="button"
@@ -199,7 +232,7 @@
           </button>
         </div>
       </div>
-      <div v-else :class="['cocktails-grid', { 'cocktails-grid--standard': cardView === 'standard' }]">
+      <div v-else-if="visibleCocktails.length" :class="['cocktails-grid', { 'cocktails-grid--standard': cardView === 'standard' }]">
         <div v-for="cocktail in visibleCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
           <CocktailCard
             :cocktail="cocktail"
@@ -208,6 +241,7 @@
             :unit="unit"
             :bar-id="activeBarId"
             :view-mode="cardView"
+            :is-cocktail-of-moment="cocktail.id === cocktailOfMoment?.id"
             @edit="$emit('edit-cocktail', cocktail)"
             @delete="$emit('delete-cocktail', cocktail.id)"
             @open="handleOpenCocktail"
@@ -276,6 +310,7 @@ const props = defineProps({
   recommendations:    { type: Array,  default: () => [] },
   cocktailOfMoment:   { type: Object, default: null },
   cocktailOfMomentId: { type: String, default: null },
+  featuredMenuCardId: { type: String, default: null },
   sharedFavoriteCocktails: { type: Array, default: () => [] },
   inviteCode:         { type: String, default: '' },
 })
@@ -287,6 +322,7 @@ const emit = defineEmits([
   'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
   'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'surprise-me',
   'set-cocktail-of-moment', 'share-favorites',
+  'set-featured-menu-card',
 ])
 
 // ── État local (UI uniquement) ────────────────────────────────────────────────
@@ -299,19 +335,29 @@ const displayCount = ref(PAGE_SIZE)
 const sentinelEl   = ref(null)
 let observer       = null
 
-const visibleCocktails = computed(() =>
-  props.filteredCocktails.slice(0, displayCount.value)
-)
+const featuredMenuCocktails = computed(() => {
+  const menuCard = props.menuCards.find(card => card.id === props.featuredMenuCardId)
+  if (!menuCard) return []
+  const filteredIds = new Set(props.filteredCocktails.map(cocktail => cocktail.id))
+  return (menuCard.cocktail_ids || [])
+    .filter(id => filteredIds.has(id))
+    .map(id => props.cocktails.find(cocktail => cocktail.id === id))
+    .filter(Boolean)
+})
 
-watch(() => props.filteredCocktails, () => {
+const featuredMenuCocktailIds = computed(() => new Set(featuredMenuCocktails.value.map(cocktail => cocktail.id)))
+const regularCocktails = computed(() => props.filteredCocktails.filter(cocktail => !featuredMenuCocktailIds.value.has(cocktail.id)))
+const visibleCocktails = computed(() => regularCocktails.value.slice(0, displayCount.value))
+
+watch(regularCocktails, () => {
   displayCount.value = PAGE_SIZE
 }, { immediate: true })
 
 function setupObserver() {
   observer?.disconnect()
   observer = new IntersectionObserver(([entry]) => {
-    if (entry.isIntersecting && displayCount.value < props.filteredCocktails.length) {
-      displayCount.value = Math.min(displayCount.value + PAGE_SIZE, props.filteredCocktails.length)
+    if (entry.isIntersecting && displayCount.value < regularCocktails.value.length) {
+      displayCount.value = Math.min(displayCount.value + PAGE_SIZE, regularCocktails.value.length)
     }
   }, { rootMargin: '200px' })
   if (sentinelEl.value) observer.observe(sentinelEl.value)

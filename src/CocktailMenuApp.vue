@@ -151,6 +151,7 @@
           :recommendations="recommendations"
           :cocktail-of-moment="cocktailOfMoment"
           :cocktail-of-moment-id="cocktailOfMomentId"
+          :featured-menu-card-id="featuredMenuCardId"
           :shared-favorite-cocktails="sharedFavoriteCocktails"
           :invite-code="inviteCode"
           @view-card="openCardView"
@@ -176,6 +177,7 @@
           @set-card-view="setCardView"
           @surprise-me="handleSurpriseMe"
           @set-cocktail-of-moment="handleSetCocktailOfMoment"
+          @set-featured-menu-card="handleSetFeaturedMenuCard"
           @share-favorites="handleShareFavorites"
         />
 
@@ -245,6 +247,7 @@
           :unit="unit"
           :card-view="cardView"
           :bar-id="activeBarId"
+          :cocktail-of-moment-id="cocktailOfMomentId"
           @close="closeCardView"
           @set-locale="setLocale"
           @set-unit="setUnit"
@@ -260,6 +263,7 @@
             :isBartenderMode="isLoggedIn"
             :bar-id="activeBarId"
             :cocktails="cocktails"
+            :cocktail-of-moment-id="cocktailOfMomentId"
             @close="closeCocktailDetailModal"
             @edit="(c) => { closeCocktailDetailModal(); openEditCocktailFormModal(c) }"
             @open-cocktail="openCocktailDetailModal"
@@ -360,6 +364,7 @@ const { features, setFeature } = useBarFeatures()
 const sharedFavoriteIds = ref([])
 const cocktailOfMomentId = computed(() => features.value.cocktailOfMomentId || guestBar.value?.features?.cocktailOfMomentId || null)
 const cocktailOfMoment = computed(() => cocktails.value.find(cocktail => cocktail.id === cocktailOfMomentId.value) || null)
+const featuredMenuCardId = computed(() => features.value.featuredMenuCardId || guestBar.value?.features?.featuredMenuCardId || null)
 const sharedFavoriteCocktails = computed(() => cocktails.value.filter(cocktail => sharedFavoriteIds.value.includes(cocktail.id)))
 
 // ── Gestion des bars ──────────────────────────────────────────────────────────
@@ -461,7 +466,7 @@ async function joinByCode() {
 
   const { data, error } = await supabase
     .from('bars')
-    .select('id, name, invite_code')
+    .select('id, name, invite_code, features')
     .eq('invite_code', code)
     .single()
 
@@ -547,6 +552,13 @@ async function handleSetCocktailOfMoment(cocktailId) {
   const result = await setFeature('cocktailOfMomentId', cocktailId || null)
   if (result.success) {
     showToast(locale.value === 'fr' ? 'Cocktail du moment mis à jour' : 'Cocktail of the moment updated')
+  }
+}
+
+async function handleSetFeaturedMenuCard(menuCardId) {
+  const result = await setFeature('featuredMenuCardId', menuCardId || null)
+  if (result.success) {
+    showToast(locale.value === 'fr' ? 'Carte mise en avant mise à jour' : 'Featured menu updated')
   }
 }
 

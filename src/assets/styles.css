@@ -838,6 +838,18 @@ body {
   line-height: 1.3;
 }
 
+.cocktail-title-name-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 100%;
+}
+
+.cocktail-title-name-group > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .cocktail-subtitle {
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -1207,6 +1219,55 @@ body {
 
 .loyalty-reward { color: var(--success); font-weight: 700; }
 
+.featured-menu-section {
+  margin: 0.75rem 0 1.25rem;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--gold);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+
+.featured-menu-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.featured-menu-heading h2 {
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.featured-menu-select {
+  min-width: 10rem;
+  max-width: 18rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+}
+
+.featured-menu-empty {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .featured-menu-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .featured-menu-select { width: 100%; max-width: none; }
+}
+
 .cocktail-moment-panel,
 .shared-favorites-panel {
   display: flex;
@@ -1221,6 +1282,9 @@ body {
 }
 
 .cocktail-moment-copy { min-width: 0; }
+
+.cocktail-title--moment { color: var(--gold) !important; }
+.cocktail-moment-star { display: block; flex-shrink: 0; }
 
 .cocktail-moment-kicker,
 .shared-favorites-heading span {
@@ -4616,8 +4680,31 @@ body {
 
 .cocktail-title-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.cocktail-title-main {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.cocktail-title-main .cocktail-title {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.cocktail-price {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.3;
 }
 .cocktail-abv-inline {
   font-size: 0.78rem;

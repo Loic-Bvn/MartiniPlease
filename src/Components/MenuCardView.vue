@@ -118,6 +118,7 @@
             :unit="unit"
             :bar-id="barId"
             :view-mode="cardView"
+            :is-cocktail-of-moment="cocktail.id === cocktailOfMomentId"
             @edit="$emit('edit-cocktail', cocktail)"
             @delete="$emit('delete-cocktail', cocktail.id)"
             @open="handleOpenCocktail"
@@ -150,6 +151,7 @@ const props = defineProps({
   unit:      { type: String, default: 'oz' },
   cardView:  { type: String, default: 'standard' },
   barId:     { type: String, default: '' },
+  cocktailOfMomentId: { type: String, default: null },
 })
 
 const emit = defineEmits([
