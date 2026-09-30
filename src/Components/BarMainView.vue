@@ -131,8 +131,9 @@
           class="surprise-button"
           @click="$emit('surprise-me')"
         >
-          <Dices :size="16" />
-          {{ locale === 'fr' ? 'Surprise-moi' : 'Surprise Me' }}
+          <Dices :size="18" class="surprise-icon" />
+          <span class="surprise-title">{{ surpriseLabel.title }}</span>
+          <span class="surprise-sub">{{ surpriseLabel.sub }}</span>
         </button>
       </div>
 
@@ -315,6 +316,27 @@ const props = defineProps({
   sharedFavoriteCocktails: { type: Array, default: () => [] },
   inviteCode:         { type: String, default: '' },
 })
+
+// ── Bouton « Surprise » : variantes de texte ──────────────────────────────────
+// Change SURPRISE_VARIANT pour tester un autre wording. `sub: ''` = pas de sous-titre.
+const SURPRISE_VARIANT = 'default'
+const SURPRISE_LABELS = {
+  default:  { fr: { title: 'Surprends-moi',         sub: 'Un cocktail au hasard' },
+              en: { title: 'Surprise Me',          sub: 'A random cocktail' } },
+  minimal:  { fr: { title: 'Surprends-moi',         sub: '' },
+              en: { title: 'Surprise Me',          sub: '' } },
+  bartender:{ fr: { title: 'Laisse-moi faire',     sub: 'Le barman choisit pour toi' },
+              en: { title: 'Bartender’s choice',   sub: 'Let the bar pick for you' } },
+  playful:  { fr: { title: 'Tente ta chance',      sub: 'Lance les dés' },
+              en: { title: 'Feeling lucky?',       sub: 'Roll the dice' } },
+  taste:    { fr: { title: 'Je ne sais pas quoi boire', sub: 'On choisit pour toi' },
+              en: { title: 'Can’t decide?',        sub: 'We’ll choose for you' } },
+}
+const surpriseLabel = computed(() => {
+  const v = SURPRISE_LABELS[SURPRISE_VARIANT] || SURPRISE_LABELS.default
+  return props.locale === 'fr' ? v.fr : v.en
+})
+
 
 const emit = defineEmits([
   'view-card', 'edit-card', 'delete-card', 'new-card', 'toggle-card-visibility',
