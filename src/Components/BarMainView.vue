@@ -24,6 +24,39 @@
       </div>
     </div>
 
+    <section v-if="cocktailOfMoment || isLoggedIn" class="cocktail-moment-panel">
+      <div class="cocktail-moment-copy">
+        <span class="cocktail-moment-kicker">{{ locale === 'fr' ? 'À découvrir maintenant' : 'Discover now' }}</span>
+        <button v-if="cocktailOfMoment" type="button" class="cocktail-moment-name" @click="$emit('open-cocktail', cocktailOfMoment)">
+          {{ cocktailOfMoment.name }}
+        </button>
+        <span v-else class="cocktail-moment-empty">{{ locale === 'fr' ? 'Aucun cocktail sélectionné' : 'No cocktail selected' }}</span>
+      </div>
+      <select
+        v-if="isLoggedIn"
+        :value="cocktailOfMomentId || ''"
+        class="cocktail-moment-select"
+        :aria-label="locale === 'fr' ? 'Choisir le cocktail du moment' : 'Choose cocktail of the moment'"
+        @change="$emit('set-cocktail-of-moment', $event.target.value || null)"
+      >
+        <option value="">{{ locale === 'fr' ? 'Choisir...' : 'Choose...' }}</option>
+        <option v-for="cocktail in cocktails" :key="cocktail.id" :value="cocktail.id">{{ cocktail.name }}</option>
+      </select>
+    </section>
+
+    <section v-if="sharedFavoriteCocktails.length" class="shared-favorites-panel">
+      <div class="shared-favorites-heading">
+        <h2>{{ locale === 'fr' ? 'Favoris partagés' : 'Shared favorites' }}</h2>
+        <span>{{ locale === 'fr' ? 'Liste en lecture seule' : 'Read-only list' }}</span>
+      </div>
+      <div class="shared-favorites-list">
+        <button v-for="cocktail in sharedFavoriteCocktails" :key="cocktail.id" type="button" @click="$emit('open-cocktail', cocktail)">
+          <Heart :size="14" fill="currentColor" />
+          {{ cocktail.name }}
+        </button>
+      </div>
+    </section>
+
     <div class="side-by-side">
 
       <div style="display: flex; flex-direction: column; gap: 0.875rem;">
@@ -81,10 +114,15 @@
           :drinker-pseudo="drinkerPseudo"
           :favorites="favorites"
           :favorite-cocktails="favoriteCocktails"
+          :recommendations="recommendations"
+          :invite-code="inviteCode"
+          :loyalty-target="5"
           :history="history"
           :get-cocktail-name="getCocktailName"
           :format-date="formatDate"
           @toggle-favorite="$emit('toggle-favorite', $event)"
+          @open-cocktail="$emit('open-cocktail', $event)"
+          @share-favorites="$emit('share-favorites')"
         />
       </div>
 
@@ -127,6 +165,25 @@
           </button>
         </div>
       </div>
+      <div v-if="hasDrinker" class="engagement-strip">
+        <div class="engagement-progress">
+          <span class="engagement-label">{{ locale === 'fr' ? 'Découverte du catalogue' : 'Catalogue discovery' }}</span>
+          <strong>{{ triedCocktailCount }} / {{ cocktails.length }}</strong>
+          <div class="engagement-progress-track" role="progressbar" :aria-valuenow="triedCocktailCount" aria-valuemin="0" :aria-valuemax="cocktails.length">
+            <span :style="{ width: `${discoveryPercent}%` }"></span>
+          </div>
+        </div>
+        <span class="engagement-hint">{{ locale === 'fr' ? 'cocktails essayés' : 'cocktails tried' }}</span>
+      </div>
+        <button
+          v-if="hasDrinker && filteredCocktails.length"
+          type="button"
+          class="surprise-button"
+          @click="$emit('surprise-me')"
+        >
+          <Dices :size="16" />
+          {{ locale === 'fr' ? 'Surprise-moi' : 'Surprise me' }}
+        </button>
 
       <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
       <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
@@ -165,7 +222,7 @@
 
 <script setup>
 import { ref, computed, watch, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
-import { ChevronDown, Rows3, GalleryVerticalEnd } from 'lucide-vue-next'
+import { ChevronDown, Rows3, GalleryVerticalEnd, Dices, Heart } from 'lucide-vue-next'
 const InventoryManager = defineAsyncComponent(() => import('@/Components/Modals/InventoryManager.vue'))
 import OrdersPanel      from '@/Components/OrdersPanel.vue'
 import FilterPanel      from '@/Components/FilterPanel.vue'
@@ -216,6 +273,11 @@ const props = defineProps({
   filteredCocktails:  { type: Array,   default: () => [] },
   hasActiveFilters:   { type: Boolean, default: false    },
   makeableCount:      { type: Number,  default: 0        },
+  recommendations:    { type: Array,  default: () => [] },
+  cocktailOfMoment:   { type: Object, default: null },
+  cocktailOfMomentId: { type: String, default: null },
+  sharedFavoriteCocktails: { type: Array, default: () => [] },
+  inviteCode:         { type: String, default: '' },
 })
 
 const emit = defineEmits([
@@ -223,7 +285,8 @@ const emit = defineEmits([
   'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail', 'open-cocktail',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
   'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
-  'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view',
+  'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'surprise-me',
+  'set-cocktail-of-moment', 'share-favorites',
 ])
 
 // ── État local (UI uniquement) ────────────────────────────────────────────────
@@ -264,6 +327,16 @@ const totalCount    = computed(() => props.ingredients?.length ?? 0)
 const favoriteCocktails = computed(() =>
   props.cocktails.filter(c => props.favorites.has(c.id))
 )
+
+const triedCocktailCount = computed(() => {
+  const catalogIds = new Set(props.cocktails.map(cocktail => cocktail.id))
+  return new Set(props.history.filter(entry => catalogIds.has(entry.cocktail_id)).map(entry => entry.cocktail_id)).size
+})
+
+const discoveryPercent = computed(() => {
+  if (!props.cocktails.length) return 0
+  return Math.round((triedCocktailCount.value / props.cocktails.length) * 100)
+})
 
 function getCocktailName(id) {
   return props.cocktails.find(c => c.id === id)?.name ?? '—'
