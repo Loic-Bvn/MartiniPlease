@@ -100,7 +100,7 @@
             </div>
           </div>
 
-          <div class="cv-content-col">
+          <div class="cv-content-col" :style="{ '--tab-count': TAB_COUNT }">
 
             <!-- Onglets -->
             <div class="swipe-tabs" role="tablist">
@@ -145,6 +145,20 @@
                 @click="goToTab(2)"
               >
                 Description
+              </button>
+              <button
+                id="tab-similar"
+                type="button"
+                role="tab"
+                :aria-selected="activeTab === 3"
+                aria-controls="panel-similar"
+                :tabindex="activeTab === 3 ? 0 : -1"
+                ref="tabRefs3"
+                class="swipe-tab"
+                :class="{ 'swipe-tab--active': activeTab === 3 }"
+                @click="goToTab(3)"
+              >
+                {{ props.locale === 'fr' ? 'Similaires' : 'Similar' }}
               </button>
               <span class="swipe-tab-indicator" :style="indicatorStyle"></span>
             </div>
@@ -252,6 +266,39 @@
                   <div v-if="props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en" class="cocktail-description">{{ props.locale === 'fr' ? cocktail.description_fr : cocktail.description_en }}</div>
                   <div v-else class="cocktail-description cocktail-description--empty">{{ props.locale === 'fr' ? 'Aucune description disponible pour ce cocktail.' : 'No description available for this cocktail.'}}</div>
                 </div>
+
+                <!-- Panel 4 : similar cocktails -->
+                <div id="panel-similar" ref="similarPanel" role="tabpanel" aria-labelledby="tab-similar" class="swipe-panel">
+                  <ul v-if="similarCocktails.length" class="cv-similar-list">
+                    <li v-for="c in similarCocktails" :key="c.id">
+                      <button type="button" class="cv-similar-item" @click="$emit('open-cocktail', c)">
+                        <span class="cv-similar-thumb">
+                          <img
+                            v-if="c.image && !failedThumbs.has(c.id)"
+                            :src="c.image"
+                            alt=""
+                            loading="lazy"
+                            @error="onThumbError(c.id)"
+                          />
+                          <Martini v-else :size="18" />
+                        </span>
+                        <span class="cv-similar-text">
+                          <span class="cv-similar-name">{{ c.name }}</span>
+                          <span v-if="similarMeta(c)" class="cv-similar-meta">{{ similarMeta(c) }}</span>
+                        </span>
+                        <span
+                          :class="['recipe-bullet', isMakeable(c) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"
+                          :title="isMakeable(c)
+                            ? (props.locale === 'fr' ? 'Réalisable avec le stock du bar' : 'Makeable with the bar stock')
+                            : (props.locale === 'fr' ? 'Ingrédients manquants' : 'Missing ingredients')"
+                        ></span>
+                      </button>
+                    </li>
+                  </ul>
+                  <div v-else class="cocktail-description cocktail-description--empty">
+                    {{ props.locale === 'fr' ? 'Aucun cocktail similaire dans ce bar.' : 'No similar cocktails in this bar.' }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -278,7 +325,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil, Star} from 'lucide-vue-next'
 import {
   getIngredientLabel,
@@ -293,13 +340,14 @@ import { useOrders } from '@/composables/useOrders'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
+import { useSimilarCocktails } from '@/composables/useSimilarCocktails'
 import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
 import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 
 const { isFeatureEnabled } = useBarFeatures()
 const showPrices = computed(() => isFeatureEnabled('showPrices'))
 
-const TAB_COUNT = 3
+const TAB_COUNT = 4
 const TAB_WIDTH = 100 / TAB_COUNT
 
 const props = defineProps({
@@ -314,8 +362,9 @@ const props = defineProps({
   unit:            { type: String, default: 'oz' },
   barId:           { type: String, default: '' },
   cocktailOfMomentId: { type: String, default: null },
+  cocktails:       { type: Array, default: () => [] },
 })
-const emit = defineEmits(['close', 'edit'])
+const emit = defineEmits(['close', 'edit', 'open-cocktail'])
 const imageError = ref(false)
 const modalEl = ref(null)
 
@@ -433,7 +482,34 @@ const recipeWithQty = computed(() =>
   (props.cocktail.recipe || []).map(ing => ({ ...ing, _qty: formatQty(ing) }))
 )
 
-// ── Swipe infos / recette / description ──
+// ── Similar cocktails ──
+const similarCocktails = useSimilarCocktails(() => props.cocktail, () => props.cocktails)
+const failedThumbs = ref(new Set())
+const similarPanel = ref(null)
+
+function isMakeable(c) {
+  return (c.recipe || []).every(isAvailable)
+}
+
+function onThumbError(id) {
+  failedThumbs.value = new Set(failedThumbs.value).add(id)
+}
+
+// "Base spirit · profile, profile"
+function similarMeta(c) {
+  const spirit = c.base_spirit ? getIngredientLabel(c.base_spirit, props.locale, ingredientsByIngredient.value) : ''
+  const profiles = (c.profile || []).slice(0, 2).map(p => getProfileLabel(p, props.locale)).join(', ')
+  return [spirit, profiles].filter(Boolean).join(' · ')
+}
+
+// Swapping to another cocktail: back to the first tab, fresh state
+watch(() => props.cocktail.id, () => {
+  imageError.value = false
+  goToTab(0)
+  if (similarPanel.value) similarPanel.value.scrollTop = 0
+})
+
+// ── Swipe infos / recette / description / similaires ──
 const activeTab = ref(0)
 const isDragging = ref(false)
 const dragDeltaPercent = ref(0)
@@ -444,11 +520,12 @@ let axisLocked = null
 const tabRefs0 = ref(null)
 const tabRefs1 = ref(null)
 const tabRefs2 = ref(null)
-const tabRefsList = [tabRefs0, tabRefs1, tabRefs2]
+const tabRefs3 = ref(null)
+const tabRefsList = [tabRefs0, tabRefs1, tabRefs2, tabRefs3]
 
 const tabLabels = computed(() => ({
-  fr: ['Infos', 'Recette', 'Description'],
-  en: ['Infos', 'Recipe', 'Description'],
+  fr: ['Infos', 'Recette', 'Description', 'Similaires'],
+  en: ['Infos', 'Recipe', 'Description', 'Similar'],
 }))
 
 const activeTabLabel = computed(() => {
@@ -885,7 +962,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.4rem;
   -webkit-tap-highlight-color: transparent;
-  flex: 1 1 33.333%;
+  flex: 1 1 calc(100% / var(--tab-count, 3));
   justify-content: center;
   margin-right: 0;
   min-width: 0;
@@ -914,7 +991,7 @@ onBeforeUnmount(() => {
   position: absolute;
   bottom: -1px;
   left: 0;
-  width: 33.333%;
+  width: calc(100% / var(--tab-count, 3));
   height: 2px;
   background: var(--gold);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
@@ -938,7 +1015,7 @@ onBeforeUnmount(() => {
 .swipe-track {
   display: flex;
   align-items: stretch;
-  width: 300%;
+  width: calc(var(--tab-count, 3) * 100%);
   height: 100%;
   min-height: 0;
   box-sizing: border-box;
@@ -949,7 +1026,7 @@ onBeforeUnmount(() => {
 }
 
 .swipe-panel {
-  width: 33.333%;
+  width: calc(100% / var(--tab-count, 3));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -961,6 +1038,83 @@ onBeforeUnmount(() => {
   min-height: 0;
   padding-right: 0.25rem;
   scrollbar-width: thin;
+}
+
+/* ── Similar cocktails ── */
+.cv-similar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cv-similar-item {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 0.6rem 0.4rem 0.4rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cv-similar-item:hover,
+.cv-similar-item:focus-visible {
+  border-color: var(--gold-dim, var(--border));
+  outline: none;
+}
+
+.cv-similar-thumb {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-raised), var(--bg-input));
+  color: var(--gold-dim);
+}
+
+.cv-similar-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cv-similar-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.cv-similar-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-similar-meta {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cv-modal-footer {
@@ -1003,9 +1157,9 @@ onBeforeUnmount(() => {
   }
 
   .swipe-tab {
-    font-size: 0.68rem;
-    letter-spacing: 0.5px;
-    padding: 0.5rem 0.15rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.2px;
+    padding: 0.5rem 0.1rem;
   }
 
   .cv-meta-row {
