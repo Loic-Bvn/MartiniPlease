@@ -84,10 +84,10 @@ export function usePreparations() {
   /**
    * Stats sur une période (RPC get_preparation_stats).
    * @param {string} barId
-   * @param {{ from?: Date|null, to?: Date|null, cardId?: string|null, uncardedOnly?: boolean }} opts
+  * @param {{ from?: Date|null, to?: Date|null, cardId?: string|null, uncardedOnly?: boolean, cocktailId?: string|null, profile?: string|null, baseSpirits?: string[]|null }} opts
    * @returns {Promise<{ total: number, by_cocktail: Array, by_card: Array }>}
    */
-  async function getStats(barId, { from = null, to = null, cardId = null, uncardedOnly = false } = {}) {
+  async function getStats(barId, { from = null, to = null, cardId = null, uncardedOnly = false, cocktailId = null, profile = null, baseSpirits = null } = {}) {
     const empty = { total: 0, by_cocktail: [], by_card: [] }
     if (!barId) return empty
     try {
@@ -97,6 +97,9 @@ export function usePreparations() {
         p_to:            to   ? to.toISOString()   : null,
         p_card_id:       cardId,
         p_uncarded_only: uncardedOnly,
+        p_cocktail_id:   cocktailId,
+        p_profile:       profile,
+        p_base_spirits:  baseSpirits,
       })
       if (error) throw error
       return { ...empty, ...(data || {}) }

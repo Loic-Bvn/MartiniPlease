@@ -112,6 +112,7 @@
           >
           <CocktailCard
             :cocktail="cocktail"
+            :card-id="card.id"
             :isBartenderMode="isLoggedIn"
             :show-cocktail-actions="false"
             :locale="locale"
@@ -214,7 +215,7 @@ const groupedCocktails = computed(() => {
 const { isLoggedIn } = useAuth()
 const { toastMessage } = useToast()
 
-function handleOpenCocktail(cocktail, rect) {
-  emit('open-cocktail', cocktail, rect)
+function handleOpenCocktail(cocktail, rect, cardId = props.card.id) {
+  emit('open-cocktail', cocktail, rect, cardId)
 }
 </script>

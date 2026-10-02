@@ -29,14 +29,14 @@
       @click.stop="onMainClick"
     >
       <Check v-if="justLogged" :size="18" />
-      <GlassWater v-else :size="18" />
+      <CircleFadingPlus v-else :size="18" />
     </button>
   </span>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { GlassWater, Check, Plus, Minus, X } from 'lucide-vue-next'
+import { Check, CircleFadingPlus, Plus, Minus, X } from 'lucide-vue-next'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 import { usePreparations } from '@/composables/usePreparations'
 
@@ -44,7 +44,7 @@ const props = defineProps({
   cocktailId:   { type: String, required: true },
   cocktailName: { type: String, default: '' },
   barId:        { type: String, default: '' },
-  cardId:       { type: String, default: null },   // null = hors carte
+  cardId:       { type: String, default: null },
   locale:       { type: String, default: 'fr' },
   // false : un clic = +1 (card). true : un clic ouvre le choix de quantité (modal).
   withQuantity: { type: Boolean, default: false },
@@ -65,7 +65,6 @@ const title = computed(() =>
     ? (props.withQuantity ? 'Marquer comme préparé (quantité)' : 'Marquer comme préparé (+1)')
     : (props.withQuantity ? 'Mark as prepared (quantity)' : 'Mark as prepared (+1)')
 )
-
 function close() {
   open.value = false
   qty.value = 1
@@ -105,7 +104,6 @@ async function submit(quantity) {
   align-items: center;
   gap: 4px;
 }
-.prep-btn--done { color: var(--gold); }
 .prep-btn:disabled { opacity: 0.5; cursor: progress; }
 
 .prep-step {
