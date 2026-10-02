@@ -196,6 +196,18 @@
                   </div>
                 </button>
 
+                <button
+                  v-if="activeBarId && !showBarsSelection"
+                  @click="setFeature('preparationCounter', !isFeatureEnabled('preparationCounter'))"
+                  class="burger-item burger-item--toggle"
+                >
+                  <GlassWater :size="15" />
+                  <span>{{ locale === 'fr' ? 'Compteur de préparations' : 'Preparation counter' }}</span>
+                  <div class="toggle-switch" :class="{ 'on': isFeatureEnabled('preparationCounter') }">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </button>
+
                 <button 
                   v-if="activeBarId && !showBarsSelection" 
                   @click="$emit('toggle-public')" 
@@ -232,6 +244,15 @@
                   {{ locale === 'fr' ? 'Catalogue de recettes' : 'Recipe Catalog' }}
                 </button> 
 
+                <button
+                  v-if="activeBarId && !showBarsSelection && isFeatureEnabled('preparationCounter')"
+                  class="burger-item"
+                  @click="$emit('open-preparation-stats'); burgerOpen = false"
+                >
+                  <ChartNoAxesCombined :size="15" />
+                  {{ locale === 'fr' ? 'Statistiques des préparations' : 'Preparation statistics' }}
+                </button>
+
                 <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
 
                 <!-- SECTION : DISCONNECT -->
@@ -267,7 +288,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Search, Plus, Library, Lock, Unlock, LogIn, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro} from 'lucide-vue-next'
+import { Search, Plus, Library, Lock, Unlock, LogIn, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro, ChartNoAxesCombined, GlassWater} from 'lucide-vue-next'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 
@@ -302,6 +323,7 @@ const emit = defineEmits([
   'open-bars-selection',
   'toggle-public',
   'open-catalog',
+  'open-preparation-stats',
   'sign-out',
   'update:searchTerm'
 ])

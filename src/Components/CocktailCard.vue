@@ -69,6 +69,14 @@
       <!-- Footer : tags du cocktail -->
       <div class="card-footer">
         <div class="footer-left" style="display:flex; align-items:center; gap:6px;">
+          <PrepareButton
+            v-if="isBartenderMode && viewMode === 'standard'"
+            :cocktail-id="cocktail.id"
+            :cocktail-name="cocktail.name"
+            :bar-id="barId"
+            :card-id="cardId"
+            :locale="locale"
+          />
           <!-- <span v-if="cocktail.cocktail_style" class="badge-method">
             {{ styleLabel }}
           </span>
@@ -98,6 +106,15 @@
             <Check v-if="isChecked" :size="18" />
             <HandPlatter v-else :size="18" />
           </button>
+
+          <PrepareButton
+            v-if="isBartenderMode && viewMode !== 'standard'"
+            :cocktail-id="cocktail.id"
+            :cocktail-name="cocktail.name"
+            :bar-id="barId"
+            :card-id="cardId"
+            :locale="locale"
+          />
 
           <template v-if="showCocktailActions && isBartenderMode">
             <AddToMenuButton
@@ -145,6 +162,7 @@ import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 import AddToMenuButton from '@/Components/AddToMenuButton.vue'
+import PrepareButton from '@/Components/PrepareButton.vue'
 // const { showPrices, ordersEnabled } = useBarFeatures()
 
 
@@ -158,6 +176,7 @@ const props = defineProps({
   locale:              { type: String, default: 'fr' },
   unit:                { type: String, default: 'oz' },
   barId:               { type: String, default: '' },
+  cardId:              { type: String, default: null },
   viewMode:            { type: String, default: 'standard' }, // 'compact' | 'standard'
   isCocktailOfMoment:  { type: Boolean, default: false },
 })
@@ -228,7 +247,7 @@ function handleOpen() {
   const rect = cardEl.value?.getBoundingClientRect()
   emit('open', props.cocktail, rect ? {
     top: rect.top, left: rect.left, width: rect.width, height: rect.height,
-  } : null)
+  } : null, props.cardId)
 }
 
 function formatQty(ing) {

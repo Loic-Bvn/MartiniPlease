@@ -44,6 +44,7 @@
           @open-bars-selection="handleOpenBarsSelection"
           @toggle-public="handleTogglePublic"
           @open-catalog="showCatalogModal = true"
+          @open-preparation-stats="showPreparationStatsModal = true"
           @sign-out="handleSignOut"
           @update:searchTerm="searchTerm = $event"
         />
@@ -158,7 +159,7 @@
           :shared-favorite-cocktails="sharedFavoriteCocktails"
           :invite-code="inviteCode"
           @view-card="openCardView"
-          @open-cocktail="openCocktailDetailModal"
+          @open-cocktail="openCocktailFromCard"
           @edit-card="openEditCardModal"
           @delete-card="handleDeleteCard"
           @new-card="openNewCardModal"
@@ -256,7 +257,7 @@
           @set-locale="setLocale"
           @set-unit="setUnit"
           @set-card-view="setCardView"
-          @open-cocktail="openCocktailDetailModal"
+          @open-cocktail="openCocktailFromCard"
         />
         <Transition name="modal-fade">
           <CocktailDetailModal
@@ -266,13 +267,24 @@
             :origin-rect="viewingCocktailRect"
             :isBartenderMode="isLoggedIn"
             :bar-id="activeBarId"
+            :preparation-card-id="preparationCardId"
             :cocktails="cocktails"
             :cocktail-of-moment-id="cocktailOfMomentId"
-            @close="closeCocktailDetailModal"
-            @edit="(c) => { closeCocktailDetailModal(); openEditCocktailFormModal(c) }"
-            @open-cocktail="openCocktailDetailModal"
+            @close="closeCocktailDetail"
+            @edit="(c) => { closeCocktailDetail(); openEditCocktailFormModal(c) }"
+            @open-cocktail="openCocktailFromCard"
           />
         </Transition>
+        <PreparationStatsModal
+          v-if="showPreparationStatsModal && isLoggedIn && preparationCounterEnabled && activeBarId"
+          :bar-id="activeBarId"
+          :locale="locale"
+          :menu-cards="menuCards"
+          :cocktails="cocktails"
+          @close="showPreparationStatsModal = false"
+          @set-locale="setLocale"
+        />
+        <PreparationUndoToast v-if="isLoggedIn && preparationCounterEnabled" :locale="locale" />
       </div>
     </div>
 
@@ -303,6 +315,7 @@ import { useBarFeatures } from '@/composables/useBarFeatures'
 
 // ── Composants ────────────────────────────────────────────────────────────────
 import AppHeader         from '@/Components/AppHeader.vue'
+import PreparationUndoToast from '@/Components/PreparationUndoToast.vue'
 import WelcomePage       from '@/Components/WelcomePage.vue'
 import BarSelector       from '@/Components/BarSelector.vue'
 import BarMainView       from '@/Components/BarMainView.vue'
@@ -322,8 +335,11 @@ const LegalNotice       = defineAsyncComponent(() => import('@/views/LegalNotice
 const PrivacyPolicy     = defineAsyncComponent(() => import('@/views/PrivacyPolicy.vue'))
 const TermsOfUse        = defineAsyncComponent(() => import('@/views/TermsOfUse.vue'))
 const CookiesPolicy     = defineAsyncComponent(() => import('@/views/CookiesPolicy.vue'))
+const PreparationStatsModal = defineAsyncComponent(() => import('@/Components/Modals/PreparationStatsModal.vue'))
 const cocktailToDelete = ref(null)
 const cardToDelete = ref(null)
+const showPreparationStatsModal = ref(false)
+const preparationCardId = ref(null)
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 const {
@@ -348,6 +364,16 @@ const {
   openCocktailDetailModal,    closeCocktailDetailModal,
 } = useUIState()
 
+function openCocktailFromCard(cocktail, originRect = null, cardId = null) {
+  preparationCardId.value = cardId
+  openCocktailDetailModal(cocktail, originRect)
+}
+
+function closeCocktailDetail() {
+  closeCocktailDetailModal()
+  preparationCardId.value = null
+}
+
 // ── Bar actif (bartender connecté OU invité via code) ─────────────────────────
 const guestBar      = ref(null)
 const activeBarId   = computed(() => currentBarId.value ?? guestBar.value?.id   ?? null)
@@ -365,6 +391,7 @@ const accessibleMenuCards = computed(() =>
 const { hasDrinker, drinkerPseudo, initDrinker, createDrinker, reconnectDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { toastMessage, toastType, showToast } = useToast()
 const { features, setFeature } = useBarFeatures()
+const preparationCounterEnabled = computed(() => features.value.preparationCounter === true)
 const sharedFavoriteIds = ref([])
 const cocktailOfMomentId = computed(() => features.value.cocktailOfMomentId || guestBar.value?.features?.cocktailOfMomentId || null)
 const cocktailOfMoment = computed(() => cocktails.value.find(cocktail => cocktail.id === cocktailOfMomentId.value) || null)
@@ -426,7 +453,7 @@ const { pendingOrdersCount, initOrdersListener, stopOrdersListener } = useOrders
 function handleSurpriseMe() {
   const pool = filteredCocktails.value.length ? filteredCocktails.value : cocktails.value
   if (!pool.length) return
-  openCocktailDetailModal(pool[Math.floor(Math.random() * pool.length)])
+  openCocktailFromCard(pool[Math.floor(Math.random() * pool.length)])
 }
 
 // ── Logo aléatoire ────────────────────────────────────────────────────────────
@@ -735,7 +762,7 @@ function openCocktailFromSlug(slug) {
   if (!slug || !cocktails.value.length) return false
   const match = cocktails.value.find(c => slugify(c.name) === slug)
   if (!match) return false
-  openCocktailDetailModal(match)
+  openCocktailFromCard(match)
   return true
 }
 

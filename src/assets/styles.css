@@ -3119,7 +3119,10 @@ body {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  min-width: 200px;
+  width: min(320px, calc(100vw - 24px));
+  min-width: min(280px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
   background: var(--bg-card);
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-lg);
@@ -3205,6 +3208,7 @@ body {
 }
 .toggle-switch {
   width: 34px;
+  flex: 0 0 34px;
   height: 18px;
   background: #ccc;
   border-radius: 999px;
@@ -3235,6 +3239,19 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.burger-item--toggle > svg {
+  flex: 0 0 15px;
+}
+
+.burger-item--toggle > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .burger-item--toggle svg {

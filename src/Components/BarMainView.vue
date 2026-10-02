@@ -188,7 +188,7 @@
       </div> -->
       <section v-if="isLoggedIn || featuredMenuCocktails.length" class="featured-menu-section">
         <div class="featured-menu-heading">
-          <h2>{{ locale === 'fr' ? 'Carte du moment' : 'Featured menu' }}</h2>
+          <h2>{{ locale === 'fr' ? 'Carte du moment' : 'Featured menu' }}<template v-if="featuredMenuCardName">  - {{ featuredMenuCardName }}</template></h2>
           <select
             v-if="isLoggedIn"
             :value="featuredMenuCardId || ''"
@@ -204,6 +204,7 @@
           <div v-for="cocktail in featuredMenuCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
             <CocktailCard
               :cocktail="cocktail"
+              :card-id="featuredMenuCardId"
               :isBartenderMode="isLoggedIn"
               :locale="locale"
               :unit="unit"
@@ -358,8 +359,13 @@ const displayCount = ref(PAGE_SIZE)
 const sentinelEl   = ref(null)
 let observer       = null
 
+const featuredMenuCard = computed(() =>
+  props.menuCards.find(card => card.id === props.featuredMenuCardId) || null
+)
+const featuredMenuCardName = computed(() => featuredMenuCard.value?.name || '')
+
 const featuredMenuCocktails = computed(() => {
-  const menuCard = props.menuCards.find(card => card.id === props.featuredMenuCardId)
+  const menuCard = featuredMenuCard.value
   if (!menuCard) return []
   const filteredIds = new Set(props.filteredCocktails.map(cocktail => cocktail.id))
   return (menuCard.cocktail_ids || [])
@@ -417,8 +423,8 @@ function formatDate(iso) {
   })
 }
 
-function handleOpenCocktail(cocktail, rect) {
-  emit('open-cocktail', cocktail, rect)
+function handleOpenCocktail(cocktail, rect, cardId = null) {
+  emit('open-cocktail', cocktail, rect, cardId)
 }
 
 const t = computed(() => ({

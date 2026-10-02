@@ -40,6 +40,16 @@
             :locale="props.locale"
           />
 
+          <PrepareButton
+            v-if="isBartenderMode"
+            :cocktail-id="cocktail.id"
+            :cocktail-name="cocktail.name"
+            :bar-id="barId"
+            :card-id="preparationCardId"
+            :locale="props.locale"
+            with-quantity
+          />
+
           <button
             v-if="isBartenderMode"
             @click="$emit('edit', cocktail)"
@@ -271,7 +281,7 @@
                 <div id="panel-similar" ref="similarPanel" role="tabpanel" aria-labelledby="tab-similar" class="swipe-panel">
                   <ul v-if="similarCocktails.length" class="cv-similar-list">
                     <li v-for="c in similarCocktails" :key="c.id">
-                      <button type="button" class="cv-similar-item" @click="$emit('open-cocktail', c)">
+                      <button type="button" class="cv-similar-item" @click="$emit('open-cocktail', c, null, preparationCardId)">
                         <span class="cv-similar-thumb">
                           <img
                             v-if="c.image && !failedThumbs.has(c.id)"
@@ -343,6 +353,7 @@ import { useBarFeatures } from '@/composables/useBarFeatures'
 import { useSimilarCocktails } from '@/composables/useSimilarCocktails'
 import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
 import AddToMenuButton from '@/Components/AddToMenuButton.vue'
+import PrepareButton from '@/Components/PrepareButton.vue'
 
 const { isFeatureEnabled } = useBarFeatures()
 const showPrices = computed(() => isFeatureEnabled('showPrices'))
@@ -361,6 +372,7 @@ const props = defineProps({
   isBartenderMode: { type: Boolean, default: false },
   unit:            { type: String, default: 'oz' },
   barId:           { type: String, default: '' },
+  preparationCardId: { type: String, default: null },
   cocktailOfMomentId: { type: String, default: null },
   cocktails:       { type: Array, default: () => [] },
 })
