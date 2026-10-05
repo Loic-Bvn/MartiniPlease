@@ -47,7 +47,7 @@
           </select>
           <select v-model="filters.cocktailStyle" @change="doFetch" class="form-input catalog-filter-select">
             <option value="">{{ locale === 'fr' ? 'Tous les styles' : 'All styles' }}</option>
-            <option v-for="s in cocktailStyleOptions" :key="s" :value="s">{{ STYLE_LABELS[s] || s }}</option>
+            <option v-for="s in cocktailStyleOptions" :key="s" :value="s">{{ getCocktailStyleLabel(s, locale) }}</option>
           </select>
           <select v-model="filters.profile" @change="doFetch" class="form-input catalog-filter-select">
             <option value="">{{ locale === 'fr' ? 'Tous les profils' : 'All profiles' }}</option>
@@ -103,7 +103,7 @@
                 <div class="catalog-item-footer-row">
                   <div class="catalog-chip-row">
                     <span v-if="cocktail.base_spirit" class="catalog-chip">{{ getIngredientLabel(cocktail.base_spirit, locale) }}</span>
-                    <span v-if="cocktail.cocktail_style" class="catalog-chip">{{ STYLE_LABELS[cocktail.cocktail_style] || cocktail.cocktail_style }}</span>
+                    <span v-if="cocktail.cocktail_style" class="catalog-chip">{{ getCocktailStyleLabel(cocktail.cocktail_style, locale) }}</span>
                   </div>
 
                   <div class="catalog-item-image-actions">
@@ -146,7 +146,7 @@ import { supabase } from '@/lib/supabase'
 import { useCatalog } from '@/composables/useCatalog'
 import { useCocktails } from '@/composables/useCocktails'
 import { useInventory } from '@/composables/useInventory'
-import { getIngredientLabel } from '../../constants/typeLabels.js'
+import { getCocktailStyleLabel, getIngredientLabel } from '../../constants/typeLabels.js'
 import { getBaseSpiritGroups, getCocktailStyles, getProfileOptions } from '@/lib/cocktail-constants'
 
 const props = defineProps({
@@ -176,20 +176,6 @@ let debounceTimer = null
 const spiritCategories = getBaseSpiritGroups()
 const cocktailStyleOptions = getCocktailStyles()
 const profileOptions = getProfileOptions()
-
-const STYLE_LABELS = {
-  sour:          '🍋 Sour',
-  fizz:          '🫧 Fizz',
-  highball:      '🥃 Highball',
-  tiki:          '🌺 Tiki',
-  negroni:       '🔴 Negroni',
-  old_fashioned: '🟠 Old Fashioned',
-  classic:       '🎩 Classic',
-  modern:        '✨ Modern',
-  creamy:        '🥛 Creamy',
-  flip:          '🥚 Flip',
-  spritz:        '🍾 Spritz',
-}
 
 // ── Computed ──────────────────────────────────────────
 const hasActiveFilters = computed(() =>

@@ -1024,10 +1024,6 @@
       "name": "Highball",
       "emoji": "🥤"
     },
-    "collins": {
-      "name": "Collins",
-      "emoji": "🥤"
-    },
     "nick_nora": {
       "name": "Nick & Nora",
       "emoji": "🍸"
@@ -1048,17 +1044,9 @@
       "name": "Tiki",
       "emoji": "🌺"
     },
-    "hurricane": {
-      "name": "Hurricane",
-      "emoji": "🌀"
-    },
     "copper_mug": {
       "name": "Copper Mug",
       "emoji": "🫙"
-    },
-    "snifter": {
-      "name": "Snifter / Ballon",
-      "emoji": "🫗"
     }
   },
   "methods": {
@@ -1135,67 +1123,67 @@
     }
   },
   "profiles": {
-    "Citrus": {
+    "citrus": {
       "name": "Agrume",
       "emoji": "🍋"
     },
-    "Fruity": {
+    "fruity": {
       "name": "Fruité",
       "emoji": "🍒"
     },
-    "Tropical": {
+    "tropical": {
       "name": "Tropical",
       "emoji": "🌴"
     },
-    "Herbal": {
+    "herbal": {
       "name": "Herbacé",
       "emoji": "🌿"
     },
-    "Floral": {
+    "floral": {
       "name": "Floral",
       "emoji": "🌸"
     },
-    "Spicy": {
+    "spicy": {
       "name": "Épicé",
       "emoji": "🌶️"
     },
-    "Smoky": {
+    "smoky": {
       "name": "Fumé",
       "emoji": "🔥"
     },
-    "Bitter": {
+    "bitter": {
       "name": "Amer",
       "emoji": "😬"
     },
-    "Sour": {
+    "sour": {
       "name": "Acidulé",
       "emoji": "😮"
     },
-    "Sweet": {
+    "sweet": {
       "name": "Sucré",
       "emoji": "🍯"
     },
-    "Dry": {
+    "dry": {
       "name": "Sec",
       "emoji": "🏜️"
     },
-    "Refreshing": {
+    "refreshing": {
       "name": "Frais",
       "emoji": "💧"
     },
-    "Rich": {
+    "rich": {
       "name": "Riche",
       "emoji": "✨"
     },
-    "Creamy": {
+    "creamy": {
       "name": "Crémeux",
       "emoji": "🥛"
     },
-    "Nutty": {
+    "nutty": {
       "name": "Noisetté",
       "emoji": "🌰"
     },
-    "Boozy": {
+    "boozy": {
       "name": "Corsé",
       "emoji": "💥"
     }
@@ -1219,24 +1207,18 @@
     }
   },
   "cocktail_styles": [
-    "Classic",
-    "Modern",
-    "Tiki",
-    "Sour",
-    "Punch",
-    "Daisy",
-    "Fizz",
-    "Sling",
-    "Flip",
-    "Fix",
-    "Highball",
-    "Smash",
-    "Mule",
-    "Martini",
-    "Negroni",
-    "Margarita",
-    "Colada",
-    "Contemporary"
+    "sour",
+    "spirit_forward",
+    "highball",
+    "fizz",
+    "smash",
+    "tiki",
+    "spritz",
+    "creamy",
+    "punch",
+    "hot",
+    "shot",
+    "frozen"
   ],
   "cocktail_categories": {
     "whiskey": {

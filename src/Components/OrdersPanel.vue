@@ -86,10 +86,10 @@
                     {{ getCocktail(group.cocktail_id).method }}
                 </span>
                 <span v-if="isValidChip(getCocktail(group.cocktail_id).ice)" class="chip chip-small">
-                    🧊 {{ getCocktail(group.cocktail_id).ice }}
+                  🧊 {{ getDetailledIceLabel(getCocktail(group.cocktail_id).ice, locale) }}
                 </span>
                 <span v-if="isValidChip(getCocktail(group.cocktail_id).glass)" class="chip chip-small">
-                    🍸 {{ getCocktail(group.cocktail_id).glass }}
+                  🍸 {{ getGlassLabel(getCocktail(group.cocktail_id).glass, locale) }}
                 </span>
             </div>
           </div>
@@ -240,7 +240,7 @@ import { ref, computed } from 'vue'
 import { User, GlassWater, Clock, Check, X } from 'lucide-vue-next'
 import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
-import { getIngredientLabel } from '../constants/typeLabels.js'
+import { getDetailledIceLabel, getGlassLabel, getIngredientLabel } from '../constants/typeLabels.js'
 import { useInventory } from '@/composables/useInventory'
 const { ingredientsByIngredient } = useInventory()
 

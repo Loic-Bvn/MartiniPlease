@@ -112,7 +112,7 @@
             <div class="form-field">
               <label class="form-label">Style de cocktail</label>
               <select v-model="form.cocktail_style" class="form-input">
-                <option v-for="s in cocktailStyleOptions" :key="s" :value="s">{{ s }}</option>
+                <option v-for="s in cocktailStyleOptions" :key="s" :value="s">{{ getCocktailStyleLabel(s, props.locale) }}</option>
               </select>
             </div>
           </div>
@@ -380,7 +380,7 @@ import { getGlassesAsOptions,
   getBaseSpiritGroups,
   getSpiritToCategoryMap,
   getProfileOptions } from '@/lib/cocktail-constants'
-import { getDetailledIceLabel } from '../../constants/typeLabels'
+import { getCocktailStyleLabel, getDetailledIceLabel } from '../../constants/typeLabels'
 import { useCocktailCost } from '@/composables/useCostCalculator'
 import { useInventory } from '@/composables/useInventory'
 

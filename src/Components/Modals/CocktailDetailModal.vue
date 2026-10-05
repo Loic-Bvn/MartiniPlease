@@ -243,7 +243,7 @@
                     </div>
                     <div class="cv-meta-row">
                       <span class="form-label">Style</span>
-                      <span :class="{ 'cv-value--na': !cocktail.cocktail_style }">{{ (cocktail.cocktail_style && cocktail.cocktail_style !== 'Unknown') ? cocktail.cocktail_style : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
+                      <span :class="{ 'cv-value--na': !cocktail.cocktail_style }">{{ (cocktail.cocktail_style && cocktail.cocktail_style !== 'Unknown') ? getCocktailStyleLabel(cocktail.cocktail_style, locale) : (props.locale === 'fr' ? 'Indisponible' : 'Unavailable') }}</span>
                     </div>
                   </div>
                 </div>
@@ -338,6 +338,7 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil, Star} from 'lucide-vue-next'
 import {
+  getCocktailStyleLabel,
   getIngredientLabel,
   getProfileLabel,
   getGlassLabel,

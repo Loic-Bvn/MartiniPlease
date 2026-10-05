@@ -25,8 +25,79 @@ create table public.bar_cocktails (
   price numeric null,
   constraint bar_cocktails_DEBUG_pkey primary key (id),
   constraint bar_cocktails_DEBUG_cocktail_catalog_id_bar_id_key unique (catalog_id, bar_id),
-  constraint bar_cocktails_DEBUG_bar_id_fkey foreign KEY (bar_id) references bars (id) on delete CASCADE,
   constraint bar_cocktails_DEBUG_catalog_id_fkey foreign KEY (catalog_id) references cocktails_catalog_bis (id),
+  constraint bar_cocktails_DEBUG_bar_id_fkey foreign KEY (bar_id) references bars (id) on delete CASCADE,
+  constraint bar_cocktails_profile_valid check (
+    (
+      (profile is null)
+      or (
+        (jsonb_typeof(profile) = 'array'::text)
+        and (
+          profile <@ '["smoky", "bitter", "creamy", "tropical", "floral", "nutty", "spicy", "herbal", "fruity", "citrus", "sour", "dry", "boozy", "refreshing", "rich", "sweet"]'::jsonb
+        )
+        and (jsonb_array_length(profile) <= 3)
+      )
+    )
+  ) not VALID,
+  constraint bar_cocktails_style_valid check (
+    (
+      (cocktail_style is null)
+      or (
+        cocktail_style = any (
+          array[
+            'sour'::text,
+            'spirit_forward'::text,
+            'highball'::text,
+            'fizz'::text,
+            'smash'::text,
+            'tiki'::text,
+            'spritz'::text,
+            'creamy'::text,
+            'punch'::text,
+            'hot'::text,
+            'shot'::text,
+            'frozen'::text
+          ]
+        )
+      )
+    )
+  ) not VALID,
+  constraint bar_cocktails_glass_valid check (
+    (
+      (glass is null)
+      or (
+        glass = any (
+          array[
+            'rocks'::text,
+            'coupe'::text,
+            'martini'::text,
+            'highball'::text,
+            'nick_nora'::text,
+            'champagne_flute'::text,
+            'wine'::text,
+            'shot'::text,
+            'tiki'::text,
+            'copper_mug'::text
+          ]
+        )
+      )
+    )
+  ) not VALID,
+  constraint bar_cocktails_ice_valid check (
+    (
+      (ice is null)
+      or (
+        ice = any (
+          array[
+            'cubed'::text,
+            'crushed'::text,
+            'clear'::text,
+            'no_ice'::text
+          ]
+        )
+      )
+    )
+  ) not VALID,
   constraint bar_cocktails_price_check check (
     (
       (price is null)

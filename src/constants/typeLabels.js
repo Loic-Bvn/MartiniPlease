@@ -506,6 +506,41 @@ export function getProfileLabel(profile, locale = 'fr') {
   return PROFILE_LABELS[locale]?.[profile] ?? unavailableCaption
 }
 
+export const COCKTAIL_STYLE_LABELS = {
+  fr: {
+    sour: 'Sour',
+    spirit_forward: 'Spiritueux dominant',
+    highball: 'Highball',
+    fizz: 'Fizz',
+    smash: 'Smash',
+    tiki: 'Tiki',
+    spritz: 'Spritz',
+    creamy: 'Crémeux',
+    punch: 'Punch',
+    hot: 'Chaud',
+    shot: 'Shot',
+    frozen: 'Glacé',
+  },
+  en: {
+    sour: 'Sour',
+    spirit_forward: 'Spirit-forward',
+    highball: 'Highball',
+    fizz: 'Fizz',
+    smash: 'Smash',
+    tiki: 'Tiki',
+    spritz: 'Spritz',
+    creamy: 'Creamy',
+    punch: 'Punch',
+    hot: 'Hot',
+    shot: 'Shot',
+    frozen: 'Frozen',
+  },
+}
+
+export function getCocktailStyleLabel(style, locale = 'fr') {
+  return COCKTAIL_STYLE_LABELS[locale]?.[style] ?? style ?? (locale === 'fr' ? 'Indisponible' : 'Unavailable')
+}
+
 export const DETAILLED_METHOD_LABELS = {
   fr: {
     shake:       'Shaker',
@@ -537,9 +572,9 @@ export function getDetailledMethodLabel(method, locale = 'fr') {
 
 export const DETAILLED_ICE_LABELS = {
   fr: {
-    cubed:       'Glacons',
+    cubed:       'Glaçons',
     crushed:     'Glace pillée',
-    clear:       'Glace transparente',
+    clear:       'Glaçon transparent',
     no_ice:      'Sans glace',
   },
   en: {
@@ -561,30 +596,24 @@ export const GLASS_LABELS = {
     coupe:           'Coupe',
     martini:         'Martini',
     highball:        'Highball',
-    collins:         'Collins',
     nick_nora:       'Nick & Nora',
     champagne_flute: 'Flûte',
     wine:            'Verre à vin',
     shot:            'Shot',
     tiki:            'Tiki',
-    hurricane:       'Hurricane',
     copper_mug:      'Tasse en cuivre',
-    snifter:         'Verre Ballon'
   },
   en: {
     rocks:           'Rocks glass',
     coupe:           'Coupe',
     martini:         'Martini glass',
     highball:        'Highball',
-    collins:         'Collins',
     nick_nora:       'Nick & Nora',
     champagne_flute: 'Champagne flute',
     wine:            'Wine glass',
     shot:            'Shot glass',
     tiki:            'Tiki Cup',
-    hurricane:       'Hurricane glass',
-    copper_mug:      'Copper mug',
-    snifter:         'Snifter'
+    copper_mug:      'Copper mug'
   },
 }
 

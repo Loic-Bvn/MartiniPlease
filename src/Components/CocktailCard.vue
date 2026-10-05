@@ -157,7 +157,7 @@ import { Upload, Bookmark, Pencil, Trash2, Heart, Check, HandPlatter, Martini, S
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
-import { getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
+import { getCocktailStyleLabel, getGlassLabel, getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
@@ -269,21 +269,7 @@ const recipeWithQty = computed(() =>
   }))
 )
 
-const STYLE_LABELS = {
-  sour:          '🍋 Sour',
-  fizz:          '🫧 Fizz',
-  highball:      '🥃 Highball',
-  tiki:          '🌺 Tiki',
-  negroni:       '🔴 Negroni',
-  old_fashioned: '🟠 Old Fashioned',
-  classic:       '🎩 Classic',
-  modern:        '✨ Modern',
-  creamy:        '🥛 Creamy',
-  flip:          '🥚 Flip',
-  spritz:        '🍾 Spritz',
-}
-
-const styleLabel = computed(() => STYLE_LABELS[props.cocktail.cocktail_style] || props.cocktail.cocktail_style)
+const styleLabel = computed(() => getCocktailStyleLabel(props.cocktail.cocktail_style, props.locale))
 
 const METHOD_LABELS = {
   shake:       '🍸 Shake',
@@ -298,13 +284,7 @@ const METHOD_LABELS = {
 
 const methodLabel = computed(() => METHOD_LABELS[props.cocktail.method] || props.cocktail.method)
 
-const GLASS_LABELS = {
-  // rocks:       'Rocks',
-  // coupe:       'Coupe',
-  // martini:     'Martini',
-  // highball:    'Highball',
-}
-const glassLabel = computed(() => GLASS_LABELS[props.cocktail.glass] || props.cocktail.glass)
+const glassLabel = computed(() => getGlassLabel(props.cocktail.glass, props.locale))
 
 
 async function handleSubmit() {

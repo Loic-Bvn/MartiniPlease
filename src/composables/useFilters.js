@@ -14,8 +14,8 @@
 //     Elles sont réinitialisées par clearFilters() lors du changement de bar.
 
 import { ref, computed } from 'vue'
-import { getFamilyLabel as getFL } from '@/constants/typeLabels.js'
-import { getCocktailCategory, isMocktail } from '@/lib/cocktail-constants'
+import { getCocktailStyleLabel, getFamilyLabel as getFL } from '@/constants/typeLabels.js'
+import { getCocktailCategory, getCocktailStyles, isMocktail } from '@/lib/cocktail-constants'
 
 // ── État singleton ────────────────────────────────────────────────────────────
 const selectedFamilies   = ref([])
@@ -109,19 +109,11 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
 
   const styleFilters = computed(() => {
     const fr = locale?.value === 'fr'
-    return [
-      { key: 'sour',          label: fr ? '🍋 Sour'          : '🍋 Sour'          },
-      { key: 'fizz',          label: fr ? '🫧 Fizz'          : '🫧 Fizz'          },
-      { key: 'highball',      label: fr ? '🥃 Highball'      : '🥃 Highball'      },
-      { key: 'tiki',          label: fr ? '🌺 Tiki'          : '🌺 Tiki'          },
-      { key: 'negroni',       label: fr ? '🔴 Negroni'       : '🔴 Negroni'       },
-      { key: 'old_fashioned', label: fr ? '🟠 Old Fashioned' : '🟠 Old Fashioned' },
-      { key: 'classic',       label: fr ? '🎩 Classique'     : '🎩 Classic'       },
-      { key: 'modern',        label: fr ? '✨ Moderne'        : '✨ Modern'        },
-      { key: 'creamy',        label: fr ? '🥛 Crémeux'       : '🥛 Creamy'        },
-      { key: 'flip',          label: fr ? '🥚 Flip'          : '🥚 Flip'          },
-      { key: 'spritz',        label: fr ? '🍾 Spritz'        : '🍾 Spritz'        },
-    ]
+    const styleLocale = fr ? 'fr' : 'en'
+    return getCocktailStyles().map(key => ({
+      key,
+      label: getCocktailStyleLabel(key, styleLocale),
+    }))
   })
 
   const seasons = computed(() => {
