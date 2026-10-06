@@ -1,6 +1,6 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-container modal-container--trends" role="dialog" aria-modal="true" aria-labelledby="trends-modal-title">
+    <div ref="dialogRef" class="modal-container modal-container--trends" role="dialog" aria-modal="true" aria-labelledby="trends-modal-title">
       <div class="modal-header">
         <h2 class="modal-title" id="trends-modal-title">📈 {{ locale === 'fr' ? 'Tendances' : 'Trends' }}</h2>
         <button @click="$emit('close')" class="btn-icon btn-icon--close" :aria-label="locale === 'fr' ? 'Fermer' : 'Close'">
@@ -46,21 +46,18 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { X } from 'lucide-vue-next'
 import { useTrends } from '@/composables/useTrends'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const props = defineProps({
   barId: { type: String, required: true },
   locale: { type: String, default: 'fr' },
 })
 const emit = defineEmits(['close'])
-
-function handleKeydown(e) {
-  if (e.key === 'Escape') emit('close')
-}
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+const dialogRef = ref(null)
+useModalAccessibility(dialogRef, () => emit('close'))
 
 const { getTrends } = useTrends()
 

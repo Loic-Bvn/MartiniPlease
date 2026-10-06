@@ -1,6 +1,6 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-container modal-container--catalog" role="dialog" aria-modal="true" aria-labelledby="catalog-modal-title">
+    <div ref="dialogRef" class="modal-container modal-container--catalog" role="dialog" aria-modal="true" aria-labelledby="catalog-modal-title">
 
       <!-- Header -->
       <div class="modal-header">
@@ -29,7 +29,7 @@
       <div class="modal-body">
         <!-- ── Filtres ── -->
         <div class="catalog-filters">
-          <div class="search-container" style="flex:1;">
+          <div class="search-container catalog-search">
             <Search class="search-icon" :size="16" />
             <input
               v-model="filters.search"
@@ -140,7 +140,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { X, Search, Upload, Martini } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { useCatalog } from '@/composables/useCatalog'
@@ -148,18 +148,15 @@ import { useCocktails } from '@/composables/useCocktails'
 import { useInventory } from '@/composables/useInventory'
 import { getCocktailStyleLabel, getIngredientLabel } from '../../constants/typeLabels.js'
 import { getBaseSpiritGroups, getCocktailStyles, getProfileOptions } from '@/lib/cocktail-constants'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },
   unit:   { type: String, default: 'oz' },
 })
 const emit = defineEmits(['close', 'imported'])
-
-function handleKeydown(e) {
-  if (e.key === 'Escape') emit('close')
-}
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+const dialogRef = ref(null)
+useModalAccessibility(dialogRef, () => emit('close'))
 
 const { catalog, loading, fetchCatalog, importCocktail } = useCatalog()
 const { cocktails: barCocktails } = useCocktails()

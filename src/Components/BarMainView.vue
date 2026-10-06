@@ -7,7 +7,7 @@
         <h2 class="section-title"><span class="tile-ico">{{ splitLabel(t.stock).icon }}</span><span class="tile-lbl"><span class="lbl-full">{{ splitLabel(t.stock).text }}</span><span class="lbl-short">Stock</span></span><span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
         <span></span>
       </button>
-      <InventoryManager v-if="openPanel === 'stock'" />
+      <InventoryManager v-if="openPanel === 'stock'" @close="togglePanel('stock')" />
     </div>
 
     <div v-if="isLoggedIn" :class="['section-card', 'tile-orders', { 'tile-open': openPanel === 'orders' }]">

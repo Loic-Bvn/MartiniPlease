@@ -9,7 +9,9 @@ import { initMonitoring } from '@/lib/monitoring'
 async function bootstrap() {
   initAnalytics()
   const app = createApp(App)
-  initMonitoring(app)
+  void initMonitoring(app).catch(err => {
+    console.error('❌ Sentry initialization failed:', err)
+  })
   const { initAuth } = useAuth()
   try {
     await Promise.race([

@@ -1,6 +1,6 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-container modal-container--cocktail" role="dialog" aria-modal="true" aria-labelledby="cocktail-form-modal-title">
+    <div ref="dialogRef" class="modal-container modal-container--cocktail" role="dialog" aria-modal="true" aria-labelledby="cocktail-form-modal-title">
 
       <!-- Header -->
       <div class="modal-header">
@@ -170,8 +170,7 @@
             <span>Catégorie</span>
             <span>Ingrédient</span>
             <span>Référence</span>
-            <span>{{ unit === 'oz' ? 'Oz' : 'Ml' }}</span>
-            <span>Dash</span>
+            <span>Quantité</span>
             <span></span>
           </div>
 
@@ -182,7 +181,13 @@
             <div
               v-for="(ing, idx) in form.recipe"
               :key="idx"
-              class="recipe-row"
+              :class="[
+                'recipe-row',
+                {
+                  'recipe-row--bitters': ing.Category === 'bitters',
+                  'recipe-row--custom': ing.Category === CUSTOM_INGREDIENT_CATEGORY,
+                },
+              ]"
             >
               <!-- categorie l'ingrédient -->
               <select v-model="ing.Category" @change="onCategoryChange(ing)" class="form-input">
@@ -196,7 +201,15 @@
               </select>
 
               <!-- Ingrédient (lien stock / coût) -->
-              <select v-model="ing.Ingredient" class="form-input">
+              <input
+                v-if="ing.Category === CUSTOM_INGREDIENT_CATEGORY"
+                v-model="ing.Ingredient"
+                type="text"
+                class="form-input"
+                placeholder="Ex. Eau de fleur d’oranger"
+                aria-label="Nom de l’ingrédient"
+              />
+              <select v-else v-model="ing.Ingredient" class="form-input">
                 <option
                   v-for="(item, ingredientKey) in getIngredientsByCategory(ing.Category)"
                   :key="ingredientKey"
@@ -208,7 +221,7 @@
 
               <!-- Speficic reference (only if bar has some for the specific ingredient) -->
               <select
-                v-if="getAvailableReferences(ing.Ingredient).length"
+                v-if="ing.Category !== CUSTOM_INGREDIENT_CATEGORY && getAvailableReferences(ing.Ingredient).length"
                 v-model="ing.Reference"
                 class="form-input"
               >
@@ -225,19 +238,28 @@
                 <option value=""> / </option>
               </select>
 
-              <!-- Quantité -->
-              <!-- OZ -->
+              <!-- Quantité ou dashes pour les bitters -->
               <input
-                v-if="unit === 'oz'"
+                v-if="ing.Category === 'bitters'"
+                v-model.number="ing.Dashes"
+                type="number"
+                min="0"
+                class="form-input"
+                placeholder="Dash"
+                aria-label="Nombre de dashes"
+              />
+
+              <input
+                v-else-if="unit === 'oz'"
                 v-model="ing.Oz"
                 @input="onOzChange(ing)"
                 type="number"
                 min="0"
                 class="form-input"
                 placeholder="—"
+                aria-label="Quantité en onces"
               />
 
-              <!-- ML -->
               <input
                 v-else
                 v-model="ing.Ml"
@@ -246,15 +268,7 @@
                 min="0"
                 class="form-input"
                 placeholder="—"
-              />
-
-              <!-- Dashes -->
-              <input
-                v-model.number="ing.Dashes"
-                type="number"
-                min="0"
-                class="form-input"
-                placeholder="—"
+                aria-label="Quantité en millilitres"
               />
 
               <!-- Supprimer -->
@@ -343,6 +357,7 @@
                   v-if="!imagePreviewError"
                   :src="form.image"
                   alt="preview"
+                  loading="lazy"
                   @error="imagePreviewError = true"
                 />
                 <div v-else class="image-preview-broken">
@@ -368,7 +383,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import { X, Trash2, Plus } from 'lucide-vue-next'
 import { validateCocktail } from '@/composables/useDataValidator'
 import { supabase, supabaseImageBucket } from '@/lib/supabase'
@@ -383,9 +398,10 @@ import { getGlassesAsOptions,
 import { getCocktailStyleLabel, getDetailledIceLabel } from '../../constants/typeLabels'
 import { useCocktailCost } from '@/composables/useCostCalculator'
 import { useInventory } from '@/composables/useInventory'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 // ── Ingrédients : source unique = DB (plus de JSON statique) ─────
-const { ingredients, getAvailableReferences } = useInventory()
+const { ingredients, loading: ingredientsLoading, getAvailableReferences } = useInventory()
 const { cost, margin } = useCocktailCost(
   computed(() => form.value.recipe),
   ingredients
@@ -401,12 +417,8 @@ const props = defineProps({
   barId: { type: String, default: '' },
 })
 const emit = defineEmits(['save', 'close'])
-
-function handleKeydown(e) {
-  if (e.key === 'Escape') emit('close')
-}
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+const dialogRef = ref(null)
+useModalAccessibility(dialogRef, () => emit('close'))
 
 // ── Unité active (oz ou ml) ──────────────────────
 const unit = ref('oz')
@@ -465,7 +477,9 @@ const CATEGORY_LABELS = {
   mixers:    '🥤 Mixers',
   garnish:   '🍋 Garniture',
   others:    '📦 Autres',
+  custom:    '✍️ Texte libre',
 }
+const CUSTOM_INGREDIENT_CATEGORY = 'custom'
 
 // ── Options depuis constantes centralisées (verres, méthodes, glace, styles) ──
 const glassOptions = computed(() => getGlassesAsOptions())
@@ -515,7 +529,9 @@ const computedAbv = computed(() => {
   let totalMl = 0
   let totalAlcMl = 0
   form.value.recipe.forEach(ing => {
-    const ml = parseFloat(ing.Ml) || (parseFloat(ing.Oz) || 0) * 29.5735
+    const ml = parseFloat(ing.Ml)
+      || (parseFloat(ing.Oz) || 0) * 29.5735
+      || (parseFloat(ing.Dashes) || 0) * 0.6
     if (!ml) return
     const abv = resolveLineAbv(ing)
     totalMl += ml
@@ -555,31 +571,38 @@ const form = ref({
     .filter(i => i.Ingredient?.trim())
     .map(i => {
       const ingredient = i.Ingredient ?? ''
+      const category = findCategoryFromIngredient(ingredient)
+      const oldVolumeMl = (parseFloat(i.Ml) || 0) + (parseFloat(i.Oz) || 0) * 29.5735
       return {
         Ingredient: ingredient,
         Reference: i.Reference ?? '',
-        Category: findCategoryFromIngredient(ingredient),
-        Oz: i.Oz ?? '',
-        Ml: i.Ml ?? '',
-        Dashes: i.Dashes ?? null,
+        Category: category,
+        Oz: category === 'bitters' ? '' : (i.Oz ?? ''),
+        Ml: category === 'bitters' ? '' : (i.Ml ?? ''),
+        Dashes: category === 'bitters'
+          ? (i.Dashes ?? (oldVolumeMl > 0 ? Math.max(1, Math.round(oldVolumeMl / 0.6)) : null))
+          : (i.Dashes ?? null),
       }
     }),
 })
 
-// ⚠️ IMPORTANT : findCategoryFromType() ci-dessus est appelée à l'initialisation
-// synchrone de `form`, donc AVANT que `ingredients` (useInventory) ait forcément
-// fini de charger si le fetch est asynchrone. Si tu constates que la Catégorie
-// des lignes de recette existantes reste vide à l'édition d'un cocktail,
-// ajoute ce watch pour re-hydrater une fois les ingrédients disponibles :
-//
-// watch(ingredients, (list) => {
-//   if (!list?.length) return
-//   form.value.recipe.forEach(ing => {
-//     if (!ing.Category && ing.Ingredient) {
-//       ing.Category = findCategoryFromType(ing.Ingredient)
-//     }
-//   })
-// }, { once: true })
+watch([ingredients, ingredientsLoading], ([list, loading]) => {
+  if (loading || !list.length) return
+  form.value.recipe.forEach(line => {
+    const category = ingredientsMap.value[line.Ingredient]?.category
+    if (category && line.Category === CUSTOM_INGREDIENT_CATEGORY) {
+      if (category === 'bitters') {
+        const volumeMl = (parseFloat(line.Ml) || 0) + (parseFloat(line.Oz) || 0) * 29.5735
+        if (!line.Dashes && volumeMl > 0) {
+          line.Dashes = Math.max(1, Math.round(volumeMl / 0.6))
+        }
+        line.Oz = ''
+        line.Ml = ''
+      }
+      line.Category = category
+    }
+  })
+})
 
 // Réinitialise l'aperçu cassé à chaque fois que l'image change
 watch(() => form.value.image, () => {
@@ -616,13 +639,15 @@ function handleSave() {
   try {
     const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
 
-    const droppedLines = form.value.recipe.filter(ing => !ing.Ingredient && (ing.Ingredient?.trim() || ing.Oz || ing.Ml))
+    const droppedLines = form.value.recipe.filter(ing =>
+      !ing.Ingredient?.trim() && (ing.Oz || ing.Ml || ing.Dashes)
+    )
     if (droppedLines.length) {
       throw new Error(`Choisis un Type pour : ${droppedLines.map(l => l.Ingredient || '(sans nom)').join(', ')}`)
     }
 
     const cleanedRecipe = form.value.recipe
-      .filter(ing => ing.Ingredient)
+      .filter(ing => ing.Ingredient?.trim())
       .map(({ Category, ...rest }) => ({
         Ingredient: rest.Ingredient,
         ...(rest.Reference?.trim() ? { Reference: rest.Reference.trim() } : {}),
@@ -660,12 +685,15 @@ function handleSave() {
 function onCategoryChange(ing) {
   ing.Ingredient = ''
   ing.Reference = ''
+  ing.Oz = ''
+  ing.Ml = ''
+  ing.Dashes = null
 }
 
 
 
 function findCategoryFromIngredient(ing) {
-  return ingredientsMap.value[ing]?.category ?? ''
+  return ingredientsMap.value[ing]?.category ?? CUSTOM_INGREDIENT_CATEGORY
 }
 
 function ozToMl(oz) {
@@ -712,6 +740,36 @@ const descriptionForLocale = computed({
 </script>
 
 <style scoped>
+.btn-toggle-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--border-mid);
+  border-radius: 9999px;
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.btn-toggle-auto:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+  background: var(--bg-card);
+}
+
+.btn-toggle-auto:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 .form-hint {
   display: block;
   font-size: 0.78rem;

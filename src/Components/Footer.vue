@@ -1,12 +1,12 @@
 <template>
-  <footer class="footer-martini border-t">
-    <div class="max-w-7xl mx-auto px-4 py-5">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+  <footer class="footer-martini">
+    <div class="footer-shell">
+      <div class="footer-row">
         <p class="footer-text">
           🍸 <span class="footer-brand">MartiniPlease</span> · © {{ currentYear }} Loïc B.
           <span class="footer-version" :title="`Version ${appVersion}`">{{ appVersion }}</span>
         </p>
-        <nav class="flex flex-wrap gap-x-3 gap-y-1 items-center justify-center">
+        <nav class="footer-nav" aria-label="Navigation du footer">
           <a @click="navigateTo('legal-notice')" class="footer-link">{{ t.legal }}</a>
           <span class="footer-sep">·</span>
           <a @click="navigateTo('privacy-policy')" class="footer-link">{{ t.privacy }}</a>
@@ -90,11 +90,30 @@ function openConsent() {
 <style scoped>
 .footer-martini {
   background: linear-gradient(to bottom, var(--bg), var(--bg-raised));
-  border-color: var(--border);
+  border-top: 1px solid var(--border);
 }
 .dark .footer-martini {
   background: linear-gradient(135deg, rgba(34,31,26,0.8), rgba(26,24,20,0.9));
   border-color: var(--border-mid);
+}
+.footer-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 1.5rem;
+}
+.footer-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem 0.75rem;
 }
 .footer-brand {
   font-weight: 600;
@@ -102,8 +121,14 @@ function openConsent() {
 }
 .dark .footer-brand { color: var(--gold); }
 .footer-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
   color: var(--text-muted);
   font-size: 0.8rem;
+  text-align: center;
 }
 .dark .footer-text { color: var(--text-dim); }
 .footer-link {
@@ -146,5 +171,11 @@ function openConsent() {
 .dark .footer-sanitary {
   color: var(--text);
   border-color: var(--border-mid);
+}
+
+@media (min-width: 768px) {
+  .footer-row {
+    flex-direction: row;
+  }
 }
 </style>

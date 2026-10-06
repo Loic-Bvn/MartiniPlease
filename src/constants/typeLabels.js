@@ -338,7 +338,7 @@ export const TYPE_LABELS = {
  * Ordre de résolution :
  *   1. Table statique TYPE_LABELS (ingrédients "communs", traduits fr/en)
  *   2. Map d'ingrédients du bar (DB), si fournie — ex: { [type]: { name, ... } }
- *   3. Texte "Indisponible" / "Unavailable" en dernier recours
+ *   3. Le type brut, notamment pour les ingrédients saisis en texte libre
  *
  * @param {string} type - clé de l'ingrédient (ex: 'bourbon', ou un type custom du bar)
  * @param {string} locale - 'fr' | 'en'
@@ -351,7 +351,7 @@ export function getIngredientLabel(type, locale = 'fr', dbIngredientsMap = null)
   const dbLabel = dbIngredientsMap?.[type]?.name
   if (dbLabel) return dbLabel
 
-  return locale === 'fr' ? 'Indisponible' : 'Unavailable'
+  return type || (locale === 'fr' ? 'Indisponible' : 'Unavailable')
 }
 
 export const FAMILY_LABELS = {

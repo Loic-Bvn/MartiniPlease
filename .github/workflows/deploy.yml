@@ -36,7 +36,6 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_KEY }}
-          VITE_BARTENDER_PASSWORD: ${{ secrets.VITE_BARTENDER_PASSWORD }}
           VITE_APP_VERSION: ${{ inputs.version || github.ref_name }}
           VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
           VITE_UMAMI_WEBSITE_ID: ${{ secrets.VITE_UMAMI_WEBSITE_ID }}

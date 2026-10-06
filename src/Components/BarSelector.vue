@@ -81,7 +81,7 @@
               <span class="welcome-card-icon">🍾</span>
               
               <!-- Infos -->
-              <div style="flex: 1;">
+              <div class="bar-info">
                 <div class="bar-title-row">
                   <div class="welcome-card-title">{{ b.name }}</div>
 

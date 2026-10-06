@@ -103,7 +103,7 @@
 
           <div class="cv-image-col">
             <div v-if="cocktail.image && !imageError" class="image-preview-large">
-              <img :src="cocktail.image" alt="cocktail image" @error="imageError = true" />
+              <img :src="cocktail.image" alt="cocktail image" loading="lazy" @error="imageError = true" />
             </div>
             <div v-else class="image-missing">
               <Martini :size="40" />
@@ -355,6 +355,7 @@ import { useSimilarCocktails } from '@/composables/useSimilarCocktails'
 import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
 import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 import PrepareButton from '@/Components/PrepareButton.vue'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const { isFeatureEnabled } = useBarFeatures()
 const showPrices = computed(() => isFeatureEnabled('showPrices'))
@@ -380,6 +381,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'edit', 'open-cocktail'])
 const imageError = ref(false)
 const modalEl = ref(null)
+useModalAccessibility(modalEl, () => emit('close'))
 
 const { barInventory, ingredients, ingredientsByIngredient } = useInventory()
 const { hasDrinker, isFavorite, toggleFavorite, drinker, quickRefreshHistory } = useDrinker()
@@ -652,7 +654,6 @@ function onHeaderTouchEnd(e) {
 }
 
 function onKeydown(e) {
-  if (e.key === 'Escape') emit('close')
   if (e.key === 'ArrowLeft' && activeTab.value > 0) goToTab(activeTab.value - 1)
   if (e.key === 'ArrowRight' && activeTab.value < TAB_COUNT - 1) goToTab(activeTab.value + 1)
 }
@@ -686,12 +687,10 @@ async function playFlipIn() {
 
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)
-  document.body.style.overflow = 'hidden'
   playFlipIn()
 })
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', onKeydown)
-  document.body.style.overflow = ''
 })
 </script>
 
@@ -975,11 +974,12 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.4rem;
   -webkit-tap-highlight-color: transparent;
-  flex: 1 1 calc(100% / var(--tab-count, 3));
+  flex: 1 1 0;
   justify-content: center;
   margin-right: 0;
   min-width: 0;
   overflow: hidden;
+  text-align: center;
 }
 
 .swipe-tab > span:first-child,
