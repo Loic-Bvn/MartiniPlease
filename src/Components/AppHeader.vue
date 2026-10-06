@@ -2,8 +2,8 @@
   <div class="header">
     <div class="header-container">
       <div class="header-top">
-        <div class="header-brand" @click="$emit('logo-click')" style="cursor: pointer;">
-          <img v-if="randomLogo" :src="randomLogo" alt="/margarita_square.png" class="header-logo" />
+        <div class="header-brand" @click="$emit('logo-click')">
+          <img v-if="randomLogo" :src="randomLogo" alt="Martini Please" class="header-logo" />
           <h1 class="header-title">{{ activeBarName }}</h1>
         </div>
         <div class="header-right" style="display:flex; align-items:center; gap:0.5rem;">

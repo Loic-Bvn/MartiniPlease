@@ -1,6 +1,6 @@
 <template>
   <div class="password-modal-overlay" @click.self="$emit('close')">
-    <div class="password-modal-content" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div ref="dialogRef" class="password-modal-content" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
 
       <div class="password-modal-header">
         <h2 class="password-modal-title ico-inline" id="auth-modal-title">
@@ -156,14 +156,11 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { X, Martini, KeyRound, Wine, MailCheck } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 import PasswordInput from '@/Components/PasswordInput.vue'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const emit = defineEmits(['close', 'success'])
-
-function handleKeydown(e) {
-  if (e.key === 'Escape') emit('close')
-}
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+const dialogRef = ref(null)
+useModalAccessibility(dialogRef, () => emit('close'))
 
 const { signIn, signUp, resetPasswordForEmail, authLoading, authError } = useAuth()
 
