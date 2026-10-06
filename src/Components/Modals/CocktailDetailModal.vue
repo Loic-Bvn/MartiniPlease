@@ -14,6 +14,16 @@
 
         <div class="modal-header-actions">
           <button
+            type="button"
+            class="btn-icon"
+            :title="props.locale === 'fr' ? 'Mode pas à pas' : 'Step-by-step mode'"
+            :aria-label="props.locale === 'fr' ? 'Mode pas à pas' : 'Step-by-step mode'"
+            @click="showStepsModal = true"
+          >
+            <ListChecks :size="18" />
+          </button>
+
+          <button
             v-if="hasDrinker && !isBartenderMode"
             type="button"
             @click="handleFavorite"
@@ -324,6 +334,17 @@
       </div>
 
     </div>
+    <StepByStepModal
+      v-if="showStepsModal"
+      :open="showStepsModal"
+      :cocktail="cocktail"
+      :unit="props.unit"
+      :locale="props.locale"
+      :is-bartender-mode="props.isBartenderMode"
+      :bar-id="props.barId"
+      :card-id="props.preparationCardId"
+      @close="showStepsModal = false"
+    />
     <BatchCalculatorModal
       v-if="showBatchModal"
       :open="showBatchModal"
@@ -336,7 +357,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil, Star} from 'lucide-vue-next'
+import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, Barrel, Bookmark, Pencil, Star, ListChecks } from 'lucide-vue-next'
 import {
   getCocktailStyleLabel,
   getIngredientLabel,
@@ -353,6 +374,7 @@ import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 import { useSimilarCocktails } from '@/composables/useSimilarCocktails'
 import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
+import StepByStepModal from '@/Components/Modals/StepByStepModal.vue'
 import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 import PrepareButton from '@/Components/PrepareButton.vue'
 
@@ -391,6 +413,7 @@ const isFav = computed(() => isFavorite(props.cocktail.id))
 const isOrdering = ref(false)
 const isSubmitting = ref(false)
 const showBatchModal = ref(false)
+const showStepsModal = ref(false)
 const selectedCocktailForBatch = ref(null)
 
 function openBatch() {
