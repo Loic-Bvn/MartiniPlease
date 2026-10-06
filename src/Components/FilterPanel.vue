@@ -102,9 +102,9 @@
 
       <!-- PROFILE -->
       <div class="filter-group">
-        <button class="filter-label" @click="showProfile = !showProfile">
-          {{ t.filterProfile }}
-          <ChevronDown :size="12" :class="{ rotated: showProfile }" style="margin-left: auto; flex-shrink: 0;" />
+        <button class="filter-label-control" @click="showProfile = !showProfile">
+          <span class="filter-label">{{ t.filterProfile }}</span>
+          <ChevronDown :size="12" :class="['filter-chevron', { rotated: showProfile }]" />
         </button>
         <transition name="fade">
           <div v-if="showProfile" class="chips-container">
@@ -122,9 +122,9 @@
 
       <!-- STYLE -->
       <div class="filter-group">
-        <button class="filter-label" @click="showStyle = !showStyle">
-          {{ t.filterStyle }}
-          <ChevronDown :size="12" :class="{ rotated: showStyle }" style="margin-left: auto; flex-shrink: 0;" />
+        <button class="filter-label-control" @click="showStyle = !showStyle">
+          <span class="filter-label">{{ t.filterStyle }}</span>
+          <ChevronDown :size="12" :class="['filter-chevron', { rotated: showStyle }]" />
         </button>
         <transition name="fade">
           <div v-if="showStyle" class="chips-container">

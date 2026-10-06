@@ -1,6 +1,6 @@
 <template>
   <div class="password-modal-overlay" @click.self="$emit('close')">
-    <div class="password-modal-content" role="dialog" aria-modal="true" aria-labelledby="drinker-login-modal-title">
+    <div ref="dialogRef" class="password-modal-content" role="dialog" aria-modal="true" aria-labelledby="drinker-login-modal-title">
 
       <div class="password-modal-header">
         <h2 class="password-modal-title" id="drinker-login-modal-title">🥂 {{ locale === 'fr' ? 'Bienvenue !' : 'Welcome!' }}</h2>
@@ -111,9 +111,10 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 import { X } from 'lucide-vue-next'
 import { useDrinker } from '@/composables/useDrinker'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const props = defineProps({
   locale: String,
@@ -121,12 +122,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['drinker-created', 'drinker-selected', 'close'])
+const dialogRef = ref(null)
+useModalAccessibility(dialogRef, () => emit('close'))
 
 const { fetchBarDrinkers } = useDrinker()
-
-function handleKeydown(e) {
-  if (e.key === 'Escape') emit('close')
-}
 
 const mode = ref('select')
 const drinkers = ref([])
@@ -138,13 +137,11 @@ const errorMessage = ref('')
 const isLoading = ref(false)
 
 onMounted(async () => {
-  window.addEventListener('keydown', handleKeydown)
   drinkers.value = await fetchBarDrinkers(props.barId)
   loadingList.value = false
   // Aucun compte dans le bar → on ouvre directement la création
   if (!drinkers.value.length) setMode('create')
 })
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 function setMode(next) {
   mode.value = next

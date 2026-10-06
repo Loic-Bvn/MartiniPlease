@@ -1,0 +1,93 @@
+# 🍸 MartiniPlease — TODO Web
+
+Périmètre : frontend uniquement (Vue 3). Hors scope : scraper, reconnexion drinker par pseudo, fichiers SQL / RLS.
+
+Légende : 🟢 rapide (< 1h) · 🟡 moyen (quelques heures) · 🔴 gros chantier
+
+---
+
+## 1. Ménage rapide
+
+- [x] 🟢 Retirer `VITE_BARTENDER_PASSWORD` de `.github/workflows/deploy.yml` (plus utilisé dans `src`)
+- [x] 🟢 `index.html` : passer `lang="en"` → `lang="fr"`
+- [x] 🟢 `index.html` : ajouter `<meta name="description">` (+ `theme-color`)
+- [x] 🟢 `index.html` : supprimer le `<script src="https://cdn.tailwindcss.com">` placé après `</html>`, puis remplacer les quelques classes utilitaires (`flex`, `flex-col`, `md:flex-row`, `gap-*`, `min-h-screen`, `bg-gray-900`…) par du CSS maison, ou installer Tailwind proprement via le build
+- [x] 🟢 Supprimer le CSS mort : `styles_retro.css`, `styles_craft.css`, `styles_minimal.css`, `styles_color.css` (~3 500 lignes, importés nulle part)
+- [x] 🟢 `AppHeader.vue` : corriger le `alt` du logo (`"/margarita_square.png"` → `"Martini Please"`)
+- [x] 🟢 `CocktailCard.vue` : retirer le `@click` en doublon sur `.recipe-compact` (le parent a déjà `@click="handleOpen"`)
+
+---
+
+## 2. Qualité & CI
+
+- [ ] 🟡 Ajouter Vitest + tests unitaires sur :
+  - [ ] `useCostCalculator`
+  - [ ] `useFilters`
+  - [ ] `useDataValidator`
+  - [ ] `useRouter` (`slugify`, `parseHash`, `buildShareUrl`)
+- [ ] 🟡 Ajouter ESLint + Prettier (config Vue 3)
+- [ ] 🟢 `deploy.yml` : lancer lint + tests avant `npm run build`
+- [ ] 🟢 Remplacer `npm install` par `npm ci` dans le workflow
+
+---
+
+## 3. Performance
+
+- [x] 🟢 Charger Sentry en import dynamique (uniquement si `VITE_SENTRY_DSN` défini) — le chunk principal fait 456 kB (135 kB gzip)
+- [x] 🟡 Réduire `styles.css` (5 000 lignes, ~92 kB de CSS dans le bundle principal) : repérer les règles inutilisées
+- [x] 🟡 Ajouter `loading="lazy"` sur les images restantes (`CocktailDetailModal`, `CocktailFormModal`, `PreparationStatsModal`)
+
+---
+
+## 4. Accessibilité
+
+- [x] 🟡 `CocktailCard.vue` : rendre la carte utilisable au clavier (`role="button"`, `tabindex="0"`, `@keydown.enter` / `@keydown.space`)
+- [x] 🟡 Créer un composable `useModal` (ou migrer vers `<dialog>` natif) : Échap, focus trap, verrouillage du scroll, restauration du focus
+  - [x] Migrer les 10 modales qui dupliquent leur `keydown`
+  - [x] Ajouter la gestion d'Échap à `InventoryManager` et `AddIngredientModal`
+  - [x] Ajouter le focus trap aux modales qui n'en ont pas (seules 3 en ont un)
+- [x] 🟢 Vérifier les contrastes en thème clair/sombre
+
+---
+
+## 5. Architecture
+
+- [ ] 🔴 `CocktailMenuApp.vue` (850 lignes) : supprimer le prop drilling vers `BarMainView` (~60 props)
+  - [ ] Faire appeler les composables singletons (`useFilters`, `useInventory`, `useDrinker`…) directement dans `BarMainView`
+  - [ ] Ou passer par `provide` / `inject` pour le reste
+- [ ] 🟡 Découper `CocktailDetailModal.vue` (1 236 lignes) : un sous-composant par onglet
+- [ ] 🟡 Découper `PreparationStatsModal.vue` (908 lignes) : filtres, graphiques, liste
+- [ ] 🟡 Découper `CocktailFormModal.vue` (745 lignes)
+- [ ] 🔴 i18n : remplacer les `locale === 'fr' ? … : …` inline par un dictionnaire (ou `vue-i18n`)
+
+---
+
+## 6. Nouvelles fonctionnalités
+
+### Commandes
+- [ ] 🟡 Suivi de commande côté drinker en temps réel (« en attente → prête ») + toast / vibration à la validation
+- [ ] 🟡 Option « Valider + compter » dans `OrdersPanel` : valider une commande enregistre aussi une préparation (activable via feature toggle)
+- [ ] 🟢 Note libre sur une commande (« sans glace », « moins sucré »)
+
+### Partage & carte
+- [ ] 🟢 QR code vers le bar / la carte, à côté des liens de partage existants
+- [ ] 🟡 Version imprimable / PDF de la carte (feuille de style `@media print`)
+
+### Statistiques
+- [ ] 🟡 Export CSV des stats de préparation
+- [ ] 🟡 Comparaison entre deux périodes
+- [ ] 🟡 Répartition par heure / jour de la semaine
+
+### Inventaire
+- [ ] 🟡 Alerte « ingrédient bientôt épuisé »
+- [ ] 🟡 Liste de courses : « acheter X débloque N cocktails »
+
+### PWA
+- [ ] 🟡 Ajouter un `manifest.webmanifest` + icônes (app installable)
+- [ ] 🔴 Service worker : cache hors-ligne de la carte consultée
+
+---
+
+## 7. À réfléchir (basse priorité)
+
+- [ ] 🔴 Passer du routage par hash à l'history mode (aperçus Open Graph au partage, + `404.html` pour GitHub Pages) — seulement si le partage social devient important

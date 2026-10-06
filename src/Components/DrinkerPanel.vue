@@ -7,7 +7,7 @@
     </button>
     <div v-if="show" class="filters-dropdown-content">
 
-      <div class="auth-tabs" style="margin-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary);">
+      <div class="auth-tabs">
         <button :class="['auth-tab', { active: tab === 'favorites' }]" @click="tab = 'favorites'">
           ❤️ {{ locale === 'fr' ? 'Favoris' : 'Favorites' }}<span class="count-badge">{{ favorites.size }}</span>
         </button>

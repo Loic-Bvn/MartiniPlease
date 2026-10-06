@@ -7,7 +7,7 @@
         <h2 class="section-title">{{ t.stock }}<span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
         <span></span>
       </button>
-      <InventoryManager v-if="showInventory" />
+      <InventoryManager v-if="showInventory" @close="showInventory = false" />
     </div>
 
     <div v-if="isLoggedIn" class="section-card">
@@ -59,7 +59,7 @@
 
     <div class="side-by-side">
 
-      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+      <div class="main-stack-column">
         <FilterPanel
           :locale="locale"
           :t="t"
@@ -112,7 +112,7 @@
         />
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+      <div class="main-stack-column">
         <CardPanel
           :is-logged-in="isLoggedIn"
           :menu-cards="menuCards"

@@ -14,7 +14,7 @@
 <template>
   <transition name="fade">
     <div v-if="open" class="modal-overlay" @click.self="$emit('close')">
-      <div class="modal-container modal-container--batch" role="dialog" aria-modal="true" aria-labelledby="batch-modal-title">
+      <div ref="dialogRef" class="modal-container modal-container--batch" role="dialog" aria-modal="true" aria-labelledby="batch-modal-title">
         <div class="modal-header">
           <h2 class="modal-title" id="batch-modal-title">🧪 Batch — {{ cocktail?.name }}</h2>
           <button @click="$emit('close')" class="btn-icon btn-icon--close" aria-label="Fermer">
@@ -107,9 +107,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { X } from 'lucide-vue-next'
 import { calculateBatch } from '@/composables/useCostCalculator'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const props = defineProps({
   open:        { type: Boolean, default: false },
@@ -118,12 +119,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
-
-function handleKeydown(e) {
-  if (e.key === 'Escape' && props.open) emit('close')
-}
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+const dialogRef = ref(null)
+useModalAccessibility(dialogRef, () => emit('close'), () => props.open)
 
 const servings        = ref(20)
 const dilutionPercent = ref(20)

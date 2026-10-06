@@ -1,6 +1,6 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-container modal-container--menucard" role="dialog" aria-modal="true" aria-labelledby="menucard-modal-title">
+    <div ref="dialogRef" class="modal-container modal-container--menucard" role="dialog" aria-modal="true" aria-labelledby="menucard-modal-title">
 
       <!-- Header -->
       <div class="modal-header">
@@ -112,9 +112,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { X, Search, Check } from 'lucide-vue-next'
 import { validateMenuCard } from '@/composables/useDataValidator'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const props = defineProps({
   card:      { type: Object, default: null },
@@ -123,12 +124,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['save', 'close'])
-
-function handleKeydown(e) {
-  if (e.key === 'Escape') emit('close')
-}
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+const dialogRef = ref(null)
+useModalAccessibility(dialogRef, () => emit('close'))
 
 const t = computed(() => ({
   editTitle:           props.locale === 'fr' ? '✏️ Modifier la carte'         : '✏️ Edit card',

@@ -1,7 +1,7 @@
   allSpirits: fr.value ? 'Toutes les familles' : 'All families',
 <template>
   <div class="modal-overlay modal-overlay--prep" @click.self="$emit('close')">
-    <div class="modal-container modal-container--prep" role="dialog" aria-modal="true" aria-labelledby="prep-modal-title">
+    <div ref="dialogRef" class="modal-container modal-container--prep" role="dialog" aria-modal="true" aria-labelledby="prep-modal-title">
       <div class="modal-header">
         <h2 class="modal-title" id="prep-modal-title">🍸 {{ t.title }}</h2>
         <div class="prep-header-actions">
@@ -270,6 +270,7 @@ import { usePreparations } from '@/composables/usePreparations'
 import { getIngredientLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { getBaseSpiritGroups } from '@/lib/cocktail-constants'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const props = defineProps({
   barId:     { type: String, required: true },
@@ -278,13 +279,10 @@ const props = defineProps({
   cocktails: { type: Array,  default: () => [] },   // cocktails du bar (filtre par recette)
 })
 const emit = defineEmits(['close', 'set-locale'])
+const dialogRef = ref(null)
+useModalAccessibility(dialogRef, () => emit('close'))
 
 const { getStats, getRecent, deleteEntry } = usePreparations()
-
-// ── Fermeture clavier ────────────────────────────────────────────────────────
-function handleKeydown(e) { if (e.key === 'Escape') emit('close') }
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 // ── Libellés ─────────────────────────────────────────────────────────────────
 const fr = computed(() => props.locale === 'fr')

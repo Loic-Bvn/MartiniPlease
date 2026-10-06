@@ -1,5 +1,5 @@
 <template>
-  <div class="inventory-manager">
+  <div class="inventory-manager" @keydown.esc="handleInventoryEscape">
 
     <!-- Contrôles globaux -->
     <div class="inventory-header">
@@ -292,6 +292,7 @@ import { useInventory } from '@/composables/useInventory'
 import { useToast } from '@/composables/useToast'
 import ConfirmModal      from '@/Components/Modals/ConfirmModal.vue'
 import AddIngredientModal from '@/Components/Modals/AddIngredientModal.vue'
+const emit = defineEmits(['close'])
 const {
   ingredients,
   loading,
@@ -308,6 +309,10 @@ const {
   deleteIngredient,
 } = useInventory()
 const { showToast } = useToast()
+
+function handleInventoryEscape(event) {
+  if (!event.target.closest('[role="dialog"]')) emit('close')
+}
 
 const searchQuery    = ref('')
 const addModalTarget = ref(null)

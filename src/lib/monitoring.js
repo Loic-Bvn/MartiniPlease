@@ -11,13 +11,12 @@
 // Les erreurs Vue non catchées (crash de composant, etc.) sont couvertes
 // nativement par l'intégration @sentry/vue passée à Sentry.init({ app }).
 
-import * as Sentry from '@sentry/vue'
-
 const DSN = import.meta.env.VITE_SENTRY_DSN
 
-export function initMonitoring(app) {
+export async function initMonitoring(app) {
   if (!DSN) return // pas de DSN en dev / si non configuré → no-op
 
+  const Sentry = await import('@sentry/vue')
   Sentry.init({
     app,
     dsn: DSN,
@@ -25,10 +24,10 @@ export function initMonitoring(app) {
     tracesSampleRate: 0, // pas de perf tracing pour l'instant, juste les erreurs
   })
 
-  bridgeConsoleErrors()
+  bridgeConsoleErrors(Sentry.captureException)
 }
 
-function bridgeConsoleErrors() {
+function bridgeConsoleErrors(captureException) {
   const originalConsoleError = console.error
 
   console.error = (...args) => {
@@ -38,12 +37,12 @@ function bridgeConsoleErrors() {
     const label = args.find(a => typeof a === 'string') ?? 'console.error'
 
     if (errorArg) {
-      Sentry.captureException(errorArg, { extra: { label } })
+      captureException(errorArg, { extra: { label } })
     } else {
       // ex. console.error('❌ removeFavorite:', error) où `error` est un objet
       // Supabase (PostgrestError) et pas une instance d'Error JS
       const errorLike = args.find(a => a && typeof a === 'object' && 'message' in a)
-      Sentry.captureException(
+      captureException(
         new Error(errorLike?.message ?? args.map(String).join(' ')),
         { extra: { label, details: errorLike } }
       )
