@@ -61,6 +61,8 @@
           @open-auth="showAuthModal = true"
           @join-public-bar="joinPublicBar"
           @join-by-code="joinByCode"
+          @open-porte-bleue="openPorteBleue"
+          :showPorteBleue="!!porteBleueBar"
           @update:inviteCodeInput="inviteCodeInput = $event"
         />
 
@@ -296,6 +298,7 @@
 <script setup>
 import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useBrand, PORTE_BLEUE_THEME } from '@/composables/useBrand'
 
 // ── Composables ───────────────────────────────────────────────────────────────
 import { useAuth }               from '@/composables/useAuth'
@@ -396,6 +399,18 @@ const sharedFavoriteIds = ref([])
 const cocktailOfMomentId = computed(() => features.value.cocktailOfMomentId || guestBar.value?.features?.cocktailOfMomentId || null)
 const cocktailOfMoment = computed(() => cocktails.value.find(cocktail => cocktail.id === cocktailOfMomentId.value) || null)
 const featuredMenuCardId = computed(() => features.value.featuredMenuCardId || guestBar.value?.features?.featuredMenuCardId || null)
+
+// ── Thème par bar ─────────────────────────────────────────────────────────────
+// Le skin (ex: Porte Bleue) suit le bar dans lequel on se trouve : défini par
+// bars.features.theme, appliqué à l'entrée, retiré à la sortie.
+const { setBrandTheme } = useBrand()
+const activeBarTheme = computed(() => {
+  if (!activeBarId.value) return null
+  const f = currentBarId.value ? features.value : guestBar.value?.features
+  return f?.theme ?? null
+})
+watch(activeBarTheme, (theme) => setBrandTheme(theme), { immediate: true })
+
 const sharedFavoriteCocktails = computed(() => cocktails.value.filter(cocktail => sharedFavoriteIds.value.includes(cocktail.id)))
 
 // ── Gestion des bars ──────────────────────────────────────────────────────────
@@ -481,6 +496,20 @@ async function fetchPublicBars() {
   publicBarsLoading.value = false
 }
 
+// ── Bar Porte Bleue (identifié par features.theme, sans configuration) ────────
+const porteBleueBar = ref(null)
+
+async function fetchPorteBleueBar() {
+  const { data, error } = await supabase
+    .from('bars')
+    .select('id, name, invite_code, features')
+    .eq('features->>theme', PORTE_BLEUE_THEME)
+    .limit(1)
+    .maybeSingle()
+  // Pas de bar visible (inexistant, ou privé et masqué par la RLS) → pas de porte.
+  porteBleueBar.value = error ? null : data
+}
+
 // ── Accès invité via code ─────────────────────────────────────────────────────
 const inviteCodeInput = ref('')
 const codeError       = ref('')
@@ -515,6 +544,42 @@ async function joinByCode() {
   ])
 
   setHash(code)
+}
+
+// ── Porte Bleue : accès direct depuis le header ──────────────────────────────
+async function openPorteBleue() {
+  const pb = porteBleueBar.value
+  if (!pb) return
+  const code = pb.invite_code
+  const fr = locale.value === 'fr'
+
+  // Déjà derrière la porte → on revient simplement sur la carte.
+  if (inviteCode.value === code || guestBar.value?.invite_code === code) {
+    showBarsSelection.value = false
+    return
+  }
+
+  // Propriétaire du bar → il y entre en bartender.
+  const own = (bars.value || []).find(b => b.id === pb.id)
+  if (own) {
+    await handleSelectBar(own)
+    return
+  }
+
+  // Bartender connecté sur un autre bar : l'état invité est masqué par sa
+  // session (activeBarId = currentBarId en priorité) → on l'explique.
+  if (isLoggedIn.value) {
+    showToast(fr
+      ? '🚪 Déconnecte-toi de ton bar pour passer la porte bleue.'
+      : '🚪 Sign out of your bar to go through the blue door.')
+    return
+  }
+
+  // Visiteur → entrée en invité par le code du bar.
+  showBarsSelection.value = false
+  inviteCodeInput.value = code
+  await joinByCode()
+  if (codeError.value) showToast(codeError.value)
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -836,7 +901,7 @@ watch(currentBarId, async (newBarId) => {
 //     donc pas besoin de la rappeler ici.
 
 onMounted(async () => {
-  await fetchPublicBars()
+  await Promise.all([fetchPublicBars(), fetchPorteBleueBar()])
   // On charge d'abord les données du bar (si bartender déjà connecté) pour
   // que handleHashRoute puisse résoudre les slugs carte/cocktail du hash.
   // (Le flux invité passe par joinByCode, qui charge lui-même les données.)

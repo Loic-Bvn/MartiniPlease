@@ -1,0 +1,603 @@
+/* =====================================================================
+   PORTE BLEUE COCKTAIL CLUB
+   ---------------------------------------------------------------------
+   1. La porte (accueil)         — visible partout, palette propre
+   2. Le thème speakeasy         — actif quand <html data-brand="porte-bleue">
+                                   (bar dont features.theme = 'porte-bleue',
+                                    cf. composables/useBrand.js)
+
+   Direction : un salon bleu laqué, éclairé à la lampe — le bleu porte porte
+   toute la structure, le laiton ne sert qu'aux filets et aux ornements.
+     • Clair  = « porcelaine & laque » : fonds bleu pâle, encre bleu nuit, accent bleu porte
+     • Sombre = « nuit bleue » : fonds bleu marine, accent bleu ciel, filets laiton
+   Le clair/sombre reste piloté par useTheme (classe .dark sur <html>).
+   Le thème surcharge d'abord les variables de styles.css, puis restyle
+   la structure (typo, cadres, boutons, modales, mouvement).
+   ===================================================================== */
+
+
+/* =====================================================================
+   1. LA PORTE
+   ===================================================================== */
+.pb-door {
+  display: block;
+  height: auto;
+  overflow: visible;
+  -webkit-tap-highlight-color: transparent;
+
+  --pbd-lac-1: #3d78cc;  --pbd-lac-2: #1f4c8f;  --pbd-lac-3: #123468;
+  --pbd-brass-1: #f7de9f; --pbd-brass-2: #c9983f; --pbd-brass-3: #7d561b;
+  --pbd-stone-1: #ddd6c3; --pbd-stone-2: #a9a08a;
+  --pbd-glass-1: #4b3a22; --pbd-glass-2: #20170d;
+
+  filter: drop-shadow(0 14px 22px rgba(19, 41, 77, 0.28));
+  transition: transform 0.9s cubic-bezier(0.22, 0.8, 0.25, 1), filter 0.5s ease;
+}
+.dark .pb-door {
+  --pbd-lac-1: #4f8ee0;  --pbd-lac-2: #2f62b0;  --pbd-lac-3: #1b4282;
+  --pbd-stone-1: #6d727f; --pbd-stone-2: #454955;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 22px rgba(60, 110, 200, 0.18));
+}
+
+.pb-s-lac-1 { stop-color: var(--pbd-lac-1); }
+.pb-s-lac-2 { stop-color: var(--pbd-lac-2); }
+.pb-s-lac-3 { stop-color: var(--pbd-lac-3); }
+.pb-s-brass-1 { stop-color: var(--pbd-brass-1); }
+.pb-s-brass-2 { stop-color: var(--pbd-brass-2); }
+.pb-s-brass-3 { stop-color: var(--pbd-brass-3); }
+.pb-s-stone-1 { stop-color: var(--pbd-stone-1); }
+.pb-s-stone-2 { stop-color: var(--pbd-stone-2); }
+.pb-s-glass-1 { stop-color: var(--pbd-glass-1); }
+.pb-s-glass-2 { stop-color: var(--pbd-glass-2); }
+
+/* ── décor statique ── */
+.pb-ground-shadow { fill: rgba(0, 0, 0, 0.3); }
+.dark .pb-ground-shadow { fill: rgba(0, 0, 0, 0.55); }
+.pb-step-line { fill: rgba(255, 255, 255, 0.4); }
+.dark .pb-step-line { fill: rgba(255, 255, 255, 0.12); }
+.pb-frame-line, .pb-keystone-line { fill: none; stroke: rgba(0, 0, 0, 0.28); stroke-width: 1; }
+.pb-bottles rect { fill: #25120a; opacity: 0.7; }
+
+.pb-rail { fill: rgba(0, 0, 0, 0.16); }
+.pb-panel { fill: rgba(0, 0, 0, 0.17); }
+.pb-panel-inner { fill: rgba(255, 255, 255, 0.045); stroke: rgba(0, 0, 0, 0.2); stroke-width: 0.5; }
+.pb-bevel-hi { fill: none; stroke: rgba(255, 255, 255, 0.3); stroke-width: 0.9; stroke-linejoin: round; }
+.pb-bevel-lo { fill: none; stroke: rgba(0, 0, 0, 0.42); stroke-width: 0.9; stroke-linejoin: round; }
+
+.pb-fan-frame { fill: none; stroke-width: 1.8; }
+.pb-fan-bars path { fill: none; stroke: var(--pbd-brass-2); stroke-width: 0.9; stroke-linecap: round; }
+.pb-fan-glow { fill: #ffc861; opacity: 0.3; transition: opacity 0.6s ease; }
+
+.pb-plaque text { fill: var(--pbd-brass-3); font: 700 5.4px/1 'Iowan Old Style', Palatino, Georgia, serif; letter-spacing: 0.3px; }
+.pb-kick-line { fill: rgba(255, 255, 255, 0.45); }
+.pb-screw { fill: rgba(0, 0, 0, 0.45); }
+.pb-keyhole { fill: #2a1a08; }
+.pb-handle-shine { fill: #fff; opacity: 0.3; transition: opacity 0.4s ease; }
+
+/* judas */
+.pb-peep-light { fill: #ffd98a; opacity: 0.18; transition: opacity 0.4s ease; }
+.pb-peep-grille path { fill: none; stroke: var(--pbd-brass-3); stroke-width: 0.5; opacity: 0.85; }
+.pb-peep-shutter {
+  fill: var(--pbd-brass-3);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.4s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+/* appliques */
+.pb-flame { fill: #fff1c2; transform-box: fill-box; transform-origin: 50% 100%; animation: pb-flame 1.1s ease-in-out infinite alternate; }
+.pb-flame-glow {
+  opacity: 0.6;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 0.5s ease, transform 0.6s ease;
+  animation: pb-flicker 3.4s ease-in-out infinite;
+}
+
+/* intérieur, lueur au sol */
+.pb-interior { filter: brightness(0.62); transition: filter 0.6s ease; }
+.pb-spill {
+  opacity: 0.3;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.22, 0.8, 0.25, 1);
+  animation: pb-breathe 5.5s ease-in-out infinite;
+}
+
+/* vantail + reflet */
+.pb-door-leaf {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transition: transform 0.75s cubic-bezier(0.2, 0.75, 0.25, 1);
+  will-change: transform;
+}
+.pb-sheen {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pb-sheen 8s ease-in-out 1.6s infinite;
+}
+
+/* ── interaction ── */
+.pb-door--interactive { cursor: pointer; outline: none; }
+.pb-door--interactive:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 8px;
+  border-radius: 8px;
+}
+
+/* survol / focus clavier : la porte s'entrouvre */
+@media (hover: hover) {
+  .pb-door--interactive:hover { transform: translateY(-3px); }
+  .pb-door--interactive:hover .pb-door-leaf { transform: perspective(900px) rotateY(-17deg); }
+  .pb-door--interactive:hover .pb-interior { filter: brightness(1); }
+  .pb-door--interactive:hover .pb-spill { opacity: 0.85; transform: scale(1.18, 1.35); }
+  .pb-door--interactive:hover .pb-fan-glow { opacity: 0.62; }
+  .pb-door--interactive:hover .pb-flame-glow { opacity: 0.95; transform: scale(1.3); }
+  .pb-door--interactive:hover .pb-peep-shutter { transform: scale(0.08); }
+  .pb-door--interactive:hover .pb-peep-light { opacity: 1; }
+  .pb-door--interactive:hover .pb-handle-shine { opacity: 0.85; }
+}
+.pb-door--interactive:focus-visible .pb-door-leaf { transform: perspective(900px) rotateY(-17deg); }
+.pb-door--interactive:focus-visible .pb-interior { filter: brightness(1); }
+.pb-door--interactive:focus-visible .pb-spill { opacity: 0.85; transform: scale(1.18, 1.35); }
+.pb-door--interactive:focus-visible .pb-fan-glow { opacity: 0.62; }
+.pb-door--interactive:focus-visible .pb-peep-shutter { transform: scale(0.08); }
+.pb-door--interactive:focus-visible .pb-peep-light { opacity: 1; }
+
+/* clic : le vantail pivote, le salon s'illumine, on avance d'un pas */
+.pb-door--opening {
+  transform: scale(1.06);
+  filter: drop-shadow(0 18px 36px rgba(255, 170, 70, 0.35));
+  pointer-events: none;
+}
+.pb-door--opening .pb-door-leaf { animation: pb-open 0.9s cubic-bezier(0.22, 0.8, 0.25, 1) forwards; }
+.pb-door--opening .pb-interior { filter: brightness(1.18) saturate(1.1); }
+.pb-door--opening .pb-spill { opacity: 1; transform: scale(1.7, 2.1); }
+.pb-door--opening .pb-fan-glow { opacity: 0.95; }
+.pb-door--opening .pb-flame-glow { opacity: 1; transform: scale(1.5); }
+.pb-door--opening .pb-peep-shutter { transform: scale(0.08); }
+.pb-door--opening .pb-peep-light { opacity: 1; }
+
+@keyframes pb-open {
+  /* pas de 0% : part de l'état courant (fermée, ou entrouverte si survolée) */
+  18%  { transform: perspective(900px) rotateY(-9deg); }
+  100% { transform: perspective(900px) rotateY(-86deg); }
+}
+@keyframes pb-sheen {
+  0%   { transform: translateX(0) skewX(-18deg); }
+  34%  { transform: translateX(215px) skewX(-18deg); }
+  100% { transform: translateX(215px) skewX(-18deg); }
+}
+@keyframes pb-breathe { 0%, 100% { scale: 1; } 50% { scale: 1.07; } }
+@keyframes pb-flicker {
+  0%, 100% { scale: 1; }
+  22% { scale: 1.08; }
+  48% { scale: 0.95; }
+  71% { scale: 1.05; }
+}
+@keyframes pb-flame { from { scale: 1 1; } to { scale: 0.88 1.14; } }
+
+/* ── carte d'accueil : la porte à droite des accès Bartender / Drinker ── */
+.welcome-screen--porte-bleue { max-width: 1000px; }
+.welcome-screen--porte-bleue .welcome-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  align-items: stretch;
+}
+.welcome-main-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.welcome-door-entry-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  justify-self: center;
+  gap: 18px;
+  min-width: 0;
+  max-width: 100%;
+}
+.welcome-door-entry { max-width: 100%; }
+.welcome-door-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  text-align: center;
+}
+.welcome-door-caption-name {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.welcome-door-caption-hint {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-muted);
+  animation: pb-hint 3.6s ease-in-out infinite;
+}
+.welcome-door-caption-hint::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 1px;
+  margin: 0 auto 8px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.welcome-door-entry-wrap:hover .welcome-door-caption-hint { animation: none; opacity: 1; }
+@keyframes pb-hint { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+@media (max-width: 700px) {
+  .welcome-screen--porte-bleue .welcome-cards { grid-template-columns: 1fr; }
+  .welcome-door-entry { width: min(260px, 100%) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-door, .pb-door *,
+  .welcome-door-caption-hint { animation: none !important; transition: none !important; }
+}
+
+
+/* =====================================================================
+   2. LE THÈME SPEAKEASY — <html data-brand="porte-bleue">
+   ===================================================================== */
+
+/* ── 2.1 Variables : clair « porcelaine & laque » ─────────────────── */
+html[data-brand="porte-bleue"] {
+  --bg:          #e6eef9;
+  --bg-card:     #f6f9fd;
+  --bg-raised:   #d9e4f4;
+  --bg-input:    #edf3fb;
+
+  /* accent principal = bleu porte (nom de variable historique conservé) */
+  --gold:        #1f4c8f;
+  --gold-dim:    #16355f;
+  --gold-bright: #2f68b8;
+  --amber:       #a9772a;
+
+  --text:        #0e1a30;
+  --text-muted:  #3d4e6c;
+  --text-dim:    #667794;
+
+  --border:      #c5d4ea;
+  --border-mid:  #9db4d8;
+
+  --success:     #2f7a58;
+  --danger:      #8a2f35;
+  --danger-text: #a33f46;
+
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+
+  --shadow-sm: 0 1px 2px rgba(16, 42, 82, 0.10);
+  --shadow-md: 0 8px 24px rgba(16, 42, 82, 0.14);
+  --shadow-lg: 0 28px 70px rgba(16, 42, 82, 0.34);
+
+  /* palette de marque : bleu = structure, laiton = filets & ornements */
+  --pb-blue:       #1f4c8f;
+  --pb-blue-deep:  #102a52;
+  --pb-brass:      #a9772a;
+  --pb-hair:       color-mix(in srgb, var(--pb-brass) 48%, transparent);
+  --pb-hair-soft:  color-mix(in srgb, var(--pb-brass) 24%, transparent);
+  --pb-on-accent:  #f6efd9;
+  --pb-btn-fg:     #f8f0d8;
+  --pb-btn-bg:       linear-gradient(180deg, #3274c9 0%, #1f4c8f 100%);
+  --pb-btn-bg-hover: linear-gradient(180deg, #4283d8 0%, #285ba5 100%);
+
+  --pb-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', 'Hoefler Text', Georgia, 'Times New Roman', serif;
+
+  --pb-lamp:  radial-gradient(ellipse 90% 55% at 50% -12%, rgba(255, 255, 255, 0.8), transparent 70%);
+  --pb-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .1  0 0 0 0 .2  0 0 0 0 .42  0 0 0 .1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ── Variables : sombre « nuit bleue » ─ */
+html.dark[data-brand="porte-bleue"] {
+  --bg:          #08172f;
+  --bg-card:     #0e2346;
+  --bg-raised:   #163061;
+  --bg-input:    #102a54;
+
+  --gold:        #7fb0f2;
+  --gold-dim:    #4f82c9;
+  --gold-bright: #a9cbf7;
+  --amber:       #d9b25f;
+
+  --text:        #eaf0fb;
+  --text-muted:  #a9bbdb;
+  --text-dim:    #7f95ba;
+
+  --border:      #1c3a6b;
+  --border-mid:  #2f5192;
+
+  --success:     #63ab77;
+  --danger:      #c06a6a;
+  --danger-text: #f39c9c;
+
+  --shadow-sm: 0 1px 2px rgba(0, 6, 20, 0.55);
+  --shadow-md: 0 10px 28px rgba(0, 6, 20, 0.55);
+  --shadow-lg: 0 30px 80px rgba(0, 6, 20, 0.8);
+
+  --pb-blue:       #2f6bc4;
+  --pb-blue-deep:  #06122a;
+  --pb-brass:      #d9b25f;
+  --pb-on-accent:  #06122a;
+  --pb-btn-fg:     #f8f0d8;
+  --pb-btn-bg:       linear-gradient(180deg, #3d7bd6 0%, #24509b 100%);
+  --pb-btn-bg-hover: linear-gradient(180deg, #5190e6 0%, #2d60b3 100%);
+
+  --pb-lamp:  radial-gradient(ellipse 85% 50% at 50% -10%, rgba(80, 140, 235, 0.32), transparent 70%);
+  --pb-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .75  0 0 0 0 .86  0 0 0 0 1  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+html[data-brand="porte-bleue"] .bartender-mode      { --bg: #dae6f6; }
+html.dark[data-brand="porte-bleue"] .bartender-mode { --bg: #040d1d; }
+
+
+/* ── 2.2 Fond : lampe + grain de papier ───────────────────────────── */
+html[data-brand="porte-bleue"] body { background-color: var(--bg); }
+html[data-brand="porte-bleue"] .menu-app {
+  background-color: var(--bg);
+  background-image: var(--pb-lamp), var(--pb-noise);
+  background-attachment: fixed, scroll;
+  background-repeat: no-repeat, repeat;
+}
+
+html[data-brand="porte-bleue"] { scrollbar-width: thin; scrollbar-color: var(--border-mid) transparent; }
+html[data-brand="porte-bleue"] ::selection { background: color-mix(in srgb, var(--gold) 32%, transparent); color: var(--text); }
+html[data-brand="porte-bleue"] :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+
+/* ── 2.3 Typographie : serif cérémonielle pour les titres ─────────── */
+html[data-brand="porte-bleue"] :is(
+  .header-title, .welcome-title, .welcome-card-title,
+  .modal-title, .password-modal-title, .add-ing-title,
+  .cocktail-title, .cv-card-name, .cv-title, .cv-group-title,
+  .section-title, .category-title, .menu-card-name,
+  .cocktail-moment-name, .recommendations-title, .similar-cocktails-title,
+  .featured-menu-heading, .loyalty-panel-title, .surprise-title,
+  .catalog-item-name, .order-card-title, .burger-title
+) {
+  font-family: var(--pb-serif);
+  font-weight: 600;
+}
+html[data-brand="porte-bleue"] :is(.cocktail-subtitle, .welcome-subtitle, .cocktail-moment-kicker, .catalog-intro, .form-hint) {
+  font-family: var(--pb-serif);
+  font-style: italic;
+}
+html[data-brand="porte-bleue"] ::placeholder { font-family: var(--pb-serif); font-style: italic; opacity: 0.75; }
+
+html[data-brand="porte-bleue"] .cocktail-title { letter-spacing: 1.3px; font-size: 0.88rem; }
+html[data-brand="porte-bleue"] .modal-title    { font-size: 0.95rem; letter-spacing: 3px; }
+
+
+/* ── 2.4 Header : seuil de laque bleue, filet laiton ──────────────── */
+html[data-brand="porte-bleue"] .header {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--pb-blue) 32%, var(--bg-card)) 0%,
+    color-mix(in srgb, var(--pb-blue) 12%, var(--bg-card)) 100%);
+  border-top: 4px solid var(--pb-blue);
+  border-bottom: 1px solid var(--pb-hair-soft);
+  box-shadow: var(--shadow-md);
+}
+html[data-brand="porte-bleue"] .header::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--pb-brass) 50%, transparent);
+  opacity: 0.7;
+}
+html[data-brand="porte-bleue"] .header-title { letter-spacing: 4px; font-size: 1.02rem; }
+@media (max-width: 640px) {
+  html[data-brand="porte-bleue"] .header-title { letter-spacing: 2.4px; font-size: 0.85rem; }
+}
+
+
+/* ── 2.5 Boutons : laiton gravé / contour fin ─────────────────────── */
+html[data-brand="porte-bleue"] :is(
+  .btn-new-cocktail, .password-btn-submit, .btn-modal-primary, .btn-primary,
+  .btn-create-bar, .btn-select-bar, .btn-select-bar-large, .btn-add-confirm,
+  .add-ing-btn-submit, .bar-edit-actions .btn-confirm, .empty-state-btn-primary
+) {
+  background: var(--pb-btn-bg);
+  color: var(--pb-btn-fg);
+  border: 1px solid color-mix(in srgb, var(--pb-brass) 70%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 2px 8px rgba(0, 20, 60, 0.28);
+  transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+html[data-brand="porte-bleue"] :is(
+  .btn-new-cocktail, .password-btn-submit, .btn-modal-primary, .btn-primary,
+  .btn-create-bar, .btn-select-bar, .btn-select-bar-large, .btn-add-confirm,
+  .add-ing-btn-submit, .bar-edit-actions .btn-confirm, .empty-state-btn-primary
+):hover:not(:disabled) {
+  background: var(--pb-btn-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 8px 22px color-mix(in srgb, var(--pb-brass) 38%, transparent);
+}
+html[data-brand="porte-bleue"] :is(.btn-modal-secondary, .btn-mode-inactive, .btn-cancel, .password-btn-cancel, .add-ing-btn-cancel) {
+  background: transparent;
+  border: 1px solid var(--pb-hair);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  font-size: 0.72rem;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+}
+html[data-brand="porte-bleue"] :is(.btn-modal-secondary, .btn-mode-inactive, .btn-cancel, .password-btn-cancel, .add-ing-btn-cancel):hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 8%, transparent);
+}
+html[data-brand="porte-bleue"] .btn-mode-active { border-color: var(--gold); box-shadow: inset 0 -2px 0 var(--pb-brass); }
+html[data-brand="porte-bleue"] .unit-btn.active,
+html[data-brand="porte-bleue"] .row-check.checked,
+html[data-brand="porte-bleue"] .catalog-tab-badge { color: var(--pb-on-accent); }
+
+html[data-brand="porte-bleue"] .toggle-switch { background: var(--border-mid); }
+html[data-brand="porte-bleue"] .toggle-switch.on { background: var(--gold); }
+html[data-brand="porte-bleue"] .burger-item--primary       { color: var(--gold); }
+html[data-brand="porte-bleue"] .burger-item--primary:hover { background: color-mix(in srgb, var(--gold) 10%, transparent); }
+
+
+/* ── 2.6 Champs : papier, fil de laiton au focus ──────────────────── */
+html[data-brand="porte-bleue"] :is(
+  .search-input, .form-input, .field-input, .form-textarea, .password-form-input,
+  .new-bar-input, .edit-field-input, .add-ing-input, .sort-select, .catalog-filter-select,
+  .pricing-mode-select
+) {
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+html[data-brand="porte-bleue"] :is(
+  .search-input, .form-input, .field-input, .form-textarea, .password-form-input,
+  .new-bar-input, .edit-field-input, .add-ing-input
+):focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 18%, transparent);
+  outline: none;
+}
+
+
+/* ── 2.7 Filtres : étiquettes de carte des vins ───────────────────── */
+html[data-brand="porte-bleue"] .chip {
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  font-size: clamp(0.62rem, 1.2vw, 0.7rem);
+  border-color: var(--border-mid);
+}
+html[data-brand="porte-bleue"] .chip:hover { background: color-mix(in srgb, var(--gold) 8%, transparent); }
+html[data-brand="porte-bleue"] .chip.active {
+  background: color-mix(in srgb, var(--gold) 16%, transparent);
+  border-color: var(--gold);
+  box-shadow: inset 0 -2px 0 var(--pb-brass);
+}
+html[data-brand="porte-bleue"] .filter-tag,
+html[data-brand="porte-bleue"] .count-badge { border-radius: var(--radius-sm); }
+html[data-brand="porte-bleue"] .filter-label,
+html[data-brand="porte-bleue"] .cocktails-header { letter-spacing: 3px; }
+html[data-brand="porte-bleue"] .cocktails-header {
+  display: flex; align-items: center; gap: 0.9rem;
+}
+html[data-brand="porte-bleue"] .cocktails-header::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--pb-hair), transparent);
+}
+
+
+/* ── 2.8 Cartes : double filet, comme un menu imprimé ─────────────── */
+html[data-brand="porte-bleue"] .cocktail-card-compact,
+html[data-brand="porte-bleue"] .cv-card {
+  border-color: var(--border-mid);
+  box-shadow: var(--shadow-sm), inset 0 0 0 3px var(--bg-card), inset 0 0 0 4px var(--pb-hair-soft);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.3s ease, box-shadow 0.35s ease;
+}
+html[data-brand="porte-bleue"] .cocktail-card-compact:hover,
+html[data-brand="porte-bleue"] .cv-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--pb-brass);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22), 0 0 0 1px var(--pb-hair),
+              inset 0 0 0 3px var(--bg-card), inset 0 0 0 4px var(--pb-hair);
+}
+html[data-brand="porte-bleue"] .card-image { filter: saturate(0.92) contrast(1.03); transition: transform 0.7s ease, filter 0.4s ease; }
+html[data-brand="porte-bleue"] .cocktail-card-compact:hover .card-image { transform: scale(1.04); filter: saturate(1.05) contrast(1.05); }
+html[data-brand="porte-bleue"] .card-image-wrap { overflow: hidden; }
+
+html[data-brand="porte-bleue"] .cocktail-moment-panel,
+html[data-brand="porte-bleue"] .section-card,
+html[data-brand="porte-bleue"] .active-filters-bar,
+html[data-brand="porte-bleue"] .menu-card-item {
+  border-color: var(--pb-hair-soft);
+}
+html[data-brand="porte-bleue"] .cocktail-moment-panel {
+  background: linear-gradient(105deg, color-mix(in srgb, var(--pb-blue) 14%, var(--bg-raised)), var(--bg-card));
+  box-shadow: inset 3px 0 0 var(--pb-brass);
+}
+
+html[data-brand="porte-bleue"] :is(.burger-divider, .cv-divider) {
+  height: 1px; border: 0;
+  background: linear-gradient(90deg, transparent, var(--pb-hair), transparent);
+}
+
+
+/* ── 2.9 Modales, menus, toasts ───────────────────────────────────── */
+html[data-brand="porte-bleue"] :is(.modal-overlay, .password-modal-overlay, .add-ing-overlay) {
+  background: radial-gradient(ellipse at 50% 28%, rgba(19, 41, 77, 0.55), rgba(3, 6, 12, 0.84));
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+html[data-brand="porte-bleue"] :is(.modal-container, .password-modal-content, .add-ing-content) {
+  border: 1px solid var(--pb-hair);
+  box-shadow: var(--shadow-lg), inset 0 0 0 4px var(--bg-card), inset 0 0 0 5px var(--pb-hair-soft);
+  animation: pb-rise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+html[data-brand="porte-bleue"] .modal-header { border-bottom: 1px solid var(--pb-hair); }
+html[data-brand="porte-bleue"] .modal-footer { border-top: 1px solid var(--pb-hair-soft); }
+
+html[data-brand="porte-bleue"] .burger-dropdown {
+  border: 1px solid var(--pb-hair);
+  box-shadow: var(--shadow-lg);
+  animation: pb-rise 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+html[data-brand="porte-bleue"] .toast {
+  background: var(--pb-blue-deep);
+  color: #f1ead8;
+  font-family: var(--pb-serif);
+  letter-spacing: 0.4px;
+  border: 1px solid var(--pb-hair);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+html[data-brand="porte-bleue"] .footer-martini { border-top: 1px solid var(--pb-hair-soft); }
+html[data-brand="porte-bleue"] .footer-brand { color: var(--gold); font-family: var(--pb-serif); letter-spacing: 1px; }
+
+
+/* ── 2.10 Mouvement : les cartes se posent une à une ──────────────── */
+@keyframes pb-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pb-card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+/* fill-mode "backwards" : l'animation relâche la main à la fin → le :hover reste libre */
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > * {
+  animation: pb-card-in 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(1) { animation-delay: 0ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(2) { animation-delay: 45ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(3) { animation-delay: 90ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(4) { animation-delay: 135ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(5) { animation-delay: 180ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(6) { animation-delay: 225ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(7) { animation-delay: 270ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(8) { animation-delay: 315ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(9) { animation-delay: 360ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(10) { animation-delay: 405ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(11) { animation-delay: 450ms; }
+html[data-brand="porte-bleue"] :is(.cocktails-grid, .cv-grid, .cocktail-list) > :nth-child(12) { animation-delay: 495ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-brand="porte-bleue"] *,
+  html[data-brand="porte-bleue"] *::before,
+  html[data-brand="porte-bleue"] *::after { animation: none !important; transition-duration: 0.01ms !important; }
+}

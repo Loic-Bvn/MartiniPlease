@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import './assets/styles.css'
 import './assets/improvements.css'
+import './assets/styles_porte_bleue.css'
 import App from './App.vue'
 import { useAuth } from '@/composables/useAuth'
 import { initAnalytics } from '@/lib/analytics'
