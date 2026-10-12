@@ -3,11 +3,11 @@
 
     <!-- HEADER TOGGLE -->
     <!-- <button @click="show = !show" class="expand-actions-btn"> -->
-    <div @click="show = !show" class="expand-actions-btn" role="button" tabindex="0" @keydown.enter="show = !show">
+    <div @click="$emit('toggle')" class="expand-actions-btn" role="button" tabindex="0" @keydown.enter="$emit('toggle')">
 
-      <ChevronDown :size="18" :class="{ rotated: show }" />
+      <ChevronDown :size="18" :class="{ rotated: open }" />
       <h2 class="section-title">
-        {{ t.filterTitle }}
+        <span class="tile-ico">{{ splitLabel(t.filterTitle).icon }}</span><span class="tile-lbl">{{ splitLabel(t.filterTitle).text }}</span>
         <span v-if="hasActiveFilters" class="count-badge">
           {{ selectedFamilies.length + selectedSubSpirits.length + selectedProfiles.length + selectedStyles.length }}
         </span>
@@ -20,7 +20,11 @@
     </div>
     
     <!-- CONTENT -->
-    <div v-if="show" class="filters-dropdown-content">
+    <div v-if="open" class="filters-dropdown-content">
+
+      <button v-if="hasActiveFilters" class="clear-all-btn clear-all-btn--inner" @click="$emit('clear-filters')">
+        {{ t.clearAll }}
+      </button>
 
       <!-- FAVORITES & AVAILABILITY & ABV -->
       <div class="filter-group">
@@ -159,11 +163,12 @@
 <script setup>
 import { ref } from 'vue'
 import { ChevronDown, X } from 'lucide-vue-next'
+import { splitLabel } from '@/utils/tileLabel'
 
-const show = ref(false)
 const showProfile = ref(false)
 const showStyle = ref(false)
 defineProps({
+  open: { type: Boolean, default: false },
   locale: String,
   t: Object,
   filterMode: String,
@@ -186,6 +191,7 @@ defineProps({
 })
 
 defineEmits([
+  'toggle',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
   'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
   'set-abv-filter', 'set-season', 'clear-filters',

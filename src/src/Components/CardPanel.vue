@@ -1,0 +1,47 @@
+<template>
+  <div class="section-card">
+    <button @click="show = !show" class="expand-actions-btn">
+      <ChevronDown :size="18" :class="{ rotated: show }" />
+      <h2 class="section-title"><span class="tile-ico">{{ splitLabel(t.cardsTitle).icon }}</span><span class="tile-lbl">{{ splitLabel(t.cardsTitle).text }}</span><span class="count-badge">{{ menuCards.length }}</span></h2>
+      <span></span>
+    </button>
+    <div v-if="show" class="cards-content">
+      <div v-if="menuCards.length === 0" class="cards-empty">{{ t.noCard }}</div>
+      <div v-else class="cards-grid">
+        <div v-for="card in menuCards" :key="card.id" class="menu-card-item" @click="$emit('view-card', card)" style="cursor: pointer;">
+          <div class="menu-card-info">
+            <span class="menu-card-name">{{ card.name }}</span>
+            <span class="menu-card-count">{{ card.cocktail_ids?.length || 0 }} cocktail{{ (card.cocktail_ids?.length || 0) > 1 ? 's' : '' }}</span>
+          </div>
+          <div class="menu-card-actions" @click.stop>
+            <template v-if="isLoggedIn">
+              <button
+                @click="$emit('toggle-card-visibility', card)"
+                class="btn-icon btn-icon--visibility"
+                :title="card.is_visible === false ? (locale === 'fr' ? 'Afficher aux drinkers' : 'Show to drinkers') : (locale === 'fr' ? 'Masquer aux drinkers' : 'Hide from drinkers')"
+              >
+                <EyeOff v-if="card.is_visible === false" :size="16" />
+                <Eye v-else :size="16" />
+              </button>
+              <button @click="$emit('edit-card', card)"    class="btn-icon btn-icon--edit"   ><Pencil :size="16" /></button>
+              <button @click="$emit('delete-card', card.id)" class="btn-icon btn-icon--delete"><Trash2 :size="16" /></button>
+            </template>
+          </div>
+        </div>
+      </div>
+      <button v-if="isLoggedIn" @click="$emit('new-card')" class="btn-new-card">
+        <Plus :size="15" /><span class="btn-label-hide"> {{ t.newCard }}</span>
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { splitLabel } from '@/utils/tileLabel'
+import { ChevronDown, Eye, EyeOff, Pencil, Trash2, Plus } from 'lucide-vue-next'
+
+const show = ref(false)
+defineProps({ isLoggedIn: Boolean, menuCards: Array, locale: String, t: Object })
+defineEmits(['view-card', 'edit-card', 'delete-card', 'new-card', 'toggle-card-visibility'])
+</script>

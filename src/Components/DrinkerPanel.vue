@@ -1,11 +1,11 @@
 <template>
   <div class="section-card">
-    <button @click="show = !show" class="expand-actions-btn">
-      <ChevronDown :size="18" :class="{ rotated: show }" />
-      <h2 class="section-title">👤 {{ drinkerPseudo }}</h2>
+    <button @click="$emit('toggle')" class="expand-actions-btn">
+      <ChevronDown :size="18" :class="{ rotated: open }" />
+      <h2 class="section-title"><span class="tile-ico">👤</span><span class="tile-lbl">{{ drinkerPseudo }}</span></h2>
       <span></span>
     </button>
-    <div v-if="show" class="filters-dropdown-content">
+    <div v-if="open" class="filters-dropdown-content">
 
       <div class="auth-tabs" style="margin-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary);">
         <button :class="['auth-tab', { active: tab === 'favorites' }]" @click="tab = 'favorites'">
@@ -71,19 +71,24 @@
         </div>
       </div>
 
+      <button type="button" class="btn-logout-panel" @click="$emit('sign-out')">
+        <LogOut :size="15" />
+        {{ locale === 'fr' ? 'Se déconnecter' : 'Sign out' }}
+      </button>
+
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { ChevronDown, Heart, Share2 } from 'lucide-vue-next'
+import { ChevronDown, Heart, Share2, LogOut } from 'lucide-vue-next'
 import { getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
 
-const show = ref(false)
 const tab  = ref('favorites')
 
 const props = defineProps({
+  open: { type: Boolean, default: false },
   locale: String, drinkerPseudo: String,
   favorites: Set, favoriteCocktails: Array,
   recommendations: { type: Array, default: () => [] },
@@ -92,7 +97,7 @@ const props = defineProps({
   history: Array,
   getCocktailName: Function, formatDate: Function,
 })
-defineEmits(['toggle-favorite', 'open-cocktail', 'share-favorites'])
+defineEmits(['toggle', 'toggle-favorite', 'open-cocktail', 'share-favorites', 'sign-out'])
 
 const loyaltyPercent = computed(() => Math.min(100, Math.round((props.history.length / props.loyaltyTarget) * 100)))
 </script>

@@ -180,6 +180,8 @@
           @clear-filters="clearFilters"
           @set-card-view="setCardView"
           @surprise-me="handleSurpriseMe"
+          @open-drinker-login="showDrinkerLoginModal = true"
+          @drinker-sign-out="handleDrinkerSignOut"
           @set-cocktail-of-moment="handleSetCocktailOfMoment"
           @set-featured-menu-card="handleSetFeaturedMenuCard"
           @share-favorites="handleShareFavorites"

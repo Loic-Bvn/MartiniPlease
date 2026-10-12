@@ -599,3 +599,173 @@ html {
     border-bottom: none;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Bar (drinker + bartender) : rangée de tuiles icône + libellé,
+   identique sur mobile et desktop
+   ══════════════════════════════════════════════════════════════ */
+.side-col { display: flex; flex-direction: column; gap: 0.875rem; }
+
+/* Panneaux repliables = rangée de tuiles icône + libellé.
+      Drinker : Filtres, Cartes, Profil, Hasard
+      Bartender : Stock, Commandes, Filtres, Cartes */
+/* 4 tuiles = 4 colonnes égales sur toute la largeur (drinker comme bartender) */
+.bar-main { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; align-items: stretch; }
+.bar-main > * { grid-column: 1 / -1; min-width: 0; order: 10; }
+.bar-main .side-by-side,
+.bar-main .side-col { display: contents; }
+.bar-main .section-card,
+.bar-main .surprise-button { margin: 0; min-width: 0; }
+
+/* Chaque panneau est « transparent » : son en-tête devient une tuile de la rangée
+   (order 1-6) et son contenu une zone pleine largeur juste sous la rangée (order 9).
+   Un seul panneau est ouvert à la fois, les tuiles ne bougent donc jamais. */
+.bar-main .section-card { display: contents; }
+.bar-main .tile-stock   > .expand-actions-btn { order: 1; }
+.bar-main .tile-orders  > .expand-actions-btn { order: 2; }
+.bar-main .tile-filters > .expand-actions-btn { order: 3; }
+.bar-main .tile-cards   > .expand-actions-btn { order: 4; }
+.bar-main .tile-drinker { order: 5; }
+.bar-main .tile-drinker > .expand-actions-btn { order: 5; }
+.bar-main .tile-surprise { order: 6; }
+
+.bar-main .section-card > .expand-actions-btn {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.bar-main .section-card > .expand-actions-btn:hover { background: var(--bg-card); }
+.bar-main .tile-open > .expand-actions-btn { border-color: var(--gold-dim); background: var(--bg-card); }
+
+.bar-main .section-card > :not(.expand-actions-btn) {
+  grid-column: 1 / -1;
+  order: 9;
+  margin: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.bar-main .expand-actions-btn {
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0.25rem;
+  text-align: center;
+}
+.bar-main .expand-actions-btn > svg,
+.bar-main .expand-actions-btn > span:empty { display: none; }
+.bar-main .section-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  max-width: 100%;
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+}
+.tile-ico { margin: 0; font-size: 1.25rem; line-height: 1; }
+.tile-lbl { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lbl-full { display: none; }
+.lbl-short { display: inline; }
+
+.bar-main .count-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  margin: 0;
+  padding: 0 0.35rem;
+  font-size: 0.6rem;
+  line-height: 1.35;
+}
+.bar-main .tile-stock .count-badge { display: none; }
+
+/* « Tout effacer » passe dans le panneau déplié */
+.bar-main .clear-all-btn { display: none; }
+.bar-main .clear-all-btn--inner { display: block; margin: 0 0 0.25rem auto; }
+
+/* Connexion : prend la place de la tuile Profil tant qu'on n'est pas connecté
+   (les boutons connexion / déconnexion du header sont masqués) */
+.btn-login-header, .btn-logout-header { display: none; }
+.btn-logout-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.btn-logout-panel:hover { color: var(--danger-text); border-color: var(--danger-text); }
+.bar-main .tile-login {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.bar-main .surprise-button {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0.25rem;
+  text-align: center;
+}
+.bar-main .surprise-icon { width: 20px; height: 20px; }
+.bar-main .surprise-title {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+  text-overflow: ellipsis;
+}
+.bar-main .surprise-sub { display: none; }
+
+/* Desktop : libellés un peu plus grands */
+@media (min-width: 861px) {
+  .bar-main .section-title,
+  .bar-main .surprise-title { font-size: 0.72rem; letter-spacing: 1px; }
+  .tile-ico { font-size: 1.4rem; }
+}
+
+/* ── Mobile / tablette ≤ 860px : header et blocs compactés ── */
+@media (max-width: 860px) {
+  /* 1. Header : 2 rangées max (logo + actions / recherche), non sticky */
+  .header { position: static; }
+  .header-top { flex-wrap: wrap; row-gap: 0.4rem; }
+  .header-brand { flex: 1 1 0; min-width: 0; }
+  .header-right { width: auto; flex: 0 0 auto; margin-left: auto; }
+  .header-actions { width: auto; justify-content: flex-end; }
+  .header-search-inline { order: 3; flex: 1 1 100%; }
+
+  /* 2. « Cocktail du moment » (bartender) sur une seule ligne */
+  .cocktail-moment-panel {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0;
+    padding: 0.5rem 0.75rem;
+  }
+  .cocktail-moment-select { width: auto; max-width: 9rem; flex-shrink: 0; padding: 0.35rem 0.5rem; }
+  .cocktail-moment-name { font-size: 0.95rem; }
+  .shared-favorites-panel { margin-bottom: 0; }
+
+  /* 3. « Carte du moment » plus tassée */
+  .featured-menu-section { margin: 0.25rem 0 0.5rem; padding: 0.6rem 0.75rem 0.75rem; }
+}
+
+@media (max-width: 640px) {
+  /* 5. Bartender : la rangée d'actions de la carte (préparer, menu, éditer,
+        supprimer, proposer) peut passer à la ligne au lieu de déborder */
+  .card-footer { flex-wrap: wrap; gap: 0.25rem 0.5rem; margin-top: 0.5rem; padding-top: 0.5rem; }
+  .card-footer .footer-right { flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+}

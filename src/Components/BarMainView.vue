@@ -1,25 +1,25 @@
 <template>
-  <div class="main-content">
+  <div class="main-content bar-main">
 
-    <div v-if="isLoggedIn" class="section-card">
-      <button @click="showInventory = !showInventory" class="expand-actions-btn">
-        <ChevronDown :size="18" :class="{ rotated: showInventory }" />
-        <h2 class="section-title">{{ t.stock }}<span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
+    <div v-if="isLoggedIn" :class="['section-card', 'tile-stock', { 'tile-open': openPanel === 'stock' }]">
+      <button @click="togglePanel('stock')" class="expand-actions-btn">
+        <ChevronDown :size="18" :class="{ rotated: openPanel === 'stock' }" />
+        <h2 class="section-title"><span class="tile-ico">{{ splitLabel(t.stock).icon }}</span><span class="tile-lbl"><span class="lbl-full">{{ splitLabel(t.stock).text }}</span><span class="lbl-short">Stock</span></span><span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
         <span></span>
       </button>
-      <InventoryManager v-if="showInventory" />
+      <InventoryManager v-if="openPanel === 'stock'" />
     </div>
 
-    <div v-if="isLoggedIn" class="section-card">
-      <button @click="showOrdersPanel = !showOrdersPanel" class="expand-actions-btn">
-        <ChevronDown :size="18" :class="{ rotated: showOrdersPanel }" />
+    <div v-if="isLoggedIn" :class="['section-card', 'tile-orders', { 'tile-open': openPanel === 'orders' }]">
+      <button @click="togglePanel('orders')" class="expand-actions-btn">
+        <ChevronDown :size="18" :class="{ rotated: openPanel === 'orders' }" />
         <h2 class="section-title">
-          🍸 {{ locale === 'fr' ? 'Commandes' : 'Orders' }}
+          <span class="tile-ico">🍸</span><span class="tile-lbl">{{ locale === 'fr' ? 'Commandes' : 'Orders' }}</span>
           <span v-if="pendingOrdersCount > 0" class="count-badge pending-badge">{{ pendingOrdersCount }}</span>
         </h2>
         <span></span>
       </button>
-      <div v-if="showOrdersPanel" class="filters-dropdown-content">
+      <div v-if="openPanel === 'orders'" class="filters-dropdown-content">
         <OrdersPanel :locale="locale" :unit="unit" />
       </div>
     </div>
@@ -59,8 +59,11 @@
 
     <div class="side-by-side">
 
-      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+      <div class="side-col">
         <FilterPanel
+          :class="['tile-filters', { 'tile-open': openPanel === 'filters' }]"
+          :open="openPanel === 'filters'"
+          @toggle="togglePanel('filters')"
           :locale="locale"
           :t="t"
           :filter-mode="filterMode"
@@ -94,8 +97,20 @@
           @clear-filters="$emit('clear-filters')"
         />
 
+        <button
+          v-if="!isLoggedIn && !hasDrinker"
+          type="button"
+          class="expand-actions-btn tile-drinker tile-login"
+          @click="$emit('open-drinker-login')"
+        >
+          <span class="section-title"><span class="tile-ico">🔑</span><span class="tile-lbl">{{ locale === 'fr' ? 'Connexion' : 'Sign in' }}</span></span>
+        </button>
+
         <DrinkerPanel
           v-if="hasDrinker"
+          :class="['tile-drinker', { 'tile-open': openPanel === 'drinker' }]"
+          :open="openPanel === 'drinker'"
+          @toggle="togglePanel('drinker')"
           :locale="locale"
           :drinker-pseudo="drinkerPseudo"
           :favorites="favorites"
@@ -109,11 +124,15 @@
           @toggle-favorite="$emit('toggle-favorite', $event)"
           @open-cocktail="$emit('open-cocktail', $event)"
           @share-favorites="$emit('share-favorites')"
+          @sign-out="$emit('drinker-sign-out')"
         />
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+      <div class="side-col">
         <CardPanel
+          :class="['tile-cards', { 'tile-open': openPanel === 'cards' }]"
+          :open="openPanel === 'cards'"
+          @toggle="togglePanel('cards')"
           :is-logged-in="isLoggedIn"
           :menu-cards="menuCards"
           :locale="locale"
@@ -126,13 +145,13 @@
         />
 
         <button
-          v-if="hasDrinker && filteredCocktails.length"
+          v-if="!isLoggedIn"
           type="button"
-          class="surprise-button"
+          class="surprise-button tile-surprise"
           @click="$emit('surprise-me')"
         >
           <Dices :size="18" class="surprise-icon" />
-          <span class="surprise-title">{{ surpriseLabel.title }}</span>
+          <span class="surprise-title"><span class="lbl-full">{{ surpriseLabel.title }}</span><span class="lbl-short">{{ locale === 'fr' ? 'Hasard' : 'Random' }}</span></span>
           <span class="surprise-sub">{{ surpriseLabel.sub }}</span>
         </button>
       </div>
@@ -266,6 +285,7 @@ import FilterPanel      from '@/Components/FilterPanel.vue'
 import DrinkerPanel     from '@/Components/DrinkerPanel.vue'
 import CardPanel        from '@/Components/CardPanel.vue'
 import CocktailCard     from '@/Components/CocktailCard.vue'
+import { splitLabel }   from '@/utils/tileLabel'
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 // filteredCocktails, hasActiveFilters et makeableCount sont calculés dans
@@ -344,14 +364,17 @@ const emit = defineEmits([
   'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail', 'open-cocktail',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
   'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
-  'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'surprise-me',
+  'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'surprise-me', 'open-drinker-login', 'drinker-sign-out',
   'set-cocktail-of-moment', 'share-favorites',
   'set-featured-menu-card',
 ])
 
 // ── État local (UI uniquement) ────────────────────────────────────────────────
-const showInventory   = ref(false)
-const showOrdersPanel = ref(false)
+// Un seul panneau ouvert à la fois : 'stock' | 'orders' | 'filters' | 'cards' | 'drinker' | null
+const openPanel = ref(null)
+function togglePanel(id) {
+  openPanel.value = openPanel.value === id ? null : id
+}
 
 // ── Pagination progressive ────────────────────────────────────────────────────
 const PAGE_SIZE    = 40
