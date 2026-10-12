@@ -41,7 +41,7 @@
             <button
               v-if="activeBarId && !isLoggedIn && !hasDrinker && !showBarsSelection"
               type="button"
-              class="btn-new-cocktail"
+              class="btn-new-cocktail btn-login-header"
               :title="t.login"
               :aria-label="t.login"
               @click="$emit('open-drinker-login')"
@@ -53,7 +53,7 @@
             <button
               v-if="activeBarId && !isLoggedIn && hasDrinker && !showBarsSelection"
               type="button"
-              class="btn-new-cocktail"
+              class="btn-new-cocktail btn-logout-header"
               :title="t.logout"
               :aria-label="t.logout"
               @click="$emit('drinker-sign-out')"

@@ -14,7 +14,9 @@ const unit   = ref('oz')   // 'oz' | 'ml'
 
 // Vue des cartes cocktails : 'compact' (sans photo) | 'standard' (avec photo, défaut)
 // Préférence mémorisée d'une session à l'autre.
-const cardView = ref(localStorage.getItem('cardView') || 'standard')
+// Par défaut : vue compacte sur téléphone (la standard est très haute), standard ailleurs.
+const defaultCardView = window.matchMedia?.('(max-width: 640px)').matches ? 'compact' : 'standard'
+const cardView = ref(localStorage.getItem('cardView') || defaultCardView)
 
 // ── Page légale ───────────────────────────────────────────────────────────────
 const currentLegalPage = ref(null)  // null | 'legal-notice' | 'privacy-policy' | 'terms-of-use' | 'cookies-policy'

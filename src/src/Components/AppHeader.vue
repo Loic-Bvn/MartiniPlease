@@ -1,0 +1,345 @@
+<template>
+  <div class="header">
+    <div class="header-container">
+      <div class="header-top">
+        <div class="header-brand" @click="$emit('logo-click')" style="cursor: pointer;">
+          <img v-if="randomLogo" :src="randomLogo" alt="/margarita_square.png" class="header-logo" />
+          <h1 class="header-title">{{ activeBarName }}</h1>
+        </div>
+        <!-- Barre de recherche masquée sur l'écran d'accueil -->
+        <div v-if="activeBarId" class="search-wrapper header-search-inline">
+          <Search class="search-icon" :size="16" />
+          <input 
+            type="text" 
+            :placeholder="t.searchPlaceholder" 
+            :value="searchTerm"
+            @input="$emit('update:searchTerm', $event.target.value)"
+            class="search-input"
+            @focus="localShowSuggestions = searchTerm.length > 0"
+            @blur="handleSearchBlur"
+          />
+          <transition name="fade">
+            <div v-if="localShowSuggestions && suggestions.length > 0" class="search-suggestions" @click.stop>
+              <div v-for="suggestion in suggestions" :key="suggestion.id" class="suggestion-item" @click="$emit('scroll-to-cocktail', suggestion.id)">
+                <span class="suggestion-type">🍹</span>
+                <span class="suggestion-name">{{ suggestion.name }}</span>
+              </div>
+            </div>
+          </transition>
+        </div>
+        <div class="header-right" style="display:flex; align-items:center; gap:0.5rem;">
+          <div class="header-actions">
+
+            <!-- Bartender connecté -->
+            <template v-if="activeBarId && isLoggedIn && !showBarsSelection">
+              <button @click="$emit('open-new-cocktail')" class="btn-new-cocktail">
+                <Plus :size="15" /><span class="btn-label-hide"> {{ t.newCocktail }}</span>
+              </button>
+            </template>
+
+            <!-- Drinker (not signed in) -->
+            <button
+              v-if="activeBarId && !isLoggedIn && !hasDrinker && !showBarsSelection"
+              type="button"
+              class="btn-new-cocktail btn-login-header"
+              :title="t.login"
+              :aria-label="t.login"
+              @click="$emit('open-drinker-login')"
+            >
+              <LogIn :size="15" /><span class="btn-label-hide"> {{ t.login }}</span>
+            </button>
+
+            <!-- Drinker (signed in) -->
+            <button
+              v-if="activeBarId && !isLoggedIn && hasDrinker && !showBarsSelection"
+              type="button"
+              class="btn-new-cocktail btn-logout-header"
+              :title="t.logout"
+              :aria-label="t.logout"
+              @click="$emit('drinker-sign-out')"
+            >
+              <LogOut :size="15" /><span class="btn-label-hide"> {{ t.logout }}</span>
+            </button>
+
+            <div
+              class="settings-switch"
+              role="group"
+              aria-label="Language switch"
+              @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
+            >
+              <button
+                type="button"
+                class="view-toggle-btn"
+                :class="{ 'view-toggle-btn--active': locale === 'fr' }"
+                :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
+              >
+                <span>FR</span>
+              </button>
+              <button
+                type="button"
+                class="view-toggle-btn"
+                :class="{ 'view-toggle-btn--active': locale === 'en' }"
+                :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
+              >
+                <span>EN</span>
+              </button>
+            </div>
+
+            <div
+              v-if="activeBarId && !showBarsSelection"
+              class="settings-switch"
+              role="group"
+              aria-label="Unit switch"
+              @click="$emit('set-unit', unit === 'oz' ? 'ml' : 'oz')"
+            >
+              <button
+                type="button"
+                class="view-toggle-btn"
+                :class="{ 'view-toggle-btn--active': unit === 'oz' }"
+                :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
+              >
+                <span>oz</span>
+              </button>
+              <button
+                type="button"
+                class="view-toggle-btn"
+                :class="{ 'view-toggle-btn--active': unit === 'ml' }"
+                :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
+              >
+                <span>ml</span>
+              </button>
+            </div>
+
+            <ThemeToggle />
+          </div>
+
+        <div v-if="toastMessage" class="toast">
+          {{ toastMessage }}
+        </div>
+
+          <!-- Menu burger tout à droite (bartender uniquement) -->
+          <div v-if="isLoggedIn" class="burger-wrapper">
+            <button 
+              @click="burgerOpen = !burgerOpen" 
+              class="btn-mode btn-mode-inactive burger-button"
+              title="Plus d'options"
+            >
+              <Menu :size="16" />
+            </button>
+
+            <transition name="fade-slide">
+              <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
+
+                <div v-if="activeBarId && !showBarsSelection" class="burger-header">
+                  <span class="burger-title">
+                    <Martini :size="16" />
+                    {{ activeBarName }}
+                  </span>
+
+                  <span class="burger-subtitle">
+                    <Key :size="14" />
+                    {{ inviteCode }}
+                  </span>
+                </div>
+                <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
+
+                <button 
+                  v-if="activeBarId && !showBarsSelection" 
+                  @click="$emit('invite')" 
+                  class="burger-item burger-item--primary"
+                >
+                  <Link :size="15" />
+                  {{ locale === 'fr' ? 'Inviter au bar' : 'Invite to bar' }}
+                </button>
+
+                <!-- SECTION : GESTION -->
+                <div v-if="bars.length >= 1 && !showBarsSelection && activeBarId">
+                  <button 
+                    @click="$emit('open-bars-selection')"
+                    class="burger-item"
+                  >
+                    <Folder :size="16" />
+                    {{ locale === 'fr' ? 'Gérer mes bars' : 'Manage bars' }}
+                  </button>
+                </div>
+
+                <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
+
+                <button
+                  v-if="activeBarId && !showBarsSelection"
+                  @click="setFeature('order', !isFeatureEnabled('order'))"
+                  class="burger-item burger-item--toggle"
+                >
+                  <HandPlatter :size="15" />
+
+                  <span>{{ locale === 'fr' ? 'Autoriser commandes' : 'Allow orders' }}</span>
+
+                  <!-- Toggle -->
+                  <div class="toggle-switch" :class="{ 'on': isFeatureEnabled('order') }">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </button>
+
+
+                <button
+                  v-if="activeBarId && !showBarsSelection"
+                  @click="setFeature('showPrices', !isFeatureEnabled('showPrices'))"
+                  class="burger-item burger-item--toggle"
+                >
+                  <Euro :size="15" />
+
+                  <span>{{ locale === 'fr' ? 'Afficher prix' : 'Show prices' }}</span>
+
+                  <!-- Toggle -->
+                  <div class="toggle-switch" :class="{ 'on': isFeatureEnabled('showPrices') }">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </button>
+
+                <button
+                  v-if="activeBarId && !showBarsSelection"
+                  @click="setFeature('preparationCounter', !isFeatureEnabled('preparationCounter'))"
+                  class="burger-item burger-item--toggle"
+                >
+                  <GlassWater :size="15" />
+                  <span>{{ locale === 'fr' ? 'Compteur de préparations' : 'Preparation counter' }}</span>
+                  <div class="toggle-switch" :class="{ 'on': isFeatureEnabled('preparationCounter') }">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </button>
+
+                <button 
+                  v-if="activeBarId && !showBarsSelection" 
+                  @click="$emit('toggle-public')" 
+                  class="burger-item burger-item--toggle"
+                >
+                  <!-- Icône dynamique -->
+                  <component 
+                    :is="isBarPublic ? Unlock : Lock" 
+                    :size="15" 
+                  />
+
+                  <span>
+                    {{ isBarPublic 
+                      ? (locale === 'fr' ? 'Bar public' : 'Public bar') 
+                      : (locale === 'fr' ? 'Bar privé' : 'Private bar') 
+                    }}
+                  </span>
+
+                  <!-- Toggle -->
+                  <div class="toggle-switch" :class="{ 'on': isBarPublic }">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </button>
+
+                <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
+
+                <!-- SECTION : CATALOG -->
+                <button 
+                  v-if="activeBarId && !showBarsSelection" 
+                  @click="$emit('open-catalog')" 
+                  class="burger-item"
+                >
+                  <Library :size="15" />
+                  {{ locale === 'fr' ? 'Catalogue de recettes' : 'Recipe Catalog' }}
+                </button> 
+
+                <button
+                  v-if="activeBarId && !showBarsSelection && isFeatureEnabled('preparationCounter')"
+                  class="burger-item"
+                  @click="$emit('open-preparation-stats'); burgerOpen = false"
+                >
+                  <ChartNoAxesCombined :size="15" />
+                  {{ locale === 'fr' ? 'Statistiques des préparations' : 'Preparation statistics' }}
+                </button>
+
+                <div v-if="activeBarId && !showBarsSelection" class="burger-divider" />
+
+                <!-- SECTION : DISCONNECT -->
+                <button 
+                  @click="$emit('sign-out')" 
+                  class="burger-item burger-item--danger"
+                >
+                  <LogOut :size="15" />
+                  {{ locale === 'fr' ? 'Se déconnecter' : 'Sign out' }}
+                </button>
+
+              </div>
+            </transition>
+
+            <div 
+              v-if="burgerOpen" 
+              class="burger-overlay" 
+              @click="burgerOpen = false" 
+            />
+          </div>
+        </div>
+      </div>
+      <!-- Barre de recherche mobile masquée sur l'écran d'accueil -->
+      <div v-if="activeBarId" class="header-search-row">
+        <div class="search-container">
+          <Search class="search-icon" :size="16" />
+          <input type="text" :placeholder="t.searchPlaceholderShort" :value="searchTerm" @input="$emit('update:searchTerm', $event.target.value)" class="search-input" />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+import { Search, Plus, Library, Lock, Unlock, LogIn, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro, ChartNoAxesCombined, GlassWater} from 'lucide-vue-next'
+import ThemeToggle from '@/Components/ThemeToggle.vue'
+import { useBarFeatures } from '@/composables/useBarFeatures'
+
+const { isFeatureEnabled, setFeature } = useBarFeatures()
+
+const props = defineProps({
+  isLoggedIn: Boolean,
+  hasDrinker: Boolean,
+  activeBarId: String,
+  activeBarName: String,
+  isBarPublic: Boolean,
+  inviteCode: String,
+  bars: Array,
+  showBarsSelection: Boolean,
+  locale: String,
+  unit: String,
+  toastMessage: String,
+  searchTerm: String,
+  suggestions: Array,
+  randomLogo: String,
+})
+
+const emit = defineEmits([
+  'logo-click',
+  'open-new-cocktail',
+  'open-drinker-login',
+  'drinker-sign-out',
+  'set-locale',
+  'set-unit',
+  'scroll-to-cocktail',
+  'invite',
+  'open-bars-selection',
+  'toggle-public',
+  'open-catalog',
+  'open-preparation-stats',
+  'sign-out',
+  'update:searchTerm'
+])
+
+const burgerOpen = ref(false)
+const localShowSuggestions = ref(false)
+
+function handleSearchBlur() {
+  setTimeout(() => { localShowSuggestions.value = false }, 150)
+}
+
+const t = computed(() => ({
+  newCocktail: props.locale === 'fr' ? 'Nouveau cocktail' : 'New cocktail',
+  login: props.locale === 'fr' ? 'Se connecter' : 'Sign in',
+  logout: props.locale === 'fr' ? 'Se déconnecter' : 'Sign out',
+  searchPlaceholder: props.locale === 'fr' ? 'Rechercher un cocktail ou un ingrédient...' : 'Search a cocktail or ingredient...',
+  searchPlaceholderShort: props.locale === 'fr' ? 'Rechercher...' : 'Search...',
+}))
+</script>
