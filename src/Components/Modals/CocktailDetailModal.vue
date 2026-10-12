@@ -103,7 +103,7 @@
 
           <div class="cv-image-col">
             <div v-if="cocktail.image && !imageError" class="image-preview-large">
-              <img :src="cocktail.image" alt="cocktail image" @error="imageError = true" />
+              <img :src="cocktail.image" :crossorigin="isSupabasePublicImage(cocktail.image) ? 'anonymous' : undefined" alt="cocktail image" @error="imageError = true" />
             </div>
             <div v-else class="image-missing">
               <Martini :size="40" />
@@ -286,6 +286,7 @@
                           <img
                             v-if="c.image && !failedThumbs.has(c.id)"
                             :src="c.image"
+                            :crossorigin="isSupabasePublicImage(c.image) ? 'anonymous' : undefined"
                             alt=""
                             loading="lazy"
                             @error="onThumbError(c.id)"
@@ -355,6 +356,7 @@ import { useSimilarCocktails } from '@/composables/useSimilarCocktails'
 import BatchCalculatorModal from '@/Components/Modals/BatchCalculatorModal.vue'
 import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 import PrepareButton from '@/Components/PrepareButton.vue'
+import { isSupabasePublicImage } from '@/lib/supabase'
 
 const { isFeatureEnabled } = useBarFeatures()
 const showPrices = computed(() => isFeatureEnabled('showPrices'))

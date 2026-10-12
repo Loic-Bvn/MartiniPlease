@@ -125,7 +125,7 @@
 
             <div class="catalog-item-image-column">
               <div v-if="cocktail.image" class="catalog-item-image-wrap">
-                <img :src="cocktail.image" :alt="cocktail.name" class="catalog-item-image" loading="lazy" />
+                <img :src="cocktail.image" :crossorigin="isSupabasePublicImage(cocktail.image) ? 'anonymous' : undefined" :alt="cocktail.name" class="catalog-item-image" loading="lazy" />
               </div>
               <div v-else class="catalog-item-image-wrap catalog-item-image-placeholder">
                 <Martini :size="28" />
@@ -142,7 +142,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { X, Search, Upload, Martini } from 'lucide-vue-next'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabasePublicImage } from '@/lib/supabase'
 import { useCatalog } from '@/composables/useCatalog'
 import { useCocktails } from '@/composables/useCocktails'
 import { useInventory } from '@/composables/useInventory'

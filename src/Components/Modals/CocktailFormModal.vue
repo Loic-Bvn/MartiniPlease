@@ -342,6 +342,7 @@
                 <img
                   v-if="!imagePreviewError"
                   :src="form.image"
+                  :crossorigin="isSupabasePublicImage(form.image) ? 'anonymous' : undefined"
                   alt="preview"
                   @error="imagePreviewError = true"
                 />
@@ -371,7 +372,7 @@
 import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { X, Trash2, Plus } from 'lucide-vue-next'
 import { validateCocktail } from '@/composables/useDataValidator'
-import { supabase, supabaseImageBucket } from '@/lib/supabase'
+import { supabase, supabaseImageBucket, isSupabasePublicImage } from '@/lib/supabase'
 import { getGlassesAsOptions,
   getMethodsAsOptions,
   getCocktailCategoriesAsOptions,

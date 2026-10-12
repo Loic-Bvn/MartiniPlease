@@ -69,6 +69,19 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabaseImageBucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET ?? 'cocktail-images'
 
+export function isSupabasePublicImage(imageUrl) {
+  if (typeof imageUrl !== 'string') return false
+
+  try {
+    const image = new URL(imageUrl)
+    const project = new URL(supabaseUrl)
+    return image.origin === project.origin &&
+      image.pathname.startsWith('/storage/v1/object/public/')
+  } catch {
+    return false
+  }
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: { lock: noOpLock },
 })

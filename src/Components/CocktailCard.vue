@@ -10,6 +10,7 @@
       <img
         v-if="cocktail.image && !imageError"
         :src="cocktail.image"
+        :crossorigin="isSupabasePublicImage(cocktail.image) ? 'anonymous' : undefined"
         :alt="cocktail.name"
         class="card-image"
         loading="lazy"
@@ -158,6 +159,7 @@ import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
 import { getCocktailStyleLabel, getGlassLabel, getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
+import { isSupabasePublicImage } from '@/lib/supabase'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'

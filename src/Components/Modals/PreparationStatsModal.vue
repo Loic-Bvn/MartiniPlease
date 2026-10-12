@@ -134,6 +134,7 @@
               <img
                 v-if="row.image && !failedImages.has(row.id)"
                 :src="row.image"
+                :crossorigin="isSupabasePublicImage(row.image) ? 'anonymous' : undefined"
                 alt=""
                 loading="lazy"
                 @error="markImageFailed(row.id)"
@@ -264,6 +265,7 @@
 </template>
 
 <script setup>
+import { isSupabasePublicImage } from '@/lib/supabase'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { Martini, X, Trash2 } from 'lucide-vue-next'
 import { usePreparations } from '@/composables/usePreparations'
