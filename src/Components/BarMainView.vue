@@ -7,7 +7,10 @@
         <h2 class="section-title"><span class="tile-ico">{{ splitLabel(t.stock).icon }}</span><span class="tile-lbl"><span class="lbl-full">{{ splitLabel(t.stock).text }}</span><span class="lbl-short">Stock</span></span><span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
         <span></span>
       </button>
-      <InventoryManager v-if="openPanel === 'stock'" @close="togglePanel('stock')" />
+      <InventoryManager
+        v-if="openPanel === 'stock'"
+        @close="togglePanel('stock')"
+      />
     </div>
 
     <div v-if="isLoggedIn" :class="['section-card', 'tile-orders', { 'tile-open': openPanel === 'orders' }]">
@@ -59,7 +62,7 @@
 
     <div class="side-by-side">
 
-      <div class="side-col">
+      <div class="main-stack-column">
         <FilterPanel
           :class="['tile-filters', { 'tile-open': openPanel === 'filters' }]"
           :open="openPanel === 'filters'"
@@ -128,7 +131,7 @@
         />
       </div>
 
-      <div class="side-col">
+      <div class="main-stack-column">
         <CardPanel
           :class="['tile-cards', { 'tile-open': openPanel === 'cards' }]"
           :open="openPanel === 'cards'"
