@@ -7,7 +7,7 @@
 
       <ChevronDown :size="18" :class="{ rotated: open }" />
       <h2 class="section-title">
-        <span class="tile-ico">{{ splitLabel(t.filterTitle).icon }}</span><span class="tile-lbl">{{ splitLabel(t.filterTitle).text }}</span>
+        <component :is="lucideIcons.filters" :size="20" class="tile-ico" /><span class="tile-lbl">{{ t.filterTitle }}</span>
         <span v-if="hasActiveFilters" class="count-badge">
           {{ selectedFamilies.length + selectedSubSpirits.length + selectedProfiles.length + selectedStyles.length }}
         </span>
@@ -35,25 +35,25 @@
             @click="$emit('toggle-favorites')"
             :class="['chip', { active: showOnlyFavorites }]"
           >
-            ❤️ {{ locale === 'fr' ? 'Favoris' : 'Favorites' }}
+            {{ locale === 'fr' ? 'Favoris' : 'Favorites' }}
           </button>
           <button
             @click="$emit('toggle-makeable')"
             :class="['chip', { active: showOnlyMakeable }]"
           >
-            🍸 {{ t.filterMakeable }}
+            {{ t.filterMakeable }}
           </button>
           <button
             @click="$emit('set-abv-filter', abvFilter === 'mocktail' ? null : 'mocktail')"
             :class="['chip', { active: abvFilter === 'mocktail' }]"
           >
-            🧃 Mocktail
+            Mocktail
           </button>
           <button
             @click="$emit('set-abv-filter', abvFilter === 'low' ? null : 'low')"
             :class="['chip', { active: abvFilter === 'low' }]"
           >
-            🍃 Low ABV
+            Low ABV
           </button>
         </div>
       </div>
@@ -87,7 +87,7 @@
             @click="$emit('toggle-family', spirit.key)"
             :class="['chip', { active: selectedFamilies.includes(spirit.key) }]"
           >
-            {{ spirit.label }}
+            {{ splitLabel(spirit.label).text }}
           </button>
         </div>
         <transition name="fade">
@@ -98,7 +98,7 @@
               @click="$emit('toggle-sub-spirit', sub.key)"
               :class="['chip chip--sub', { active: selectedSubSpirits.includes(sub.key) }]"
             >
-              {{ sub.label }}
+              {{ splitLabel(sub.label).text }}
             </button>
           </div>
         </transition>
@@ -162,7 +162,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import { ChevronDown, X } from 'lucide-vue-next'
+import { ChevronDown } from 'lucide-vue-next'
+import { lucideIcons } from '@/utils/lucideIcons'
 import { splitLabel } from '@/utils/tileLabel'
 
 const showProfile = ref(false)

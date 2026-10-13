@@ -2,17 +2,17 @@
   <div class="section-card">
     <button @click="$emit('toggle')" class="expand-actions-btn">
       <ChevronDown :size="18" :class="{ rotated: open }" />
-      <h2 class="section-title"><span class="tile-ico">👤</span><span class="tile-lbl">{{ drinkerPseudo }}</span></h2>
+      <h2 class="section-title"><component :is="lucideIcons.profile" :size="20" class="tile-ico" /><span class="tile-lbl">{{ drinkerPseudo }}</span></h2>
       <span></span>
     </button>
     <div v-if="open" class="filters-dropdown-content">
 
       <div class="auth-tabs" style="margin-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary);">
         <button :class="['auth-tab', { active: tab === 'favorites' }]" @click="tab = 'favorites'">
-          ❤️ {{ locale === 'fr' ? 'Favoris' : 'Favorites' }}<span class="count-badge">{{ favorites.size }}</span>
+          {{ locale === 'fr' ? 'Favoris' : 'Favorites' }}<span class="count-badge">{{ favorites.size }}</span>
         </button>
         <button :class="['auth-tab', { active: tab === 'history' }]" @click="tab = 'history'">
-          🕐 {{ locale === 'fr' ? 'Historique' : 'History' }}<span class="count-badge">{{ history.length }}</span>
+          {{ locale === 'fr' ? 'Historique' : 'History' }}<span class="count-badge">{{ history.length }}</span>
         </button>
       </div>
 
@@ -83,6 +83,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { ChevronDown, Heart, Share2, LogOut } from 'lucide-vue-next'
+import { lucideIcons } from '@/utils/lucideIcons'
 import { getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
 
 const tab  = ref('favorites')

@@ -1,0 +1,33 @@
+import {
+  AlertTriangle,
+  BookOpen,
+  ChartNoAxesCombined,
+  Check,
+  GlassWater,
+  Globe,
+  LoaderCircle,
+  LockKeyhole,
+  LogIn,
+  Martini,
+  Package,
+  Search,
+  UserRound,
+} from 'lucide-vue-next'
+
+export const lucideIcons = {
+  alert: AlertTriangle,
+  bartender: Martini,
+  cards: BookOpen,
+  check: Check,
+  cocktail: Martini,
+  drinker: GlassWater,
+  filters: Search,
+  globe: Globe,
+  loading: LoaderCircle,
+  lock: LockKeyhole,
+  stock: Package,
+  orders: Martini,
+  login: LogIn,
+  profile: UserRound,
+  trends: ChartNoAxesCombined,
+}

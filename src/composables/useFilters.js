@@ -35,7 +35,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
   const baseSpirits = computed(() => {
     const fr = locale?.value !== 'en'
     return [
-    { key: 'whiskey', label: fr ? '🥃 Whiskey' : '🥃 Whiskey', subs: [
+    { key: 'whiskey', label: 'Whiskey', subs: [
       { key: 'bourbon',       label: getFL('bourbon',       locale?.value ?? 'fr') },
       { key: 'rye',           label: getFL('rye',           locale?.value ?? 'fr') },
       { key: 'scotch',        label: getFL('scotch',        locale?.value ?? 'fr') },
@@ -43,7 +43,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
       { key: 'peated_whisky', label: getFL('peated_whisky', locale?.value ?? 'fr') },
       { key: 'whiskey',       label: getFL('whiskey',       locale?.value ?? 'fr') },
     ]},
-    { key: 'rum', label: fr ? '🍹 Rhum' : '🍹 Rum', subs: [
+    { key: 'rum', label: fr ? 'Rhum' : 'Rum', subs: [
       { key: 'rum',           label: getFL('rum',           locale?.value ?? 'fr') },
       { key: 'rum_agricol',   label: getFL('rum_agricol',   locale?.value ?? 'fr') },
       { key: 'rum_jamaican',  label: getFL('rum_jamaican',  locale?.value ?? 'fr') },
@@ -51,28 +51,28 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
       { key: 'rum_overproof', label: getFL('rum_overproof', locale?.value ?? 'fr') },
       { key: 'cachaca',       label: getFL('cachaca',       locale?.value ?? 'fr') },
     ]},
-    { key: 'agave', label: '🌵 Agave', subs: [
+    { key: 'agave', label: 'Agave', subs: [
       { key: 'tequila',          label: getFL('tequila',          locale?.value ?? 'fr') },
       { key: 'tequila_reposado', label: getFL('tequila_reposado', locale?.value ?? 'fr') },
       { key: 'mezcal',           label: getFL('mezcal',           locale?.value ?? 'fr') },
     ]},
-    { key: 'gin', label: '🌿 Gin', subs: [
+    { key: 'gin', label: 'Gin', subs: [
       { key: 'gin',      label: getFL('gin',      locale?.value ?? 'fr') },
       { key: 'gin_dry',  label: getFL('gin_dry',  locale?.value ?? 'fr') },
       { key: 'gin_navy', label: getFL('gin_navy', locale?.value ?? 'fr') },
       { key: 'genever',  label: getFL('genever',  locale?.value ?? 'fr') },
     ]},
-    { key: 'brandy', label: '🍇 Brandy', subs: [
+    { key: 'brandy', label: 'Brandy', subs: [
       { key: 'cognac',   label: getFL('cognac',   locale?.value ?? 'fr') },
       { key: 'calvados', label: getFL('calvados', locale?.value ?? 'fr') },
       { key: 'pisco',    label: getFL('pisco',    locale?.value ?? 'fr') },
       { key: 'grappa',   label: getFL('grappa',   locale?.value ?? 'fr') },
       { key: 'brandy',   label: getFL('brandy',   locale?.value ?? 'fr') },
     ]},
-    { key: 'vodka',    label: '❄️ Vodka',    subs: [] },
-    { key: 'absinthe', label: '🌱 Absinthe', subs: [] },
-    { key: 'aquavit',  label: '🌾 Aquavit',  subs: [] },
-    { key: 'pastis',   label: '⭐ Pastis',   subs: [] },
+    { key: 'vodka',    label: 'Vodka',    subs: [] },
+    { key: 'absinthe', label: 'Absinthe', subs: [] },
+    { key: 'aquavit',  label: 'Aquavit',  subs: [] },
+    { key: 'pastis',   label: 'Pastis',   subs: [] },
   ]})
 
   const liqueurFamilies = computed(() => [
@@ -88,22 +88,22 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
   const profileFilters = computed(() => {
     const fr = locale?.value === 'fr'
     return [
-      { key: 'smoky',      label: fr ? '🔥 Fumé'       : '🔥 Smoky'      },
-      { key: 'bitter',     label: fr ? '🍫 Amer'        : '🍫 Bitter'     },
-      { key: 'creamy',     label: fr ? '🥛 Crémeux'     : '🥛 Creamy'     },
-      { key: 'tropical',   label: fr ? '🍍 Tropical'    : '🍍 Tropical'   },
-      { key: 'floral',     label: fr ? '🌸 Floral'      : '🌸 Floral'     },
-      { key: 'nutty',      label: fr ? '🌰 Noiseté'    : '🌰 Nutty'      },
-      { key: 'spicy',      label: fr ? '🌶️ Épicé'      : '🌶️ Spicy'     },
-      { key: 'herbal',     label: fr ? '🌿 Herbacé'     : '🌿 Herbal'     },
-      { key: 'fruity',     label: fr ? '🍓 Fruité'      : '🍓 Fruity'     },
-      { key: 'citrus',     label: fr ? '🍋 Agrume'      : '🍋 Citrus'     },
-      { key: 'sour',       label: fr ? '🍋 Acidulé'     : '🍋 Sour'       },
-      { key: 'dry',        label: fr ? '🧂 Sec'         : '🧂 Dry'        },
-      { key: 'boozy',      label: fr ? '🥃 Corsé'       : '🥃 Boozy'      },
-      { key: 'refreshing', label: fr ? '🧊 Frais'       : '🧊 Refreshing' },
-      { key: 'rich',       label: fr ? '🍯 Riche'       : '🍯 Rich'       },
-      { key: 'sweet',      label: fr ? '🍬 Sucré'       : '🍬 Sweet'      },
+      { key: 'smoky',      label: fr ? 'Fumé'       : 'Smoky'      },
+      { key: 'bitter',     label: fr ? 'Amer'       : 'Bitter'     },
+      { key: 'creamy',     label: fr ? 'Crémeux'    : 'Creamy'     },
+      { key: 'tropical',   label: 'Tropical'                       },
+      { key: 'floral',     label: 'Floral'                         },
+      { key: 'nutty',      label: fr ? 'Noiseté'    : 'Nutty'      },
+      { key: 'spicy',      label: fr ? 'Épicé'      : 'Spicy'      },
+      { key: 'herbal',     label: fr ? 'Herbacé'    : 'Herbal'     },
+      { key: 'fruity',     label: fr ? 'Fruité'     : 'Fruity'     },
+      { key: 'citrus',     label: fr ? 'Agrume'     : 'Citrus'     },
+      { key: 'sour',       label: fr ? 'Acidulé'    : 'Sour'       },
+      { key: 'dry',        label: fr ? 'Sec'        : 'Dry'        },
+      { key: 'boozy',      label: fr ? 'Corsé'      : 'Boozy'      },
+      { key: 'refreshing', label: fr ? 'Frais'      : 'Refreshing' },
+      { key: 'rich',       label: fr ? 'Riche'      : 'Rich'       },
+      { key: 'sweet',      label: fr ? 'Sucré'      : 'Sweet'      },
     ]
   })
 

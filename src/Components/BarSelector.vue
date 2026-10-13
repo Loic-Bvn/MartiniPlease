@@ -68,7 +68,8 @@
             </div>
             <div class="bar-edit-actions">
               <button @click="$emit('save-bar-edits', b.id)" :disabled="updatingBarId === b.id" class="btn-confirm">
-                {{ updatingBarId === b.id ? '⏳' : '✓' }} {{ locale === 'fr' ? 'Sauvegarder' : 'Save' }}
+                <component :is="updatingBarId === b.id ? lucideIcons.loading : lucideIcons.check" :size="16" :class="{ 'icon-spin': updatingBarId === b.id }" aria-hidden="true" />
+                {{ locale === 'fr' ? 'Sauvegarder' : 'Save' }}
               </button>
               <button @click="$emit('cancel-edit-bar')" :disabled="updatingBarId === b.id" class="btn-cancel">
                 {{ locale === 'fr' ? 'Annuler' : 'Cancel' }}
@@ -78,15 +79,15 @@
           <!-- Mode affichage -->
           <div v-else>
             <div class="bar-header">
-              <span class="welcome-card-icon">🍾</span>
+              <component :is="lucideIcons.bartender" :size="24" class="welcome-card-icon" aria-hidden="true" />
               
               <!-- Infos -->
               <div style="flex: 1;">
                 <div class="bar-title-row">
                   <div class="welcome-card-title">{{ b.name }}</div>
 
-                  <span v-if="b.is_public" class="bar-status-badge public">🌐 Public</span>
-                  <span v-else class="bar-status-badge private">🔒 {{ locale === 'fr' ? 'Privé' : 'Private' }}</span>
+                  <span v-if="b.is_public" class="bar-status-badge public"><component :is="lucideIcons.globe" :size="12" aria-hidden="true" /> Public</span>
+                  <span v-else class="bar-status-badge private"><component :is="lucideIcons.lock" :size="12" aria-hidden="true" /> {{ locale === 'fr' ? 'Privé' : 'Private' }}</span>
                 </div>
 
                 <div class="welcome-card-desc">
@@ -113,7 +114,9 @@
                   <Check :size="18" /> {{ locale === 'fr' ? 'Sélectionner' : 'Select' }}
                 </button>
                 <button @click="$emit('start-edit-bar', b)" class="btn-action-small"><Pencil :size="14" /></button>
-                <button @click="viewingTrendsFor = b.id" class="btn-action-small" :title="locale === 'fr' ? 'Tendances' : 'Trends'">📈</button>
+                <button @click="viewingTrendsFor = b.id" class="btn-action-small" :title="locale === 'fr' ? 'Tendances' : 'Trends'">
+                  <component :is="lucideIcons.trends" :size="16" aria-hidden="true" />
+                </button>
                 <button @click="$emit('start-delete-bar', b)" class="btn-action-small btn-action-small--danger"><Trash2 :size="14" /></button>
               </div>
             </div>
@@ -126,7 +129,7 @@
         <div v-if="barToDelete" class="modal-overlay" @click.self="$emit('close-delete-modal')">
           <div class="modal-container modal-container--delete-bar">
             <div class="modal-header">
-              <h2 class="modal-title">{{ locale === 'fr' ? '⚠️ Supprimer le bar' : '⚠️ Delete bar' }}</h2>
+              <h2 class="modal-title"><component :is="lucideIcons.alert" :size="18" aria-hidden="true" /> {{ locale === 'fr' ? 'Supprimer le bar' : 'Delete bar' }}</h2>
               <button @click="$emit('close-delete-modal')" class="btn-icon btn-icon--close">
                 <X :size="20" />
               </button>
@@ -186,6 +189,7 @@
 <script setup>
 import { ref } from 'vue'
 import { X, Plus, Pencil, Trash2, Check } from 'lucide-vue-next'
+import { lucideIcons } from '@/utils/lucideIcons'
 import TrendsModal from './Modals/TrendsModal.vue'
 
 const viewingTrendsFor = ref(null)
