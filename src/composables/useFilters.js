@@ -153,7 +153,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
   function isMakeable(cocktail) {
     const recipe = cocktail.recipe || []
     if (!recipe.length) return false
-    return recipe.every(ing => ing.Ingredient === 'garnish' || barInventory?.value.has(ing.Ingredient))
+    return recipe.every(ing => ing.Ingredient === 'garnish' || ing.Custom || barInventory?.value.has(ing.Ingredient))
   }
 
   const makeableCount = computed(() =>

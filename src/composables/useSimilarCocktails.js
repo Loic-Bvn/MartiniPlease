@@ -14,7 +14,7 @@ function profileList(c) {
 // Recipe ingredient keys, without garnish
 function ingredientSet(c) {
   return new Set(
-    (c?.recipe || []).map(i => i.Ingredient).filter(i => i && i !== 'garnish')
+    (c?.recipe || []).filter(i => !i.Custom).map(i => i.Ingredient).filter(i => i && i !== 'garnish')
   )
 }
 

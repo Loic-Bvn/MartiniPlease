@@ -198,8 +198,19 @@
                 </option>
               </select>
 
+              <!-- Ingrédient libre (texte saisi à la main, hors stock / coût) -->
+              <input
+                v-if="ing.Category === 'custom'"
+                v-model="ing.Ingredient"
+                type="text"
+                maxlength="80"
+                class="form-input"
+                placeholder="Ex: Sirop de violette maison"
+                aria-label="Ingrédient libre"
+              />
+
               <!-- Ingrédient (lien stock / coût) -->
-              <select v-model="ing.Ingredient" class="form-input">
+              <select v-else v-model="ing.Ingredient" class="form-input">
                 <option
                   v-for="(item, ingredientKey) in getIngredientsByCategory(ing.Category)"
                   :key="ingredientKey"
@@ -211,7 +222,7 @@
 
               <!-- Speficic reference (only if bar has some for the specific ingredient) -->
               <select
-                v-if="getAvailableReferences(ing.Ingredient).length"
+                v-if="ing.Category !== 'custom' && getAvailableReferences(ing.Ingredient).length"
                 v-model="ing.Reference"
                 class="form-input"
               >
@@ -471,6 +482,7 @@ const CATEGORY_LABELS = {
   mixers:    'Mixers',
   garnish:   'Garniture',
   others:    'Autres',
+  custom:    'Texte libre',
 }
 
 // ── Options depuis constantes centralisées (verres, méthodes, glace, styles) ──
@@ -564,7 +576,7 @@ const form = ref({
       return {
         Ingredient: ingredient,
         Reference: i.Reference ?? '',
-        Category: findCategoryFromIngredient(ingredient),
+        Category: i.Custom ? 'custom' : findCategoryFromIngredient(ingredient),
         Oz: i.Oz ?? '',
         Ml: i.Ml ?? '',
         Dashes: i.Dashes ?? null,
@@ -622,16 +634,17 @@ function handleSave() {
   try {
     const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
 
-    const droppedLines = form.value.recipe.filter(ing => !ing.Ingredient && (ing.Ingredient?.trim() || ing.Oz || ing.Ml))
+    const droppedLines = form.value.recipe.filter(ing => !ing.Ingredient?.trim() && (ing.Oz || ing.Ml))
     if (droppedLines.length) {
       throw new Error(`Choisis un Type pour : ${droppedLines.map(l => l.Ingredient || '(sans nom)').join(', ')}`)
     }
 
     const cleanedRecipe = form.value.recipe
-      .filter(ing => ing.Ingredient)
+      .filter(ing => ing.Ingredient?.trim())
       .map(({ Category, ...rest }) => ({
-        Ingredient: rest.Ingredient,
-        ...(rest.Reference?.trim() ? { Reference: rest.Reference.trim() } : {}),
+        Ingredient: rest.Ingredient.trim(),
+        ...(Category === 'custom' ? { Custom: true } : {}),
+        ...(Category !== 'custom' && rest.Reference?.trim() ? { Reference: rest.Reference.trim() } : {}),
         IsGarnish: Category === 'garnish',
         Oz: normalizeNumber(rest.Oz),
         Ml: normalizeNumber(rest.Ml),

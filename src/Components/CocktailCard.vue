@@ -60,7 +60,7 @@
             <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']">
             </span>
             <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-              {{ getIngredientLabel(ing.Ingredient, locale, ingredientsByIngredient) }}
+              {{ getRecipeLineLabel(ing, locale, ingredientsByIngredient) }}
             </span>
           </div>
           <span class="ingredient-quantity">{{ ing._qty }}</span>
@@ -158,7 +158,7 @@ import { Upload, Bookmark, Pencil, Trash2, Heart, Check, HandPlatter, Martini, S
 import { useInventory } from '@/composables/useInventory'
 import { useDrinker } from '@/composables/useDrinker'
 import { useOrders } from '@/composables/useOrders'
-import { getCocktailStyleLabel, getGlassLabel, getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
+import { getCocktailStyleLabel, getGlassLabel, getIngredientLabel, getRecipeLineLabel, getProfileLabel } from '../constants/typeLabels.js'
 import { isSupabasePublicImage } from '@/lib/supabase'
 import { useCatalog } from '@/composables/useCatalog'
 import { useToast } from '@/composables/useToast'
@@ -195,7 +195,7 @@ const emit = defineEmits(['edit', 'delete', 'open'])
 
 
 function isAvailable(ing) {
-  if (ing.Ingredient === 'garnish') return true
+  if (ing.Ingredient === 'garnish' || ing.Custom) return true
   return barInventory.value.has(ing.Ingredient)
 }
 

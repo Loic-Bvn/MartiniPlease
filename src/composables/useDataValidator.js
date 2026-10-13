@@ -16,7 +16,12 @@ export function cleanRecipe(recipe) {
       }
 
       // Reference est optionnelle - référence précise de bouteille choisie (nom, pas d'id)
-      const referenceValue = ing.Reference?.trim?.()
+      // Ingrédient libre : texte saisi à la main, absent du stock (pas de référence ni de coût)
+      if (ing.Custom === true) {
+        cleaned.Custom = true
+      }
+
+      const referenceValue = ing.Custom === true ? '' : ing.Reference?.trim?.()
       if (referenceValue) {
         cleaned.Reference = referenceValue
       }
