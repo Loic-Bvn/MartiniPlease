@@ -10,7 +10,7 @@
         <!-- Bloc Bartender -->
         <div class="welcome-card">
           <div class="welcome-card-header">
-            <span class="welcome-card-icon">🍾</span>
+            <component :is="lucideIcons.bartender" :size="24" class="welcome-card-icon" aria-hidden="true" />
             <div>
               <div class="welcome-card-title">Bartender</div>
               <div class="welcome-card-desc">{{ locale === 'fr' ? 'Gérez votre stock et vos recettes' : 'Manage your stock and recipes' }}</div>
@@ -24,7 +24,7 @@
         <!-- Bloc Drinker -->
         <div class="welcome-card">
           <div class="welcome-card-header">
-            <span class="welcome-card-icon">🥂</span>
+            <component :is="lucideIcons.drinker" :size="24" class="welcome-card-icon" aria-hidden="true" />
             <div>
               <div class="welcome-card-title">Drinker</div>
               <div class="welcome-card-desc">{{ locale === 'fr' ? 'Explorez la carte d\'un bar' : 'Explore a bar\'s menu' }}</div>
@@ -42,7 +42,8 @@
               class="welcome-demo"
               @click="$emit('join-public-bar', b)"
             >
-              🍸 {{ b.name }}
+              <component :is="lucideIcons.cocktail" :size="16" class="welcome-demo-icon" aria-hidden="true" />
+              {{ b.name }}
               <span class="welcome-demo-code">{{ b.invite_code }}</span>
             </button>
             <div class="welcome-or-divider">
@@ -74,6 +75,8 @@
 </template>
 
 <script setup>
+import { lucideIcons } from '@/utils/lucideIcons'
+
 const props = defineProps({
   randomLogo: String,
   locale: String,

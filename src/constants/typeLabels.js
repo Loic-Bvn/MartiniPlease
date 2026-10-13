@@ -354,6 +354,15 @@ export function getIngredientLabel(type, locale = 'fr', dbIngredientsMap = null)
   return locale === 'fr' ? 'Indisponible' : 'Unavailable'
 }
 
+/**
+ * Libellé d'une ligne de recette.
+ * Ingrédient libre (Custom) : le texte saisi tel quel ; sinon libellé du type.
+ */
+export function getRecipeLineLabel(line, locale = 'fr', dbIngredientsMap = null) {
+  if (line?.Custom) return line.Ingredient
+  return getIngredientLabel(line?.Ingredient, locale, dbIngredientsMap)
+}
+
 export const FAMILY_LABELS = {
   fr: {
     // Sous-types

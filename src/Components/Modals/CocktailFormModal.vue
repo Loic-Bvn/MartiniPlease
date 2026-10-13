@@ -4,8 +4,9 @@
 
       <!-- Header -->
       <div class="modal-header">
-        <h2 class="modal-title" id="cocktail-form-modal-title">
-          {{ isNew ? '✨ Nouveau cocktail' : '✏️ Modifier le cocktail' }}
+        <h2 class="modal-title ico-inline" id="cocktail-form-modal-title">
+          <component :is="isNew ? Sparkles : Pencil" :size="16" />
+          {{ isNew ? 'Nouveau cocktail' : 'Modifier le cocktail' }}
         </h2>
         <button @click="$emit('close')" class="modal-close-btn" aria-label="Fermer">
           <X :size="20" />
@@ -28,7 +29,7 @@
             <div class="form-field">
               <label class="form-label">Spirit de base</label>
               <select v-model="form.base_spirit" @change="autoFillCategory" class="form-input">
-                <optgroup v-for="cat in categories" :key="cat.key" :label="cat.label">
+                <optgroup v-for="cat in categories" :key="cat.key" :label="splitLabel(cat.label).text">
                   <option v-for="spirit in cat.spirits" :key="spirit.key" :value="spirit.key">
                     {{ spirit.label }}
                   </option>
@@ -38,7 +39,7 @@
             <div class="form-field">
               <label class="form-label">Catégorie</label>
               <select v-model="form.category" class="form-input form-input--placeholder" :disabled=true>
-                <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">{{ cat.label }}</option>
+                <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">{{ splitLabel(cat.label).text }}</option>
               </select>
             </div>
           </div>
@@ -66,8 +67,10 @@
             <div class="form-field">
               <label class="form-label">
                 ABV (%)
-                <button type="button" @click="abvAuto = !abvAuto" class="btn-toggle-auto">
-                  {{ abvAuto ? '🔄 Auto' : '✏️ Manuel' }}
+                <button type="button" @click="abvAuto = !abvAuto" class="btn-toggle-auto ico-inline">
+                  <RefreshCw v-if="abvAuto" :size="12" />
+                  <Pencil v-else :size="12" />
+                  {{ abvAuto ? 'Auto' : 'Manuel' }}
                 </button>
               </label>
               <input
@@ -98,7 +101,7 @@
                     :key="key"
                     :value="key"
                   >
-                    {{ opt.emoji + " " + getDetailledIceLabel(opt.name, locale) }}
+                    {{ getDetailledIceLabel(opt.name, locale) }}
                   </option>
                 </select>
             </div>
@@ -136,7 +139,7 @@
               @click="toggleProfile(p.key)"
               :class="['chip', { active: form.profile.includes(p.key) }]"
             >
-              {{ p.icon }} {{ p.label }}
+              {{ p.label }}
             </button>
           </div>
         </section>
@@ -195,8 +198,19 @@
                 </option>
               </select>
 
+              <!-- Ingrédient libre (texte saisi à la main, hors stock / coût) -->
+              <input
+                v-if="ing.Category === 'custom'"
+                v-model="ing.Ingredient"
+                type="text"
+                maxlength="80"
+                class="form-input"
+                placeholder="Ex: Sirop de violette maison"
+                aria-label="Ingrédient libre"
+              />
+
               <!-- Ingrédient (lien stock / coût) -->
-              <select v-model="ing.Ingredient" class="form-input">
+              <select v-else v-model="ing.Ingredient" class="form-input">
                 <option
                   v-for="(item, ingredientKey) in getIngredientsByCategory(ing.Category)"
                   :key="ingredientKey"
@@ -208,7 +222,7 @@
 
               <!-- Speficic reference (only if bar has some for the specific ingredient) -->
               <select
-                v-if="getAvailableReferences(ing.Ingredient).length"
+                v-if="ing.Category !== 'custom' && getAvailableReferences(ing.Ingredient).length"
                 v-model="ing.Reference"
                 class="form-input"
               >
@@ -359,8 +373,9 @@
       <!-- Footer -->
       <div class="modal-footer">
         <button @click="$emit('close')" class="btn-modal-secondary">Annuler</button>
-        <button @click="handleSave" class="btn-modal-primary" :disabled="!form.name.trim()">
-          {{ isNew ? '✨ Créer' : '💾 Enregistrer' }}
+        <button @click="handleSave" class="btn-modal-primary ico-inline" :disabled="!form.name.trim()">
+          <component :is="isNew ? Sparkles : Save" :size="14" />
+          {{ isNew ? 'Créer' : 'Enregistrer' }}
         </button>
       </div>
 
@@ -370,7 +385,8 @@
 
 <script setup>
 import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
-import { X, Trash2, Plus } from 'lucide-vue-next'
+import { X, Trash2, Plus, Sparkles, Pencil, RefreshCw, Save } from 'lucide-vue-next'
+import { splitLabel } from '@/utils/tileLabel'
 import { validateCocktail } from '@/composables/useDataValidator'
 import { supabase, supabaseImageBucket, isSupabasePublicImage } from '@/lib/supabase'
 import { getGlassesAsOptions,
@@ -457,15 +473,16 @@ const recipeCategoryFilter = reactive({})
 
 // Catégories structurelles fixes (taxonomie du domaine, pas des données de stock)
 const CATEGORY_LABELS = {
-  spirits:   '🥃 Spiritueux',
-  licors:    '🍷 Liqueurs',
-  modifiers: '🍸 Modificateurs',
-  juices:    '🍊 Jus',
-  syrups:    '🍯 Sirops',
-  bitters:   '💧 Bitters',
-  mixers:    '🥤 Mixers',
-  garnish:   '🍋 Garniture',
-  others:    '📦 Autres',
+  spirits:   'Spiritueux',
+  licors:    'Liqueurs',
+  modifiers: 'Modificateurs',
+  juices:    'Jus',
+  syrups:    'Sirops',
+  bitters:   'Bitters',
+  mixers:    'Mixers',
+  garnish:   'Garniture',
+  others:    'Autres',
+  custom:    'Texte libre',
 }
 
 // ── Options depuis constantes centralisées (verres, méthodes, glace, styles) ──
@@ -559,7 +576,7 @@ const form = ref({
       return {
         Ingredient: ingredient,
         Reference: i.Reference ?? '',
-        Category: findCategoryFromIngredient(ingredient),
+        Category: i.Custom ? 'custom' : findCategoryFromIngredient(ingredient),
         Oz: i.Oz ?? '',
         Ml: i.Ml ?? '',
         Dashes: i.Dashes ?? null,
@@ -617,16 +634,17 @@ function handleSave() {
   try {
     const abvFinal = abvAuto.value ? computedAbv.value : form.value.abv
 
-    const droppedLines = form.value.recipe.filter(ing => !ing.Ingredient && (ing.Ingredient?.trim() || ing.Oz || ing.Ml))
+    const droppedLines = form.value.recipe.filter(ing => !ing.Ingredient?.trim() && (ing.Oz || ing.Ml))
     if (droppedLines.length) {
       throw new Error(`Choisis un Type pour : ${droppedLines.map(l => l.Ingredient || '(sans nom)').join(', ')}`)
     }
 
     const cleanedRecipe = form.value.recipe
-      .filter(ing => ing.Ingredient)
+      .filter(ing => ing.Ingredient?.trim())
       .map(({ Category, ...rest }) => ({
-        Ingredient: rest.Ingredient,
-        ...(rest.Reference?.trim() ? { Reference: rest.Reference.trim() } : {}),
+        Ingredient: rest.Ingredient.trim(),
+        ...(Category === 'custom' ? { Custom: true } : {}),
+        ...(Category !== 'custom' && rest.Reference?.trim() ? { Reference: rest.Reference.trim() } : {}),
         IsGarnish: Category === 'garnish',
         Oz: normalizeNumber(rest.Oz),
         Ml: normalizeNumber(rest.Ml),
@@ -654,7 +672,7 @@ function handleSave() {
 
   } catch (err) {
     console.error('❌ Save failed:', err)
-    alert(`❌ ${err.message}`)
+    alert(err.message)
   }
 }
 

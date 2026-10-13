@@ -3,10 +3,13 @@
     <div class="password-modal-content" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
 
       <div class="password-modal-header">
-        <h2 class="password-modal-title" id="auth-modal-title">
-          {{ mode === 'login' ? '🍸 Connexion Bartender'
-             : mode === 'reset' ? '🔑 Mot de passe oublié'
-             : '🍾 Créer mon bar' }}
+        <h2 class="password-modal-title ico-inline" id="auth-modal-title">
+          <Martini v-if="mode === 'login'" :size="16" />
+          <KeyRound v-else-if="mode === 'reset'" :size="16" />
+          <Wine v-else :size="16" />
+          {{ mode === 'login' ? 'Connexion Bartender'
+             : mode === 'reset' ? 'Mot de passe oublié'
+             : 'Créer mon bar' }}
         </h2>
         <button @click="$emit('close')" class="password-modal-close" aria-label="Fermer">
           <X :size="20" />
@@ -75,8 +78,9 @@
             autocomplete="email"
           />
         </div>
-        <p v-else class="password-reset-success">
-          📬 Si un compte existe pour cet email, un lien vient d'être envoyé. Pense à vérifier tes spams.
+        <p v-else class="password-reset-success ico-inline--top">
+          <MailCheck :size="16" />
+          <span>Si un compte existe pour cet email, un lien vient d'être envoyé. Pense à vérifier tes spams.</span>
         </p>
 
         <p v-if="authError" class="password-form-error">{{ authError }}</p>
@@ -149,7 +153,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { X } from 'lucide-vue-next'
+import { X, Martini, KeyRound, Wine, MailCheck } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 import PasswordInput from '@/Components/PasswordInput.vue'
 

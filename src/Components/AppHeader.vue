@@ -21,7 +21,7 @@
           <transition name="fade">
             <div v-if="localShowSuggestions && suggestions.length > 0" class="search-suggestions" @click.stop>
               <div v-for="suggestion in suggestions" :key="suggestion.id" class="suggestion-item" @click="$emit('scroll-to-cocktail', suggestion.id)">
-                <span class="suggestion-type">🍹</span>
+                <Martini :size="14" class="suggestion-type-icon" aria-hidden="true" />
                 <span class="suggestion-name">{{ suggestion.name }}</span>
               </div>
             </div>

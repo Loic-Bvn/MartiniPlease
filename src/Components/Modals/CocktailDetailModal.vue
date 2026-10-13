@@ -261,7 +261,7 @@
                         <span :class="['recipe-bullet', isAvailable(ing) ? 'recipe-bullet--available' : 'recipe-bullet--missing']"></span>
                         <span class="ingredient-name-col">
                           <span :class="['ingredient-name', !isAvailable(ing) ? 'ingredient-name--missing' : '']">
-                            {{ getIngredientLabel(ing.Ingredient, locale, ingredientsByIngredient) }}
+                            {{ getRecipeLineLabel(ing, locale, ingredientsByIngredient) }}
                           </span>
                           <span v-if="ing.Reference" class="ingredient-reference">{{ ing.Reference }}</span>
                         </span>
@@ -341,6 +341,7 @@ import { X, GlassWater, Martini, Snowflake, Heart, Share2, HandPlatter, Upload, 
 import {
   getCocktailStyleLabel,
   getIngredientLabel,
+  getRecipeLineLabel,
   getProfileLabel,
   getGlassLabel,
   getDetailledMethodLabel,
@@ -478,7 +479,7 @@ const makeable = computed(() =>
 )
 
 function isAvailable(ing) {
-  if (ing.Ingredient === 'garnish') return true
+  if (ing.Ingredient === 'garnish' || ing.Custom) return true
   return barInventory.value.has(ing.Ingredient)
 }
 

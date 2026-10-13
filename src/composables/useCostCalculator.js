@@ -81,17 +81,18 @@ export function calculateCocktailCost(recipe, ingredients, opts = {}) {
     const ml = recipeLineMl(line)
     if (!ml) continue
 
-    const ingredient = line.Ingredient ? byIngredient.get(line.Ingredient) : null
+    const ingredient = line.Ingredient && !line.Custom ? byIngredient.get(line.Ingredient) : null
     const pricingSource = resolvePricingSource(line, ingredient)
     const unitCost = costPerMl(pricingSource)
     const lineCost = unitCost * ml
     const priced = unitCost > 0
 
-    if (!priced && line.Ingredient) missingPrice.push(line.Ingredient)
+    if (!priced && line.Ingredient && !line.Custom) missingPrice.push(line.Ingredient)
 
     lines.push({
       name: line.Ingredient,
       Ingredient: line.Ingredient ?? null,
+      custom: line.Custom === true,
       reference: line.Reference ?? null,
       ml,
       unitCost,

@@ -100,7 +100,7 @@
         <div v-for="group in groupedCocktails" :key="group.key ?? 'others'" class="cv-group">
 
         <div class="cv-group-header">
-          <span class="cv-group-icon">{{ group.icon }}</span>
+          <component :is="group.icon" :size="16" class="cv-group-icon" />
           <h2 class="cv-group-title">{{ group.label }}</h2>
           <span class="cv-group-count">{{ group.cocktails.length }}</span>
         </div>
@@ -139,6 +139,7 @@
 <script setup>
 import { computed } from 'vue'
 import { ArrowLeft, Rows3, GalleryVerticalEnd } from 'lucide-vue-next'
+import { spiritIcons } from '@/utils/lucideIcons'
 import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
 import CocktailCard from '@/Components/CocktailCard.vue'
@@ -173,17 +174,17 @@ const t = computed(() => ({
 }))
 
 const CATEGORY_ORDER = computed(() => [
-  { key: 'whiskey',  label: 'Whiskey',               icon: '🥃' },
-  { key: 'rum',      label: props.locale === 'fr' ? 'Rhum'     : 'Rum',      icon: '🍹' },
-  { key: 'agave',    label: 'Agave',                 icon: '🌵' },
-  { key: 'gin',      label: 'Gin',                   icon: '🌿' },
-  { key: 'vodka',    label: 'Vodka',                 icon: '❄️' },
-  { key: 'brandy',   label: 'Brandy',                icon: '🍇' },
-  { key: 'absinthe', label: 'Absinthe',              icon: '🌱' },
-  { key: 'aquavit',  label: 'Aquavit',               icon: '🌾' },
-  { key: 'pastis',   label: 'Pastis',                icon: '⭐' },
-  { key: 'mocktail', label: t.value.mocktails,       icon: '🧃' },
-  { key: null,       label: t.value.others,          icon: '🍸' },
+  { key: 'whiskey',  label: 'Whiskey',               icon: spiritIcons.whiskey },
+  { key: 'rum',      label: props.locale === 'fr' ? 'Rhum'     : 'Rum',      icon: spiritIcons.rum },
+  { key: 'agave',    label: 'Agave',                 icon: spiritIcons.agave },
+  { key: 'gin',      label: 'Gin',                   icon: spiritIcons.gin },
+  { key: 'vodka',    label: 'Vodka',                 icon: spiritIcons.vodka },
+  { key: 'brandy',   label: 'Brandy',                icon: spiritIcons.brandy },
+  { key: 'absinthe', label: 'Absinthe',              icon: spiritIcons.absinthe },
+  { key: 'aquavit',  label: 'Aquavit',               icon: spiritIcons.aquavit },
+  { key: 'pastis',   label: 'Pastis',                icon: spiritIcons.pastis },
+  { key: 'mocktail', label: t.value.mocktails,       icon: spiritIcons.mocktail },
+  { key: null,       label: t.value.others,          icon: spiritIcons.others },
 ])
 
 const cardCocktails = computed(() =>
