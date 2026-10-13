@@ -14,8 +14,14 @@
 //     Elles sont réinitialisées par clearFilters() lors du changement de bar.
 
 import { ref, computed } from 'vue'
-import { getCocktailStyleLabel, getFamilyLabel as getFL } from '@/constants/typeLabels.js'
-import { getCocktailCategory, getCocktailStyles, isMocktail } from '@/lib/cocktail-constants'
+import { getCocktailStyleLabel, getFamilyLabel as getFL, getIngredientLabel } from '@/constants/typeLabels.js'
+import { getCocktailCategory, getCocktailStyles, isMocktail, getIngredientsByCategory } from '@/lib/cocktail-constants'
+
+// ── Réglages de l'affichage du filtre Style ───────────────────────────────────
+// Valeurs de `cocktail_styles` à ne PAS proposer dans la colonne Style.
+const HIDDEN_STYLES = ['shot', 'punch', 'spritz', 'frozen']
+// true → masque aussi automatiquement tout style qu'aucun cocktail n'utilise.
+const HIDE_UNUSED_STYLES = true
 
 // ── État singleton ────────────────────────────────────────────────────────────
 const selectedFamilies   = ref([])
@@ -23,7 +29,6 @@ const selectedSubSpirits = ref([])
 const selectedSeasons    = ref([])
 const showOnlyMakeable   = ref(false)
 const showOnlyFavorites  = ref(false)
-const filterMode         = ref('main')   // 'main' | 'contains'
 const abvFilter          = ref(null)     // null | 'mocktail' | 'low'
 const selectedProfiles   = ref([])
 const selectedStyles     = ref([])
@@ -75,15 +80,25 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     { key: 'pastis',   label: 'Pastis',   subs: [] },
   ]})
 
-  const liqueurFamilies = computed(() => [
-    { key: 'bitter_liqueur',  label: getFL('bitter_liqueur',  locale?.value ?? 'fr') },
-    { key: 'citrus_liqueur',  label: getFL('citrus_liqueur',  locale?.value ?? 'fr') },
-    { key: 'fruit_liqueur',   label: getFL('fruit_liqueur',   locale?.value ?? 'fr') },
-    { key: 'herbal_liqueur',  label: getFL('herbal_liqueur',  locale?.value ?? 'fr') },
-    { key: 'nut_liqueur',     label: getFL('nut_liqueur',     locale?.value ?? 'fr') },
-    { key: 'dessert_liqueur', label: getFL('dessert_liqueur', locale?.value ?? 'fr') },
-    { key: 'anise_liqueur',   label: getFL('anise_liqueur',   locale?.value ?? 'fr') },
-  ])
+  // Liqueurs : même forme que baseSpirits ({ key, label, subs }), construite
+  // depuis cocktail-constants.json (catégorie « licors », champ `family`).
+  const LIQUEUR_FAMILY_ORDER = [
+    'bitter_liqueur', 'citrus_liqueur', 'fruit_liqueur',
+    'herbal_liqueur', 'nut_liqueur', 'dessert_liqueur',
+  ]
+  const liqueurFamilies = computed(() => {
+    const loc = locale?.value ?? 'fr'
+    const items = getIngredientsByCategory().licors || {}
+    return LIQUEUR_FAMILY_ORDER.map(famKey => ({
+      key: famKey,
+      label: getFL(famKey, loc),
+      subs: Object.entries(items)
+        .filter(([, data]) => data?.family === famKey)
+        // libellé d'un ingrédient : TYPE_LABELS, sinon `name` du JSON (items sert de map de secours)
+        .map(([key]) => ({ key, label: getIngredientLabel(key, loc, items) }))
+        .sort((a, b) => a.label.localeCompare(b.label, loc)),
+    }))
+  })
 
   const profileFilters = computed(() => {
     const fr = locale?.value === 'fr'
@@ -110,10 +125,14 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
   const styleFilters = computed(() => {
     const fr = locale?.value === 'fr'
     const styleLocale = fr ? 'fr' : 'en'
-    return getCocktailStyles().map(key => ({
-      key,
-      label: getCocktailStyleLabel(key, styleLocale),
-    }))
+    const used = new Set((cocktails?.value || []).map(c => c.cocktail_style))
+    return getCocktailStyles()
+      .filter(key => !HIDDEN_STYLES.includes(key))
+      .filter(key => !HIDE_UNUSED_STYLES || used.has(key) || selectedStyles.value.includes(key))
+      .map(key => ({
+        key,
+        label: getCocktailStyleLabel(key, styleLocale),
+      }))
   })
 
   const seasons = computed(() => {
@@ -135,12 +154,13 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
   ]))
 
   const allSubLabels = computed(() => Object.fromEntries(
-    baseSpirits.value.flatMap(s => s.subs.map(sub => [sub.key, sub.label]))
+    [...baseSpirits.value, ...liqueurFamilies.value]
+      .flatMap(s => s.subs.map(sub => [sub.key, sub.label]))
   ))
 
   const activeSubSpirits = computed(() => {
     const subs = []
-    for (const family of baseSpirits.value) {
+    for (const family of [...baseSpirits.value, ...liqueurFamilies.value]) {
       if (selectedFamilies.value.includes(family.key) && family.subs.length) {
         subs.push(...family.subs)
       }
@@ -175,40 +195,35 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
       )
     }
 
-    // Famille / sous-spirits
+    // Famille / sous-spirits — logique ET : le cocktail doit CONTENIR
+    // chaque famille ET chaque sous-spiritueux sélectionné.
     if (selectedFamilies.value.length || selectedSubSpirits.value.length) {
       const activeSubs     = selectedSubSpirits.value
       const activeFamilies = selectedFamilies.value
 
       list = list.filter(c => {
-        if (filterMode.value === 'main') {
-          const familyMatch = !activeFamilies.length || activeFamilies.includes(getCocktailCategory(c))          
-          const subMatch    = !activeSubs.length     || activeSubs.includes(c.base_spirit)
-          return familyMatch && subMatch
-        } else {
-          const recipeTypes = (c.recipe || []).map(ing => ing.Ingredient)
-          if (activeSubs.length)
-            return activeSubs.some(sub => recipeTypes.includes(sub))
-          return activeFamilies.some(family => {
-            const familyDef = baseSpirits.value.find(s => s.key === family)
-            if (familyDef) {
-              const subKeys    = familyDef.subs.map(s => s.key)
-              const genericKey = family.toLowerCase()
-              return recipeTypes.some(t => subKeys.includes(t) || t === genericKey)
-            }
-            return recipeTypes.includes(family.toLowerCase())
-          })
+        const recipeTypes = new Set((c.recipe || []).map(ing => ing.Ingredient))
+
+        const hasFamily = family => {
+          const familyDef = [...baseSpirits.value, ...liqueurFamilies.value].find(s => s.key === family)
+          if (familyDef) {
+            const generic = family.toLowerCase()
+            return recipeTypes.has(generic) || familyDef.subs.some(sub => recipeTypes.has(sub.key))
+          }
+          return recipeTypes.has(family.toLowerCase())
         }
+
+        return activeFamilies.every(hasFamily) &&
+               activeSubs.every(sub => recipeTypes.has(sub))
       })
     }
 
     // Saisons
     if (selectedSeasons.value.length) {
-      list = list.filter(c =>
-        Array.isArray(c.season)
-          ? c.season.some(s => selectedSeasons.value.includes(s))
-          : selectedSeasons.value.includes(c.season)
-      )
+      list = list.filter(c => {
+        const cs = Array.isArray(c.season) ? c.season : [c.season]
+        return selectedSeasons.value.every(s => cs.includes(s))
+      })
     }
 
     // Réalisables
@@ -226,7 +241,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
 
     // Style
     if (selectedStyles.value.length)
-      list = list.filter(c => selectedStyles.value.includes(c.cocktail_style))
+      list = list.filter(c => selectedStyles.value.every(st => c.cocktail_style === st))
 
     // Favoris
     if (showOnlyFavorites.value && hasDrinker?.value)
@@ -242,6 +257,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     selectedProfiles.value.length   > 0 ||
     abvFilter.value !== null            ||
     showOnlyFavorites.value             ||
+    showOnlyMakeable.value              ||
     selectedStyles.value.length     > 0
   )
 
@@ -258,7 +274,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     _toggle(selectedFamilies, familyKey)
     // Désélectionne les sous-spirits orphelins quand on retire la famille
     if (isActive) {
-      const family = baseSpirits.value.find(s => s.key === familyKey)
+      const family = [...baseSpirits.value, ...liqueurFamilies.value].find(s => s.key === familyKey)
       if (family?.subs.length) {
         const subKeys = family.subs.map(s => s.key)
         selectedSubSpirits.value = selectedSubSpirits.value.filter(k => !subKeys.includes(k))
@@ -268,9 +284,12 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
 
   function toggleSubSpirit(spiritKey)  { _toggle(selectedSubSpirits, spiritKey) }
   function toggleProfile(profileKey)   { _toggle(selectedProfiles,   profileKey) }
-  function toggleStyle(styleKey)       { _toggle(selectedStyles,     styleKey) }
+  // cocktail_style est mono-valué : en logique ET, deux styles = 0 résultat.
+  // On le traite donc comme un choix unique (re-cliquer désélectionne).
+  function toggleStyle(styleKey) {
+    selectedStyles.value = selectedStyles.value.includes(styleKey) ? [] : [styleKey]
+  }
 
-  function toggleFilterMode(mode)      { filterMode.value = mode }
   function toggleMakeable()            { showOnlyMakeable.value  = !showOnlyMakeable.value }
   function toggleFavorites()           { showOnlyFavorites.value = !showOnlyFavorites.value }
 
@@ -313,7 +332,6 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     selectedSeasons,
     showOnlyMakeable,
     showOnlyFavorites,
-    filterMode,
     abvFilter,
     selectedProfiles,
     selectedStyles,
@@ -339,7 +357,6 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     toggleSubSpirit,
     toggleProfile,
     toggleStyle,
-    toggleFilterMode,
     toggleMakeable,
     toggleFavorites,
     setAbvFilter,

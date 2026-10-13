@@ -137,7 +137,6 @@
           :selectedSeasons="selectedSeasons"
           :showOnlyMakeable="showOnlyMakeable"
           :showOnlyFavorites="showOnlyFavorites"
-          :filterMode="filterMode"
           :abvFilter="abvFilter"
           :selectedProfiles="selectedProfiles"
           :selectedStyles="selectedStyles"
@@ -172,7 +171,6 @@
           @toggle-sub-spirit="toggleSubSpirit"
           @toggle-profile="toggleProfile"
           @toggle-style="toggleStyle"
-          @toggle-filter-mode="toggleFilterMode"
           @toggle-makeable="toggleMakeable"
           @toggle-favorites="toggleFavorites"
           @set-abv-filter="setAbvFilter"
@@ -438,13 +436,13 @@ const { searchInput: searchTerm, showSuggestions: showSearchSuggestions, suggest
 // ── Filtres ───────────────────────────────────────────────────────────────────
 const {
   selectedFamilies, selectedSubSpirits, selectedSeasons,
-  showOnlyMakeable, showOnlyFavorites, filterMode, abvFilter,
+  showOnlyMakeable, showOnlyFavorites, abvFilter,
   selectedProfiles, selectedStyles,
   baseSpirits, liqueurFamilies, profileFilters, styleFilters, seasons,
   allLabels, allSubLabels, activeSubSpirits,
   filteredCocktails, hasActiveFilters, makeableCount,
   toggleFamily, toggleSubSpirit, toggleProfile, toggleStyle,
-  toggleFilterMode, toggleMakeable, toggleFavorites,
+  toggleMakeable, toggleFavorites,
   setAbvFilter, setSeason, clearFilters,
 } = useFilters({ cocktails, barInventory, favorites, hasDrinker, locale, searchTerm })
 const { recommendations } = useCocktailRecommendations({ cocktails, favorites, history })

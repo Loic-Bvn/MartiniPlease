@@ -66,7 +66,6 @@
           @toggle="togglePanel('filters')"
           :locale="locale"
           :t="t"
-          :filter-mode="filterMode"
           :abv-filter="abvFilter"
           :selected-families="selectedFamilies"
           :selected-sub-spirits="selectedSubSpirits"
@@ -89,7 +88,6 @@
           @toggle-sub-spirit="$emit('toggle-sub-spirit', $event)"
           @toggle-profile="$emit('toggle-profile', $event)"
           @toggle-style="$emit('toggle-style', $event)"
-          @toggle-filter-mode="$emit('toggle-filter-mode', $event)"
           @toggle-makeable="$emit('toggle-makeable')"
           @toggle-favorites="$emit('toggle-favorites')"
           @set-abv-filter="$emit('set-abv-filter', $event)"
@@ -313,7 +311,6 @@ const props = defineProps({
   selectedSeasons:    Array,
   showOnlyMakeable:   Boolean,
   showOnlyFavorites:  Boolean,
-  filterMode:         String,
   abvFilter:          String,
   selectedProfiles:   Array,
   selectedStyles:     Array,
@@ -363,7 +360,7 @@ const emit = defineEmits([
   'view-card', 'edit-card', 'delete-card', 'new-card', 'toggle-card-visibility',
   'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail', 'open-cocktail',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
-  'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
+  'toggle-makeable', 'toggle-favorites',
   'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'surprise-me', 'open-drinker-login', 'drinker-sign-out',
   'set-cocktail-of-moment', 'share-favorites',
   'set-featured-menu-card',
@@ -456,9 +453,6 @@ const t = computed(() => ({
   newCard:        props.locale === 'fr' ? 'Nouvelle carte'            : 'New card',
   noCard:         props.locale === 'fr' ? 'Aucune carte créée.'       : 'No card yet.',
   stock:          props.locale === 'fr' ? 'Stock du bar'             : 'Bar stock',
-  filterMode:     props.locale === 'fr' ? 'Mode de recherche'         : 'Search mode',
-  filterMain:     props.locale === 'fr' ? 'Ingrédient principal'     : 'Main ingredient',
-  filterContains: props.locale === 'fr' ? 'Contient'                 : 'Contains',
   filterSpirits:  props.locale === 'fr' ? 'Spiritueux de base'        : 'Base spirits',
   filterLiqueurs: props.locale === 'fr' ? 'Liqueurs'                  : 'Licors',
   filterSeason:   props.locale === 'fr' ? 'Saison'                   : 'Season',
