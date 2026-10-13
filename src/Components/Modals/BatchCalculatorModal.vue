@@ -16,7 +16,10 @@
     <div v-if="open" class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-container modal-container--batch" role="dialog" aria-modal="true" aria-labelledby="batch-modal-title">
         <div class="modal-header">
-          <h2 class="modal-title" id="batch-modal-title">🧪 Batch — {{ cocktail?.name }}</h2>
+          <h2 class="modal-title ico-inline" id="batch-modal-title">
+            <FlaskConical :size="16" />
+            Batch — {{ cocktail?.name }}
+          </h2>
           <button @click="$emit('close')" class="btn-icon btn-icon--close" aria-label="Fermer">
             <X :size="20" />
           </button>
@@ -48,9 +51,9 @@
             </label>
           </div>
 
-          <div v-if="batch.missingPrice.length" class="batch-warning">
-            ⚠️ Prix manquant pour : {{ batch.missingPrice.join(', ') }}.
-            Le coût affiché est incomplet.
+          <div v-if="batch.missingPrice.length" class="batch-warning ico-inline--top">
+            <TriangleAlert :size="16" />
+            <span>Prix manquant pour : {{ batch.missingPrice.join(', ') }}. Le coût affiché est incomplet.</span>
           </div>
 
           <table class="batch-table">
@@ -108,7 +111,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { X } from 'lucide-vue-next'
+import { X, FlaskConical, TriangleAlert } from 'lucide-vue-next'
 import { calculateBatch } from '@/composables/useCostCalculator'
 
 const props = defineProps({

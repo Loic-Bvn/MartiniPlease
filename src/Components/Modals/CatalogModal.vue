@@ -4,7 +4,10 @@
 
       <!-- Header -->
       <div class="modal-header">
-        <h2 class="modal-title" id="catalog-modal-title">📚 {{ locale === 'fr' ? 'Importer une recette' : 'Import a recipe' }}</h2>
+        <h2 class="modal-title ico-inline" id="catalog-modal-title">
+          <Library :size="16" />
+          {{ locale === 'fr' ? 'Importer une recette' : 'Import a recipe' }}
+        </h2>
         <button @click="$emit('close')" class="modal-close-btn" :aria-label="locale === 'fr' ? 'Fermer' : 'Close'">
           <X :size="20" />
         </button>
@@ -41,7 +44,7 @@
           </div>
           <select v-model="filters.spirit" @change="doFetch" class="form-input catalog-filter-select">
             <option value="">{{ locale === 'fr' ? 'Tous les spiritueux' : 'All spirits' }}</option>
-            <optgroup v-for="cat in spiritCategories" :key="cat.key" :label="cat.label">
+            <optgroup v-for="cat in spiritCategories" :key="cat.key" :label="splitLabel(cat.label).text">
               <option v-for="s in cat.spirits" :key="s.key" :value="s.key">{{ s.label }}</option>
             </optgroup>
           </select>
@@ -51,12 +54,13 @@
           </select>
           <select v-model="filters.profile" @change="doFetch" class="form-input catalog-filter-select">
             <option value="">{{ locale === 'fr' ? 'Tous les profils' : 'All profiles' }}</option>
-            <option v-for="p in profileOptions" :key="p.key" :value="p.key">{{ p.icon }} {{ p.label }}</option>
+            <option v-for="p in profileOptions" :key="p.key" :value="p.key">{{ p.label }}</option>
           </select>
         </div>
 
-        <button v-if="hasActiveFilters" @click="clearFilters" class="btn-modal-secondary catalog-clear-filters">
-          {{ locale === 'fr' ? '✕ Effacer les filtres' : '✕ Clear filters' }}
+        <button v-if="hasActiveFilters" @click="clearFilters" class="btn-modal-secondary catalog-clear-filters ico-inline">
+          <X :size="14" />
+          {{ locale === 'fr' ? 'Effacer les filtres' : 'Clear filters' }}
         </button>
 
         <!-- ── États ── -->
@@ -65,7 +69,7 @@
         </div>
 
         <div v-else-if="catalog.length === 0" class="catalog-empty">
-          <span style="font-size:2rem">🍸</span>
+          <Martini :size="32" />
           <p>{{ locale === 'fr' ? 'Aucune recette trouvée' : 'No recipe found' }}</p>
         </div>
 
@@ -111,12 +115,17 @@
                       v-if="!isAlreadyInBar(cocktail.id)"
                       @click="handleImport(cocktail)"
                       :disabled="importing === cocktail.id"
-                      class="btn-modal-primary catalog-btn-import"
+                      class="btn-modal-primary catalog-btn-import ico-inline"
                     >
-                      {{ importing === cocktail.id ? '⏳' : (locale === 'fr' ? '⬇ Importer' : '⬇ Import') }}
+                      <LoaderCircle v-if="importing === cocktail.id" :size="14" class="spin" />
+                      <template v-else>
+                        <Download :size="14" />
+                        {{ locale === 'fr' ? 'Importer' : 'Import' }}
+                      </template>
                     </button>
-                    <span v-else class="catalog-badge catalog-badge--done">
-                      ✓ {{ locale === 'fr' ? 'Déjà dans votre bar' : 'Already in your bar' }}
+                    <span v-else class="catalog-badge catalog-badge--done ico-inline">
+                      <Check :size="12" />
+                      {{ locale === 'fr' ? 'Déjà dans votre bar' : 'Already in your bar' }}
                     </span>
                   </div>
                 </div>
@@ -141,7 +150,8 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { X, Search, Upload, Martini } from 'lucide-vue-next'
+import { X, Search, Upload, Martini, Library, Download, Check, LoaderCircle } from 'lucide-vue-next'
+import { splitLabel } from '@/utils/tileLabel'
 import { supabase, isSupabasePublicImage } from '@/lib/supabase'
 import { useCatalog } from '@/composables/useCatalog'
 import { useCocktails } from '@/composables/useCocktails'

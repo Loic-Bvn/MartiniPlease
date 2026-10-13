@@ -75,7 +75,7 @@
           <div class="category-title-row">
             <component :is="isExpanded(category.key) ? ChevronDown : ChevronRight" :size="16" class="category-chevron" />
             <h3 class="category-title">
-              <span class="category-icon">{{ category.icon }}</span>
+              <component :is="category.icon" :size="16" class="category-icon" />
               {{ category.label }}
             </h3>
             <span class="category-count" :title="`${category.selectedCount} ingrédient(s) + ${category.selectedReferencesCount} référence(s)`">
@@ -263,7 +263,7 @@
     <!-- Modal de confirmation de suppression -->
     <ConfirmModal
       :open="!!ingredientToDelete"
-      title="🗑️ Supprimer l'ingrédient"
+      title="Supprimer l'ingrédient"
       :message="deleteWarningMessage"
       confirm-label="Supprimer"
       cancel-label="Annuler"
@@ -274,7 +274,7 @@
     <!-- Modal de confirmation de suppression d'une référence -->
     <ConfirmModal
       :open="!!referenceToDelete"
-      title="🗑️ Supprimer la référence"
+      title="Supprimer la référence"
       :message="deleteReferenceWarningMessage"
       confirm-label="Supprimer"
       cancel-label="Annuler"
@@ -288,6 +288,7 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { CheckSquare, Square, Search, Plus, ChevronDown, ChevronRight, BookPlus, Trash2 } from 'lucide-vue-next'
+import { categoryIcons } from '@/utils/lucideIcons'
 import { useInventory } from '@/composables/useInventory'
 import { useToast } from '@/composables/useToast'
 import ConfirmModal      from '@/Components/Modals/ConfirmModal.vue'
@@ -368,7 +369,7 @@ async function confirmDeleteIngredient() {
 
   try {
     await deleteIngredient(ing.type)
-    showToast(`🗑️ ${ing.name} supprimé`)
+    showToast(`${ing.name} supprimé`)
   } catch (err) {
     console.error('❌ Erreur suppression ingrédient:', err)
     showToast('Erreur lors de la suppression.')
@@ -400,7 +401,7 @@ async function confirmDeleteReference() {
 
   try {
     await removeReference(target.type, target.ref.id)
-    showToast(`🗑️ ${target.ref.name} supprimée`)
+    showToast(`${target.ref.name} supprimée`)
   } catch (err) {
     console.error('❌ Erreur suppression référence:', err)
     showToast('Erreur lors de la suppression.')
@@ -410,15 +411,15 @@ async function confirmDeleteReference() {
 }
 
 const categoryMetadata = {
-  spirits:   { label: 'Spiritueux',    icon: '🥃' },
-  licors:    { label: 'Liqueurs',      icon: '🍷' },
-  modifiers: { label: 'Modificateurs', icon: '🍸' },
-  juices:    { label: 'Jus',           icon: '🍊' },
-  syrups:    { label: 'Sirops',        icon: '🍯' },
-  bitters:   { label: 'Bitters',       icon: '💧' },
-  mixers:    { label: 'Mixers',        icon: '🥤' },
-  garnish:   { label: 'Garniture',     icon: '🍋' },
-  others:    { label: 'Autres',        icon: '📦' },
+  spirits:   { label: 'Spiritueux',    icon: categoryIcons.spirits },
+  licors:    { label: 'Liqueurs',      icon: categoryIcons.licors },
+  modifiers: { label: 'Modificateurs', icon: categoryIcons.modifiers },
+  juices:    { label: 'Jus',           icon: categoryIcons.juices },
+  syrups:    { label: 'Sirops',        icon: categoryIcons.syrups },
+  bitters:   { label: 'Bitters',       icon: categoryIcons.bitters },
+  mixers:    { label: 'Mixers',        icon: categoryIcons.mixers },
+  garnish:   { label: 'Garniture',     icon: categoryIcons.garnish },
+  others:    { label: 'Autres',        icon: categoryIcons.others },
 }
 
 // Catégories pour lesquelles l'ABV générique de l'ingrédient est éditable
@@ -465,7 +466,7 @@ const categorizedIngredients = computed(() => {
       return {
         key,
         label: categoryMetadata[key]?.label || key,
-        icon: categoryMetadata[key]?.icon || '📦',
+        icon: categoryMetadata[key]?.icon || categoryIcons.others,
         ingredients: ings,
         selectedCount: ings.filter(isIngredientAvailable).length,
         selectedReferencesCount: ings.reduce((sum, i) => sum + (i.references || []).filter(r => r.available).length, 0),

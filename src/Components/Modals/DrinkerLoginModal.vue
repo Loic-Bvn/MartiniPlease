@@ -3,7 +3,10 @@
     <div class="password-modal-content" role="dialog" aria-modal="true" aria-labelledby="drinker-login-modal-title">
 
       <div class="password-modal-header">
-        <h2 class="password-modal-title" id="drinker-login-modal-title">🥂 {{ locale === 'fr' ? 'Bienvenue !' : 'Welcome!' }}</h2>
+        <h2 class="password-modal-title ico-inline" id="drinker-login-modal-title">
+          <Wine :size="16" />
+          {{ locale === 'fr' ? 'Bienvenue !' : 'Welcome!' }}
+        </h2>
         <button @click="$emit('close')" class="password-modal-close" :aria-label="locale === 'fr' ? 'Fermer' : 'Close'">
           <X :size="20" />
         </button>
@@ -59,13 +62,14 @@
         <div class="password-modal-buttons">
           <button
             @click="submitSelect"
-            class="password-btn-submit"
+            class="password-btn-submit ico-inline"
             :disabled="!selectedPseudo || isLoading"
           >
-            {{ isLoading
-              ? (locale === 'fr' ? '⏳ Chargement...' : '⏳ Loading...')
-              : (locale === 'fr' ? 'Me connecter' : 'Log in')
-            }}
+            <template v-if="isLoading">
+              <LoaderCircle :size="16" class="spin" />
+              {{ locale === 'fr' ? 'Chargement...' : 'Loading...' }}
+            </template>
+            <template v-else>{{ locale === 'fr' ? 'Me connecter' : 'Log in' }}</template>
           </button>
         </div>
       </template>
@@ -96,13 +100,14 @@
         <div class="password-modal-buttons">
           <button
             @click="submitCreate"
-            class="password-btn-submit"
+            class="password-btn-submit ico-inline"
             :disabled="!pseudoInput.trim() || isLoading"
           >
-            {{ isLoading
-              ? (locale === 'fr' ? '⏳ Chargement...' : '⏳ Loading...')
-              : (locale === 'fr' ? "C'est parti" : 'Got it')
-            }}
+            <template v-if="isLoading">
+              <LoaderCircle :size="16" class="spin" />
+              {{ locale === 'fr' ? 'Chargement...' : 'Loading...' }}
+            </template>
+            <template v-else>{{ locale === 'fr' ? "C'est parti" : 'Got it' }}</template>
           </button>
         </div>
       </template>
@@ -112,7 +117,7 @@
 
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
-import { X } from 'lucide-vue-next'
+import { X, Wine, LoaderCircle } from 'lucide-vue-next'
 import { useDrinker } from '@/composables/useDrinker'
 
 const props = defineProps({

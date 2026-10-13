@@ -9,7 +9,7 @@
         @click="activeTab = 'pending'"
         :class="['tab-btn', { 'tab-btn--active': activeTab === 'pending' }]"
       >
-        <span v-if="activeTab === 'pending'" class="tab-icon">⏳</span>
+        <Clock v-if="activeTab === 'pending'" :size="14" class="tab-icon" />
         {{ locale === 'fr' ? 'En attente' : 'Pending' }}
         <span v-if="orders.length > 0" class="tab-count">
           {{ orders.length }}
@@ -20,7 +20,7 @@
         @click="activeTab = 'completed'"
         :class="['tab-btn', { 'tab-btn--active': activeTab === 'completed' }]"
       >
-        <span v-if="activeTab === 'completed'" class="tab-icon">✅</span>
+        <Check v-if="activeTab === 'completed'" :size="14" class="tab-icon" />
         {{ locale === 'fr' ? 'Complétées' : 'Completed' }}
         <span v-if="completedOrders.length > 0" class="tab-count">
           {{ completedOrders.length }}
@@ -85,11 +85,13 @@
                 <span v-if="isValidChip(getCocktail(group.cocktail_id).method)" class="chip chip-small">
                     {{ getCocktail(group.cocktail_id).method }}
                 </span>
-                <span v-if="isValidChip(getCocktail(group.cocktail_id).ice)" class="chip chip-small">
-                  🧊 {{ getDetailledIceLabel(getCocktail(group.cocktail_id).ice, locale) }}
+                <span v-if="isValidChip(getCocktail(group.cocktail_id).ice)" class="chip chip-small ico-inline">
+                  <Snowflake :size="12" />
+                  {{ getDetailledIceLabel(getCocktail(group.cocktail_id).ice, locale) }}
                 </span>
-                <span v-if="isValidChip(getCocktail(group.cocktail_id).glass)" class="chip chip-small">
-                  🍸 {{ getGlassLabel(getCocktail(group.cocktail_id).glass, locale) }}
+                <span v-if="isValidChip(getCocktail(group.cocktail_id).glass)" class="chip chip-small ico-inline">
+                  <Martini :size="12" />
+                  {{ getGlassLabel(getCocktail(group.cocktail_id).glass, locale) }}
                 </span>
             </div>
           </div>
@@ -237,7 +239,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { User, GlassWater, Clock, Check, X } from 'lucide-vue-next'
+import { User, GlassWater, Clock, Check, X, Snowflake, Martini } from 'lucide-vue-next'
 import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
 import { getDetailledIceLabel, getGlassLabel, getIngredientLabel } from '../constants/typeLabels.js'

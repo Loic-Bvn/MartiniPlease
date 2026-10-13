@@ -5,7 +5,7 @@
       <!-- Header -->
       <div class="add-ing-header">
         <h2 class="add-ing-title">
-          <span class="add-ing-icon">{{ categoryIcon }}</span>
+          <component :is="categoryIcon || Package" :size="18" class="add-ing-icon" />
           Ajouter un ingrédient
         </h2>
         <button @click="$emit('close')" class="add-ing-close" aria-label="Fermer">
@@ -91,14 +91,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { X, Plus, Loader2 } from 'lucide-vue-next'
+import { X, Plus, Loader2, Package } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { getFamilyOptions } from '@/lib/cocktail-constants'
 
 const props = defineProps({
   categoryKey:   { type: String, required: true },
   categoryLabel: { type: String, required: true },
-  categoryIcon:  { type: String, default: '📦' },
+  categoryIcon:  { type: [Object, Function], default: null },
   locale:        { type: String, default: 'fr' },
 })
 

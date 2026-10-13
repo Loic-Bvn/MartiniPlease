@@ -3552,9 +3552,10 @@ body {
   margin-bottom: 4px;
 }
 .welcome-card-icon {
-  font-size: 22px;
+  color: var(--gold);
   flex-shrink: 0;
 }
+.welcome-demo-icon { color: var(--gold); flex-shrink: 0; }
 .welcome-card-title {
   font-size: 0.9rem;
   font-weight: 700;

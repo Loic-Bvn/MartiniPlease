@@ -4,7 +4,7 @@
     <div v-if="isLoggedIn" :class="['section-card', 'tile-stock', { 'tile-open': openPanel === 'stock' }]">
       <button @click="togglePanel('stock')" class="expand-actions-btn">
         <ChevronDown :size="18" :class="{ rotated: openPanel === 'stock' }" />
-        <h2 class="section-title"><span class="tile-ico">{{ splitLabel(t.stock).icon }}</span><span class="tile-lbl"><span class="lbl-full">{{ splitLabel(t.stock).text }}</span><span class="lbl-short">Stock</span></span><span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
+        <h2 class="section-title"><component :is="lucideIcons.stock" :size="20" class="tile-ico" /><span class="tile-lbl"><span class="lbl-full">{{ t.stock }}</span><span class="lbl-short">Stock</span></span><span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
         <span></span>
       </button>
       <InventoryManager v-if="openPanel === 'stock'" />
@@ -14,7 +14,7 @@
       <button @click="togglePanel('orders')" class="expand-actions-btn">
         <ChevronDown :size="18" :class="{ rotated: openPanel === 'orders' }" />
         <h2 class="section-title">
-          <span class="tile-ico">🍸</span><span class="tile-lbl">{{ locale === 'fr' ? 'Commandes' : 'Orders' }}</span>
+          <component :is="lucideIcons.orders" :size="20" class="tile-ico" /><span class="tile-lbl">{{ locale === 'fr' ? 'Commandes' : 'Orders' }}</span>
           <span v-if="pendingOrdersCount > 0" class="count-badge pending-badge">{{ pendingOrdersCount }}</span>
         </h2>
         <span></span>
@@ -103,7 +103,7 @@
           class="expand-actions-btn tile-drinker tile-login"
           @click="$emit('open-drinker-login')"
         >
-          <span class="section-title"><span class="tile-ico">🔑</span><span class="tile-lbl">{{ locale === 'fr' ? 'Connexion' : 'Sign in' }}</span></span>
+          <span class="section-title"><component :is="lucideIcons.login" :size="20" class="tile-ico" /><span class="tile-lbl">{{ locale === 'fr' ? 'Connexion' : 'Sign in' }}</span></span>
         </button>
 
         <DrinkerPanel
@@ -242,7 +242,7 @@
 
       <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
       <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
-        <div class="empty-state-icon">🍹</div>
+        <component :is="lucideIcons.cocktail" :size="48" class="empty-state-icon" aria-hidden="true" />
         <h3 class="empty-state-title">{{ locale === 'fr' ? 'Aucun cocktail trouvé' : 'No cocktails found' }}</h3>
         <p class="empty-state-message">{{ locale === 'fr' ? 'Essayez d\'ajuster vos filtres...' : 'Try adjusting your filters...' }}</p>
         <div class="empty-state-actions">
@@ -279,13 +279,13 @@
 <script setup>
 import { ref, computed, watch, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
 import { ChevronDown, Rows3, GalleryVerticalEnd, Dices, Heart } from 'lucide-vue-next'
+import { lucideIcons } from '@/utils/lucideIcons'
 const InventoryManager = defineAsyncComponent(() => import('@/Components/Modals/InventoryManager.vue'))
 import OrdersPanel      from '@/Components/OrdersPanel.vue'
 import FilterPanel      from '@/Components/FilterPanel.vue'
 import DrinkerPanel     from '@/Components/DrinkerPanel.vue'
 import CardPanel        from '@/Components/CardPanel.vue'
 import CocktailCard     from '@/Components/CocktailCard.vue'
-import { splitLabel }   from '@/utils/tileLabel'
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 // filteredCocktails, hasActiveFilters et makeableCount sont calculés dans
@@ -451,14 +451,14 @@ function handleOpenCocktail(cocktail, rect, cardId = null) {
 }
 
 const t = computed(() => ({
-  filterTitle:    props.locale === 'fr' ? '🔍 Filtres'                : '🔍 Filters',
-  cardsTitle:     props.locale === 'fr' ? '📜 Cartes'                 : '📜 Cards',
+  filterTitle:    props.locale === 'fr' ? 'Filtres'                  : 'Filters',
+  cardsTitle:     props.locale === 'fr' ? 'Cartes'                   : 'Cards',
   newCard:        props.locale === 'fr' ? 'Nouvelle carte'            : 'New card',
   noCard:         props.locale === 'fr' ? 'Aucune carte créée.'       : 'No card yet.',
-  stock:          props.locale === 'fr' ? '📦 Stock du bar'           : '📦 Bar stock',
+  stock:          props.locale === 'fr' ? 'Stock du bar'             : 'Bar stock',
   filterMode:     props.locale === 'fr' ? 'Mode de recherche'         : 'Search mode',
-  filterMain:     props.locale === 'fr' ? '🎯 Ingrédient principal'   : '🎯 Main ingredient',
-  filterContains: props.locale === 'fr' ? '🔍 Contient'              : '🔍 Contains',
+  filterMain:     props.locale === 'fr' ? 'Ingrédient principal'     : 'Main ingredient',
+  filterContains: props.locale === 'fr' ? 'Contient'                 : 'Contains',
   filterSpirits:  props.locale === 'fr' ? 'Spiritueux de base'        : 'Base spirits',
   filterLiqueurs: props.locale === 'fr' ? 'Liqueurs'                  : 'Licors',
   filterSeason:   props.locale === 'fr' ? 'Saison'                   : 'Season',

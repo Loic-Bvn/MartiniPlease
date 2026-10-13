@@ -2,7 +2,7 @@
   <div class="section-card">
     <button @click="$emit('toggle')" class="expand-actions-btn">
       <ChevronDown :size="18" :class="{ rotated: open }" />
-      <h2 class="section-title"><span class="tile-ico">{{ splitLabel(t.cardsTitle).icon }}</span><span class="tile-lbl">{{ splitLabel(t.cardsTitle).text }}</span><span class="count-badge">{{ menuCards.length }}</span></h2>
+      <h2 class="section-title"><component :is="lucideIcons.cards" :size="20" class="tile-ico" /><span class="tile-lbl">{{ t.cardsTitle }}</span><span class="count-badge">{{ menuCards.length }}</span></h2>
       <span></span>
     </button>
     <div v-if="open" class="cards-content">
@@ -38,7 +38,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { splitLabel } from '@/utils/tileLabel'
+import { lucideIcons } from '@/utils/lucideIcons'
 import { ChevronDown, Eye, EyeOff, Pencil, Trash2, Plus } from 'lucide-vue-next'
 
 defineProps({ open: { type: Boolean, default: false }, isLoggedIn: Boolean, menuCards: Array, locale: String, t: Object })

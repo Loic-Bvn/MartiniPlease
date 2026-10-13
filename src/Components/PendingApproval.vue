@@ -7,7 +7,7 @@
   <div class="pending-approval">
     <div class="pending-card">
       <template v-if="status === 'pending'">
-        <div class="icon">⏳</div>
+        <div class="icon"><Clock :size="40" /></div>
         <h2>Ton bar est en cours de validation</h2>
         <p>
           Merci pour ton inscription ! Pour limiter les créations abusives,
@@ -19,7 +19,7 @@
       </template>
 
       <template v-else-if="status === 'rejected'">
-        <div class="icon">✖️</div>
+        <div class="icon"><CircleX :size="40" /></div>
         <h2>Inscription refusée</h2>
         <p>
           Ton inscription n'a pas pu être validée. Si tu penses qu'il s'agit
@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+import { Clock, CircleX } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 
 const { barStatus: status, signOut } = useAuth()

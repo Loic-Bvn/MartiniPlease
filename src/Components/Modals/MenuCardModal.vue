@@ -4,7 +4,8 @@
 
       <!-- Header -->
       <div class="modal-header">
-        <h2 class="modal-title" id="menucard-modal-title">
+        <h2 class="modal-title ico-inline" id="menucard-modal-title">
+          <component :is="isEditing ? Pencil : FolderPlus" :size="16" />
           {{ isEditing ? t.editTitle : t.newTitle }}
         </h2>
         <button @click="$emit('close')" class="btn-icon btn-icon--close" aria-label="Fermer">
@@ -54,7 +55,7 @@
       <div class="cocktail-list">
         <!-- Sélectionnés en premier -->
         <div v-if="selectedCocktails.length" class="list-section">
-          <p class="list-section-label">✓ {{ t.selected }}</p>
+          <p class="list-section-label ico-inline"><Check :size="12" /> {{ t.selected }}</p>
           <div
             v-for="c in selectedCocktails"
             :key="c.id"
@@ -66,7 +67,13 @@
             </div>
             <div class="row-info">
               <span class="row-name">{{ c.name }}</span>
-              <span class="row-meta">{{ c.base_spirit }} · {{ seasonIcon(c.season) }}</span>
+              <span class="row-meta ico-inline">
+                {{ c.base_spirit }} ·
+                <template v-for="k in seasonKeys(c.season)" :key="k">
+                  <component v-if="seasonIcons[k]" :is="seasonIcons[k]" :size="12" :aria-label="k" />
+                  <span v-else>{{ k }}</span>
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -85,7 +92,13 @@
             </div>
             <div class="row-info">
               <span class="row-name">{{ c.name }}</span>
-              <span class="row-meta">{{ c.base_spirit }} · {{ seasonIcon(c.season) }}</span>
+              <span class="row-meta ico-inline">
+                {{ c.base_spirit }} ·
+                <template v-for="k in seasonKeys(c.season)" :key="k">
+                  <component v-if="seasonIcons[k]" :is="seasonIcons[k]" :size="12" :aria-label="k" />
+                  <span v-else>{{ k }}</span>
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -113,7 +126,8 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { X, Search, Check } from 'lucide-vue-next'
+import { X, Search, Check, Pencil, FolderPlus } from 'lucide-vue-next'
+import { seasonIcons } from '@/utils/lucideIcons'
 import { validateMenuCard } from '@/composables/useDataValidator'
 
 const props = defineProps({
@@ -131,8 +145,8 @@ onMounted(() => window.addEventListener('keydown', handleKeydown))
 onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 const t = computed(() => ({
-  editTitle:           props.locale === 'fr' ? '✏️ Modifier la carte'         : '✏️ Edit card',
-  newTitle:            props.locale === 'fr' ? '🗂️ Nouvelle carte'            : '🗂️ New card',
+  editTitle:           props.locale === 'fr' ? 'Modifier la carte'         : 'Edit card',
+  newTitle:            props.locale === 'fr' ? 'Nouvelle carte'            : 'New card',
   cardName:            props.locale === 'fr' ? 'Nom de la carte'              : 'Card name',
   cardNamePlaceholder: props.locale === 'fr' ? "Ex: Carte d'été, Carte du soir..." : 'Ex: Summer card, Evening card...',
   visibleToDrinkers:   props.locale === 'fr' ? 'Afficher ce menu aux drinkers' : 'Show this menu to drinkers',
@@ -175,10 +189,8 @@ function toggle(id) {
   else selectedIds.value.push(id)
 }
 
-function seasonIcon(season) {
-  const icons = { spring: '🌸', summer: '☀️', fall: '🍂', winter: '❄️' }
-  const s = Array.isArray(season) ? season : [season]
-  return s.map(k => icons[k] || k).join(' ')
+function seasonKeys(season) {
+  return (Array.isArray(season) ? season : [season]).filter(Boolean)
 }
 
 async function save() {
@@ -194,7 +206,7 @@ async function save() {
     saving.value = true
     emit('save', validated)
   } catch (err) {
-    alert(`❌ ${err.message}`)
+    alert(err.message)
     saving.value = false
   }
 }

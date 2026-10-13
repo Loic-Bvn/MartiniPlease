@@ -168,8 +168,8 @@ export function getCocktailCategories() {
 export function getGlassesAsOptions() {
   const glasses = getGlasses()
   return Object.entries(glasses)
-    .map(([key, data]) => ({ value: key, label: `${data.emoji} ${data.name}` }))
-    .sort((a, b) => a.label.slice(2).localeCompare(b.label, 'fr'))
+    .map(([key, data]) => ({ value: key, label: data.name }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
 }
 
 /**
@@ -178,8 +178,8 @@ export function getGlassesAsOptions() {
 export function getMethodsAsOptions() {
   const methods = getMethods()
   return Object.entries(methods)
-    .map(([key, data]) => ({ value: key, label: `${data.emoji} ${data.name}` }))
-    .sort((a, b) => a.label.slice(2).localeCompare(b.label, 'fr'))
+    .map(([key, data]) => ({ value: key, label: data.name }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
 }
 
 /**

@@ -97,6 +97,7 @@
   text-transform: uppercase;
   font-weight: 600;
 }
+.suggestion-type-icon { color: var(--gold); flex-shrink: 0; }
 
 .suggestion-name {
   font-size: 0.9rem;
@@ -150,6 +151,9 @@
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
 }
+.bar-status-badge svg { color: var(--gold); vertical-align: middle; }
+.icon-spin { animation: icon-spin 1s linear infinite; }
+@keyframes icon-spin { to { transform: rotate(360deg); } }
 
 /* ── Bar Actions New Layout ────────────────────────────────── */
 .bar-actions-new {
@@ -237,6 +241,7 @@
   font-size: 3rem;
   margin-bottom: 1rem;
   opacity: 0.5;
+  color: var(--gold);
   animation: float 3s ease-in-out infinite;
 }
 
@@ -667,7 +672,7 @@ html {
   font-size: 0.62rem;
   letter-spacing: 0.5px;
 }
-.tile-ico { margin: 0; font-size: 1.25rem; line-height: 1; }
+.tile-ico { margin: 0; color: var(--gold); font-size: 1.25rem; line-height: 1; }
 .tile-lbl { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lbl-full { display: none; }
 .lbl-short { display: inline; }
@@ -769,3 +774,19 @@ html {
   .card-footer { flex-wrap: wrap; gap: 0.25rem 0.5rem; margin-top: 0.5rem; padding-top: 0.5rem; }
   .card-footer .footer-right { flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
 }
+
+/* ── Icônes Lucide alignées avec le texte (remplacent les emojis) ── */
+.ico-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  vertical-align: middle;
+}
+.ico-inline > svg { flex-shrink: 0; }
+.ico-inline--top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+.ico-inline--top > svg { flex-shrink: 0; margin-top: 0.15em; }
