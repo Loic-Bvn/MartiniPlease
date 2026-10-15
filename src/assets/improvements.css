@@ -869,6 +869,18 @@ html {
 .filters-grid > .filter-group { min-width: 0; }
 .filters-grid .filter-label { margin-bottom: 0.3rem; }
 
+/* Barre d'outils : recherche (extensible) + « Tout effacer » sur une seule ligne */
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.filter-toolbar .filter-search { flex: 1 1 auto; min-width: 0; }
+.filter-toolbar .filter-search .search-input { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.filter-toolbar .clear-all-btn--inner { flex: none; margin: 0 0 0 auto; white-space: nowrap; }
+.filters-grid > .filter-toolbar { padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+
 /* Titre ──────── [compteur] [chevron] : la ligne de séparation reste visible,
    le compteur se place à son extrémité droite */
 /* Titre ────────────── [chevron sur mobile] : la ligne est un vrai élément */
@@ -905,7 +917,6 @@ html {
 /* Mobile / tablette : groupes empilés, séparés par un filet */
 @media (max-width: 860px) {
   .filters-grid { display: flex; flex-direction: column; gap: 0.6rem; }
-  .filters-grid > .clear-all-btn--inner { align-self: flex-end; }
   .filters-grid > .filter-group:not(.filter-group--categories) {
     padding-top: 0.6rem;
     border-top: 1px solid var(--border);
@@ -913,14 +924,16 @@ html {
 }
 
 /* Grand écran :
-   ligne 1 : [ Catégories ............................ ] [ Tout effacer ]
-   ligne 2 : [ Spiritueux ] [ Liqueurs ] [ Profil ] [ Style ]            */
+   ligne 1 : [ Recherche ........... ] [ Tout effacer ]
+   ligne 2 : [ Catégories ........................................ ]
+   ligne 3 : [ Spiritueux ] [ Liqueurs ] [ Profil ] [ Style ]            */
 @media (min-width: 861px) {
   .filters-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 0.85fr);
     grid-template-areas:
-      "cat      cat       cat      clear"
+      "toolbar  toolbar   toolbar  toolbar"
+      "cat      cat       cat      cat"
       "spirits  liqueurs  profile  style";
     column-gap: 1.5rem;
     row-gap: 0.9rem;
@@ -928,8 +941,8 @@ html {
     max-height: none;
     overflow: visible;
   }
+  .filters-grid > .filter-toolbar           { grid-area: toolbar; }
   .filters-grid > .filter-group--categories { grid-area: cat; align-self: center; }
-  .filters-grid > .clear-all-btn--inner     { grid-area: clear; justify-self: end; align-self: center; margin: 0; }
   .filters-grid > .filter-group--spirits    { grid-area: spirits; }
   .filters-grid > .filter-group--liqueurs   { grid-area: liqueurs; }
   .filters-grid > .filter-group--profile    { grid-area: profile; }
@@ -961,7 +974,8 @@ html {
   .filters-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
-      "cat      clear"
+      "toolbar  toolbar"
+      "cat      cat"
       "spirits  liqueurs"
       "profile  style";
   }
@@ -1266,4 +1280,66 @@ html {
 @media (min-width: 861px) {
   .cards-content .menu-card-item { border-bottom: none; border-radius: var(--radius-md); }
   .cards-content .cards-grid > * { margin-bottom: 0.15rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Cartes : lignes épurées, pastille « Ouvrir » discrète en teinte dorée
+   ══════════════════════════════════════════════════════════════ */
+.cards-content .cards-grid > * { margin-bottom: 0.3rem; }
+
+.cards-content .menu-card-item {
+  background: rgba(201, 168, 76, 0.07);
+  border: 1px solid rgba(201, 168, 76, 0.28);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  transform: none;
+  padding: 0.35rem 0.4rem 0.35rem 0.75rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: rgba(201, 168, 76, 0.14);
+  border-color: var(--gold-dim);
+}
+.cards-content .menu-card-item:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+/* nom : texte simple, sans surligneur */
+.cards-content .menu-card-name {
+  background-image: none;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* « Ouvrir » : pastille sans contour, fond doré léger, l'icône avance au survol */
+.cards-content .menu-card-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  color: var(--gold);
+  background: rgba(201, 168, 76, 0.16);
+  border: none;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.cards-content .menu-card-open svg { flex: none; stroke: currentColor; }
+.cards-content .menu-card-item:hover .menu-card-open,
+.cards-content .menu-card-open:hover,
+.cards-content .menu-card-open:focus-visible {
+  background: rgba(201, 168, 76, 0.3);
+  color: var(--gold);
+}
+
+@media (min-width: 861px) {
+  .cards-content .menu-card-item { border: 1px solid rgba(201, 168, 76, 0.28); }
+  .cards-content .menu-card-item:hover,
+  .cards-content .menu-card-item:focus-visible { border-color: var(--gold-dim); }
+  .cards-content .cards-grid > * { margin-bottom: 0.3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cards-content .menu-card-item,
+  .cards-content .menu-card-open { transition: none; }
 }

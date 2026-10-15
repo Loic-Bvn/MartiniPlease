@@ -84,6 +84,10 @@
           :active-sub-spirits="activeSubSpirits"
           :all-family-labels="allLabels"
           :all-sub-labels="allSubLabels"
+          :search-term="searchTerm"
+          :suggestions="suggestions"
+          @update:search-term="$emit('update:searchTerm', $event)"
+          @scroll-to-cocktail="onScrollToCocktail"
           @toggle-family="$emit('toggle-family', $event)"
           @toggle-sub-spirit="$emit('toggle-sub-spirit', $event)"
           @toggle-profile="$emit('toggle-profile', $event)"
@@ -275,7 +279,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
 import { ChevronDown, Rows3, GalleryVerticalEnd, Dices, Heart } from 'lucide-vue-next'
 import { lucideIcons } from '@/utils/lucideIcons'
 const InventoryManager = defineAsyncComponent(() => import('@/Components/Modals/InventoryManager.vue'))
@@ -326,6 +330,8 @@ const props = defineProps({
   // Résultats calculés par useFilters dans CocktailMenuApp
   filteredCocktails:  { type: Array,   default: () => [] },
   hasActiveFilters:   { type: Boolean, default: false    },
+  searchTerm:         { type: String,  default: ''       },
+  suggestions:        { type: Array,   default: () => [] },
   makeableCount:      { type: Number,  default: 0        },
   recommendations:    { type: Array,  default: () => [] },
   cocktailOfMoment:   { type: Object, default: null },
@@ -363,7 +369,7 @@ const emit = defineEmits([
   'toggle-makeable', 'toggle-favorites',
   'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'surprise-me', 'open-drinker-login', 'drinker-sign-out',
   'set-cocktail-of-moment', 'share-favorites',
-  'set-featured-menu-card',
+  'set-featured-menu-card', 'update:searchTerm', 'scroll-to-cocktail',
 ])
 
 // ── État local (UI uniquement) ────────────────────────────────────────────────
@@ -371,6 +377,13 @@ const emit = defineEmits([
 const openPanel = ref(null)
 function togglePanel(id) {
   openPanel.value = openPanel.value === id ? null : id
+}
+
+// Clic sur une suggestion : on referme le panneau Filtres puis on scrolle vers la carte
+async function onScrollToCocktail(id) {
+  openPanel.value = null
+  await nextTick()
+  emit('scroll-to-cocktail', id)
 }
 
 // ── Pagination progressive ────────────────────────────────────────────────────
@@ -449,6 +462,7 @@ function handleOpenCocktail(cocktail, rect, cardId = null) {
 
 const t = computed(() => ({
   filterTitle:    props.locale === 'fr' ? 'Filtres'                  : 'Filters',
+  searchPlaceholder: props.locale === 'fr' ? 'Rechercher un cocktail ou un ingrédient...' : 'Search a cocktail or ingredient...',
   cardsTitle:     props.locale === 'fr' ? 'Cartes'                   : 'Cards',
   newCard:        props.locale === 'fr' ? 'Nouvelle carte'            : 'New card',
   noCard:         props.locale === 'fr' ? 'Aucune carte créée.'       : 'No card yet.',

@@ -17,6 +17,29 @@
     <!-- CONTENT -->
     <div v-if="open" class="filters-dropdown-content filters-grid">
 
+      <!-- BARRE D'OUTILS : recherche + « Tout effacer » sur la même ligne -->
+      <div class="filter-toolbar">
+      <div class="search-wrapper filter-search">
+        <Search class="search-icon" :size="16" />
+        <input
+          type="text"
+          :placeholder="t.searchPlaceholder"
+          :value="searchTerm"
+          @input="$emit('update:searchTerm', $event.target.value)"
+          class="search-input"
+          @focus="showSuggestions = !!searchTerm"
+          @blur="handleSearchBlur"
+        />
+        <transition name="fade">
+          <div v-if="showSuggestions && suggestions.length > 0" class="search-suggestions" @click.stop>
+            <div v-for="suggestion in suggestions" :key="suggestion.id" class="suggestion-item" @click="onSuggestionClick(suggestion.id)">
+              <Martini :size="14" class="suggestion-type-icon" aria-hidden="true" />
+              <span class="suggestion-name">{{ suggestion.name }}</span>
+            </div>
+          </div>
+        </transition>
+      </div>
+
       <!-- « Tout effacer » : toujours présent (désactivé si rien d'actif) pour ne rien faire bouger -->
       <button
         class="clear-all-btn clear-all-btn--inner"
@@ -25,6 +48,7 @@
       >
         {{ t.clearAll }}
       </button>
+      </div>
 
       <!-- CATÉGORIES -->
       <div class="filter-group filter-group--categories">
@@ -139,9 +163,18 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { ChevronDown } from 'lucide-vue-next'
+import { ChevronDown, Search, Martini } from 'lucide-vue-next'
 import { lucideIcons } from '@/utils/lucideIcons'
 import { splitLabel } from '@/utils/tileLabel'
+
+const showSuggestions = ref(false)
+function handleSearchBlur() {
+  setTimeout(() => { showSuggestions.value = false }, 150)
+}
+function onSuggestionClick(id) {
+  showSuggestions.value = false
+  emit('scroll-to-cocktail', id)
+}
 
 const showProfile = ref(false)
 const showStyle = ref(false)
@@ -185,6 +218,8 @@ const props = defineProps({
   activeSubSpirits:   { type: Array,   default: () => []  },
   allLabels:    { type: Object,  default: () => ({}) },
   allSubLabels:       { type: Object,  default: () => ({}) },
+  searchTerm:         { type: String,  default: ''        },
+  suggestions:        { type: Array,   default: () => []  },
 })
 
 // Nombre de filtres réellement actifs (tout ce qui restreint la liste)
@@ -196,11 +231,12 @@ const activeCount = computed(() =>
   props.selectedStyles.length +
   (props.abvFilter ? 1 : 0) +
   (props.showOnlyMakeable ? 1 : 0) +
-  (props.showOnlyFavorites && props.hasDrinker ? 1 : 0)
+  (props.showOnlyFavorites && props.hasDrinker ? 1 : 0) +
+  (props.searchTerm?.trim() ? 1 : 0)
 )
 
-defineEmits([
-  'toggle',
+const emit = defineEmits([
+  'toggle', 'update:searchTerm', 'scroll-to-cocktail',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
   'toggle-makeable', 'toggle-favorites',
   'set-abv-filter', 'set-season', 'clear-filters',

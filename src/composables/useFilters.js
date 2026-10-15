@@ -258,7 +258,8 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     abvFilter.value !== null            ||
     showOnlyFavorites.value             ||
     showOnlyMakeable.value              ||
-    selectedStyles.value.length     > 0
+    selectedStyles.value.length     > 0 ||
+    !!searchTerm?.value?.trim()
   )
 
   // ── Actions toggle ─────────────────────────────────────────────────────────
@@ -314,6 +315,7 @@ export function useFilters({ cocktails, barInventory, favorites, hasDrinker, loc
     abvFilter.value          = null
     showOnlyFavorites.value  = false
     showOnlyMakeable.value   = false
+    if (searchTerm) searchTerm.value = ''
   }
 
   // ── Helpers labels ─────────────────────────────────────────────────────────
