@@ -391,11 +391,11 @@
 }
 
 /* ── Filter collapse for mobile ════════════════════════════════ */
-@media (max-width: 768px) {
-  .filters-dropdown-content {
-    max-height: 400px;
-    overflow-y: auto;
-  }
+/* Pas de zone scrollable dans la page : le panneau Filtres s'ouvre en entier
+   (la page elle-même défile), quelle que soit la largeur d'écran. */
+.filters-dropdown-content.filters-grid {
+  max-height: none;
+  overflow: visible;
 }
 
 /* ── Cards grid responsive ═════════════════════════════════════ */
@@ -696,20 +696,21 @@ html {
    (les boutons connexion / déconnexion du header sont masqués) */
 .btn-login-header, .btn-logout-header { display: none; }
 .btn-logout-panel {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  width: 100%;
-  margin-top: 0.75rem;
-  padding: 0.5rem 0.75rem;
+  gap: 0.3rem;
+  align-self: flex-end;          /* petit bouton discret, aligné à droite */
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.55rem;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-dim);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.68rem;
+  line-height: 1.2;
   cursor: pointer;
 }
+.btn-logout-panel svg { width: 12px; height: 12px; }
 .btn-logout-panel:hover { color: var(--danger-text); border-color: var(--danger-text); }
 .bar-main .tile-login {
   display: flex;
@@ -790,3 +791,555 @@ html {
   gap: 0.5em;
 }
 .ico-inline--top > svg { flex-shrink: 0; margin-top: 0.15em; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   Filtres — listes à cases à cocher (remplacent les chips)
+   ══════════════════════════════════════════════════════════════ */
+.filter-list { display: flex; flex-direction: column; gap: 0.1rem; }
+.filter-list--cols { column-gap: 1.25rem; }
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.3rem 0.35rem;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+.filter-option:hover { background: rgba(201, 168, 76, 0.07); color: var(--text); }
+/* Case native masquée (reste accessible au clavier / lecteur d'écran) */
+.filter-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* Effet surligneur fluo : le trait « balaie » le libellé quand il est sélectionné */
+.filter-option > span {
+  --hl: rgba(250, 225, 60, 0.6);
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.3rem 0.7rem 0.35rem 0.6rem;
+  background-image: linear-gradient(100deg, var(--hl) 0%, var(--hl) 100%);
+  background-repeat: no-repeat;
+  background-position: 0 75%;
+  background-size: 0% 80%;
+  transition: background-size 0.28s ease, color 0.15s;
+}
+.dark .filter-option > span { --hl: rgba(250, 225, 60, 0.34); }
+
+.filter-option input:checked + span {
+  background-size: 100% 80%;
+  color: var(--text);
+  font-weight: 600;
+}
+.filter-option input:focus-visible + span {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* sous-spiritueux : indentés sous leur famille */
+.filter-family { break-inside: avoid; }
+.filter-sublist {
+  margin: 0.1rem 0 0.35rem 0.55rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--gold-dim);
+}
+.filter-option--sub { font-size: 0.78rem; padding: 0.2rem 0.35rem; }
+
+/* « Tout effacer » : réservé en permanence, simplement grisé quand inactif */
+.clear-all-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Filtres — agencement : bandeau Catégories + colonnes
+   ══════════════════════════════════════════════════════════════ */
+
+.filters-grid > .filter-group { min-width: 0; }
+.filters-grid .filter-label { margin-bottom: 0.3rem; }
+
+/* Barre d'outils : recherche (extensible) + « Tout effacer » sur une seule ligne */
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.filter-toolbar .filter-search { flex: 1 1 auto; min-width: 0; }
+.filter-toolbar .filter-search .search-input { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.filter-toolbar .clear-all-btn--inner { flex: none; margin: 0 0 0 auto; white-space: nowrap; }
+.filters-grid > .filter-toolbar { padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+
+/* Titre ──────── [compteur] [chevron] : la ligne de séparation reste visible,
+   le compteur se place à son extrémité droite */
+/* Titre ────────────── [chevron sur mobile] : la ligne est un vrai élément */
+.filters-grid .filter-label { white-space: nowrap; }
+.filters-grid .filter-label::after { display: none; }
+.filter-label-line {
+  flex: 1 1 1.25rem;
+  min-width: 1.25rem;
+  height: 1px;
+  background: var(--border);
+}
+.filters-grid .filter-label .filter-label-chevron { flex: none; margin-left: 0 !important; }
+
+/* Listes : une seule colonne verticale, dans l'ordre */
+.filter-list { display: flex; flex-direction: column; }
+.filter-list--cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.5rem; }
+
+/* Catégories : bandeau horizontal (titre + options sur une ligne) */
+.filter-group--categories {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 0.25rem;
+}
+.filter-group--categories .filter-label { width: auto; margin: 0; }
+.filter-group--categories .filter-label::after { display: none; }
+.filter-group--categories .filter-list {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 0.5rem;
+}
+
+/* Mobile / tablette : groupes empilés, séparés par un filet */
+@media (max-width: 860px) {
+  .filters-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+  .filters-grid > .filter-group:not(.filter-group--categories) {
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+  }
+}
+
+/* Grand écran :
+   ligne 1 : [ Recherche ........... ] [ Tout effacer ]
+   ligne 2 : [ Catégories ........................................ ]
+   ligne 3 : [ Spiritueux ] [ Liqueurs ] [ Profil ] [ Style ]            */
+@media (min-width: 861px) {
+  .filters-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 0.85fr);
+    grid-template-areas:
+      "toolbar  toolbar   toolbar  toolbar"
+      "cat      cat       cat      cat"
+      "spirits  liqueurs  profile  style";
+    column-gap: 1.5rem;
+    row-gap: 0.9rem;
+    align-items: stretch;      /* colonnes de même hauteur → filets verticaux continus */
+    max-height: none;
+    overflow: visible;
+  }
+  .filters-grid > .filter-toolbar           { grid-area: toolbar; }
+  .filters-grid > .filter-group--categories { grid-area: cat; align-self: center; }
+  .filters-grid > .filter-group--spirits    { grid-area: spirits; }
+  .filters-grid > .filter-group--liqueurs   { grid-area: liqueurs; }
+  .filters-grid > .filter-group--profile    { grid-area: profile; }
+  .filters-grid > .filter-group--style      { grid-area: style; }
+
+  /* filets verticaux entre les 4 colonnes */
+  .filters-grid > .filter-group--liqueurs,
+  .filters-grid > .filter-group--profile,
+  .filters-grid > .filter-group--style {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--border);
+  }
+  /* les filets descendent jusqu'au bord bas du panneau (annule son padding-bottom) */
+  .filters-grid > .filter-group--spirits,
+  .filters-grid > .filter-group--liqueurs,
+  .filters-grid > .filter-group--profile,
+  .filters-grid > .filter-group--style {
+    margin-bottom: -1rem;
+    padding-bottom: 1rem;
+  }
+
+  /* pas d'accordéon sur grand écran */
+  .filters-grid .filter-label-chevron { display: none; }
+  .filters-grid button.filter-label { cursor: default; pointer-events: none; }
+}
+
+/* Écrans moyens : 2 colonnes */
+@media (min-width: 861px) and (max-width: 1180px) {
+  .filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "toolbar  toolbar"
+      "cat      cat"
+      "spirits  liqueurs"
+      "profile  style";
+  }
+  .filters-grid > .filter-group--profile { padding-left: 0; border-left: none; }
+  .filters-grid > .filter-group--style   { border-left: 1px solid var(--border); }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Liste des cartes (tuile « Cartes ») : liste fine, une ligne par carte
+   ══════════════════════════════════════════════════════════════ */
+.cards-content { padding: 0.4rem 0.5rem 0.5rem; }
+
+.cards-content .cards-grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;                 /* pleine largeur du panneau, aligné avec les autres tuiles */
+}
+
+.cards-content .menu-card-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: var(--bg-raised);
+  outline: none;
+}
+
+/* nom + infos sur une seule ligne */
+.cards-content .menu-card-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 0.6rem;
+}
+.cards-content .menu-card-name {
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.menu-card-meta { flex: none; display: flex; align-items: baseline; gap: 0.5rem; }
+.cards-content .menu-card-count { font-size: 0.72rem; color: var(--text-dim); white-space: nowrap; }
+.menu-card-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+/* carte masquée aux drinkers : en retrait */
+.cards-content .menu-card-item--hidden .menu-card-name { color: var(--text-muted); font-weight: 500; }
+
+/* actions à droite, discrètes jusqu'au survol (toujours visibles sur mobile) */
+.cards-content .menu-card-actions { flex: none; display: flex; align-items: center; gap: 0.1rem; }
+.cards-content .menu-card-actions .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  opacity: 0.5;
+}
+.cards-content .menu-card-item:hover .btn-icon,
+.cards-content .menu-card-item:focus-within .btn-icon { opacity: 1; }
+.cards-content .menu-card-actions .btn-icon:hover { background: var(--bg-input); }
+.menu-card-go { color: var(--text-dim); transition: transform 0.15s, color 0.15s; }
+.menu-card-item:hover .menu-card-go { color: var(--gold); transform: translateX(2px); }
+
+/* « Nouvelle carte » : dernière ligne de la liste, discrète */
+.menu-card-new {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.menu-card-new:hover { color: var(--gold); background: var(--bg-raised); }
+
+/* Grand écran : 2 colonnes séparées par un filet vertical, comme les filtres.
+   Chaque colonne se remplit de haut en bas avant de passer à la suivante. */
+@media (min-width: 861px) {
+  .cards-content { padding: 0.9rem 1.5rem 1rem; }
+  .cards-content .cards-grid {
+    display: block;
+    column-count: 2;
+    column-gap: 3rem;                       /* 1.5rem de chaque côté du filet */
+    column-rule: 1px solid var(--border);
+  }
+  .cards-content .cards-grid > * { break-inside: avoid; }
+
+  /* même esprit que les listes de filtres : pas de lignes, fond léger au survol */
+  .cards-content .menu-card-item {
+    border-bottom: none;
+    border-radius: var(--radius-md);
+    padding: 0.3rem 0.35rem 0.3rem 0.5rem;
+    min-height: 2.5rem;
+  }
+  .cards-content .menu-card-item:hover,
+  .cards-content .menu-card-item:focus-visible { background: rgba(201, 168, 76, 0.07); }
+
+  /* effet surligneur fluo sur le nom au survol */
+  .cards-content .menu-card-name {
+    --hl: rgba(250, 225, 60, 0.6);
+    padding: 0.05rem 0.4rem;
+    border-radius: 0.3rem 0.7rem 0.35rem 0.6rem;
+    background-image: linear-gradient(100deg, var(--hl), var(--hl));
+    background-repeat: no-repeat;
+    background-position: 0 75%;
+    background-size: 0% 80%;
+    transition: background-size 0.28s ease;
+  }
+  .dark .cards-content .menu-card-name { --hl: rgba(250, 225, 60, 0.34); }
+  .cards-content .menu-card-item:hover .menu-card-name,
+  .cards-content .menu-card-item:focus-visible .menu-card-name { background-size: 100% 80%; }
+
+  .menu-card-new { border-radius: var(--radius-md); }
+}
+
+@media (max-width: 600px) {
+  .cards-content { padding: 0.25rem 0.25rem 0.4rem; }
+  .cards-content .menu-card-actions .btn-icon { opacity: 1; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Profil drinker : Favoris et Historique
+   mobile = onglets, grand écran = les deux côte à côte
+   ══════════════════════════════════════════════════════════════ */
+/* aucun panneau de tuile n'a de zone scrollable interne */
+.filters-dropdown-content { max-height: none; overflow: visible; }
+
+.drinker-col-title { display: none; }
+
+@media (max-width: 860px) {
+  .drinker-col:not(.is-active) { display: none; }
+}
+
+@media (min-width: 861px) {
+  .drinker-tabs { display: none; }
+  .drinker-col-title { display: flex; margin-bottom: 0.5rem; }
+  .drinker-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.5rem;
+    align-items: stretch;          /* filet vertical sur toute la hauteur */
+  }
+  .drinker-col + .drinker-col {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--border);
+  }
+}
+
+/* Favoris cliquables (ouvrent la fiche du cocktail) */
+.menu-card-item--clickable { cursor: pointer; transition: background 0.15s; }
+.menu-card-item--clickable:hover,
+.menu-card-item--clickable:focus-visible { background: rgba(201, 168, 76, 0.07); outline: none; }
+.menu-card-item--clickable:hover .menu-card-name { color: var(--gold); }
+
+/* ══════════════════════════════════════════════════════════════
+   Liste des cartes : lignes plus « bouton » + pastille « Ouvrir »
+   ══════════════════════════════════════════════════════════════ */
+.cards-content .cards-grid { gap: 0.4rem; }
+
+.cards-content .menu-card-item {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: var(--bg-card);
+  border-color: var(--gold);
+  box-shadow: 0 2px 8px rgba(201, 168, 76, 0.18);
+}
+.cards-content .menu-card-item:active { transform: translateY(1px); box-shadow: none; }
+
+/* un seul signal au survol : on retire le surligneur sur le nom */
+.cards-content .menu-card-item:hover .menu-card-name,
+.cards-content .menu-card-item:focus-visible .menu-card-name { background-size: 0% 80%; }
+
+@media (min-width: 861px) {
+  .cards-content .cards-grid > * { margin-bottom: 0.4rem; }
+  .cards-content .menu-card-item { padding: 0.3rem 0.4rem 0.3rem 0.75rem; min-height: 2.6rem; }
+}
+
+.menu-card-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.7rem;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.menu-card-item:hover .menu-card-open,
+.menu-card-open:hover,
+.menu-card-open:focus-visible {
+  background: var(--gold);
+  color: var(--bg-card);
+  border-color: var(--gold);
+  outline: none;
+}
+
+/* bartender : la pastille cohabite avec 3 icônes → icône seule sur petit écran */
+@media (max-width: 600px) {
+  .menu-card-open--compact span { display: none; }
+  .menu-card-open--compact { padding: 0.3rem 0.45rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Liste des cartes : même langage que les filtres
+   (pas de cadre, fond doré léger, trait de surligneur sur le nom)
+   ══════════════════════════════════════════════════════════════ */
+.cards-content .menu-card-item {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: rgba(201, 168, 76, 0.07);
+  border-color: var(--border);
+  box-shadow: none;
+}
+.cards-content .menu-card-item:active { transform: none; }
+
+/* Le nom porte un léger trait de surligneur au repos (« je suis cliquable »),
+   qui se remplit au survol — comme les options de filtre. */
+.cards-content .menu-card-name {
+  --hl: rgba(250, 225, 60, 0.6);
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.3rem 0.7rem 0.35rem 0.6rem;
+  background-image: linear-gradient(100deg, var(--hl), var(--hl));
+  background-repeat: no-repeat;
+  background-position: 0 90%;
+  background-size: 100% 24%;
+  opacity: 1;
+  transition: background-size 0.28s ease;
+}
+.dark .cards-content .menu-card-name { --hl: rgba(250, 225, 60, 0.34); }
+.cards-content .menu-card-item:hover .menu-card-name,
+.cards-content .menu-card-item:focus-visible .menu-card-name { background-size: 100% 80%; }
+
+/* « Ouvrir » : simple texte discret, sans pastille ni contour */
+.menu-card-open {
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.4rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+.menu-card-item:hover .menu-card-open,
+.menu-card-open:hover,
+.menu-card-open:focus-visible {
+  background: transparent;
+  border: none;
+  color: var(--gold);
+}
+
+@media (min-width: 861px) {
+  .cards-content .menu-card-item { border-bottom: none; border-radius: var(--radius-md); }
+  .cards-content .cards-grid > * { margin-bottom: 0.15rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Cartes : lignes épurées, pastille « Ouvrir » discrète en teinte dorée
+   ══════════════════════════════════════════════════════════════ */
+.cards-content .cards-grid > * { margin-bottom: 0.3rem; }
+
+.cards-content .menu-card-item {
+  background: rgba(201, 168, 76, 0.07);
+  border: 1px solid rgba(201, 168, 76, 0.28);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  transform: none;
+  padding: 0.35rem 0.4rem 0.35rem 0.75rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: rgba(201, 168, 76, 0.14);
+  border-color: var(--gold-dim);
+}
+.cards-content .menu-card-item:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+/* nom : texte simple, sans surligneur */
+.cards-content .menu-card-name {
+  background-image: none;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* « Ouvrir » : pastille sans contour, fond doré léger, l'icône avance au survol */
+.cards-content .menu-card-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  color: var(--gold);
+  background: rgba(201, 168, 76, 0.16);
+  border: none;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.cards-content .menu-card-open svg { flex: none; stroke: currentColor; }
+.cards-content .menu-card-item:hover .menu-card-open,
+.cards-content .menu-card-open:hover,
+.cards-content .menu-card-open:focus-visible {
+  background: rgba(201, 168, 76, 0.3);
+  color: var(--gold);
+}
+
+@media (min-width: 861px) {
+  .cards-content .menu-card-item { border: 1px solid rgba(201, 168, 76, 0.28); }
+  .cards-content .menu-card-item:hover,
+  .cards-content .menu-card-item:focus-visible { border-color: var(--gold-dim); }
+  .cards-content .cards-grid > * { margin-bottom: 0.3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cards-content .menu-card-item,
+  .cards-content .menu-card-open { transition: none; }
+}

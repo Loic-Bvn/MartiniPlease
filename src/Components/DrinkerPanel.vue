@@ -7,7 +7,7 @@
     </button>
     <div v-if="open" class="filters-dropdown-content">
 
-      <div class="auth-tabs" style="margin-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary);">
+      <div class="auth-tabs drinker-tabs" style="margin-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary);">
         <button :class="['auth-tab', { active: tab === 'favorites' }]" @click="tab = 'favorites'">
           {{ locale === 'fr' ? 'Favoris' : 'Favorites' }}<span class="count-badge">{{ favorites.size }}</span>
         </button>
@@ -32,16 +32,26 @@
         </p>
       </div> -->
 
-      <div v-if="tab === 'favorites'">
+      <div class="drinker-cols">
+      <section :class="['drinker-col', { 'is-active': tab === 'favorites' }]">
+        <div class="filter-label drinker-col-title">{{ locale === 'fr' ? 'Favoris' : 'Favorites' }}</div>
         <!-- <button v-if="favorites.size" type="button" class="share-favorites-button" @click="$emit('share-favorites')">
           <Share2 :size="15" />
           {{ locale === 'fr' ? 'Partager ma liste' : 'Share my list' }}
         </button> -->
         <div v-if="favorites.size === 0" class="cards-empty">{{ locale === 'fr' ? 'Aucun favori pour l\'instant.' : 'No favorites yet.' }}</div>
         <div v-else class="cards-grid">
-          <div v-for="cocktail in favoriteCocktails" :key="cocktail.id" class="menu-card-item">
+          <div
+            v-for="cocktail in favoriteCocktails"
+            :key="cocktail.id"
+            class="menu-card-item menu-card-item--clickable"
+            role="button"
+            tabindex="0"
+            @click="$emit('open-cocktail', cocktail)"
+            @keydown.enter="$emit('open-cocktail', cocktail)"
+          >
             <span class="menu-card-name">{{ cocktail.name }}</span>
-            <button @click="$emit('toggle-favorite', cocktail.id)" class="btn-icon btn-icon--delete">
+            <button @click.stop="$emit('toggle-favorite', cocktail.id)" class="btn-icon btn-icon--delete">
               <Heart :size="14" fill="currentColor" style="color: #e05c6e" />
             </button>
           </div>
@@ -59,9 +69,10 @@
             <span class="recommendation-reason">{{ getIngredientLabel(cocktail.base_spirit, locale) }} - {{ cocktail.profile.map(p => getProfileLabel(p, locale)).join(', ') }}</span>
           </button>
         </div>
-      </div>
+      </section>
 
-      <div v-if="tab === 'history'">
+      <section :class="['drinker-col', { 'is-active': tab === 'history' }]">
+        <div class="filter-label drinker-col-title">{{ locale === 'fr' ? 'Historique' : 'History' }}</div>
         <div v-if="history.length === 0" class="cards-empty">{{ locale === 'fr' ? 'Aucune commande encore.' : 'No orders yet.' }}</div>
         <div v-else class="cards-grid">
           <div v-for="(entry, i) in history" :key="i" class="menu-card-item">
@@ -69,6 +80,7 @@
             <span class="menu-card-count">{{ formatDate(entry.ordered_at) }}</span>
           </div>
         </div>
+      </section>
       </div>
 
       <button type="button" class="btn-logout-panel" @click="$emit('sign-out')">

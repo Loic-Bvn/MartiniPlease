@@ -66,7 +66,6 @@
           @toggle="togglePanel('filters')"
           :locale="locale"
           :t="t"
-          :filter-mode="filterMode"
           :abv-filter="abvFilter"
           :selected-families="selectedFamilies"
           :selected-sub-spirits="selectedSubSpirits"
@@ -85,11 +84,14 @@
           :active-sub-spirits="activeSubSpirits"
           :all-family-labels="allLabels"
           :all-sub-labels="allSubLabels"
+          :search-term="searchTerm"
+          :suggestions="suggestions"
+          @update:search-term="$emit('update:searchTerm', $event)"
+          @scroll-to-cocktail="onScrollToCocktail"
           @toggle-family="$emit('toggle-family', $event)"
           @toggle-sub-spirit="$emit('toggle-sub-spirit', $event)"
           @toggle-profile="$emit('toggle-profile', $event)"
           @toggle-style="$emit('toggle-style', $event)"
-          @toggle-filter-mode="$emit('toggle-filter-mode', $event)"
           @toggle-makeable="$emit('toggle-makeable')"
           @toggle-favorites="$emit('toggle-favorites')"
           @set-abv-filter="$emit('set-abv-filter', $event)"
@@ -277,7 +279,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
 import { ChevronDown, Rows3, GalleryVerticalEnd, Dices, Heart } from 'lucide-vue-next'
 import { lucideIcons } from '@/utils/lucideIcons'
 const InventoryManager = defineAsyncComponent(() => import('@/Components/Modals/InventoryManager.vue'))
@@ -313,7 +315,6 @@ const props = defineProps({
   selectedSeasons:    Array,
   showOnlyMakeable:   Boolean,
   showOnlyFavorites:  Boolean,
-  filterMode:         String,
   abvFilter:          String,
   selectedProfiles:   Array,
   selectedStyles:     Array,
@@ -329,6 +330,8 @@ const props = defineProps({
   // Résultats calculés par useFilters dans CocktailMenuApp
   filteredCocktails:  { type: Array,   default: () => [] },
   hasActiveFilters:   { type: Boolean, default: false    },
+  searchTerm:         { type: String,  default: ''       },
+  suggestions:        { type: Array,   default: () => [] },
   makeableCount:      { type: Number,  default: 0        },
   recommendations:    { type: Array,  default: () => [] },
   cocktailOfMoment:   { type: Object, default: null },
@@ -363,10 +366,10 @@ const emit = defineEmits([
   'view-card', 'edit-card', 'delete-card', 'new-card', 'toggle-card-visibility',
   'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail', 'open-cocktail',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
-  'toggle-filter-mode', 'toggle-makeable', 'toggle-favorites',
+  'toggle-makeable', 'toggle-favorites',
   'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'surprise-me', 'open-drinker-login', 'drinker-sign-out',
   'set-cocktail-of-moment', 'share-favorites',
-  'set-featured-menu-card',
+  'set-featured-menu-card', 'update:searchTerm', 'scroll-to-cocktail',
 ])
 
 // ── État local (UI uniquement) ────────────────────────────────────────────────
@@ -374,6 +377,13 @@ const emit = defineEmits([
 const openPanel = ref(null)
 function togglePanel(id) {
   openPanel.value = openPanel.value === id ? null : id
+}
+
+// Clic sur une suggestion : on referme le panneau Filtres puis on scrolle vers la carte
+async function onScrollToCocktail(id) {
+  openPanel.value = null
+  await nextTick()
+  emit('scroll-to-cocktail', id)
 }
 
 // ── Pagination progressive ────────────────────────────────────────────────────
@@ -452,13 +462,11 @@ function handleOpenCocktail(cocktail, rect, cardId = null) {
 
 const t = computed(() => ({
   filterTitle:    props.locale === 'fr' ? 'Filtres'                  : 'Filters',
+  searchPlaceholder: props.locale === 'fr' ? 'Rechercher un cocktail ou un ingrédient...' : 'Search a cocktail or ingredient...',
   cardsTitle:     props.locale === 'fr' ? 'Cartes'                   : 'Cards',
   newCard:        props.locale === 'fr' ? 'Nouvelle carte'            : 'New card',
   noCard:         props.locale === 'fr' ? 'Aucune carte créée.'       : 'No card yet.',
   stock:          props.locale === 'fr' ? 'Stock du bar'             : 'Bar stock',
-  filterMode:     props.locale === 'fr' ? 'Mode de recherche'         : 'Search mode',
-  filterMain:     props.locale === 'fr' ? 'Ingrédient principal'     : 'Main ingredient',
-  filterContains: props.locale === 'fr' ? 'Contient'                 : 'Contains',
   filterSpirits:  props.locale === 'fr' ? 'Spiritueux de base'        : 'Base spirits',
   filterLiqueurs: props.locale === 'fr' ? 'Liqueurs'                  : 'Licors',
   filterSeason:   props.locale === 'fr' ? 'Saison'                   : 'Season',

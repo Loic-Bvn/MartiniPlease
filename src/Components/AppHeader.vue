@@ -6,27 +6,6 @@
           <img v-if="randomLogo" :src="randomLogo" alt="/margarita_square.png" class="header-logo" />
           <h1 class="header-title">{{ activeBarName }}</h1>
         </div>
-        <!-- Barre de recherche masquée sur l'écran d'accueil -->
-        <div v-if="activeBarId" class="search-wrapper header-search-inline">
-          <Search class="search-icon" :size="16" />
-          <input 
-            type="text" 
-            :placeholder="t.searchPlaceholder" 
-            :value="searchTerm"
-            @input="$emit('update:searchTerm', $event.target.value)"
-            class="search-input"
-            @focus="localShowSuggestions = searchTerm.length > 0"
-            @blur="handleSearchBlur"
-          />
-          <transition name="fade">
-            <div v-if="localShowSuggestions && suggestions.length > 0" class="search-suggestions" @click.stop>
-              <div v-for="suggestion in suggestions" :key="suggestion.id" class="suggestion-item" @click="$emit('scroll-to-cocktail', suggestion.id)">
-                <Martini :size="14" class="suggestion-type-icon" aria-hidden="true" />
-                <span class="suggestion-name">{{ suggestion.name }}</span>
-              </div>
-            </div>
-          </transition>
-        </div>
         <div class="header-right" style="display:flex; align-items:center; gap:0.5rem;">
           <div class="header-actions">
 
@@ -61,64 +40,23 @@
               <LogOut :size="15" /><span class="btn-label-hide"> {{ t.logout }}</span>
             </button>
 
-            <div
-              class="settings-switch"
-              role="group"
-              aria-label="Language switch"
-              @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
-            >
-              <button
-                type="button"
-                class="view-toggle-btn"
-                :class="{ 'view-toggle-btn--active': locale === 'fr' }"
-                :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
-              >
-                <span>FR</span>
-              </button>
-              <button
-                type="button"
-                class="view-toggle-btn"
-                :class="{ 'view-toggle-btn--active': locale === 'en' }"
-                :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
-              >
-                <span>EN</span>
-              </button>
-            </div>
-
-            <div
-              v-if="activeBarId && !showBarsSelection"
-              class="settings-switch"
-              role="group"
-              aria-label="Unit switch"
-              @click="$emit('set-unit', unit === 'oz' ? 'ml' : 'oz')"
-            >
-              <button
-                type="button"
-                class="view-toggle-btn"
-                :class="{ 'view-toggle-btn--active': unit === 'oz' }"
-                :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
-              >
-                <span>oz</span>
-              </button>
-              <button
-                type="button"
-                class="view-toggle-btn"
-                :class="{ 'view-toggle-btn--active': unit === 'ml' }"
-                :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
-              >
-                <span>ml</span>
-              </button>
-            </div>
-
-            <ThemeToggle />
+            <!-- Langue / unité / thème : dans le header, sauf en écran étroit (→ menu burger) -->
+            <SettingsSwitches
+              v-if="!isNarrow"
+              :locale="locale"
+              :unit="unit"
+              :show-unit="!!activeBarId && !showBarsSelection"
+              @set-locale="$emit('set-locale', $event)"
+              @set-unit="$emit('set-unit', $event)"
+            />
           </div>
 
         <div v-if="toastMessage" class="toast">
           {{ toastMessage }}
         </div>
 
-          <!-- Menu burger tout à droite (bartender uniquement) -->
-          <div v-if="isLoggedIn" class="burger-wrapper">
+          <!-- Menu burger tout à droite (bartender, ou tout le monde en écran étroit) -->
+          <div v-if="isLoggedIn || isNarrow" class="burger-wrapper">
             <button 
               @click="burgerOpen = !burgerOpen" 
               class="btn-mode btn-mode-inactive burger-button"
@@ -130,6 +68,20 @@
             <transition name="fade-slide">
               <div v-if="burgerOpen" class="burger-dropdown" @click.stop>
 
+                <!-- Réglages (écran étroit uniquement) -->
+                <template v-if="isNarrow">
+                  <SettingsSwitches
+                    layout="stacked"
+                    :locale="locale"
+                    :unit="unit"
+                    :show-unit="!!activeBarId && !showBarsSelection"
+                    @set-locale="$emit('set-locale', $event)"
+                    @set-unit="$emit('set-unit', $event)"
+                  />
+                  <div v-if="isLoggedIn" class="burger-divider" />
+                </template>
+
+                <template v-if="isLoggedIn">
                 <div v-if="activeBarId && !showBarsSelection" class="burger-header">
                   <span class="burger-title">
                     <Martini :size="16" />
@@ -263,6 +215,7 @@
                   <LogOut :size="15" />
                   {{ locale === 'fr' ? 'Se déconnecter' : 'Sign out' }}
                 </button>
+                </template>
 
               </div>
             </transition>
@@ -275,21 +228,14 @@
           </div>
         </div>
       </div>
-      <!-- Barre de recherche mobile masquée sur l'écran d'accueil -->
-      <div v-if="activeBarId" class="header-search-row">
-        <div class="search-container">
-          <Search class="search-icon" :size="16" />
-          <input type="text" :placeholder="t.searchPlaceholderShort" :value="searchTerm" @input="$emit('update:searchTerm', $event.target.value)" class="search-input" />
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { Search, Plus, Library, Lock, Unlock, LogIn, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro, ChartNoAxesCombined, GlassWater} from 'lucide-vue-next'
-import ThemeToggle from '@/Components/ThemeToggle.vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { Plus, Library, Lock, Unlock, LogIn, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro, ChartNoAxesCombined, GlassWater} from 'lucide-vue-next'
+import SettingsSwitches from '@/Components/SettingsSwitches.vue'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 
 const { isFeatureEnabled, setFeature } = useBarFeatures()
@@ -306,8 +252,6 @@ const props = defineProps({
   locale: String,
   unit: String,
   toastMessage: String,
-  searchTerm: String,
-  suggestions: Array,
   randomLogo: String,
 })
 
@@ -318,28 +262,51 @@ const emit = defineEmits([
   'drinker-sign-out',
   'set-locale',
   'set-unit',
-  'scroll-to-cocktail',
   'invite',
   'open-bars-selection',
   'toggle-public',
   'open-catalog',
   'open-preparation-stats',
-  'sign-out',
-  'update:searchTerm'
+  'sign-out'
 ])
 
 const burgerOpen = ref(false)
-const localShowSuggestions = ref(false)
 
-function handleSearchBlur() {
-  setTimeout(() => { localShowSuggestions.value = false }, 150)
-}
+// Écran étroit : langue / unité / thème passent dans le menu burger
+// (libère la place pour le nom du bar actif)
+const NARROW_QUERY = '(max-width: 600px)'
+const isNarrow = ref(false)
+let mql = null
+const syncNarrow = (e) => { isNarrow.value = e.matches }
+onMounted(() => {
+  mql = window.matchMedia(NARROW_QUERY)
+  isNarrow.value = mql.matches
+  mql.addEventListener('change', syncNarrow)
+})
+onBeforeUnmount(() => mql?.removeEventListener('change', syncNarrow))
 
 const t = computed(() => ({
   newCocktail: props.locale === 'fr' ? 'Nouveau cocktail' : 'New cocktail',
   login: props.locale === 'fr' ? 'Se connecter' : 'Sign in',
   logout: props.locale === 'fr' ? 'Se déconnecter' : 'Sign out',
-  searchPlaceholder: props.locale === 'fr' ? 'Rechercher un cocktail ou un ingrédient...' : 'Search a cocktail or ingredient...',
-  searchPlaceholderShort: props.locale === 'fr' ? 'Rechercher...' : 'Search...',
 }))
 </script>
+
+<style>
+/* Menu burger : version compacte une fois déployé */
+.header .burger-dropdown {
+  width: min(240px, calc(100vw - 24px));
+  min-width: 0;
+  padding: 4px;
+  border-radius: 10px;
+}
+.header .burger-dropdown .burger-item {
+  gap: 7px;
+  padding: 6px 9px;
+  font-size: 0.76rem;
+}
+.header .burger-dropdown .burger-header { padding: 6px 9px; gap: 1px; }
+.header .burger-dropdown .burger-title { font-size: 0.82rem; }
+.header .burger-dropdown .burger-subtitle { font-size: 0.7rem; }
+.header .burger-dropdown .burger-divider { margin: 3px 0; }
+</style>
