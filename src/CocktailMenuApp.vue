@@ -14,7 +14,7 @@
   <!-- Application principale -->
   <div v-else class="flex flex-col min-h-screen">
     <div class="flex-1">
-      <div class="min-h-screen menu-app" :class="{ 'bartender-mode': isLoggedIn }">
+      <div class="min-h-screen menu-app" :class="[{ 'bartender-mode': isLoggedIn }, activeSkinClass]">
 
         <!-- Header -->
         <AppHeader
@@ -26,6 +26,7 @@
           :bars="bars"
           :showBarsSelection="showBarsSelection"
           :locale="locale"
+          :skin="features.skin || 'luxe'"
           :unit="unit"
           :toastMessage="toastMessage"
           :toastType="toastType"
@@ -36,6 +37,7 @@
           @drinker-sign-out="handleDrinkerSignOut"
           @open-new-cocktail="openNewCocktailFormModal"
           @set-locale="setLocale"
+          @set-skin="setFeature('skin', $event)"
           @set-unit="setUnit"
           @invite="handleInvite"
           @open-bars-selection="handleOpenBarsSelection"
@@ -48,10 +50,13 @@
         <!-- État : pas connecté + pas de bar -->
         <WelcomePage
           v-if="!isLoggedIn && !activeBarId"
-          :randomLogo="randomLogo"
           :locale="locale"
+          :featuredBarId="FEATURED_BAR_ID"
+          :featuredBar="featuredBar"
+          :featuredCocktails="featuredCocktails"
           :publicBars="publicBars"
           :publicBarsLoading="publicBarsLoading"
+          :publicBarsError="publicBarsError"
           :inviteCodeInput="inviteCodeInput"
           :codeError="codeError"
           @open-auth="showAuthModal = true"
@@ -391,6 +396,12 @@ const accessibleMenuCards = computed(() =>
 const { hasDrinker, drinkerPseudo, initDrinker, createDrinker, reconnectDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { toastMessage, toastType, showToast } = useToast()
 const { features, setFeature } = useBarFeatures()
+const activeBarSkin = computed(() => isLoggedIn.value ? features.value.skin : guestBar.value?.features?.skin)
+const activeSkinClass = computed(() => {
+  const skins = ['luxe', 'classic', 'color', 'brasserie', 'craft', 'minimal']
+  const skin = skins.includes(activeBarSkin.value) ? activeBarSkin.value : 'luxe'
+  return activeBarId.value ? `skin-${skin}` : null
+})
 const preparationCounterEnabled = computed(() => features.value.preparationCounter === true)
 const sharedFavoriteIds = ref([])
 const cocktailOfMomentId = computed(() => features.value.cocktailOfMomentId || guestBar.value?.features?.cocktailOfMomentId || null)
@@ -469,16 +480,58 @@ const randomLogo = ref(availableLogos[Math.floor(Math.random() * availableLogos.
 // ── Bars publics ──────────────────────────────────────────────────────────────
 const publicBars        = ref([])
 const publicBarsLoading = ref(false)
+const publicBarsError   = ref(false)
+const featuredCocktails = ref([])
+const FEATURED_BAR_ID = import.meta.env.VITE_FEATURED_BAR_ID || 'd37d1296-9167-4694-a7fb-8e3878cecdb9'
+const FEATURED_MENU_CARD_ID = import.meta.env.VITE_FEATURED_MENU_CARD_ID
+const featuredBar = computed(() => publicBars.value.find(bar => bar.id === FEATURED_BAR_ID) || null)
 
 async function fetchPublicBars() {
   publicBarsLoading.value = true
-  const { data, error } = await supabase
-    .from('bars')
-    .select('id, name, invite_code, features')
-    .eq('is_public', true)
-    .order('name')
-  if (!error && data) publicBars.value = data
-  publicBarsLoading.value = false
+  publicBarsError.value = false
+  try {
+    const { data, error } = await supabase
+      .from('bars')
+      .select('id, name, invite_code, features')
+      .eq('is_public', true)
+      .order('name')
+    if (error) throw error
+    publicBars.value = data || []
+  } catch (error) {
+    console.error('❌ Erreur fetchPublicBars:', error)
+    publicBarsError.value = true
+  } finally {
+    publicBarsLoading.value = false
+  }
+
+  if (!featuredBar.value || !FEATURED_MENU_CARD_ID) return
+
+  try {
+    const { data: menuCard, error: menuError } = await supabase
+      .from('menu_cards')
+      .select('cocktail_ids, is_visible')
+      .eq('id', FEATURED_MENU_CARD_ID)
+      .eq('bar_id', FEATURED_BAR_ID)
+      .maybeSingle()
+
+    if (menuError) throw menuError
+    if (!menuCard || menuCard.is_visible === false || !menuCard.cocktail_ids?.length) return
+
+    const { data, error } = await supabase
+      .from('bar_cocktails')
+      .select('id, name, image')
+      .eq('bar_id', FEATURED_BAR_ID)
+      .in('id', menuCard.cocktail_ids)
+      .not('image', 'is', null)
+
+    if (error) throw error
+    const cocktailsById = new Map((data || []).map(cocktail => [cocktail.id, cocktail]))
+    featuredCocktails.value = menuCard.cocktail_ids
+      .map(id => cocktailsById.get(id))
+      .filter(Boolean)
+  } catch (error) {
+    console.error('❌ Erreur chargement des cocktails de la carte à la une:', error)
+  }
 }
 
 // ── Accès invité via code ─────────────────────────────────────────────────────

@@ -1,0 +1,43 @@
+.menu-app.skin-minimal {
+  --font-body: 'Futura', 'Century Gothic', 'Avenir Next', Arial, sans-serif;
+  --font-display: 'Avenir Next', 'Century Gothic', Futura, Arial, sans-serif;
+  --bg: #ffffff;
+  --bg-card: #fafafa;
+  --bg-raised: #f4f4f4;
+  --bg-input: #ffffff;
+  --gold: #111111;
+  --gold-dim: #555555;
+  --amber: #333333;
+  --text: #111111;
+  --text-muted: #888888;
+  --text-dim: #aaaaaa;
+  --border: #e8e8e8;
+  --border-mid: #d4d4d4;
+  --radius-control: 0;
+  --radius-panel: 1px;
+  --radius-dialog: 2px;
+  --radius-sm: 0;
+  --radius-md: 1px;
+  --radius-lg: 2px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.035);
+  --shadow-md: 0 2px 5px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 5px 14px rgba(0, 0, 0, 0.08);
+}
+
+.dark .menu-app.skin-minimal {
+  --bg: #111111;
+  --bg-card: #1a1a1a;
+  --bg-raised: #222222;
+  --bg-input: #1a1a1a;
+  --gold: #f0f0f0;
+  --gold-dim: #888888;
+  --amber: #cccccc;
+  --text: #f0f0f0;
+  --text-muted: #aaaaaa;
+  --text-dim: #888888;
+  --border: #2e2e2e;
+  --border-mid: #3a3a3a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 5px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 5px 14px rgba(0, 0, 0, 0.32);
+}

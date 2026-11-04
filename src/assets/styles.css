@@ -8,6 +8,12 @@
 
 /* ── Variables ─────────────────────────────── */
 :root {
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --radius-control: 3px;
+  --radius-panel: 6px;
+  --radius-dialog: 8px;
+  --radius-pill: 999px;
   --bg:          #f8f5ee;
   --bg-card:     #fffdf8;
   --bg-raised:   #f2ead7;
@@ -5094,4 +5100,1466 @@ body {
   padding: 3rem 1.5rem;
   text-align: center;
   color: inherit;
+}
+
+/* Shared presentation rules; individual skins only provide design tokens. */
+.menu-app {
+  font-family: var(--font-body);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.menu-app .header-title,
+.menu-app .cocktail-title,
+.menu-app .cv-title,
+.menu-app .modal-title {
+  font-family: var(--font-display);
+}
+
+.menu-app .header {
+  box-shadow: var(--shadow-sm);
+}
+
+.menu-app .section-card,
+.menu-app .cocktail-card-compact,
+.menu-app .pending-card,
+.menu-app .reset-password-card,
+.menu-app .storage-banner,
+.menu-app .modal-container--trends {
+  border-radius: var(--radius-panel) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+.menu-app .modal-container {
+  border-radius: var(--radius-dialog) !important;
+  box-shadow: var(--shadow-lg);
+}
+
+.menu-app .btn-primary,
+.menu-app .btn-secondary,
+.menu-app .btn-mode,
+.menu-app .btn-new-card,
+.menu-app .btn-new-cocktail,
+.menu-app .view-toggle,
+.menu-app .settings-switch,
+.menu-app .view-toggle-btn,
+.menu-app .search-input,
+.menu-app .form-input,
+.menu-app .form-textarea,
+.menu-app .form-select,
+.menu-app .password-form-input {
+  border-radius: var(--radius-control) !important;
+}
+
+.menu-app .chip-counter,
+.menu-app .bar-status-badge {
+  border-radius: var(--radius-pill);
+}
+
+.menu-app .btn-primary {
+  background: var(--gold);
+  color: var(--bg-card);
+}
+
+.menu-app .btn-primary:hover:not(:disabled) {
+  background: var(--gold-dim);
+  box-shadow: none;
+  transform: none;
+}
+
+.menu-app .btn-new-cocktail {
+  color: var(--bg-card);
+}
+
+.menu-app .btn-new-cocktail:hover {
+  background: var(--gold-dim);
+  box-shadow: none;
+}
+
+.menu-app .cocktail-card-compact {
+  background: var(--bg-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.menu-app .cocktail-card-compact:hover {
+  box-shadow: var(--shadow-md);
+  transform: none;
+}
+
+.menu-app .view-toggle-btn--active {
+  background: var(--bg-card);
+  box-shadow: none;
+}
+
+.menu-app .search-suggestions,
+.menu-app .dropdown-menu,
+.menu-app .burger-dropdown,
+.menu-app .toast,
+.menu-app .prep-undo {
+  box-shadow: var(--shadow-md);
+}
+
+.menu-app .skin-select-row {
+  cursor: default;
+}
+
+.menu-app .skin-select-row:hover {
+  background: transparent;
+}
+
+.menu-app .skin-select-row select {
+  min-width: 90px;
+  margin-left: auto;
+  padding: 5px 8px;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-control);
+  background: var(--bg-card);
+  color: var(--text);
+  font: inherit;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   GUI IMPROVEMENTS - NOVO STYLES
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Chip with counter ─────────────────────────────────────── */
+.chip-with-count {
+  position: relative;
+}
+
+.chip-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  margin-left: 6px;
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.chip.active .chip-counter {
+  background: rgba(212, 175, 55, 0.4);
+}
+
+/* ── Filter icon/emoji ─────────────────────────────────────── */
+.filter-icon {
+  margin-right: 4px;
+  font-size: 0.9rem;
+}
+
+/* ── Autocomplete search ───────────────────────────────────── */
+.search-wrapper {
+  position: relative;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.15);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.35);
+  }
+}
+
+.suggestion-item {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s ease;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: var(--bg-raised);
+}
+
+.suggestion-type {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.suggestion-type-icon { color: var(--gold); flex-shrink: 0; }
+
+.suggestion-name {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ── Bar statistics card ───────────────────────────────────── */
+.bar-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.bar-stat {
+  text-align: center;
+}
+
+.bar-stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.bar-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.bar-status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.bar-status-badge.public {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.bar-status-badge.private {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+.bar-status-badge svg { color: var(--gold); vertical-align: middle; }
+.icon-spin { animation: icon-spin 1s linear infinite; }
+@keyframes icon-spin { to { transform: rotate(360deg); } }
+
+/* ── Bar Actions New Layout ────────────────────────────────── */
+.bar-actions-new {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-select-bar-large {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--gold);
+  color: white;
+  width: 100%;
+}
+
+.btn-select-bar-large:hover {
+  background: #d4a737;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.bar-actions-small {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-action-small {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text);
+  border: 1px solid var(--border);
+}
+
+.btn-action-small:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--gold-dim);
+}
+
+.btn-action-small--danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.btn-action-small--danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+
+/* ── Enhanced empty state ──────────────────────────────────── */
+.empty-state-enhanced {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+  color: var(--gold);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state-message {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+}
+
+.empty-state-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.empty-state-btn {
+  all: unset;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.empty-state-btn-primary {
+  background: var(--gold);
+  color: white;
+}
+
+.empty-state-btn-primary:hover {
+  background: #d4a737;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.empty-state-btn-secondary {
+  background: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.empty-state-btn-secondary:hover {
+  background: var(--bg-card);
+  border-color: var(--gold-dim);
+}
+
+/* ── Makeable cocktail indicator ────────────────────────────── */
+.makeable-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #22c55e;
+  margin-top: 6px;
+}
+
+.makeable-badge::before {
+  content: '✓';
+  font-weight: 700;
+}
+
+/* ── Expandable sections animation ─────────────────────────── */
+.expand-actions-btn {
+  transition: all 0.2s ease;
+}
+
+.expand-actions-btn:hover {
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.expand-actions-btn ChevronDown.rotated {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+/* ── Responsive improvements ────────────────────────────────── */
+@media (max-width: 768px) {
+  .header-title {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+
+  .chip {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  .cocktails-grid:not(.cocktails-grid--standard) {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  }
+
+  .side-by-side {
+    flex-direction: column;
+  }
+
+  .empty-state-icon {
+    font-size: 2.5rem;
+  }
+
+  .empty-state-enhanced {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-container {
+    padding: 0.4rem 1rem;
+  }
+
+  .header-logo {
+    height: 32px;
+  }
+
+  .cocktails-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem;
+  }
+
+  .chip-counter {
+    display: none;
+  }
+
+  .bar-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* ── Filter collapse for mobile ════════════════════════════════ */
+/* Pas de zone scrollable dans la page : le panneau Filtres s'ouvre en entier
+   (la page elle-même défile), quelle que soit la largeur d'écran. */
+.filters-dropdown-content.filters-grid {
+  max-height: none;
+  overflow: visible;
+}
+
+/* ── Cards grid responsive ═════════════════════════════════════ */
+@media (min-width: 1400px) {
+  .cocktails-grid:not(.cocktails-grid--standard) {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  }
+}
+
+/* ── Transitions globales ══════════════════════════════════════ */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+/* ── Smooth scroll ═════════════════════════════════════════════ */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PHONE UX FIXES — écran de téléphone uniquement (≤ 640px)
+   Ces règles n'affectent volontairement pas l'affichage desktop.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Recette du formulaire cocktail : cartes de labels ──────────
+   .recipe-field est neutre (display:contents) tant qu'on n'est pas
+   sur téléphone, donc la grille 7 colonnes desktop n'est pas
+   impactée : le <label>/<div> disparaît de la mise en page et seul
+   son contenu (select/input/bouton) reste un enfant direct de la
+   grille, exactement comme avant. */
+.recipe-field {
+  display: contents;
+}
+
+.recipe-field-label {
+  display: none;
+}
+
+/* Placeholder de la colonne "Référence" quand l'ingrédient n'en a
+   aucune de définie : un <span> vide, affiché pour garder les 7
+   colonnes alignées avec les autres lignes de la recette. .form-input
+   ne fixe pas de display, et un <span> reste "inline" par défaut —
+   ce qui annule son width:100% et casse l'alignement de la grille
+   dès qu'une ligne mélange des ingrédients avec et sans référence. */
+.form-input--placeholder {
+  display: block;
+}
+
+@media (max-width: 640px) {
+
+  /* — Formulaire cocktail : modal centrée, pas collée en bas — */
+  .modal-overlay {
+    align-items: center;
+  }
+
+  /* Les modals forcées en "bottom sheet" (coins plats) redeviennent
+     des cartes centrées classiques, cohérent avec .modal-overlay
+     recentrée ci-dessus. */
+  .modal-container--menucard,
+  .modal-container--batch {
+    border-radius: var(--radius-lg);
+  }
+
+  /* — Recette : une carte par ingrédient, un champ par ligne — */
+  .recipe-columns-header {
+    display: none;
+  }
+
+  .recipe-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-raised);
+  }
+
+  .recipe-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .recipe-field-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Placeholder de référence (pas de références pour ce type) :
+     utile pour l'alignement de la grille desktop, inutile en carte
+     empilée sur téléphone. */
+  .recipe-field--empty {
+    display: none;
+  }
+
+  .recipe-field--delete {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  /* — Gérer vos bars : stats qui ne chevauchent plus le badge — */
+  .bar-header {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .bar-title-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .welcome-card-title {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .bar-stats {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  /* — Stock du bar : un ingrédient par ligne dans chaque catégorie —
+     (règle déjà tentée plus haut dans styles.css mais neutralisée par
+     la déclaration .category-body plus bas dans ce même fichier ;
+     on la refixe ici, dans la feuille chargée en dernier.)
+     minmax(0, 1fr) et pas juste 1fr : sinon la colonne s'élargit pour
+     loger le contenu non compressible d'une référence ouverte (les
+     champs de prix), et comme .category-section a overflow:hidden,
+     le surplus est rogné à droite au lieu de passer à la ligne. */
+  .category-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Filet de sécurité : même si un enfant refuse de rétrécir, on
+     préfère un scroll horizontal contenu à une carte qui déborde et
+     se fait rogner par .category-section. */
+  .ingredient-item-wrap {
+    min-width: 0;
+  }
+
+  /* — Ajouter une référence : le bouton texte déborde du formulaire
+     étroit (input flex:1 + bouton non compressible). Sur téléphone,
+     on ne garde que le + ; le libellé reste accessible via
+     aria-label/title, .reference-add-form garde son gap réduit. */
+  .btn-add-reference-label {
+    display: none;
+  }
+
+  .btn-add-reference {
+    flex-shrink: 0;
+    padding: 0.35rem 0.5rem;
+  }
+
+  /* Le bouton + reste collé à droite du champ texte (input flex:1
+     occupe déjà tout l'espace restant, on le rend explicite). */
+  .reference-add-form {
+    justify-content: flex-end;
+  }
+
+  /* — Paramètres d'ingrédient / de référence : le nom passe déjà à
+     la ligne au-dessus (checkbox + nom + badge réfs), donc on laisse
+     les champs de prix et le bouton supprimer utiliser toute la
+     largeur de la carte au lieu de rester tassés à droite. */
+  .ingredient-item-actions,
+  .reference-actions {
+    flex-basis: 100%;
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .ingredient-pricing,
+  .reference-pricing {
+    flex: 1 1 auto;
+  }
+
+  /* — Bouton "gérer les références" : calé tout à droite de la
+     ligne nom/checkbox, donc juste au-dessus du bouton supprimer
+     (lui-même ancré à droite via .ingredient-item-actions). */
+  .badge-references,
+  .btn-manage-references {
+    margin-left: auto;
+  }
+
+  /* — Une référence = une carte : sur deux lignes désormais (nom
+     au-dessus, prix/suppression en dessous, pleine largeur), une
+     fine ligne de séparation suffit pour distinguer où l'une
+     s'arrête et où la suivante commence (pas besoin d'un encadré). */
+  .reference-row {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .reference-row:last-of-type {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Bar (drinker + bartender) : rangée de tuiles icône + libellé,
+   identique sur mobile et desktop
+   ══════════════════════════════════════════════════════════════ */
+.side-col { display: flex; flex-direction: column; gap: 0.875rem; }
+
+/* Panneaux repliables = rangée de tuiles icône + libellé.
+      Drinker : Filtres, Cartes, Profil, Hasard
+      Bartender : Stock, Commandes, Filtres, Cartes */
+/* 4 tuiles = 4 colonnes égales sur toute la largeur (drinker comme bartender) */
+.bar-main { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; align-items: stretch; }
+.bar-main > * { grid-column: 1 / -1; min-width: 0; order: 10; }
+.bar-main .side-by-side,
+.bar-main .side-col { display: contents; }
+.bar-main .section-card,
+.bar-main .surprise-button { margin: 0; min-width: 0; }
+
+/* Chaque panneau est « transparent » : son en-tête devient une tuile de la rangée
+   (order 1-6) et son contenu une zone pleine largeur juste sous la rangée (order 9).
+   Un seul panneau est ouvert à la fois, les tuiles ne bougent donc jamais. */
+.bar-main .section-card { display: contents; }
+.bar-main .tile-stock   > .expand-actions-btn { order: 1; }
+.bar-main .tile-orders  > .expand-actions-btn { order: 2; }
+.bar-main .tile-filters > .expand-actions-btn { order: 3; }
+.bar-main .tile-cards   > .expand-actions-btn { order: 4; }
+.bar-main .tile-drinker { order: 5; }
+.bar-main .tile-drinker > .expand-actions-btn { order: 5; }
+.bar-main .tile-surprise { order: 6; }
+
+.bar-main .section-card > .expand-actions-btn {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.bar-main .section-card > .expand-actions-btn:hover { background: var(--bg-card); }
+.bar-main .tile-open > .expand-actions-btn { border-color: var(--gold-dim); background: var(--bg-card); }
+
+.bar-main .section-card > :not(.expand-actions-btn) {
+  grid-column: 1 / -1;
+  order: 9;
+  margin: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.bar-main .expand-actions-btn {
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0.25rem;
+  text-align: center;
+}
+.bar-main .expand-actions-btn > svg,
+.bar-main .expand-actions-btn > span:empty { display: none; }
+.bar-main .section-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  max-width: 100%;
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+}
+.tile-ico { margin: 0; color: var(--gold); font-size: 1.25rem; line-height: 1; }
+.tile-lbl { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lbl-full { display: none; }
+.lbl-short { display: inline; }
+
+.bar-main .count-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  margin: 0;
+  padding: 0 0.35rem;
+  font-size: 0.6rem;
+  line-height: 1.35;
+}
+.bar-main .tile-stock .count-badge { display: none; }
+
+/* « Tout effacer » passe dans le panneau déplié */
+.bar-main .clear-all-btn { display: none; }
+.bar-main .clear-all-btn--inner { display: block; margin: 0 0 0.25rem auto; }
+
+/* Connexion : prend la place de la tuile Profil tant qu'on n'est pas connecté
+   (les boutons connexion / déconnexion du header sont masqués) */
+.btn-login-header, .btn-logout-header { display: none; }
+.btn-logout-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  align-self: flex-end;          /* petit bouton discret, aligné à droite */
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.55rem;
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.68rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.btn-logout-panel svg { width: 12px; height: 12px; }
+.btn-logout-panel:hover { color: var(--danger-text); border-color: var(--danger-text); }
+.bar-main .tile-login {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.bar-main .surprise-button {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0.25rem;
+  text-align: center;
+}
+.bar-main .surprise-icon { width: 20px; height: 20px; }
+.bar-main .surprise-title {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+  text-overflow: ellipsis;
+}
+.bar-main .surprise-sub { display: none; }
+
+/* Desktop : libellés un peu plus grands */
+@media (min-width: 861px) {
+  .bar-main .section-title,
+  .bar-main .surprise-title { font-size: 0.72rem; letter-spacing: 1px; }
+  .tile-ico { font-size: 1.4rem; }
+}
+
+/* ── Mobile / tablette ≤ 860px : header et blocs compactés ── */
+@media (max-width: 860px) {
+  /* 1. Header : 2 rangées max (logo + actions / recherche), non sticky */
+  .header { position: static; }
+  .header-top { flex-wrap: wrap; row-gap: 0.4rem; }
+  .header-brand { flex: 1 1 0; min-width: 0; }
+  .header-right { width: auto; flex: 0 0 auto; margin-left: auto; }
+  .header-actions { width: auto; justify-content: flex-end; }
+  .header-search-inline { order: 3; flex: 1 1 100%; }
+
+  /* 2. « Cocktail du moment » (bartender) sur une seule ligne */
+  .cocktail-moment-panel {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0;
+    padding: 0.5rem 0.75rem;
+  }
+  .cocktail-moment-select { width: auto; max-width: 9rem; flex-shrink: 0; padding: 0.35rem 0.5rem; }
+  .cocktail-moment-name { font-size: 0.95rem; }
+  .shared-favorites-panel { margin-bottom: 0; }
+
+  /* 3. « Carte du moment » plus tassée */
+  .featured-menu-section { margin: 0.25rem 0 0.5rem; padding: 0.6rem 0.75rem 0.75rem; }
+}
+
+@media (max-width: 640px) {
+  /* 5. Bartender : la rangée d'actions de la carte (préparer, menu, éditer,
+        supprimer, proposer) peut passer à la ligne au lieu de déborder */
+  .card-footer { flex-wrap: wrap; gap: 0.25rem 0.5rem; margin-top: 0.5rem; padding-top: 0.5rem; }
+  .card-footer .footer-right { flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+}
+
+/* ── Icônes Lucide alignées avec le texte (remplacent les emojis) ── */
+.ico-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  vertical-align: middle;
+}
+.ico-inline > svg { flex-shrink: 0; }
+.ico-inline--top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+.ico-inline--top > svg { flex-shrink: 0; margin-top: 0.15em; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   Filtres — listes à cases à cocher (remplacent les chips)
+   ══════════════════════════════════════════════════════════════ */
+.filter-list { display: flex; flex-direction: column; gap: 0.1rem; }
+.filter-list--cols { column-gap: 1.25rem; }
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.3rem 0.35rem;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+.filter-option:hover { background: rgba(201, 168, 76, 0.07); color: var(--text); }
+/* Case native masquée (reste accessible au clavier / lecteur d'écran) */
+.filter-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* Effet surligneur fluo : le trait « balaie » le libellé quand il est sélectionné */
+.filter-option > span {
+  --hl: rgba(250, 225, 60, 0.6);
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.3rem 0.7rem 0.35rem 0.6rem;
+  background-image: linear-gradient(100deg, var(--hl) 0%, var(--hl) 100%);
+  background-repeat: no-repeat;
+  background-position: 0 75%;
+  background-size: 0% 80%;
+  transition: background-size 0.28s ease, color 0.15s;
+}
+.dark .filter-option > span { --hl: rgba(250, 225, 60, 0.34); }
+
+.filter-option input:checked + span {
+  background-size: 100% 80%;
+  color: var(--text);
+  font-weight: 600;
+}
+.filter-option input:focus-visible + span {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* sous-spiritueux : indentés sous leur famille */
+.filter-family { break-inside: avoid; }
+.filter-sublist {
+  margin: 0.1rem 0 0.35rem 0.55rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--gold-dim);
+}
+.filter-option--sub { font-size: 0.78rem; padding: 0.2rem 0.35rem; }
+
+/* « Tout effacer » : réservé en permanence, simplement grisé quand inactif */
+.clear-all-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Filtres — agencement : bandeau Catégories + colonnes
+   ══════════════════════════════════════════════════════════════ */
+
+.filters-grid > .filter-group { min-width: 0; }
+.filters-grid .filter-label { margin-bottom: 0.3rem; }
+
+/* Barre d'outils : recherche (extensible) + « Tout effacer » sur une seule ligne */
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.filter-toolbar .filter-search { flex: 1 1 auto; min-width: 0; }
+.filter-toolbar .filter-search .search-input { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.filter-toolbar .clear-all-btn--inner { flex: none; margin: 0 0 0 auto; white-space: nowrap; }
+.filters-grid > .filter-toolbar { padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+
+/* Titre ──────── [compteur] [chevron] : la ligne de séparation reste visible,
+   le compteur se place à son extrémité droite */
+/* Titre ────────────── [chevron sur mobile] : la ligne est un vrai élément */
+.filters-grid .filter-label { white-space: nowrap; }
+.filters-grid .filter-label::after { display: none; }
+.filter-label-line {
+  flex: 1 1 1.25rem;
+  min-width: 1.25rem;
+  height: 1px;
+  background: var(--border);
+}
+.filters-grid .filter-label .filter-label-chevron { flex: none; margin-left: 0 !important; }
+
+/* Listes : une seule colonne verticale, dans l'ordre */
+.filter-list { display: flex; flex-direction: column; }
+.filter-list--cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.5rem; }
+
+/* Catégories : bandeau horizontal (titre + options sur une ligne) */
+.filter-group--categories {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 0.25rem;
+}
+.filter-group--categories .filter-label { width: auto; margin: 0; }
+.filter-group--categories .filter-label::after { display: none; }
+.filter-group--categories .filter-list {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 0.5rem;
+}
+
+/* Mobile / tablette : groupes empilés, séparés par un filet */
+@media (max-width: 860px) {
+  .filters-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+  .filters-grid > .filter-group:not(.filter-group--categories) {
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+  }
+}
+
+/* Grand écran :
+   ligne 1 : [ Recherche ........... ] [ Tout effacer ]
+   ligne 2 : [ Catégories ........................................ ]
+   ligne 3 : [ Spiritueux ] [ Liqueurs ] [ Profil ] [ Style ]            */
+@media (min-width: 861px) {
+  .filters-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 0.85fr);
+    grid-template-areas:
+      "toolbar  toolbar   toolbar  toolbar"
+      "cat      cat       cat      cat"
+      "spirits  liqueurs  profile  style";
+    column-gap: 1.5rem;
+    row-gap: 0.9rem;
+    align-items: stretch;      /* colonnes de même hauteur → filets verticaux continus */
+    max-height: none;
+    overflow: visible;
+  }
+  .filters-grid > .filter-toolbar           { grid-area: toolbar; }
+  .filters-grid > .filter-group--categories { grid-area: cat; align-self: center; }
+  .filters-grid > .filter-group--spirits    { grid-area: spirits; }
+  .filters-grid > .filter-group--liqueurs   { grid-area: liqueurs; }
+  .filters-grid > .filter-group--profile    { grid-area: profile; }
+  .filters-grid > .filter-group--style      { grid-area: style; }
+
+  /* filets verticaux entre les 4 colonnes */
+  .filters-grid > .filter-group--liqueurs,
+  .filters-grid > .filter-group--profile,
+  .filters-grid > .filter-group--style {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--border);
+  }
+  /* les filets descendent jusqu'au bord bas du panneau (annule son padding-bottom) */
+  .filters-grid > .filter-group--spirits,
+  .filters-grid > .filter-group--liqueurs,
+  .filters-grid > .filter-group--profile,
+  .filters-grid > .filter-group--style {
+    margin-bottom: -1rem;
+    padding-bottom: 1rem;
+  }
+
+  /* pas d'accordéon sur grand écran */
+  .filters-grid .filter-label-chevron { display: none; }
+  .filters-grid button.filter-label { cursor: default; pointer-events: none; }
+}
+
+/* Écrans moyens : 2 colonnes */
+@media (min-width: 861px) and (max-width: 1180px) {
+  .filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "toolbar  toolbar"
+      "cat      cat"
+      "spirits  liqueurs"
+      "profile  style";
+  }
+  .filters-grid > .filter-group--profile { padding-left: 0; border-left: none; }
+  .filters-grid > .filter-group--style   { border-left: 1px solid var(--border); }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Liste des cartes (tuile « Cartes ») : liste fine, une ligne par carte
+   ══════════════════════════════════════════════════════════════ */
+.cards-content { padding: 0.4rem 0.5rem 0.5rem; }
+
+.cards-content .cards-grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;                 /* pleine largeur du panneau, aligné avec les autres tuiles */
+}
+
+.cards-content .menu-card-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: var(--bg-raised);
+  outline: none;
+}
+
+/* nom + infos sur une seule ligne */
+.cards-content .menu-card-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 0.6rem;
+}
+.cards-content .menu-card-name {
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.menu-card-meta { flex: none; display: flex; align-items: baseline; gap: 0.5rem; }
+.cards-content .menu-card-count { font-size: 0.72rem; color: var(--text-dim); white-space: nowrap; }
+.menu-card-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+/* carte masquée aux drinkers : en retrait */
+.cards-content .menu-card-item--hidden .menu-card-name { color: var(--text-muted); font-weight: 500; }
+
+/* actions à droite, discrètes jusqu'au survol (toujours visibles sur mobile) */
+.cards-content .menu-card-actions { flex: none; display: flex; align-items: center; gap: 0.1rem; }
+.cards-content .menu-card-actions .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  opacity: 0.5;
+}
+.cards-content .menu-card-item:hover .btn-icon,
+.cards-content .menu-card-item:focus-within .btn-icon { opacity: 1; }
+.cards-content .menu-card-actions .btn-icon:hover { background: var(--bg-input); }
+.menu-card-go { color: var(--text-dim); transition: transform 0.15s, color 0.15s; }
+.menu-card-item:hover .menu-card-go { color: var(--gold); transform: translateX(2px); }
+
+/* « Nouvelle carte » : dernière ligne de la liste, discrète */
+.menu-card-new {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.menu-card-new:hover { color: var(--gold); background: var(--bg-raised); }
+
+/* Grand écran : 2 colonnes séparées par un filet vertical, comme les filtres.
+   Chaque colonne se remplit de haut en bas avant de passer à la suivante. */
+@media (min-width: 861px) {
+  .cards-content { padding: 0.9rem 1.5rem 1rem; }
+  .cards-content .cards-grid {
+    display: block;
+    column-count: 2;
+    column-gap: 3rem;                       /* 1.5rem de chaque côté du filet */
+    column-rule: 1px solid var(--border);
+  }
+  .cards-content .cards-grid > * { break-inside: avoid; }
+
+  /* même esprit que les listes de filtres : pas de lignes, fond léger au survol */
+  .cards-content .menu-card-item {
+    border-bottom: none;
+    border-radius: var(--radius-md);
+    padding: 0.3rem 0.35rem 0.3rem 0.5rem;
+    min-height: 2.5rem;
+  }
+  .cards-content .menu-card-item:hover,
+  .cards-content .menu-card-item:focus-visible { background: rgba(201, 168, 76, 0.07); }
+
+  /* effet surligneur fluo sur le nom au survol */
+  .cards-content .menu-card-name {
+    --hl: rgba(250, 225, 60, 0.6);
+    padding: 0.05rem 0.4rem;
+    border-radius: 0.3rem 0.7rem 0.35rem 0.6rem;
+    background-image: linear-gradient(100deg, var(--hl), var(--hl));
+    background-repeat: no-repeat;
+    background-position: 0 75%;
+    background-size: 0% 80%;
+    transition: background-size 0.28s ease;
+  }
+  .dark .cards-content .menu-card-name { --hl: rgba(250, 225, 60, 0.34); }
+  .cards-content .menu-card-item:hover .menu-card-name,
+  .cards-content .menu-card-item:focus-visible .menu-card-name { background-size: 100% 80%; }
+
+  .menu-card-new { border-radius: var(--radius-md); }
+}
+
+@media (max-width: 600px) {
+  .cards-content { padding: 0.25rem 0.25rem 0.4rem; }
+  .cards-content .menu-card-actions .btn-icon { opacity: 1; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Profil drinker : Favoris et Historique
+   mobile = onglets, grand écran = les deux côte à côte
+   ══════════════════════════════════════════════════════════════ */
+/* aucun panneau de tuile n'a de zone scrollable interne */
+.filters-dropdown-content { max-height: none; overflow: visible; }
+
+.drinker-col-title { display: none; }
+
+@media (max-width: 860px) {
+  .drinker-col:not(.is-active) { display: none; }
+}
+
+@media (min-width: 861px) {
+  .drinker-tabs { display: none; }
+  .drinker-col-title { display: flex; margin-bottom: 0.5rem; }
+  .drinker-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.5rem;
+    align-items: stretch;          /* filet vertical sur toute la hauteur */
+  }
+  .drinker-col + .drinker-col {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--border);
+  }
+}
+
+/* Favoris cliquables (ouvrent la fiche du cocktail) */
+.menu-card-item--clickable { cursor: pointer; transition: background 0.15s; }
+.menu-card-item--clickable:hover,
+.menu-card-item--clickable:focus-visible { background: rgba(201, 168, 76, 0.07); outline: none; }
+.menu-card-item--clickable:hover .menu-card-name { color: var(--gold); }
+
+/* ══════════════════════════════════════════════════════════════
+   Liste des cartes : lignes plus « bouton » + pastille « Ouvrir »
+   ══════════════════════════════════════════════════════════════ */
+.cards-content .cards-grid { gap: 0.4rem; }
+
+.cards-content .menu-card-item {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: var(--bg-card);
+  border-color: var(--gold);
+  box-shadow: 0 2px 8px rgba(201, 168, 76, 0.18);
+}
+.cards-content .menu-card-item:active { transform: translateY(1px); box-shadow: none; }
+
+/* un seul signal au survol : on retire le surligneur sur le nom */
+.cards-content .menu-card-item:hover .menu-card-name,
+.cards-content .menu-card-item:focus-visible .menu-card-name { background-size: 0% 80%; }
+
+@media (min-width: 861px) {
+  .cards-content .cards-grid > * { margin-bottom: 0.4rem; }
+  .cards-content .menu-card-item { padding: 0.3rem 0.4rem 0.3rem 0.75rem; min-height: 2.6rem; }
+}
+
+.menu-card-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.7rem;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.menu-card-item:hover .menu-card-open,
+.menu-card-open:hover,
+.menu-card-open:focus-visible {
+  background: var(--gold);
+  color: var(--bg-card);
+  border-color: var(--gold);
+  outline: none;
+}
+
+/* bartender : la pastille cohabite avec 3 icônes → icône seule sur petit écran */
+@media (max-width: 600px) {
+  .menu-card-open--compact span { display: none; }
+  .menu-card-open--compact { padding: 0.3rem 0.45rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Liste des cartes : même langage que les filtres
+   (pas de cadre, fond doré léger, trait de surligneur sur le nom)
+   ══════════════════════════════════════════════════════════════ */
+.cards-content .menu-card-item {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: rgba(201, 168, 76, 0.07);
+  border-color: var(--border);
+  box-shadow: none;
+}
+.cards-content .menu-card-item:active { transform: none; }
+
+/* Le nom porte un léger trait de surligneur au repos (« je suis cliquable »),
+   qui se remplit au survol — comme les options de filtre. */
+.cards-content .menu-card-name {
+  --hl: rgba(250, 225, 60, 0.6);
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.3rem 0.7rem 0.35rem 0.6rem;
+  background-image: linear-gradient(100deg, var(--hl), var(--hl));
+  background-repeat: no-repeat;
+  background-position: 0 90%;
+  background-size: 100% 24%;
+  opacity: 1;
+  transition: background-size 0.28s ease;
+}
+.dark .cards-content .menu-card-name { --hl: rgba(250, 225, 60, 0.34); }
+.cards-content .menu-card-item:hover .menu-card-name,
+.cards-content .menu-card-item:focus-visible .menu-card-name { background-size: 100% 80%; }
+
+/* « Ouvrir » : simple texte discret, sans pastille ni contour */
+.menu-card-open {
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.4rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+.menu-card-item:hover .menu-card-open,
+.menu-card-open:hover,
+.menu-card-open:focus-visible {
+  background: transparent;
+  border: none;
+  color: var(--gold);
+}
+
+@media (min-width: 861px) {
+  .cards-content .menu-card-item { border-bottom: none; border-radius: var(--radius-md); }
+  .cards-content .cards-grid > * { margin-bottom: 0.15rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Cartes : lignes épurées, pastille « Ouvrir » discrète en teinte dorée
+   ══════════════════════════════════════════════════════════════ */
+.cards-content .cards-grid > * { margin-bottom: 0.3rem; }
+
+.cards-content .menu-card-item {
+  background: rgba(201, 168, 76, 0.07);
+  border: 1px solid rgba(201, 168, 76, 0.28);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  transform: none;
+  padding: 0.35rem 0.4rem 0.35rem 0.75rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+.cards-content .menu-card-item:hover,
+.cards-content .menu-card-item:focus-visible {
+  background: rgba(201, 168, 76, 0.14);
+  border-color: var(--gold-dim);
+}
+.cards-content .menu-card-item:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+/* nom : texte simple, sans surligneur */
+.cards-content .menu-card-name {
+  background-image: none;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* « Ouvrir » : pastille sans contour, fond doré léger, l'icône avance au survol */
+.cards-content .menu-card-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  color: var(--gold);
+  background: rgba(201, 168, 76, 0.16);
+  border: none;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.cards-content .menu-card-open svg { flex: none; stroke: currentColor; }
+.cards-content .menu-card-item:hover .menu-card-open,
+.cards-content .menu-card-open:hover,
+.cards-content .menu-card-open:focus-visible {
+  background: rgba(201, 168, 76, 0.3);
+  color: var(--gold);
+}
+
+@media (min-width: 861px) {
+  .cards-content .menu-card-item { border: 1px solid rgba(201, 168, 76, 0.28); }
+  .cards-content .menu-card-item:hover,
+  .cards-content .menu-card-item:focus-visible { border-color: var(--gold-dim); }
+  .cards-content .cards-grid > * { margin-bottom: 0.3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cards-content .menu-card-item,
+  .cards-content .menu-card-open { transition: none; }
 }

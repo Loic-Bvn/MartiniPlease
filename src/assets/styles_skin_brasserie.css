@@ -1,0 +1,43 @@
+.menu-app.skin-brasserie {
+  --font-body: 'Arial Narrow', 'Roboto Condensed', 'Liberation Sans Narrow', sans-serif;
+  --font-display: 'Rockwell', 'Roboto Slab', 'DejaVu Serif', Georgia, serif;
+  --bg: #faf8f2;
+  --bg-card: #f2eedf;
+  --bg-raised: #e8e2cc;
+  --bg-input: #f2eedf;
+  --gold: #8a6010;
+  --gold-dim: #9a7020;
+  --amber: #a05010;
+  --text: #1e1a0e;
+  --text-muted: #706040;
+  --text-dim: #9a8860;
+  --border: #c8bfa0;
+  --border-mid: #a89870;
+  --radius-control: 1px;
+  --radius-panel: 2px;
+  --radius-dialog: 3px;
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --shadow-sm: 0 1px 2px rgba(32, 43, 39, 0.08);
+  --shadow-md: 0 2px 6px rgba(32, 43, 39, 0.1);
+  --shadow-lg: 0 6px 16px rgba(32, 43, 39, 0.13);
+}
+
+.dark .menu-app.skin-brasserie {
+  --bg: #171410;
+  --bg-card: #1e1a12;
+  --bg-raised: #27221a;
+  --bg-input: #1e1a12;
+  --gold: #c8a840;
+  --gold-dim: #907020;
+  --amber: #c07030;
+  --text: #f0e8cc;
+  --text-muted: #a08850;
+  --text-dim: #806840;
+  --border: #3a3220;
+  --border-mid: #4e4530;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.22);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.36);
+}

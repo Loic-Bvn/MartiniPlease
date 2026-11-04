@@ -1,0 +1,43 @@
+.menu-app.skin-craft {
+  --font-body: 'Palatino Linotype', 'Book Antiqua', 'URW Palladio L', serif;
+  --font-display: 'Bookman Old Style', 'URW Bookman', 'Palatino Linotype', serif;
+  --bg: #eef1e6;
+  --bg-card: #f8f8ef;
+  --bg-raised: #dce5d2;
+  --bg-input: #f8f8ef;
+  --gold: #536b3c;
+  --gold-dim: #40552f;
+  --amber: #a75e3b;
+  --text: #293326;
+  --text-muted: #65705c;
+  --text-dim: #87917a;
+  --border: #cbd5c0;
+  --border-mid: #aeba9f;
+  --radius-control: 6px;
+  --radius-panel: 12px;
+  --radius-dialog: 18px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 2px 4px rgba(41, 51, 38, 0.07);
+  --shadow-md: 0 5px 12px rgba(41, 51, 38, 0.1);
+  --shadow-lg: 0 10px 24px rgba(41, 51, 38, 0.14);
+}
+
+.dark .menu-app.skin-craft {
+  --bg: #182019;
+  --bg-card: #222c22;
+  --bg-raised: #2c392b;
+  --bg-input: #222c22;
+  --gold: #a9bd83;
+  --gold-dim: #8fa36a;
+  --amber: #d38b68;
+  --text: #e5e9db;
+  --text-muted: #b4c0a6;
+  --text-dim: #8d9b7c;
+  --border: #3a4938;
+  --border-mid: #50644b;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.22);
+  --shadow-md: 0 5px 12px rgba(0, 0, 0, 0.29);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.37);
+}

@@ -1,6 +1,13 @@
 ## TODO
 TAG new version using "npm run release:patch"
 
+# Amelioration des perfs
+- [ ] Mesurer la taille du bundle de production et identifier ses principaux contributeurs.
+- [ ] Supprimer Sentry, son initialisation et sa configuration.
+- [ ] Supprimer Umami, son intégration et sa configuration.
+- [ ] Recompiler, comparer avec la mesure initiale et optimiser les gros morceaux restants si nécessaire.
+
+
 # Fonctionnalités côté Drinker
 ## Engagement & fidélisation
 - [ ] **Gamification découverte** — badge de progression `X/Y cocktails essayés` sur le catalogue du bar, calculé depuis `history`
