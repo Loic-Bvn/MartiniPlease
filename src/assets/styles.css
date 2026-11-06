@@ -97,14 +97,31 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif);
   background-color: var(--bg);
   color: var(--text);
 }
 
+.landing-layout {
+  position: relative;
+  --landing-inline-padding: clamp(1.5rem, 5vw, 4rem);
+}
+
+.landing-layout .header-container {
+  max-width: none;
+  padding-left: var(--landing-inline-padding);
+  padding-right: var(--landing-inline-padding);
+}
+
+@media (max-width: 520px) {
+  .landing-layout {
+    --landing-inline-padding: 1rem;
+  }
+}
+
 /* ── Header ────────────────────────────────── */
 .header {
-  background: var(--bg-card);
+  background: linear-gradient(to bottom, var(--bg), var(--bg-raised));
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -112,7 +129,13 @@ body {
   box-shadow: var(--shadow-md);
 }
 
+.dark .header {
+  background: var(--bg-card);
+  border-color: var(--border-mid);
+}
+
 .header-container {
+  width: 100%;
   max-width: 1100px;
   margin: 0 auto;
   padding: 0.5rem 1.5rem;
@@ -206,7 +229,6 @@ body {
 .menu-app {
   background-color: var(--bg);
   color: var(--text);
-  min-height: 100vh;
 }
 
 .main-content {
@@ -663,6 +685,15 @@ body {
   gap: 1rem;
 }
 
+.cocktail-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-panel);
+  background: var(--cocktail-list-bg, transparent);
+}
+
 /* Vue "standard" : cartes plus larges (photo + texte côte à côte) => 2 par ligne sur desktop */
 .cocktails-grid--standard {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -687,11 +718,12 @@ body {
 .settings-switch {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 3px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--gold);
   border-radius: var(--radius-lg);
+  overflow: hidden;
   flex-shrink: 0;
 }
 
@@ -719,14 +751,14 @@ body {
 
 .view-toggle-btn:hover {
   color: var(--text);
-  border-color: var(--border-mid);
+  border-color: transparent;
 }
 
 .view-toggle-btn--active {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 94%, var(--bg-raised) 6%), var(--bg-card));
-  color: var(--gold);
-  border-color: var(--border-mid);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  background: var(--gold);
+  color: var(--bg);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .settings-switch .view-toggle-btn {
@@ -734,7 +766,8 @@ body {
 }
 
 .settings-switch .view-toggle-btn--active {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, var(--bg-raised) 4%), var(--bg-card));
+  background: var(--gold);
+  color: var(--bg);
 }
 
 @media (max-width: 480px) {
@@ -743,7 +776,7 @@ body {
 
 /* ── Cocktail card compact ─────────────────── */
 .cocktail-card-compact {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, var(--bg-raised) 4%), var(--bg-card));
+  background: var(--bg-cocktail-card, linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, var(--bg-raised) 4%), var(--bg-card)));
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1rem;
@@ -773,7 +806,6 @@ body {
   flex-shrink: 0;
   overflow: hidden;
   background: linear-gradient(135deg, var(--bg-raised, var(--bg-input)), var(--bg-input));
-  border-right: 1px solid var(--border);
   border-radius: var(--radius-lg) 0 0 var(--radius-lg);
 }
 
@@ -866,6 +898,39 @@ body {
   margin: 0.2rem 0 0 0;
 }
 
+.menu-app.skin-luxe h1,
+.menu-app.skin-luxe h2,
+.menu-app.skin-luxe h3,
+.menu-app.skin-luxe h4,
+.menu-app.skin-luxe h5,
+.menu-app.skin-luxe h6 {
+  font-family: var(--font-display);
+}
+
+.menu-app.skin-luxe .section-title,
+.menu-app.skin-luxe .cocktails-header,
+.menu-app.skin-luxe .cocktail-moment-kicker,
+.menu-app.skin-luxe .featured-menu-heading h2,
+.menu-app.skin-luxe .form-section-title,
+.menu-app.skin-luxe .prep-section-title,
+.menu-app.skin-luxe .cv-group-title,
+.menu-app.skin-luxe .category-title,
+.menu-app.skin-luxe .recommendations-title,
+.menu-app.skin-luxe .similar-cocktails-title,
+.menu-app.skin-luxe .loyalty-panel-title,
+.menu-app.skin-luxe .shared-favorites-heading h2,
+.menu-app.skin-luxe .drinker-col-title {
+  font-family: var(--font-subtitle, inherit);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.menu-app.skin-luxe .surprise-button,
+.menu-app.skin-luxe .view-toggle-btn {
+  font-family: var(--font-subtitle);
+}
+
 .header-actions {
   display: flex;
   gap: 0.25rem;
@@ -899,7 +964,7 @@ body {
 .ingredient-info::after {
   content: '';
   flex: 1;
-  border-bottom: 1px dotted var(--border-mid);
+  border-bottom: 1px dotted var(--recipe-leader, var(--border-mid));
   height: 1em;
   display: flex;
 }
@@ -1286,8 +1351,6 @@ body {
 .featured-menu-section {
   margin: 0.75rem 0 1.25rem;
   padding: 0.9rem 1rem 1rem;
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--gold);
   border-radius: var(--radius-md);
   background: var(--amber);
 }
@@ -2956,7 +3019,6 @@ body {
 }
 
 @media (max-width: 640px) {
-  .header-container,
   .main-content {
     padding-left: 0.875rem;
     padding-right: 0.875rem;
@@ -3051,7 +3113,7 @@ body {
 
 /* ── Mobile ≤ 540px ──────────────────────────── */
 @media (max-width: 540px) {
-  .header-container, .main-content { padding-left: 0.75rem; padding-right: 0.75rem; }
+  .main-content { padding-left: 0.75rem; padding-right: 0.75rem; }
   .header-title  { font-size: 0.85rem; letter-spacing: 2px; max-width: min(100%, 16rem); }
   .header-logo   { height: 30px; }
   .header-right { gap: 0.375rem; }
@@ -5109,10 +5171,17 @@ body {
 }
 
 .menu-app .header-title,
-.menu-app .cocktail-title,
 .menu-app .cv-title,
 .menu-app .modal-title {
   font-family: var(--font-display);
+}
+
+.menu-app .cocktail-title {
+  font-family: var(--font-cocktail, var(--font-display));
+}
+
+.menu-app.skin-luxe .cocktail-title {
+  font-family: var(--font-cocktail);
 }
 
 .menu-app .header {
@@ -5176,7 +5245,7 @@ body {
 }
 
 .menu-app .cocktail-card-compact {
-  background: var(--bg-card);
+  background: var(--bg-cocktail-card, var(--bg-card));
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -5186,8 +5255,15 @@ body {
 }
 
 .menu-app .view-toggle-btn--active {
-  background: var(--bg-card);
+  background: var(--gold);
+  color: var(--bg);
+  border-color: transparent;
   box-shadow: none;
+}
+
+.menu-app .view-toggle > .view-toggle-btn,
+.menu-app .settings-switch > .view-toggle-btn {
+  border-radius: 0 !important;
 }
 
 .menu-app .search-suggestions,

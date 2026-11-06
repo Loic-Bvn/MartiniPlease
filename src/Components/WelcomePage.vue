@@ -2,83 +2,74 @@
   <div class="landing-page">
     <main class="landing-hero">
       <Transition name="landing-fade">
-        <div v-if="activeCocktail" :key="activeCocktail.id" class="landing-slide" aria-hidden="true">
-          <img :src="activeCocktail.image" alt="" class="landing-photo" />
-          <div class="landing-caption">{{ activeCocktail.name }} · <b>{{ featuredBar?.name }}</b></div>
+        <div v-if="activeSlide" :key="activeSlide.id" class="landing-slide" aria-hidden="true">
+          <img :src="activeSlide.image" alt="" class="landing-photo-backdrop" />
+          <img :src="activeSlide.image" alt="" class="landing-photo" />
         </div>
       </Transition>
-      <div v-if="!activeCocktail" class="landing-slide landing-slide--fallback" aria-hidden="true"></div>
+      <div v-if="!activeSlide" class="landing-slide landing-slide--fallback" aria-hidden="true"></div>
       <div class="landing-shade" aria-hidden="true"></div>
+      <div v-if="activeSlide?.caption" class="landing-caption">
+        {{ activeSlide.caption }}
+      </div>
 
+      <div class="landing-inner">
       <div class="landing-copy">
-        <p class="landing-eyebrow">COCKTAILS · {{ locale === 'fr' ? 'STOCK · RECETTES' : 'INVENTORY · RECIPES' }}</p>
-        <h1>{{ locale === 'fr' ? 'Ton bar, ta carte, un seul code.' : 'Your bar, your menu, one simple code.' }}</h1>
-        <p class="landing-intro">
-          {{ locale === 'fr'
-            ? 'Gère ton bar, partage ta carte. Tes invités n’ont plus qu’à choisir.'
-            : 'Manage your bar and share your menu. Your guests just have to choose.' }}
-        </p>
+        <p class="landing-eyebrow">{{ t.eyebrow }}</p>
+        <h1>{{ t.title }}</h1>
+        <p class="landing-intro">{{ t.intro }}</p>
       </div>
 
       <div class="landing-actions">
-        <section class="landing-action">
-          <h2>BARTENDER</h2>
-          <p>{{ locale === 'fr' ? 'Gère ton stock et tes recettes.' : 'Manage your inventory and recipes.' }}</p>
-          <button type="button" class="landing-primary-button" @click="emit('open-auth')">
-            {{ locale === 'fr' ? 'Créer ou accéder à mon bar' : 'Create or access my bar' }}
-          </button>
-        </section>
-
-        <section class="landing-action">
-          <h2>DRINKER</h2>
-          <p>{{ locale === 'fr' ? 'Explore la carte d’un bar avec son code.' : 'Explore a bar menu with its code.' }}</p>
+        <section class="landing-action landing-action--drinker" aria-labelledby="landing-drinker">
+          <div class="landing-action-heading">
+            <h2 id="landing-drinker">Drinker</h2>
+            <p>{{ t.drinkerText }}</p>
+          </div>
           <form class="landing-join" @submit.prevent="emit('join-by-code')">
             <input
               :value="inviteCodeInput"
               type="text"
-              :placeholder="locale === 'fr' ? 'Code du bar (ex : STAR-7514)' : 'Bar code (e.g. STAR-7514)'"
-              :aria-label="locale === 'fr' ? 'Code du bar' : 'Bar code'"
+              :placeholder="t.codePlaceholder"
+              :aria-label="t.codeLabel"
               autocomplete="off"
               @input="emit('update:inviteCodeInput', $event.target.value)"
             />
-            <button type="submit" class="landing-primary-button">
-              {{ locale === 'fr' ? 'Rejoindre' : 'Join' }}
-            </button>
+            <button type="submit" class="landing-button">{{ t.join }}</button>
           </form>
           <p v-if="codeError" class="landing-error" role="alert">{{ codeError }}</p>
+
           <div id="landing-public-bars" class="landing-public-bars" aria-live="polite">
-            <p v-if="publicBarsLoading" class="landing-public-status">
-              {{ locale === 'fr' ? 'Chargement des bars…' : 'Loading bars…' }}
-            </p>
-            <p v-else-if="publicBarsError" class="landing-public-status" role="alert">
-              {{ locale === 'fr' ? 'Impossible de charger les bars. Réessaie plus tard.' : 'Unable to load bars. Please try again later.' }}
-            </p>
-            <p v-else-if="publicBars.length === 0" class="landing-public-status">
-              {{ locale === 'fr' ? 'Aucun bar ouvert pour le moment.' : 'No open bars right now.' }}
-            </p>
+            <p v-if="publicBarsLoading" class="landing-status">{{ t.loading }}</p>
+            <p v-else-if="publicBarsError" class="landing-status" role="alert">{{ t.loadError }}</p>
+            <p v-else-if="publicBars.length === 0" class="landing-status">{{ t.noBars }}</p>
             <template v-else>
-              <h3 class="landing-list-title">{{ locale === 'fr' ? 'Bars ouverts' : 'Open bars' }}</h3>
+              <h3 class="landing-list-title">{{ t.openBars }}</h3>
               <button
                 v-for="bar in publicBars"
                 :key="bar.id"
                 type="button"
-                :class="['landing-public-bar', { 'landing-public-bar--featured': bar.id === featuredBarId }]"
-                :aria-label="bar.id === featuredBarId
-                  ? `${bar.name} — ${locale === 'fr' ? 'bar à la une' : 'featured bar'}`
-                  : bar.name"
+                class="landing-bar"
+                :aria-label="bar.name"
                 @click="emit('join-public-bar', bar)"
               >
-                <span class="landing-public-bar-name">
-                  {{ bar.name }}
-                </span>
-                <span v-if="bar.id === featuredBarId" class="landing-featured-badge">
-                  {{ locale === 'fr' ? 'À la une' : 'Featured' }}
-                </span>
+                <span class="landing-bar-name">{{ bar.name }}</span>
                 <span class="landing-bar-code">{{ bar.invite_code }}</span>
               </button>
             </template>
           </div>
         </section>
+
+        <section class="landing-action landing-action--bartender" aria-labelledby="landing-bartender">
+          <div class="landing-action-heading">
+            <h2 id="landing-bartender">Bartender</h2>
+            <p>{{ t.bartenderText }}</p>
+          </div>
+          <button type="button" class="landing-button" @click="emit('open-auth')">
+            {{ t.bartenderCta }}
+          </button>
+        </section>
+      </div>
       </div>
     </main>
   </div>
@@ -89,9 +80,9 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },
-  featuredBarId: { type: String, default: '' },
   featuredBar: { type: Object, default: null },
   featuredCocktails: { type: Array, default: () => [] },
+  landingPhotos: { type: Array, default: () => [] },
   publicBars: { type: Array, default: () => [] },
   publicBarsLoading: Boolean,
   publicBarsError: Boolean,
@@ -106,19 +97,63 @@ const emit = defineEmits([
   'update:inviteCodeInput',
 ])
 
+const MESSAGES = {
+  fr: {
+    eyebrow: 'Cocktails · Stock · Recettes',
+    title: 'Ton bar, ta carte, un seul code.',
+    intro: 'Gère ton bar, partage ta carte. Tes invités n’ont plus qu’à choisir.',
+    bartenderText: 'Gère ton stock et tes recettes.',
+    bartenderCta: 'Créer ou accéder à mon bar',
+    drinkerText: 'Explore la carte d’un bar avec son code.',
+    codePlaceholder: 'Code du bar (ex : STAR-7514)',
+    codeLabel: 'Code du bar',
+    join: 'Rejoindre',
+    loading: 'Chargement des bars…',
+    loadError: 'Impossible de charger les bars. Réessaie plus tard.',
+    noBars: 'Aucun bar ouvert pour le moment.',
+    openBars: 'Bars ouverts',
+  },
+  en: {
+    eyebrow: 'Cocktails · Inventory · Recipes',
+    title: 'Your bar, your menu, one simple code.',
+    intro: 'Manage your bar and share your menu. Your guests just have to choose.',
+    bartenderText: 'Manage your inventory and recipes.',
+    bartenderCta: 'Create or access my bar',
+    drinkerText: 'Explore a bar menu with its code.',
+    codePlaceholder: 'Bar code (e.g. STAR-7514)',
+    codeLabel: 'Bar code',
+    join: 'Join',
+    loading: 'Loading bars…',
+    loadError: 'Unable to load bars. Please try again later.',
+    noBars: 'No open bars right now.',
+    openBars: 'Open bars',
+  },
+}
+
+const t = computed(() => MESSAGES[props.locale] || MESSAGES.fr)
+
+// Carrousel
 const activeCocktailIndex = ref(0)
-const activeCocktail = computed(() => props.featuredCocktails[activeCocktailIndex.value] || null)
+const slides = computed(() => {
+  if (props.landingPhotos.length) return props.landingPhotos
+  return props.featuredCocktails.map((cocktail) => ({
+    ...cocktail,
+    caption: [cocktail.name, props.featuredBar?.name].filter(Boolean).join(' · '),
+  }))
+})
+const activeSlide = computed(() => slides.value[activeCocktailIndex.value] || null)
 let carouselTimer
 
-watch(() => props.featuredCocktails.length, () => {
+watch(() => slides.value.length, () => {
   activeCocktailIndex.value = 0
 })
 
 onMounted(() => {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduceMotion) return
   carouselTimer = window.setInterval(() => {
-    if (props.featuredCocktails.length > 1) {
-      activeCocktailIndex.value = (activeCocktailIndex.value + 1) % props.featuredCocktails.length
-    }
+    const count = slides.value.length
+    if (count > 1) activeCocktailIndex.value = (activeCocktailIndex.value + 1) % count
   }, 6000)
 })
 
@@ -126,42 +161,41 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
 </script>
 
 <style scoped>
+/*
+ * Tout passe par les variables du skin (--gold, --bg-card, --radius-*, --font-*).
+ * Seul le texte posé sur la photo utilise des tons fixes (clair sur voile sombre),
+ * identiques quel que soit le skin.
+ */
 .landing-page {
-  --landing-paper: var(--bg);
-  --landing-ink: var(--text);
-  --landing-card: var(--bg-card);
-  --landing-border: var(--border);
-  --landing-muted: var(--text-muted);
-  --landing-accent: var(--gold);
-  --landing-orange: var(--amber);
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 1.25rem 1.5rem;
-  color: var(--landing-ink);
-  font-family: inherit;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  --hero-ink: #f6f1e7;
+  --hero-ink-soft: color-mix(in srgb, var(--hero-ink) 82%, transparent);
+  --hero-veil: #0d0806;
+  color: var(--text);
+  font-family: var(--font-body, inherit);
 }
 
-.landing-primary-button:focus-visible,
-.landing-public-bar:focus-visible,
-.landing-join input:focus-visible {
-  outline: 3px solid #f2a516;
-  outline-offset: 2px;
-}
-
+/* ── Hero ─────────────────────────────────────────── */
 .landing-hero {
   position: relative;
   display: flex;
-  min-height: 660px;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 32px;
-  margin-top: 24px;
-  padding: 56px 56px 32px;
+  flex: 1;
+  min-height: 30rem;
+  padding: 3.5rem clamp(1.5rem, 5vw, 4rem) 8rem;
   overflow: hidden;
-  border-radius: var(--radius-dialog);
-  background: #120805;
-  color: #f4eddc;
+  background: var(--hero-veil);
+  color: var(--hero-ink);
   isolation: isolate;
+}
+
+.landing-inner {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
 }
 
 .landing-slide {
@@ -173,32 +207,27 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
 
 .landing-slide--fallback {
   background:
-    radial-gradient(circle at 72% 45%, rgba(216, 182, 101, 0.45), transparent 35%),
-    linear-gradient(120deg, #181510, #35251b 58%, #181510);
-  opacity: 1;
+    radial-gradient(circle at 72% 45%, color-mix(in srgb, var(--gold) 35%, transparent), transparent 40%),
+    linear-gradient(120deg, var(--hero-veil), color-mix(in srgb, var(--hero-veil) 80%, var(--gold)) 60%, var(--hero-veil));
 }
 
 .landing-photo {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center 45%;
 }
 
-.landing-caption {
+.landing-photo-backdrop {
   position: absolute;
-  top: 28px;
-  right: 32px;
-  padding: 8px 16px;
-  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
-  border-radius: 999px;
-  background: #1a0c08aa;
-  color: #eadfcb;
-  font-size: 13px;
-}
-
-.landing-caption b {
-  color: #f2a516;
+  inset: -1rem;
+  width: calc(100% + 2rem);
+  height: calc(100% + 2rem);
+  object-fit: cover;
+  object-position: center 45%;
+  filter: blur(1rem) brightness(0.55);
 }
 
 .landing-shade {
@@ -206,104 +235,193 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
   z-index: -1;
   inset: 0;
   background:
-    linear-gradient(90deg, #120805ee, #12080599 45%, transparent 75%),
-    linear-gradient(0deg, #120805dd, transparent 45%);
+    linear-gradient(90deg, color-mix(in srgb, var(--hero-veil) 93%, transparent), color-mix(in srgb, var(--hero-veil) 60%, transparent) 45%, transparent 75%),
+    linear-gradient(0deg, color-mix(in srgb, var(--hero-veil) 87%, transparent), transparent 45%);
 }
 
+.landing-caption {
+  position: absolute;
+  z-index: 1;
+  bottom: 7rem;
+  left: clamp(1.5rem, 5vw, 4rem);
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-control);
+  background: rgba(13, 8, 6, 0.58);
+  color: #fff;
+  font-size: 0.8rem;
+  backdrop-filter: blur(6px);
+}
+
+.landing-caption b {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Texte ────────────────────────────────────────── */
 .landing-copy {
   position: relative;
-  max-width: 560px;
+  flex: 1 1 0;
+  align-self: center;
+  min-width: 0;
+  max-width: 48rem;
 }
 
 .landing-eyebrow {
-  color: var(--gold);
-  font-size: 12px;
-  font-weight: 700;
+  margin: 0;
+  color: var(--hero-ink-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
   letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
 .landing-copy h1 {
-  margin: 14px 0;
-  font: 600 64px/1.04 var(--font-display);
+  margin: 0.9rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 4.2vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1.05;
   letter-spacing: 0.01em;
 }
 
 .landing-intro {
   margin: 0;
-  color: #e5dac9;
-  font-size: 18px;
-  line-height: 1.5;
+  color: var(--hero-ink-soft);
+  font-size: 1.1rem;
+  line-height: 1.55;
 }
 
+/* ── Cartes d'action ──────────────────────────────── */
 .landing-actions {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  flex: none;
+  width: min(100%, clamp(24rem, 28.5vw, 34rem));
+  gap: clamp(0.6rem, 0.8vw, 0.9rem);
 }
 
 .landing-action {
   min-width: 0;
-  padding: 22px 24px;
-  border: 1px solid var(--landing-border);
+  padding: clamp(0.85rem, 1.1vw, 1.25rem);
+  border: 1px solid var(--border);
   border-radius: var(--radius-panel);
-  background: var(--landing-card);
-  color: var(--landing-ink);
-  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg-card) 94%, transparent);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
 }
 
-.landing-action h2 {
-  margin: 0 0 4px;
-  color: var(--landing-orange);
-  font-size: 13px;
-  letter-spacing: 0.16em;
+.landing-action--bartender,
+.landing-action--drinker {
+  display: grid;
+  gap: clamp(0.7rem, 0.9vw, 1rem);
 }
 
-.landing-action > p {
-  margin: 0 0 14px;
-  color: var(--landing-muted);
-  font-size: 14px;
+.landing-action-heading {
+  margin-bottom: 0.6rem;
+  text-align: left;
 }
 
-.landing-primary-button {
+.landing-action--bartender .landing-action-heading,
+.landing-action--drinker .landing-action-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.landing-action--bartender .landing-action-heading h2 {
+  flex: none;
+  margin: 0;
+}
+
+.landing-action--drinker .landing-action-heading h2 {
+  flex: none;
+  margin: 0;
+}
+
+.landing-action--bartender .landing-action-heading p,
+.landing-action--drinker .landing-action-heading p {
+  flex: 1;
+  min-width: 0;
+  margin-left: auto;
+  text-align: right;
+}
+
+.landing-action-heading h2 {
+  margin: 0 0 0.35rem;
+  color: var(--gold);
+  font-family: var(--font-subtitle, var(--font-body, inherit));
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.landing-action-heading p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  line-height: 1.45;
+}
+
+.landing-action > .landing-button {
+  min-width: 12rem;
+}
+
+.landing-action--bartender > .landing-button {
+  width: 100%;
+}
+
+.landing-action--drinker .landing-action-heading {
+  margin-bottom: 0;
+}
+
+.landing-action--drinker .landing-join {
+  margin-top: 0;
+}
+
+/* ── Contrôles ────────────────────────────────────── */
+.landing-button,
+.landing-join input {
+  min-height: clamp(2.2rem, 2.5vw, 2.6rem);
+  border-radius: var(--radius-control);
+  font-family: inherit;
+  font-size: clamp(0.85rem, 0.9vw, 1rem);
+  line-height: 1.2;
+}
+
+.landing-button {
   display: inline-flex;
-  min-height: 46px;
   align-items: center;
   justify-content: center;
-  padding: 0 22px;
+  padding: 0 1rem;
   border: 0;
-  border-radius: var(--radius-control);
-  background: var(--landing-accent);
-  color: var(--landing-paper);
-  font-family: inherit;
-  font-size: 14px;
+  background: var(--gold);
+  color: var(--bg);
   font-weight: 700;
-  line-height: 1.2;
   cursor: pointer;
+  transition: filter 0.15s ease;
 }
 
-.landing-primary-button:hover {
+.landing-button:hover {
   filter: brightness(1.12);
 }
 
 .landing-join {
   display: flex;
-  gap: 10px;
+  gap: 0.6rem;
 }
 
 .landing-join input {
   min-width: 0;
-  min-height: 46px;
   flex: 1;
-  padding: 0 14px;
-  border: 1px solid var(--landing-border);
-  border-radius: var(--radius-control);
+  padding: 0 0.9rem;
+  border: 1px solid var(--border);
   background: var(--bg-input);
   color: var(--text);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.2;
 }
 
 .landing-join input::placeholder {
@@ -311,85 +429,95 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
   opacity: 1;
 }
 
+.landing-button:focus-visible,
+.landing-bar:focus-visible,
+.landing-join input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.landing-error {
+  margin: 0.5rem 0 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+/* ── Liste des bars ───────────────────────────────── */
 .landing-public-bars {
   display: grid;
-  gap: 6px;
-  max-height: 190px;
-  margin-top: 14px;
+  gap: 0.35rem;
+  max-height: min(20rem, 45vh);
+  margin-top: 0.65rem;
+  padding-top: 0.5rem;
+  padding-right: 2px;
+  border-top: 1px solid var(--border);
   overflow: auto;
 }
 
 .landing-list-title {
-  position: sticky;
-  top: 0;
-  padding: 4px 0;
-  background: var(--landing-card);
-  color: var(--landing-muted);
-  font-size: 11px;
+  margin: 0;
+  padding: 0.15rem 0 0.4rem;
+  color: var(--gold);
+  font-family: var(--font-subtitle, var(--font-body, inherit));
+  font-size: 0.7rem;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.landing-public-status {
-  color: var(--landing-muted);
-  font-size: 13px;
+.landing-status {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
-.landing-public-bar {
+.landing-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 0.6rem;
   width: 100%;
-  padding: 9px 12px;
-  border: 1px solid var(--landing-border);
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
   border-radius: var(--radius-control);
-  background: var(--landing-paper);
-  color: var(--landing-ink);
+  background: var(--bg);
+  font-size: 0.75rem;
+  color: var(--text);
+  font-family: inherit;
   text-align: left;
   cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
 }
 
-.landing-public-bar:hover {
-  border-color: var(--landing-accent);
+.landing-bar:hover {
+  border-color: var(--gold-dim);
   background: var(--bg-raised);
+  color: var(--gold-dim);
 }
 
-.landing-public-bar--featured {
-  border: 2px solid var(--landing-accent);
-  background: var(--bg-raised);
-  box-shadow: 0 0 0 2px rgba(167, 120, 42, 0.16);
+.landing-bar:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline-offset: -2px;
 }
 
-.landing-public-bar-name {
+.landing-bar-name {
   min-width: 0;
-  font-weight: 600;
-}
-
-.landing-featured-badge {
-  flex: none;
-  padding: 3px 7px;
-  border: 1px solid var(--gold);
-  border-radius: 999px;
-  background: var(--bg-input);
-  color: var(--landing-orange);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  flex: 1;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .landing-bar-code {
-  color: var(--landing-muted);
-  font-size: 12px;
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.landing-error {
-  margin: 8px 0 0;
-  color: var(--danger);
-  font-size: 13px;
-}
-
+/* ── Transition ───────────────────────────────────── */
 .landing-fade-enter-active,
 .landing-fade-leave-active {
   transition: opacity 1s ease;
@@ -402,68 +530,216 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
 
 @media (prefers-reduced-motion: reduce) {
   .landing-fade-enter-active,
-  .landing-fade-leave-active {
+  .landing-fade-leave-active,
+  .landing-button,
+  .landing-bar {
     transition-duration: 0.01ms;
   }
 }
 
+/* ── Responsive ───────────────────────────────────── */
 @media (max-width: 900px) {
-  .landing-actions {
-    grid-template-columns: 1fr;
-  }
-
   .landing-hero {
-    padding: 72px 24px 24px;
+    padding-top: 4.5rem;
   }
 
-  .landing-copy h1 {
-    font-size: 40px;
+  .landing-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .landing-copy {
+    align-self: flex-start;
+    width: 100%;
+    max-width: none;
+  }
+
+  .landing-actions {
+    width: 100%;
+    max-width: 26rem;
   }
 
   .landing-caption {
-    top: 20px;
-    right: 20px;
-    left: 20px;
+    bottom: 7rem;
+    left: 1.5rem;
     width: fit-content;
   }
-
 }
 
-@media (max-width: 520px) {
-  .landing-page {
-    padding: 1rem;
-  }
-
-  .landing-hero {
-    min-height: 680px;
-    gap: 24px;
-    margin-top: 16px;
-    padding: 76px 16px 16px;
-    border-radius: var(--radius-dialog);
-  }
-
+@media (min-width: 901px) and (max-width: 1600px) {
   .landing-copy h1 {
-    font-size: clamp(36px, 10vw, 46px);
+    font-size: clamp(2.4rem, 3.8vw, 4.1rem);
   }
 
-  .landing-intro {
-    font-size: 16px;
+  .landing-actions {
+    width: min(100%, clamp(21.7rem, 25.7vw, 30.7rem));
   }
 
   .landing-action {
-    padding: 18px 16px;
+    padding: clamp(0.75rem, 0.95vw, 1.1rem);
+  }
+
+  .landing-action--bartender,
+  .landing-action--drinker {
+    gap: clamp(0.6rem, 0.8vw, 0.9rem);
+  }
+
+  .landing-action-heading h2,
+  .landing-action-heading p {
+    font-size: clamp(0.78rem, 0.8vw, 0.9rem);
+  }
+
+  .landing-button,
+  .landing-join input {
+    min-height: clamp(2rem, 2.25vw, 2.35rem);
+    font-size: clamp(0.82rem, 0.8vw, 0.9rem);
+  }
+}
+
+@media (min-width: 901px) and (max-height: 800px) {
+  .landing-hero {
+    padding-top: clamp(1.5rem, 4vh, 2.5rem);
+    padding-bottom: clamp(4rem, 7vh, 5.5rem);
+  }
+
+  .landing-actions {
+    gap: 0.5rem;
+  }
+
+  .landing-action {
+    padding: 0.8rem;
+  }
+
+  .landing-action--bartender,
+  .landing-action--drinker {
+    gap: 0.6rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .landing-page,
+  .landing-hero {
+    flex: none;
+  }
+
+  .landing-hero {
+    min-height: 0;
+    padding: 0;
+  }
+
+  .landing-inner {
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .landing-slide,
+  .landing-shade {
+    bottom: auto;
+    height: clamp(14rem, 34vh, 19rem);
+  }
+
+  .landing-photo {
+    object-fit: cover;
+  }
+
+  .landing-photo-backdrop {
+    display: none;
+  }
+
+  .landing-shade {
+    background: linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--hero-veil) 80%, transparent),
+      color-mix(in srgb, var(--hero-veil) 36%, transparent) 55%,
+      color-mix(in srgb, var(--hero-veil) 25%, transparent)
+    );
+  }
+
+  .landing-copy {
+    display: flex;
+    flex: 0 0 clamp(14rem, 34vh, 19rem);
+    flex-direction: column;
+    justify-content: flex-start;
+    max-width: none;
+    padding: 2rem 1rem 2.5rem;
+  }
+
+  .landing-actions {
+    position: relative;
+    z-index: 1;
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: none;
+    margin-top: -2.5rem;
+    padding: 1rem;
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+    background: var(--bg);
+  }
+
+  .landing-caption {
+    top: calc(clamp(14rem, 34vh, 19rem) - 2.75rem);
+    right: 1rem;
+    bottom: auto;
+    left: auto;
+    width: fit-content;
+    max-width: calc(100% - 2rem);
+    padding: 0.35rem 0.65rem;
+    font-size: 0.7rem;
+  }
+
+  .landing-intro {
+    font-size: 0.9rem;
+  }
+
+  .landing-copy h1 {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+  }
+
+  .landing-eyebrow {
+    font-size: 0.65rem;
+  }
+
+  .landing-action-heading h2 {
+    font-size: 0.72rem;
+  }
+
+  .landing-action-heading p,
+  .landing-status {
+    font-size: 0.72rem;
+  }
+
+  .landing-button,
+  .landing-join input {
+    font-size: 0.8rem;
+  }
+
+  .landing-action {
+    padding: 0 0 1rem;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .landing-action:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .landing-action--bartender > .landing-button {
+    min-width: 0;
+    width: auto;
+  }
+
+  .landing-action > .landing-button {
+    width: auto;
   }
 
   .landing-join {
-    flex-wrap: wrap;
-  }
-
-  .landing-join input {
-    flex-basis: 100%;
-  }
-
-  .landing-join .landing-primary-button {
-    width: 100%;
+    gap: 0.4rem;
   }
 }
 </style>
