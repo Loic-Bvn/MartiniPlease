@@ -1,16 +1,42 @@
 <template>
   <div class="landing-page">
-    <main class="landing-hero">
-      <Transition name="landing-fade">
-        <div v-if="activeSlide" :key="activeSlide.id" class="landing-slide" aria-hidden="true">
-          <img :src="activeSlide.image" alt="" class="landing-photo-backdrop" />
-          <img :src="activeSlide.image" alt="" class="landing-photo" />
-        </div>
-      </Transition>
-      <div v-if="!activeSlide" class="landing-slide landing-slide--fallback" aria-hidden="true"></div>
+    <main class="landing-hero" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
+      <div ref="mediaEl" class="landing-media" aria-hidden="true">
+        <Transition name="landing-fade">
+          <div
+            v-if="photoReady"
+            :key="activeSlide.image"
+            class="landing-slide"
+            :class="`landing-slide--${fit}`"
+            :style="focalStyle"
+          >
+            <img v-if="fit === 'contain'" :src="activeSlide.image" alt="" class="landing-photo-backdrop" />
+            <img :src="activeSlide.image" alt="" class="landing-photo" />
+          </div>
+        </Transition>
+        <div v-if="!photoReady" class="landing-slide landing-slide--fallback"></div>
+      </div>
       <div class="landing-shade" aria-hidden="true"></div>
       <div v-if="activeSlide?.caption" class="landing-caption">
         {{ activeSlide.caption }}
+      </div>
+      <div v-if="slides.length > 1" class="landing-dots" role="group">
+        <button type="button" class="landing-arrow" :aria-label="t.prevPhoto" @click.stop="showPreviousPhoto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+        </button>
+        <button
+          v-for="(slide, index) in slides"
+          :key="slide.image || slide.id || index"
+          type="button"
+          class="landing-dot"
+          :class="{ 'is-active': index === activeCocktailIndex }"
+          :aria-label="`Photo ${index + 1} / ${slides.length}`"
+          :aria-current="index === activeCocktailIndex ? 'true' : undefined"
+          @click="select(index)"
+        ></button>
+        <button type="button" class="landing-arrow" :aria-label="t.nextPhoto" @click.stop="showNextPhoto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+        </button>
       </div>
 
       <div class="landing-inner">
@@ -76,7 +102,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },
@@ -110,6 +136,8 @@ const MESSAGES = {
     join: 'Rejoindre',
     loading: 'Chargement des bars…',
     loadError: 'Impossible de charger les bars. Réessaie plus tard.',
+    prevPhoto: 'Photo précédente',
+    nextPhoto: 'Photo suivante',
     noBars: 'Aucun bar ouvert pour le moment.',
     openBars: 'Bars ouverts',
   },
@@ -125,6 +153,8 @@ const MESSAGES = {
     join: 'Join',
     loading: 'Loading bars…',
     loadError: 'Unable to load bars. Please try again later.',
+    prevPhoto: 'Previous photo',
+    nextPhoto: 'Next photo',
     noBars: 'No open bars right now.',
     openBars: 'Open bars',
   },
@@ -143,21 +173,142 @@ const slides = computed(() => {
 })
 const activeSlide = computed(() => slides.value[activeCocktailIndex.value] || null)
 let carouselTimer
+let navToken = 0
+let prefersReducedMotion = false
 
 watch(() => slides.value.length, () => {
   activeCocktailIndex.value = 0
 })
 
-onMounted(() => {
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (reduceMotion) return
-  carouselTimer = window.setInterval(() => {
-    const count = slides.value.length
-    if (count > 1) activeCocktailIndex.value = (activeCocktailIndex.value + 1) % count
-  }, 6000)
+// ── Ajustement de la photo (cover vs contain) ─────────
+// cover  : la photo remplit la zone, recadrée autour de son point focal.
+// contain: photo entière sur fond flouté, uniquement si son ratio est trop éloigné
+//          de celui de la zone (ex. portrait sur écran large) pour être recadrée proprement.
+const MAX_RATIO_GAP = 1.5
+const DEFAULT_FOCAL = { x: 50, y: 45 }
+
+const mediaEl = ref(null)
+const mediaRatio = ref(0)
+const ratios = reactive({}) // url → ratio l/h (-1 si échec de chargement)
+const pending = new Map()
+let resizeObserver
+
+function measure(slide) {
+  const url = slide?.image
+  if (!url) return Promise.resolve()
+  if (url in ratios) return Promise.resolve()
+  if (!pending.has(url)) {
+    pending.set(url, new Promise((resolve) => {
+      const img = new Image()
+      img.onload = () => {
+        ratios[url] = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : -1
+        resolve()
+      }
+      img.onerror = () => {
+        ratios[url] = -1
+        resolve()
+      }
+      img.src = url
+    }))
+  }
+  return pending.get(url)
+}
+
+const photoReady = computed(() => !!activeSlide.value && ratios[activeSlide.value.image] > 0)
+
+const fit = computed(() => {
+  const ratio = ratios[activeSlide.value?.image]
+  if (!(ratio > 0) || !(mediaRatio.value > 0)) return 'cover'
+  const gap = Math.max(ratio / mediaRatio.value, mediaRatio.value / ratio)
+  return gap > MAX_RATIO_GAP ? 'contain' : 'cover'
 })
 
-onBeforeUnmount(() => window.clearInterval(carouselTimer))
+const focalStyle = computed(() => {
+  const focal = activeSlide.value?.focal || DEFAULT_FOCAL
+  return { '--focal': `${focal.x}% ${focal.y}%` }
+})
+
+watch(activeSlide, (slide) => measure(slide), { immediate: true })
+
+// ── Navigation ────────────────────────────────────────
+async function goTo(index) {
+  const count = slides.value.length
+  if (!count) return
+  const target = ((index % count) + count) % count
+  const token = ++navToken
+  await measure(slides.value[target]) // précharge avant de changer
+  if (token !== navToken || target >= slides.value.length) return
+  activeCocktailIndex.value = target
+}
+
+function stopAutoplay() {
+  window.clearInterval(carouselTimer)
+}
+
+function startAutoplay() {
+  stopAutoplay()
+  if (prefersReducedMotion) return
+  carouselTimer = window.setInterval(() => {
+    if (slides.value.length > 1) goTo(activeCocktailIndex.value + 1)
+  }, 6000)
+}
+
+// Action utilisateur : navigue puis relance le minuteur pour laisser le temps de voir la photo
+function select(index) {
+  if (index === activeCocktailIndex.value) return
+  startAutoplay()
+  goTo(index)
+}
+
+function showPreviousPhoto() {
+  select(activeCocktailIndex.value - 1)
+}
+
+function showNextPhoto() {
+  select(activeCocktailIndex.value + 1)
+}
+
+// Swipe horizontal (mobile)
+let touchStart = null
+function onTouchStart(event) {
+  if (event.target.closest('input, textarea') || event.touches.length !== 1) {
+    touchStart = null
+    return
+  }
+  touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY }
+}
+function onTouchEnd(event) {
+  if (!touchStart || slides.value.length < 2) return
+  const touch = event.changedTouches[0]
+  const dx = touch.clientX - touchStart.x
+  const dy = touch.clientY - touchStart.y
+  touchStart = null
+  if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return
+  select(activeCocktailIndex.value + (dx < 0 ? 1 : -1))
+}
+
+function updateMediaRatio() {
+  const el = mediaEl.value
+  if (!el) return
+  const { width, height } = el.getBoundingClientRect()
+  mediaRatio.value = height > 0 ? width / height : 0
+}
+
+onMounted(() => {
+  updateMediaRatio()
+  if (typeof ResizeObserver !== 'undefined' && mediaEl.value) {
+    resizeObserver = new ResizeObserver(updateMediaRatio)
+    resizeObserver.observe(mediaEl.value)
+  }
+
+  prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  startAutoplay()
+})
+
+onBeforeUnmount(() => {
+  stopAutoplay()
+  resizeObserver?.disconnect()
+})
 </script>
 
 <style scoped>
@@ -198,9 +349,15 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
   gap: 2rem;
 }
 
-.landing-slide {
+.landing-media {
   position: absolute;
   z-index: -2;
+  inset: 0;
+  overflow: hidden;
+}
+
+.landing-slide {
+  position: absolute;
   inset: 0;
   overflow: hidden;
 }
@@ -216,6 +373,14 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+.landing-slide--cover .landing-photo {
+  object-fit: cover;
+  object-position: var(--focal, 50% 45%);
+}
+
+.landing-slide--contain .landing-photo {
   object-fit: contain;
   object-position: center 45%;
 }
@@ -226,7 +391,7 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
   width: calc(100% + 2rem);
   height: calc(100% + 2rem);
   object-fit: cover;
-  object-position: center 45%;
+  object-position: var(--focal, 50% 45%);
   filter: blur(1rem) brightness(0.55);
 }
 
@@ -237,6 +402,17 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--hero-veil) 93%, transparent), color-mix(in srgb, var(--hero-veil) 60%, transparent) 45%, transparent 75%),
     linear-gradient(0deg, color-mix(in srgb, var(--hero-veil) 87%, transparent), transparent 45%);
+}
+
+.landing-shade::after {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  content: '';
+  opacity: 0.14;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
 }
 
 .landing-caption {
@@ -251,6 +427,97 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
   color: #fff;
   font-size: 0.8rem;
   backdrop-filter: blur(6px);
+}
+
+.landing-dots {
+  position: absolute;
+  z-index: 10;
+  pointer-events: auto;
+  bottom: 5.25rem;
+  left: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: calc(100% - 3rem);
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+}
+
+.landing-arrow {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.6;
+  pointer-events: auto;
+  place-items: center;
+  touch-action: manipulation;
+  transition: opacity 0.2s ease;
+}
+
+.landing-arrow:hover {
+  opacity: 1;
+}
+
+.landing-arrow:focus-visible {
+  border-radius: 999px;
+  opacity: 1;
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+.landing-arrow svg {
+  width: 1rem;
+  height: 1rem;
+  filter: drop-shadow(0 0 2px rgba(13, 8, 6, 0.6));
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.landing-dot {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  place-items: center;
+}
+
+.landing-dot::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 1px rgba(13, 8, 6, 0.35);
+  content: "";
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+.landing-dot:hover::before {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.landing-dot.is-active::before {
+  width: 1.25rem;
+  background: #fff;
+}
+
+.landing-dot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+  border-radius: 999px;
 }
 
 .landing-caption b {
@@ -535,6 +802,11 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
   .landing-bar {
     transition-duration: 0.01ms;
   }
+
+  .landing-dot::before,
+  .landing-arrow {
+    transition: none;
+  }
 }
 
 /* ── Responsive ───────────────────────────────────── */
@@ -633,18 +905,10 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
     gap: 0;
   }
 
-  .landing-slide,
+  .landing-media,
   .landing-shade {
     bottom: auto;
     height: clamp(14rem, 34vh, 19rem);
-  }
-
-  .landing-photo {
-    object-fit: cover;
-  }
-
-  .landing-photo-backdrop {
-    display: none;
   }
 
   .landing-shade {
@@ -675,6 +939,11 @@ onBeforeUnmount(() => window.clearInterval(carouselTimer))
     padding: 1rem;
     border-radius: var(--radius-panel) var(--radius-panel) 0 0;
     background: var(--bg);
+  }
+
+  .landing-dots {
+    top: calc(clamp(14rem, 34vh, 19rem) - 4rem);
+    bottom: auto;
   }
 
   .landing-caption {

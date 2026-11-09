@@ -513,12 +513,19 @@ async function fetchLandingPhotos() {
         const { data } = supabase.storage
           .from(supabaseImageBucket)
           .getPublicUrl(`${LANDING_PHOTOS_PATH}/${file.name}`)
+        // Point focal optionnel en fin de nom : "negroni_30-60.jpg" ou "negroni__30-60.jpg" → x 30 %, y 60 %
         const filename = file.name.replace(/\.[^.]+$/, '')
+        const FOCAL_SUFFIX = /[\s_-]+(\d{1,3})[\s_x-](\d{1,3})$/
+        const focalMatch = filename.match(FOCAL_SUFFIX)
+        const focal = focalMatch
+          ? { x: Math.min(100, +focalMatch[1]), y: Math.min(100, +focalMatch[2]) }
+          : null
+        const label = filename.replace(FOCAL_SUFFIX, '')
         const caption = file.name.startsWith('_')
           ? ''
-          : filename.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
+          : label.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
 
-        return { id: file.name, image: data.publicUrl, caption }
+        return { id: file.name, image: data.publicUrl, caption, focal }
       })
   } catch (error) {
     console.error('❌ Erreur chargement des images de la landing:', error)
