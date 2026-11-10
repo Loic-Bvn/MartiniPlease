@@ -359,6 +359,7 @@ import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 import PrepareButton from '@/Components/PrepareButton.vue'
 import { isSupabasePublicImage } from '@/lib/supabase'
 import { useModalAccessibility } from '@/composables/useModalAccessibility'
+import { formatOz } from '@/utils/formatters'
 
 const { isFeatureEnabled } = useBarFeatures()
 const showPrices = computed(() => isFeatureEnabled('showPrices'))
@@ -491,7 +492,7 @@ function formatQty(ing) {
     if (ing.Dashes) return `${ing.Dashes} dash${ing.Dashes > 1 ? 'es' : ''}`
     return ''
   }
-  if (ing.Oz) return `${ing.Oz}oz`
+  if (ing.Oz) return `${formatOz(ing.Oz)}oz`
   if (ing.Dashes) return `${ing.Dashes} dash${ing.Dashes > 1 ? 'es' : ''}`
   return ''
 }

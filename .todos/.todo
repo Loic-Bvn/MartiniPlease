@@ -1,6 +1,9 @@
 ## TODO
 TAG new version using "npm run release:patch"
 
+# Calcul de difficulté
+associer un poids au différents ingredients pour rendre une note a chaque cocktail
+
 # Amelioration des perfs
 - [x] Mesurer la taille du bundle de production et identifier ses principaux contributeurs.
 - [x] Supprimer Sentry, son initialisation et sa configuration.

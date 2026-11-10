@@ -244,6 +244,7 @@ import { useOrders } from '@/composables/useOrders'
 import { useCocktails } from '@/composables/useCocktails'
 import { getDetailledIceLabel, getGlassLabel, getIngredientLabel, getRecipeLineLabel } from '../constants/typeLabels.js'
 import { useInventory } from '@/composables/useInventory'
+import { formatOz } from '@/utils/formatters'
 const { ingredientsByIngredient } = useInventory()
 
 const props = defineProps({
@@ -425,7 +426,7 @@ function getQty(ing, count, unit) {
     return ''
   }
 
-  return `${amount}${label}`
+  return `${unit === 'oz' ? formatOz(amount) : amount}${label}`
 }
 
 function isValidChip(value) {

@@ -169,6 +169,7 @@ import { useToast } from '@/composables/useToast'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 import PrepareButton from '@/Components/PrepareButton.vue'
+import { formatOz } from '@/utils/formatters'
 // const { showPrices, ordersEnabled } = useBarFeatures()
 
 
@@ -268,7 +269,7 @@ function formatQty(ing) {
     if (ing.Dashes) return `${ing.Dashes} dash${ing.Dashes > 1 ? 'es' : ''}`
     return ''
   }
-  if (ing.Oz) return `${ing.Oz}oz`
+  if (ing.Oz) return `${formatOz(ing.Oz)}oz`
   if (ing.Dashes) return `${ing.Dashes} dash${ing.Dashes > 1 ? 'es' : ''}`
   return ''
 }
