@@ -8,13 +8,9 @@ import './assets/styles_skin_classic.css'
 import './assets/styles_skin_minimal.css'
 import App from './App.vue'
 import { useAuth } from '@/composables/useAuth'
-import { initAnalytics } from '@/lib/analytics'
-import { initMonitoring } from '@/lib/monitoring'
 
 async function bootstrap() {
-  initAnalytics()
   const app = createApp(App)
-  initMonitoring(app)
   const { initAuth } = useAuth()
   try {
     await Promise.race([
