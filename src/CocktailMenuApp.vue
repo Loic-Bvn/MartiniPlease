@@ -303,7 +303,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
+import { ref, computed, onMounted, watch, defineAsyncComponent, h } from 'vue'
 import { supabase, supabaseImageBucket } from '@/lib/supabase'
 
 // ── Composables ───────────────────────────────────────────────────────────────
@@ -327,11 +327,24 @@ import AppHeader         from '@/Components/AppHeader.vue'
 import PreparationUndoToast from '@/Components/PreparationUndoToast.vue'
 import WelcomePage       from '@/Components/WelcomePage.vue'
 import BarSelector       from '@/Components/BarSelector.vue'
-import BarMainView       from '@/Components/BarMainView.vue'
 import Footer            from '@/Components/Footer.vue'
 import ConfirmModal      from '@/Components/Modals/ConfirmModal.vue'
 import PendingApproval   from '@/Components/PendingApproval.vue'
 // Lazy-loaded — ne font pas partie du bundle initial
+const BarMainView       = defineAsyncComponent({
+  loader: () => import('@/Components/BarMainView.vue'),
+  delay: 0,
+  loadingComponent: {
+    props: ['locale'],
+    setup(props) {
+      return () => h(
+        'div',
+        { class: 'loading-state', role: 'status' },
+        props.locale === 'fr' ? 'Chargement…' : 'Loading…'
+      )
+    },
+  },
+})
 const AuthModal         = defineAsyncComponent(() => import('@/Components/Modals/AuthModal.vue'))
 const DrinkerLoginModal = defineAsyncComponent(() => import('@/Components/Modals/DrinkerLoginModal.vue'))
 const MenuCardModal     = defineAsyncComponent(() => import('@/Components/Modals/MenuCardModal.vue'))
