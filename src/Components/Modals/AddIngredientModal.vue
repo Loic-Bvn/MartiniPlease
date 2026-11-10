@@ -1,10 +1,10 @@
 <template>
   <div class="add-ing-overlay" @click.self="$emit('close')">
-    <div class="add-ing-content">
+    <div ref="dialogRef" class="add-ing-content" role="dialog" aria-modal="true" aria-labelledby="add-ing-title">
 
       <!-- Header -->
       <div class="add-ing-header">
-        <h2 class="add-ing-title">
+        <h2 id="add-ing-title" class="add-ing-title">
           <component :is="categoryIcon || Package" :size="18" class="add-ing-icon" />
           Ajouter un ingrédient
         </h2>
@@ -94,6 +94,7 @@ import { ref, computed, onMounted } from 'vue'
 import { X, Plus, Loader2, Package } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
 import { getFamilyOptions } from '@/lib/cocktail-constants'
+import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const props = defineProps({
   categoryKey:   { type: String, required: true },
@@ -111,8 +112,10 @@ const emit = defineEmits(['close', 'added'])
 const { addIngredient } = useInventory()
 
 const nameInput = ref(null)
+const dialogRef = ref(null)
 const saving    = ref(false)
 const error     = ref('')
+useModalAccessibility(dialogRef, () => emit('close'), true, nameInput)
 
 const form = ref({
   name:      '',
@@ -121,8 +124,6 @@ const form = ref({
   abv:       null,
   available: true,
 })
-
-onMounted(() => nameInput.value?.focus())
 
 function toSlug(str) {
   return str

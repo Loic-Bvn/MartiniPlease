@@ -2,7 +2,11 @@
   <div
     ref="cardEl"
     :class="['cocktail-card-compact', { 'cocktail-card-standard': viewMode === 'standard' }]"
+    role="button"
+    tabindex="0"
     @click="handleOpen"
+    @keydown.enter="handleCardKeydown"
+    @keydown.space="handleCardKeydown"
   >
 
     <!-- Photo (vue standard uniquement) -->
@@ -24,7 +28,7 @@
     <div class="card-content">
       <!-- Header -->
       <div class="card-header">
-        <div class="min-w-0 flex-1">
+        <div class="cocktail-heading-content">
           <div class="cocktail-title-row">
             <div class="cocktail-title-main">
               <h3 :class="['cocktail-title', makeable ? 'cocktail-title--available' : 'cocktail-title--unavailable', { 'cocktail-title--moment': isCocktailOfMoment }]">
@@ -50,7 +54,7 @@
       </div>
 
       <!-- Recette -->
-      <div class="recipe-compact" @click="handleOpen" title="Voir les détails">
+      <div class="recipe-compact" title="Voir les détails">
         <div
           v-for="(ing, idx) in recipeWithQty"
           :key="ing.Ingredient ? ing.Ingredient + idx : idx"
@@ -69,7 +73,7 @@
 
       <!-- Footer : tags du cocktail -->
       <div class="card-footer">
-        <div class="footer-left" style="display:flex; align-items:center; gap:6px;">
+        <div class="footer-left">
           <PrepareButton
             v-if="isBartenderMode && viewMode === 'standard'"
             :cocktail-id="cocktail.id"
@@ -89,7 +93,7 @@
           </span> -->
         </div>
 
-        <div class="footer-right" style="display:flex; align-items:center; gap:6px;">
+        <div class="footer-right">
           <button
             v-if="hasDrinker && !isBartenderMode"
             @click.stop="handleFavorite"
@@ -192,6 +196,12 @@ const showPrices = computed(() => isFeatureEnabled('showPrices'))
 const ordersEnabled = computed(() => isFeatureEnabled('order'))
 
 const emit = defineEmits(['edit', 'delete', 'open'])
+
+function handleCardKeydown(event) {
+  if (event.target !== cardEl.value) return
+  event.preventDefault()
+  handleOpen()
+}
 
 
 function isAvailable(ing) {
@@ -301,5 +311,29 @@ async function handleSubmit() {
 <style scoped>
 .cocktail-card-compact {
   will-change: transform, box-shadow;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border);
+}
+
+.footer-left,
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.footer-right {
+  margin-left: auto;
+  justify-content: flex-end;
 }
 </style>

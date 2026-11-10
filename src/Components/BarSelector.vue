@@ -82,7 +82,7 @@
               <component :is="lucideIcons.bartender" :size="24" class="welcome-card-icon" aria-hidden="true" />
               
               <!-- Infos -->
-              <div style="flex: 1;">
+              <div class="bar-info">
                 <div class="bar-title-row">
                   <div class="welcome-card-title">{{ b.name }}</div>
 
