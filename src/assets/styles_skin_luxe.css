@@ -11,6 +11,7 @@
   --gold: #937253;
   --gold-dim: #937253;
   --amber: #260101;
+  --amber-surface: var(--amber);
   --recipe-leader: #937253;
   --text: #260101;
   --text-muted: #260101;
@@ -37,6 +38,7 @@
   --gold: #f8f2da;
   --gold-dim: #e1d2b5;
   --amber: #e1d2b5;
+  --amber-surface: var(--amber);
   --recipe-leader: #e1d2b5;
   --text: #f8f2da;
   --text-muted: #e1d2b5;

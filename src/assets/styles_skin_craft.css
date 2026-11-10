@@ -8,6 +8,7 @@
   --gold: #536b3c;
   --gold-dim: #40552f;
   --amber: #a75e3b;
+  --amber-surface: var(--amber);
   --text: #293326;
   --text-muted: #65705c;
   --text-dim: #87917a;
@@ -32,6 +33,7 @@
   --gold: #a9bd83;
   --gold-dim: #8fa36a;
   --amber: #d38b68;
+  --amber-surface: var(--amber);
   --text: #e5e9db;
   --text-muted: #b4c0a6;
   --text-dim: #8d9b7c;
