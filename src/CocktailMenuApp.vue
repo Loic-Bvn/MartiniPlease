@@ -402,7 +402,14 @@ const { toastMessage, toastType, showToast } = useToast()
 const { features, setFeature } = useBarFeatures()
 const activeBarSkin = computed(() => isLoggedIn.value ? features.value.skin : guestBar.value?.features?.skin)
 const activeSkinClass = computed(() => {
-  const skins = ['luxe', 'classic', 'color', 'brasserie', 'craft', 'minimal']
+  const skins = [
+    'luxe',
+    'classic',
+    'minimal'
+    // 'color',
+    // 'brasserie',
+    // 'craft',
+  ]
   const skin = skins.includes(activeBarSkin.value) ? activeBarSkin.value : 'luxe'
   return activeBarId.value ? `skin-${skin}` : null
 })

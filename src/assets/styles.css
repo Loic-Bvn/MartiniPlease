@@ -8,12 +8,12 @@
 
 /* ── Variables ─────────────────────────────── */
 :root {
-  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  /* --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   --font-display: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
   --radius-control: 3px;
   --radius-panel: 6px;
   --radius-dialog: 8px;
-  --radius-pill: 999px;
+  --radius-pill: 999px; */
   --bg:          #f8f5ee;
   --bg-card:     #fffdf8;
   --bg-raised:   #f2ead7;
@@ -97,7 +97,7 @@
 }
 
 body {
-  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif);
+  /* font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif); */
   background-color: var(--bg);
   color: var(--text);
 }

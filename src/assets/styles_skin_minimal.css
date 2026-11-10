@@ -1,6 +1,8 @@
 .menu-app.skin-minimal {
-  --font-body: 'Futura', 'Century Gothic', 'Avenir Next', Arial, sans-serif;
-  --font-display: 'Avenir Next', 'Century Gothic', Futura, Arial, sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-subtitle: 'Inter', sans-serif;
+  --font-display: 'DM Sans', sans-serif;
+  --font-cocktail: 'DM Sans', sans-serif;
   --bg: #ffffff;
   --bg-card: #fafafa;
   --bg-raised: #f4f4f4;

@@ -168,12 +168,12 @@
                     :aria-label="locale === 'fr' ? 'Style du bar' : 'Bar style'"
                     @change="$emit('set-skin', $event.target.value)"
                   >
-                    <option value="luxe">{{ locale === 'fr' ? 'Luxe' : 'Luxe' }}</option>
                     <option value="classic">{{ locale === 'fr' ? 'Classique' : 'Classic' }}</option>
-                    <option value="color">{{ locale === 'fr' ? 'Coloré' : 'Colorful' }}</option>
-                    <option value="brasserie">{{ locale === 'fr' ? 'Brasserie' : 'Brasserie' }}</option>
-                    <option value="craft">{{ locale === 'fr' ? 'Artisanal' : 'Craft' }}</option>
+                    <option value="luxe">{{ locale === 'fr' ? 'Luxe' : 'Luxe' }}</option>
                     <option value="minimal">{{ locale === 'fr' ? 'Minimaliste' : 'Minimal' }}</option>
+                    <!-- <option value="color">{{ locale === 'fr' ? 'Coloré' : 'Colorful' }}</option>
+                    <option value="brasserie">{{ locale === 'fr' ? 'Brasserie' : 'Brasserie' }}</option>
+                    <option value="craft">{{ locale === 'fr' ? 'Artisanal' : 'Craft' }}</option> -->
                   </select>
                 </label>
 
