@@ -1,0 +1,51 @@
+.menu-app.skin-classic {
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --bg: #f7f5ef;
+  --bg-card: #ffffff;
+  --bg-raised: #efede6;
+  --bg-input: #ffffff;
+  --gold: #8a6d3b;
+  --gold-dim: #70572e;
+  --amber: #a77c32;
+  --text: #282720;
+  --text-muted: #66645b;
+  --text-dim: #89877e;
+  --border: #e2dfd5;
+  --border-mid: #d3d0c5;
+  --radius-control: 7px;
+  --radius-panel: 14px;
+  --radius-dialog: 20px;
+  --radius-sm: 5px;
+  --radius-md: 9px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(40, 39, 32, 0.08);
+  --shadow-md: 0 4px 12px rgba(40, 39, 32, 0.1);
+  --shadow-lg: 0 12px 32px rgba(40, 39, 32, 0.14);
+}
+
+.dark .menu-app.skin-classic {
+  --bg: #252521;
+  --bg-card: #302f2a;
+  --bg-raised: #393831;
+  --bg-input: #393831;
+  --gold: #d4b674;
+  --gold-dim: #b89a5c;
+  --amber: #d2a44c;
+  --text: #e8e5dc;
+  --text-muted: #c0bdb3;
+  --text-dim: #96938a;
+  --border: #45443d;
+  --border-mid: #56544b;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.26);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.34);
+}
+
+.menu-app.skin-classic .header-title {
+  font-family: 'Playfair Display', serif;
+}
+
+.menu-app.skin-classic .cocktail-title-name-group > span:first-child {
+  font-family: 'Lora', serif;
+}

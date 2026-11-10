@@ -1,95 +1,1014 @@
 <template>
-  <div class="main-content">
-    <div class="welcome-screen">
-      <img :src="randomLogo" alt="Martini Please" class="welcome-logo" />
-      <h2 class="welcome-title">Martini Please</h2>
-      <p class="welcome-subtitle">{{ locale === 'fr' ? 'Gérez votre bar, explorez les cocktails.' : 'Manage your bar, explore cocktails.' }}</p>
-
-      <div class="welcome-cards">
-
-        <!-- Bloc Bartender -->
-        <div class="welcome-card">
-          <div class="welcome-card-header">
-            <component :is="lucideIcons.bartender" :size="24" class="welcome-card-icon" aria-hidden="true" />
-            <div>
-              <div class="welcome-card-title">Bartender</div>
-              <div class="welcome-card-desc">{{ locale === 'fr' ? 'Gérez votre stock et vos recettes' : 'Manage your stock and recipes' }}</div>
-            </div>
+  <div class="landing-page">
+    <main class="landing-hero" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
+      <div ref="mediaEl" class="landing-media" aria-hidden="true">
+        <Transition name="landing-fade">
+          <div
+            v-if="photoReady"
+            :key="activeSlide.image"
+            class="landing-slide"
+            :class="`landing-slide--${fit}`"
+            :style="focalStyle"
+          >
+            <img v-if="fit === 'contain'" :src="activeSlide.image" alt="" class="landing-photo-backdrop" />
+            <img :src="activeSlide.image" alt="" class="landing-photo" />
           </div>
-          <button @click="$emit('open-auth')" class="password-btn-submit welcome-btn">
-            {{ locale === 'fr' ? 'Créer ou accéder à mon bar' : 'Create or access my bar' }}
-          </button>
-        </div>
+        </Transition>
+        <div v-if="!photoReady" class="landing-slide landing-slide--fallback"></div>
+      </div>
+      <div class="landing-shade" aria-hidden="true"></div>
+      <div v-if="activeSlide?.caption" class="landing-caption">
+        {{ activeSlide.caption }}
+      </div>
+      <div v-if="slides.length > 1" class="landing-dots" role="group">
+        <button type="button" class="landing-arrow" :aria-label="t.prevPhoto" @click.stop="showPreviousPhoto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+        </button>
+        <button
+          v-for="(slide, index) in slides"
+          :key="slide.image || slide.id || index"
+          type="button"
+          class="landing-dot"
+          :class="{ 'is-active': index === activeCocktailIndex }"
+          :aria-label="`Photo ${index + 1} / ${slides.length}`"
+          :aria-current="index === activeCocktailIndex ? 'true' : undefined"
+          @click="select(index)"
+        ></button>
+        <button type="button" class="landing-arrow" :aria-label="t.nextPhoto" @click.stop="showNextPhoto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
 
-        <!-- Bloc Drinker -->
-        <div class="welcome-card">
-          <div class="welcome-card-header">
-            <component :is="lucideIcons.drinker" :size="24" class="welcome-card-icon" aria-hidden="true" />
-            <div>
-              <div class="welcome-card-title">Drinker</div>
-              <div class="welcome-card-desc">{{ locale === 'fr' ? 'Explorez la carte d\'un bar' : 'Explore a bar\'s menu' }}</div>
-            </div>
-          </div>
+      <div class="landing-inner">
+      <div class="landing-copy">
+        <p class="landing-eyebrow">{{ t.eyebrow }}</p>
+        <h1>{{ t.title }}</h1>
+        <p class="landing-intro">{{ t.intro }}</p>
+      </div>
 
-          <!-- Bars publics disponibles -->
-          <template v-if="!publicBarsLoading && publicBars.length > 0">
-            <p class="welcome-public-title">
-              {{ locale === 'fr' ? 'Bars disponibles' : 'Available bars' }}
-            </p>
-            <button
-              v-for="b in publicBars"
-              :key="b.id"
-              class="welcome-demo"
-              @click="$emit('join-public-bar', b)"
-            >
-              <component :is="lucideIcons.cocktail" :size="16" class="welcome-demo-icon" aria-hidden="true" />
-              {{ b.name }}
-              <span class="welcome-demo-code">{{ b.invite_code }}</span>
-            </button>
-            <div class="welcome-or-divider">
-              <span>{{ locale === 'fr' ? 'ou entrer un code' : 'or enter a code' }}</span>
-            </div>
-          </template>
-          <div v-if="publicBarsLoading" class="welcome-public-loading">
-            {{ locale === 'fr' ? 'Chargement des bars...' : 'Loading bars...' }}
+      <div class="landing-actions">
+        <section class="landing-action landing-action--drinker" aria-labelledby="landing-drinker">
+          <div class="landing-action-heading">
+            <h2 id="landing-drinker">Drinker</h2>
+            <p>{{ t.drinkerText }}</p>
           </div>
-          <div class="welcome-code-row">
+          <form class="landing-join" @submit.prevent="emit('join-by-code')">
             <input
               :value="inviteCodeInput"
-              @input="$emit('update:inviteCodeInput', $event.target.value)"
               type="text"
-              :placeholder="locale === 'fr' ? 'Code du bar (ex: STAR-7514)' : 'Bar code (ex: STAR-7514)'"
-              class="password-form-input welcome-code-input"
-              @keyup.enter="$emit('join-by-code')"
+              :placeholder="t.codePlaceholder"
+              :aria-label="t.codeLabel"
+              autocomplete="off"
+              @input="emit('update:inviteCodeInput', $event.target.value)"
             />
-            <button @click="$emit('join-by-code')" class="password-btn-submit">
-              {{ locale === 'fr' ? 'Rejoindre' : 'Join' }}
-            </button>
-          </div>
-          <p v-if="codeError" class="password-form-error">{{ codeError }}</p>
-        </div>
+            <button type="submit" class="landing-button">{{ t.join }}</button>
+          </form>
+          <p v-if="codeError" class="landing-error" role="alert">{{ codeError }}</p>
 
+          <div id="landing-public-bars" class="landing-public-bars" aria-live="polite">
+            <p v-if="publicBarsLoading" class="landing-status">{{ t.loading }}</p>
+            <p v-else-if="publicBarsError" class="landing-status" role="alert">{{ t.loadError }}</p>
+            <p v-else-if="publicBars.length === 0" class="landing-status">{{ t.noBars }}</p>
+            <template v-else>
+              <h3 class="landing-list-title">{{ t.openBars }}</h3>
+              <button
+                v-for="bar in publicBars"
+                :key="bar.id"
+                type="button"
+                class="landing-bar"
+                :aria-label="bar.name"
+                @click="emit('join-public-bar', bar)"
+              >
+                <span class="landing-bar-name">{{ bar.name }}</span>
+                <span class="landing-bar-code">{{ bar.invite_code }}</span>
+              </button>
+            </template>
+          </div>
+        </section>
+
+        <section class="landing-action landing-action--bartender" aria-labelledby="landing-bartender">
+          <div class="landing-action-heading">
+            <h2 id="landing-bartender">Bartender</h2>
+            <p>{{ t.bartenderText }}</p>
+          </div>
+          <button type="button" class="landing-button" @click="emit('open-auth')">
+            {{ t.bartenderCta }}
+          </button>
+        </section>
       </div>
-    </div>
+      </div>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { lucideIcons } from '@/utils/lucideIcons'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 
 const props = defineProps({
-  randomLogo: String,
-  locale: String,
-  publicBars: Array,
+  locale: { type: String, default: 'fr' },
+  featuredBar: { type: Object, default: null },
+  featuredCocktails: { type: Array, default: () => [] },
+  landingPhotos: { type: Array, default: () => [] },
+  publicBars: { type: Array, default: () => [] },
   publicBarsLoading: Boolean,
-  inviteCodeInput: String,
-  codeError: String,
+  publicBarsError: Boolean,
+  inviteCodeInput: { type: String, default: '' },
+  codeError: { type: String, default: '' },
 })
 
 const emit = defineEmits([
   'open-auth',
   'join-public-bar',
   'join-by-code',
-  'update:inviteCodeInput'
+  'update:inviteCodeInput',
 ])
+
+const MESSAGES = {
+  fr: {
+    eyebrow: 'Cocktails · Stock · Recettes',
+    title: 'Ton bar, ta carte, un seul code.',
+    intro: 'Gère ton bar, partage ta carte. Tes invités n’ont plus qu’à choisir.',
+    bartenderText: 'Gère ton stock et tes recettes.',
+    bartenderCta: 'Créer ou accéder à mon bar',
+    drinkerText: 'Explore la carte d’un bar avec son code.',
+    codePlaceholder: 'Code du bar (ex : STAR-7514)',
+    codeLabel: 'Code du bar',
+    join: 'Rejoindre',
+    loading: 'Chargement des bars…',
+    loadError: 'Impossible de charger les bars. Réessaie plus tard.',
+    prevPhoto: 'Photo précédente',
+    nextPhoto: 'Photo suivante',
+    noBars: 'Aucun bar ouvert pour le moment.',
+    openBars: 'Bars ouverts',
+  },
+  en: {
+    eyebrow: 'Cocktails · Inventory · Recipes',
+    title: 'Your bar, your menu, one simple code.',
+    intro: 'Manage your bar and share your menu. Your guests just have to choose.',
+    bartenderText: 'Manage your inventory and recipes.',
+    bartenderCta: 'Create or access my bar',
+    drinkerText: 'Explore a bar menu with its code.',
+    codePlaceholder: 'Bar code (e.g. STAR-7514)',
+    codeLabel: 'Bar code',
+    join: 'Join',
+    loading: 'Loading bars…',
+    loadError: 'Unable to load bars. Please try again later.',
+    prevPhoto: 'Previous photo',
+    nextPhoto: 'Next photo',
+    noBars: 'No open bars right now.',
+    openBars: 'Open bars',
+  },
+}
+
+const t = computed(() => MESSAGES[props.locale] || MESSAGES.fr)
+
+// Carrousel
+const activeCocktailIndex = ref(0)
+const slides = computed(() => {
+  if (props.landingPhotos.length) return props.landingPhotos
+  return props.featuredCocktails.map((cocktail) => ({
+    ...cocktail,
+    caption: [cocktail.name, props.featuredBar?.name].filter(Boolean).join(' · '),
+  }))
+})
+const activeSlide = computed(() => slides.value[activeCocktailIndex.value] || null)
+let carouselTimer
+let navToken = 0
+let prefersReducedMotion = false
+
+watch(() => slides.value.length, () => {
+  activeCocktailIndex.value = 0
+})
+
+// ── Ajustement de la photo (cover vs contain) ─────────
+// cover  : la photo remplit la zone, recadrée autour de son point focal.
+// contain: photo entière sur fond flouté, uniquement si son ratio est trop éloigné
+//          de celui de la zone (ex. portrait sur écran large) pour être recadrée proprement.
+const MAX_RATIO_GAP = 1.5
+const DEFAULT_FOCAL = { x: 50, y: 45 }
+
+const mediaEl = ref(null)
+const mediaRatio = ref(0)
+const ratios = reactive({}) // url → ratio l/h (-1 si échec de chargement)
+const pending = new Map()
+let resizeObserver
+
+function measure(slide) {
+  const url = slide?.image
+  if (!url) return Promise.resolve()
+  if (url in ratios) return Promise.resolve()
+  if (!pending.has(url)) {
+    pending.set(url, new Promise((resolve) => {
+      const img = new Image()
+      img.onload = () => {
+        ratios[url] = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : -1
+        resolve()
+      }
+      img.onerror = () => {
+        ratios[url] = -1
+        resolve()
+      }
+      img.src = url
+    }))
+  }
+  return pending.get(url)
+}
+
+const photoReady = computed(() => !!activeSlide.value && ratios[activeSlide.value.image] > 0)
+
+const fit = computed(() => {
+  const ratio = ratios[activeSlide.value?.image]
+  if (!(ratio > 0) || !(mediaRatio.value > 0)) return 'cover'
+  const gap = Math.max(ratio / mediaRatio.value, mediaRatio.value / ratio)
+  return gap > MAX_RATIO_GAP ? 'contain' : 'cover'
+})
+
+const focalStyle = computed(() => {
+  const focal = activeSlide.value?.focal || DEFAULT_FOCAL
+  return { '--focal': `${focal.x}% ${focal.y}%` }
+})
+
+watch(activeSlide, (slide) => measure(slide), { immediate: true })
+
+// ── Navigation ────────────────────────────────────────
+async function goTo(index) {
+  const count = slides.value.length
+  if (!count) return
+  const target = ((index % count) + count) % count
+  const token = ++navToken
+  await measure(slides.value[target]) // précharge avant de changer
+  if (token !== navToken || target >= slides.value.length) return
+  activeCocktailIndex.value = target
+}
+
+function stopAutoplay() {
+  window.clearInterval(carouselTimer)
+}
+
+function startAutoplay() {
+  stopAutoplay()
+  if (prefersReducedMotion) return
+  carouselTimer = window.setInterval(() => {
+    if (slides.value.length > 1) goTo(activeCocktailIndex.value + 1)
+  }, 6000)
+}
+
+// Action utilisateur : navigue puis relance le minuteur pour laisser le temps de voir la photo
+function select(index) {
+  if (index === activeCocktailIndex.value) return
+  startAutoplay()
+  goTo(index)
+}
+
+function showPreviousPhoto() {
+  select(activeCocktailIndex.value - 1)
+}
+
+function showNextPhoto() {
+  select(activeCocktailIndex.value + 1)
+}
+
+// Swipe horizontal (mobile)
+let touchStart = null
+function onTouchStart(event) {
+  if (event.target.closest('input, textarea') || event.touches.length !== 1) {
+    touchStart = null
+    return
+  }
+  touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY }
+}
+function onTouchEnd(event) {
+  if (!touchStart || slides.value.length < 2) return
+  const touch = event.changedTouches[0]
+  const dx = touch.clientX - touchStart.x
+  const dy = touch.clientY - touchStart.y
+  touchStart = null
+  if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return
+  select(activeCocktailIndex.value + (dx < 0 ? 1 : -1))
+}
+
+function updateMediaRatio() {
+  const el = mediaEl.value
+  if (!el) return
+  const { width, height } = el.getBoundingClientRect()
+  mediaRatio.value = height > 0 ? width / height : 0
+}
+
+onMounted(() => {
+  updateMediaRatio()
+  if (typeof ResizeObserver !== 'undefined' && mediaEl.value) {
+    resizeObserver = new ResizeObserver(updateMediaRatio)
+    resizeObserver.observe(mediaEl.value)
+  }
+
+  prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  startAutoplay()
+})
+
+onBeforeUnmount(() => {
+  stopAutoplay()
+  resizeObserver?.disconnect()
+})
 </script>
+
+<style scoped>
+/*
+ * Tout passe par les variables du skin (--gold, --bg-card, --radius-*, --font-*).
+ * Seul le texte posé sur la photo utilise des tons fixes (clair sur voile sombre),
+ * identiques quel que soit le skin.
+ */
+.landing-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  --hero-ink: #f6f1e7;
+  --hero-ink-soft: color-mix(in srgb, var(--hero-ink) 82%, transparent);
+  --hero-veil: #0d0806;
+  color: var(--text);
+  font-family: var(--font-body, inherit);
+}
+
+/* ── Hero ─────────────────────────────────────────── */
+.landing-hero {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 30rem;
+  padding: 3.5rem clamp(1.5rem, 5vw, 4rem) 8rem;
+  overflow: hidden;
+  background: var(--hero-veil);
+  color: var(--hero-ink);
+  isolation: isolate;
+}
+
+.landing-inner {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.landing-media {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  overflow: hidden;
+}
+
+.landing-slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.landing-slide--fallback {
+  background:
+    radial-gradient(circle at 72% 45%, color-mix(in srgb, var(--gold) 35%, transparent), transparent 40%),
+    linear-gradient(120deg, var(--hero-veil), color-mix(in srgb, var(--hero-veil) 80%, var(--gold)) 60%, var(--hero-veil));
+}
+
+.landing-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.landing-slide--cover .landing-photo {
+  object-fit: cover;
+  object-position: var(--focal, 50% 45%);
+}
+
+.landing-slide--contain .landing-photo {
+  object-fit: contain;
+  object-position: center 45%;
+}
+
+.landing-photo-backdrop {
+  position: absolute;
+  inset: -1rem;
+  width: calc(100% + 2rem);
+  height: calc(100% + 2rem);
+  object-fit: cover;
+  object-position: var(--focal, 50% 45%);
+  filter: blur(1rem) brightness(0.55);
+}
+
+.landing-shade {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--hero-veil) 93%, transparent), color-mix(in srgb, var(--hero-veil) 60%, transparent) 45%, transparent 75%),
+    linear-gradient(0deg, color-mix(in srgb, var(--hero-veil) 87%, transparent), transparent 45%);
+}
+
+.landing-shade::after {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  content: '';
+  opacity: 0.14;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+
+.landing-caption {
+  position: absolute;
+  z-index: 1;
+  bottom: 7rem;
+  left: clamp(1.5rem, 5vw, 4rem);
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-control);
+  background: rgba(13, 8, 6, 0.58);
+  color: #fff;
+  font-size: 0.8rem;
+  backdrop-filter: blur(6px);
+}
+
+.landing-dots {
+  position: absolute;
+  z-index: 10;
+  pointer-events: auto;
+  bottom: 5.25rem;
+  left: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: calc(100% - 3rem);
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+}
+
+.landing-arrow {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.6;
+  pointer-events: auto;
+  place-items: center;
+  touch-action: manipulation;
+  transition: opacity 0.2s ease;
+}
+
+.landing-arrow:hover {
+  opacity: 1;
+}
+
+.landing-arrow:focus-visible {
+  border-radius: 999px;
+  opacity: 1;
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+.landing-arrow svg {
+  width: 1rem;
+  height: 1rem;
+  filter: drop-shadow(0 0 2px rgba(13, 8, 6, 0.6));
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.landing-dot {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  place-items: center;
+}
+
+.landing-dot::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 1px rgba(13, 8, 6, 0.35);
+  content: "";
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+.landing-dot:hover::before {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.landing-dot.is-active::before {
+  width: 1.25rem;
+  background: #fff;
+}
+
+.landing-dot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+  border-radius: 999px;
+}
+
+.landing-caption b {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Texte ────────────────────────────────────────── */
+.landing-copy {
+  position: relative;
+  flex: 1 1 0;
+  align-self: center;
+  min-width: 0;
+  max-width: 48rem;
+}
+
+.landing-eyebrow {
+  margin: 0;
+  color: var(--hero-ink-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.landing-copy h1 {
+  margin: 0.9rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 4.2vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.landing-intro {
+  margin: 0;
+  color: var(--hero-ink-soft);
+  font-size: 1.1rem;
+  line-height: 1.55;
+}
+
+/* ── Cartes d'action ──────────────────────────────── */
+.landing-actions {
+  position: relative;
+  display: grid;
+  flex: none;
+  width: min(100%, clamp(24rem, 28.5vw, 34rem));
+  gap: clamp(0.6rem, 0.8vw, 0.9rem);
+}
+
+.landing-action {
+  min-width: 0;
+  padding: clamp(0.85rem, 1.1vw, 1.25rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: color-mix(in srgb, var(--bg-card) 94%, transparent);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
+}
+
+.landing-action--bartender,
+.landing-action--drinker {
+  display: grid;
+  gap: clamp(0.7rem, 0.9vw, 1rem);
+}
+
+.landing-action-heading {
+  margin-bottom: 0.6rem;
+  text-align: left;
+}
+
+.landing-action--bartender .landing-action-heading,
+.landing-action--drinker .landing-action-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.landing-action--bartender .landing-action-heading h2 {
+  flex: none;
+  margin: 0;
+}
+
+.landing-action--drinker .landing-action-heading h2 {
+  flex: none;
+  margin: 0;
+}
+
+.landing-action--bartender .landing-action-heading p,
+.landing-action--drinker .landing-action-heading p {
+  flex: 1;
+  min-width: 0;
+  margin-left: auto;
+  text-align: right;
+}
+
+.landing-action-heading h2 {
+  margin: 0 0 0.35rem;
+  color: var(--gold);
+  font-family: var(--font-subtitle, var(--font-body, inherit));
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.landing-action-heading p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  line-height: 1.45;
+}
+
+.landing-action > .landing-button {
+  min-width: 12rem;
+}
+
+.landing-action--bartender > .landing-button {
+  width: 100%;
+}
+
+.landing-action--drinker .landing-action-heading {
+  margin-bottom: 0;
+}
+
+.landing-action--drinker .landing-join {
+  margin-top: 0;
+}
+
+/* ── Contrôles ────────────────────────────────────── */
+.landing-button,
+.landing-join input {
+  min-height: clamp(2.2rem, 2.5vw, 2.6rem);
+  border-radius: var(--radius-control);
+  font-family: inherit;
+  font-size: clamp(0.85rem, 0.9vw, 1rem);
+  line-height: 1.2;
+}
+
+.landing-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  border: 0;
+  background: var(--gold);
+  color: var(--bg);
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.landing-button:hover {
+  filter: brightness(1.12);
+}
+
+.landing-join {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.landing-join input {
+  min-width: 0;
+  flex: 1;
+  padding: 0 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text);
+}
+
+.landing-join input::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.landing-button:focus-visible,
+.landing-bar:focus-visible,
+.landing-join input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.landing-error {
+  margin: 0.5rem 0 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+/* ── Liste des bars ───────────────────────────────── */
+.landing-public-bars {
+  display: grid;
+  gap: 0.35rem;
+  max-height: min(20rem, 45vh);
+  margin-top: 0.65rem;
+  padding-top: 0.5rem;
+  padding-right: 2px;
+  border-top: 1px solid var(--border);
+  overflow: auto;
+}
+
+.landing-list-title {
+  margin: 0;
+  padding: 0.15rem 0 0.4rem;
+  color: var(--gold);
+  font-family: var(--font-subtitle, var(--font-body, inherit));
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.landing-status {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.landing-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font-size: 0.75rem;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.landing-bar:hover {
+  border-color: var(--gold-dim);
+  background: var(--bg-raised);
+  color: var(--gold-dim);
+}
+
+.landing-bar:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline-offset: -2px;
+}
+
+.landing-bar-name {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.landing-bar-code {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Transition ───────────────────────────────────── */
+.landing-fade-enter-active,
+.landing-fade-leave-active {
+  transition: opacity 1s ease;
+}
+
+.landing-fade-enter-from,
+.landing-fade-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-fade-enter-active,
+  .landing-fade-leave-active,
+  .landing-button,
+  .landing-bar {
+    transition-duration: 0.01ms;
+  }
+
+  .landing-dot::before,
+  .landing-arrow {
+    transition: none;
+  }
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 900px) {
+  .landing-hero {
+    padding-top: 4.5rem;
+  }
+
+  .landing-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .landing-copy {
+    align-self: flex-start;
+    width: 100%;
+    max-width: none;
+  }
+
+  .landing-actions {
+    width: 100%;
+    max-width: 26rem;
+  }
+
+  .landing-caption {
+    bottom: 7rem;
+    left: 1.5rem;
+    width: fit-content;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1600px) {
+  .landing-copy h1 {
+    font-size: clamp(2.4rem, 3.8vw, 4.1rem);
+  }
+
+  .landing-actions {
+    width: min(100%, clamp(21.7rem, 25.7vw, 30.7rem));
+  }
+
+  .landing-action {
+    padding: clamp(0.75rem, 0.95vw, 1.1rem);
+  }
+
+  .landing-action--bartender,
+  .landing-action--drinker {
+    gap: clamp(0.6rem, 0.8vw, 0.9rem);
+  }
+
+  .landing-action-heading h2,
+  .landing-action-heading p {
+    font-size: clamp(0.78rem, 0.8vw, 0.9rem);
+  }
+
+  .landing-button,
+  .landing-join input {
+    min-height: clamp(2rem, 2.25vw, 2.35rem);
+    font-size: clamp(0.82rem, 0.8vw, 0.9rem);
+  }
+}
+
+@media (min-width: 901px) and (max-height: 800px) {
+  .landing-hero {
+    padding-top: clamp(1.5rem, 4vh, 2.5rem);
+    padding-bottom: clamp(4rem, 7vh, 5.5rem);
+  }
+
+  .landing-actions {
+    gap: 0.5rem;
+  }
+
+  .landing-action {
+    padding: 0.8rem;
+  }
+
+  .landing-action--bartender,
+  .landing-action--drinker {
+    gap: 0.6rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .landing-page,
+  .landing-hero {
+    flex: none;
+  }
+
+  .landing-hero {
+    min-height: 0;
+    padding: 0;
+  }
+
+  .landing-inner {
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .landing-media,
+  .landing-shade {
+    bottom: auto;
+    height: clamp(14rem, 34vh, 19rem);
+  }
+
+  .landing-shade {
+    background: linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--hero-veil) 80%, transparent),
+      color-mix(in srgb, var(--hero-veil) 36%, transparent) 55%,
+      color-mix(in srgb, var(--hero-veil) 25%, transparent)
+    );
+  }
+
+  .landing-copy {
+    display: flex;
+    flex: 0 0 clamp(14rem, 34vh, 19rem);
+    flex-direction: column;
+    justify-content: flex-start;
+    max-width: none;
+    padding: 2rem 1rem 2.5rem;
+  }
+
+  .landing-actions {
+    position: relative;
+    z-index: 1;
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: none;
+    margin-top: -2.5rem;
+    padding: 1rem;
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+    background: var(--bg);
+  }
+
+  .landing-dots {
+    top: calc(clamp(14rem, 34vh, 19rem) - 4rem);
+    bottom: auto;
+  }
+
+  .landing-caption {
+    top: calc(clamp(14rem, 34vh, 19rem) - 2.75rem);
+    right: 1rem;
+    bottom: auto;
+    left: auto;
+    width: fit-content;
+    max-width: calc(100% - 2rem);
+    padding: 0.35rem 0.65rem;
+    font-size: 0.7rem;
+  }
+
+  .landing-intro {
+    font-size: 0.9rem;
+  }
+
+  .landing-copy h1 {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+  }
+
+  .landing-eyebrow {
+    font-size: 0.65rem;
+  }
+
+  .landing-action-heading h2 {
+    font-size: 0.72rem;
+  }
+
+  .landing-action-heading p,
+  .landing-status {
+    font-size: 0.72rem;
+  }
+
+  .landing-button,
+  .landing-join input {
+    font-size: 0.8rem;
+  }
+
+  .landing-action {
+    padding: 0 0 1rem;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .landing-action:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .landing-action--bartender > .landing-button {
+    min-width: 0;
+    width: auto;
+  }
+
+  .landing-action > .landing-button {
+    width: auto;
+  }
+
+  .landing-join {
+    gap: 0.4rem;
+  }
+}
+</style>

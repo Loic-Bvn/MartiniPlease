@@ -115,6 +115,16 @@ Variables requises dans `.env.local` :
 | `VITE_SUPABASE_URL`        | URL du projet Supabase                          |
 | `VITE_SUPABASE_ANON_KEY`   | Clé `anon` Supabase                             |
 | `VITE_SUPABASE_STORAGE_BUCKET` | Nom du bucket Supabase pour les images     |
+| `VITE_FEATURED_BAR_ID` | ID du bar public utilisé pour les cocktails mis en avant (par défaut : `d37d1296-9167-4694-a7fb-8e3878cecdb9`) |
+| `VITE_FEATURED_MENU_CARD_ID` | ID de la carte visible du bar dont les cocktails avec photo sont mis en avant |
+
+Les deux variables `VITE_FEATURED_*` permettent de choisir le bar et sa carte
+pour le carrousel de la landing page. Le bar doit être public et la carte
+visible pour ses visiteurs.
+
+Chaque bar peut également choisir son skin dans le menu du bartender :
+Luxe, Classique, Coloré, Brasserie, Artisanal ou Minimal. Le choix est enregistré dans
+les options du bar et s'applique aussi aux visiteurs de ce bar.
 
 ### Développement
 

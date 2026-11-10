@@ -160,6 +160,23 @@
                   </div>
                 </button>
 
+                <label v-if="isLoggedIn && activeBarId && !showBarsSelection" class="burger-item skin-select-row">
+                  <Palette :size="15" />
+                  <span>{{ locale === 'fr' ? 'Style du bar' : 'Bar style' }}</span>
+                  <select
+                    :value="skin || 'luxe'"
+                    :aria-label="locale === 'fr' ? 'Style du bar' : 'Bar style'"
+                    @change="$emit('set-skin', $event.target.value)"
+                  >
+                    <option value="classic">{{ locale === 'fr' ? 'Classique' : 'Classic' }}</option>
+                    <option value="luxe">{{ locale === 'fr' ? 'Luxe' : 'Luxe' }}</option>
+                    <option value="minimal">{{ locale === 'fr' ? 'Minimaliste' : 'Minimal' }}</option>
+                    <!-- <option value="color">{{ locale === 'fr' ? 'Coloré' : 'Colorful' }}</option>
+                    <option value="brasserie">{{ locale === 'fr' ? 'Brasserie' : 'Brasserie' }}</option>
+                    <option value="craft">{{ locale === 'fr' ? 'Artisanal' : 'Craft' }}</option> -->
+                  </select>
+                </label>
+
                 <button 
                   v-if="activeBarId && !showBarsSelection" 
                   @click="$emit('toggle-public')" 
@@ -234,7 +251,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { Plus, Library, Lock, Unlock, LogIn, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro, ChartNoAxesCombined, GlassWater} from 'lucide-vue-next'
+import { Plus, Library, Lock, Unlock, LogIn, LogOut, Menu, Link, Folder, Martini, Key, HandPlatter, Euro, ChartNoAxesCombined, GlassWater, Palette} from 'lucide-vue-next'
 import SettingsSwitches from '@/Components/SettingsSwitches.vue'
 import { useBarFeatures } from '@/composables/useBarFeatures'
 
@@ -250,6 +267,7 @@ const props = defineProps({
   bars: Array,
   showBarsSelection: Boolean,
   locale: String,
+  skin: { type: String, default: 'luxe' },
   unit: String,
   toastMessage: String,
   randomLogo: String,
@@ -261,6 +279,7 @@ const emit = defineEmits([
   'open-drinker-login',
   'drinker-sign-out',
   'set-locale',
+  'set-skin',
   'set-unit',
   'invite',
   'open-bars-selection',

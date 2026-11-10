@@ -12,9 +12,9 @@
   </div>
 
   <!-- Application principale -->
-  <div v-else class="flex flex-col min-h-screen">
-    <div class="flex-1">
-      <div class="min-h-screen menu-app" :class="{ 'bartender-mode': isLoggedIn }">
+  <div v-else class="flex flex-col min-h-screen" :class="{ 'landing-layout': !isLoggedIn && !activeBarId }">
+    <div class="flex-1 flex flex-col">
+      <div class="flex-1 menu-app" :class="[{ 'bartender-mode': isLoggedIn, 'flex flex-col': !isLoggedIn && !activeBarId }, activeSkinClass]">
 
         <!-- Header -->
         <AppHeader
@@ -26,6 +26,7 @@
           :bars="bars"
           :showBarsSelection="showBarsSelection"
           :locale="locale"
+          :skin="features.skin || 'luxe'"
           :unit="unit"
           :toastMessage="toastMessage"
           :toastType="toastType"
@@ -36,6 +37,7 @@
           @drinker-sign-out="handleDrinkerSignOut"
           @open-new-cocktail="openNewCocktailFormModal"
           @set-locale="setLocale"
+          @set-skin="setFeature('skin', $event)"
           @set-unit="setUnit"
           @invite="handleInvite"
           @open-bars-selection="handleOpenBarsSelection"
@@ -48,10 +50,13 @@
         <!-- État : pas connecté + pas de bar -->
         <WelcomePage
           v-if="!isLoggedIn && !activeBarId"
-          :randomLogo="randomLogo"
           :locale="locale"
+          :featuredBar="featuredBar"
+          :featuredCocktails="featuredCocktails"
+          :landingPhotos="landingPhotos"
           :publicBars="publicBars"
           :publicBarsLoading="publicBarsLoading"
+          :publicBarsError="publicBarsError"
           :inviteCodeInput="inviteCodeInput"
           :codeError="codeError"
           @open-auth="showAuthModal = true"
@@ -61,7 +66,7 @@
         />
 
         <div v-if="isLoggedIn && barFetchError && !bar && !hasMultipleBars" class="bar-fetch-error">
-          <p>😕 Impossible de charger ton bar pour le moment.</p>
+          <p>Impossible de charger ton bar pour le moment.</p>
           <button type="button" class="password-btn-submit" @click="fetchBar()">Réessayer</button>
         </div>
 
@@ -289,13 +294,17 @@
     </div>
 
     <!-- Footer -->
-    <Footer :locale="locale" @navigate-to-legal="openLegalPage" />
+    <Footer
+      :locale="locale"
+      :transparent-on-landing="!isLoggedIn && !activeBarId"
+      @navigate-to-legal="openLegalPage"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseImageBucket } from '@/lib/supabase'
 
 // ── Composables ───────────────────────────────────────────────────────────────
 import { useAuth }               from '@/composables/useAuth'
@@ -391,6 +400,19 @@ const accessibleMenuCards = computed(() =>
 const { hasDrinker, drinkerPseudo, initDrinker, createDrinker, reconnectDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { toastMessage, toastType, showToast } = useToast()
 const { features, setFeature } = useBarFeatures()
+const activeBarSkin = computed(() => isLoggedIn.value ? features.value.skin : guestBar.value?.features?.skin)
+const activeSkinClass = computed(() => {
+  const skins = [
+    'luxe',
+    'classic',
+    'minimal'
+    // 'color',
+    // 'brasserie',
+    // 'craft',
+  ]
+  const skin = skins.includes(activeBarSkin.value) ? activeBarSkin.value : 'luxe'
+  return activeBarId.value ? `skin-${skin}` : null
+})
 const preparationCounterEnabled = computed(() => features.value.preparationCounter === true)
 const sharedFavoriteIds = ref([])
 const cocktailOfMomentId = computed(() => features.value.cocktailOfMomentId || guestBar.value?.features?.cocktailOfMomentId || null)
@@ -469,16 +491,100 @@ const randomLogo = ref(availableLogos[Math.floor(Math.random() * availableLogos.
 // ── Bars publics ──────────────────────────────────────────────────────────────
 const publicBars        = ref([])
 const publicBarsLoading = ref(false)
+const publicBarsError   = ref(false)
+const featuredCocktails = ref([])
+const landingPhotos = ref([])
+const LANDING_PHOTOS_PATH = '423b7a57-d0e1-40cb-97d0-182bc2b51a04/_landing_page'
+const FEATURED_BAR_ID = import.meta.env.VITE_FEATURED_BAR_ID || 'd37d1296-9167-4694-a7fb-8e3878cecdb9'
+const FEATURED_MENU_CARD_ID = import.meta.env.VITE_FEATURED_MENU_CARD_ID
+const featuredBar = computed(() => publicBars.value.find(bar => bar.id === FEATURED_BAR_ID) || null)
+
+async function fetchLandingPhotos() {
+  try {
+    const { data: files, error } = await supabase.storage
+      .from(supabaseImageBucket)
+      .list(LANDING_PHOTOS_PATH, { limit: 1000, sortBy: { column: 'name', order: 'asc' } })
+
+    if (error) throw error
+
+    if (!files?.length) {
+      console.warn(
+        `Aucune image de landing accessible dans "${supabaseImageBucket}/${LANDING_PHOTOS_PATH}". Vérifie la policy SELECT de storage.objects pour le rôle anon.`,
+      )
+      return
+    }
+
+    landingPhotos.value = (files || [])
+      .filter(file => /\.(avif|gif|jpe?g|png|webp)$/i.test(file.name))
+      .map(file => {
+        const { data } = supabase.storage
+          .from(supabaseImageBucket)
+          .getPublicUrl(`${LANDING_PHOTOS_PATH}/${file.name}`)
+        // Point focal optionnel en fin de nom : "negroni_30-60.jpg" ou "negroni__30-60.jpg" → x 30 %, y 60 %
+        const filename = file.name.replace(/\.[^.]+$/, '')
+        const FOCAL_SUFFIX = /[\s_-]+(\d{1,3})[\s_x-](\d{1,3})$/
+        const focalMatch = filename.match(FOCAL_SUFFIX)
+        const focal = focalMatch
+          ? { x: Math.min(100, +focalMatch[1]), y: Math.min(100, +focalMatch[2]) }
+          : null
+        const label = filename.replace(FOCAL_SUFFIX, '')
+        const caption = file.name.startsWith('_')
+          ? ''
+          : label.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
+
+        return { id: file.name, image: data.publicUrl, caption, focal }
+      })
+  } catch (error) {
+    console.error('❌ Erreur chargement des images de la landing:', error)
+  }
+}
 
 async function fetchPublicBars() {
   publicBarsLoading.value = true
-  const { data, error } = await supabase
-    .from('bars')
-    .select('id, name, invite_code, features')
-    .eq('is_public', true)
-    .order('name')
-  if (!error && data) publicBars.value = data
-  publicBarsLoading.value = false
+  publicBarsError.value = false
+  try {
+    const { data, error } = await supabase
+      .from('bars')
+      .select('id, name, invite_code, features')
+      .eq('is_public', true)
+      .order('name')
+    if (error) throw error
+    publicBars.value = data || []
+  } catch (error) {
+    console.error('❌ Erreur fetchPublicBars:', error)
+    publicBarsError.value = true
+  } finally {
+    publicBarsLoading.value = false
+  }
+
+  if (!featuredBar.value || !FEATURED_MENU_CARD_ID) return
+
+  try {
+    const { data: menuCard, error: menuError } = await supabase
+      .from('menu_cards')
+      .select('cocktail_ids, is_visible')
+      .eq('id', FEATURED_MENU_CARD_ID)
+      .eq('bar_id', FEATURED_BAR_ID)
+      .maybeSingle()
+
+    if (menuError) throw menuError
+    if (!menuCard || menuCard.is_visible === false || !menuCard.cocktail_ids?.length) return
+
+    const { data, error } = await supabase
+      .from('bar_cocktails')
+      .select('id, name, image')
+      .eq('bar_id', FEATURED_BAR_ID)
+      .in('id', menuCard.cocktail_ids)
+      .not('image', 'is', null)
+
+    if (error) throw error
+    const cocktailsById = new Map((data || []).map(cocktail => [cocktail.id, cocktail]))
+    featuredCocktails.value = menuCard.cocktail_ids
+      .map(id => cocktailsById.get(id))
+      .filter(Boolean)
+  } catch (error) {
+    console.error('❌ Erreur chargement des cocktails de la carte à la une:', error)
+  }
 }
 
 // ── Accès invité via code ─────────────────────────────────────────────────────
@@ -836,7 +942,7 @@ watch(currentBarId, async (newBarId) => {
 //     donc pas besoin de la rappeler ici.
 
 onMounted(async () => {
-  await fetchPublicBars()
+  await Promise.all([fetchPublicBars(), fetchLandingPhotos()])
   // On charge d'abord les données du bar (si bartender déjà connecté) pour
   // que handleHashRoute puisse résoudre les slugs carte/cocktail du hash.
   // (Le flux invité passe par joinByCode, qui charge lui-même les données.)

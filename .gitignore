@@ -17,6 +17,7 @@ dist-ssr
 .env.local
 .env.*.local
 scraper/.env
+src/maquettes*
 
 # ── Python ────────────────────────────────────────────────
 __pycache__/
@@ -28,6 +29,7 @@ venv/
 
 # ── Scraper cache ─────────────────────────────────────────
 scraper/cache/
+.todos
 
 # ── Éditeurs ──────────────────────────────────────────────
 .vscode/*

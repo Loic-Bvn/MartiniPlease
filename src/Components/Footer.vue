@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer-martini border-t">
+  <footer :class="['footer-martini border-t', { 'footer-martini--landing': transparentOnLanding }]">
     <div class="max-w-7xl mx-auto px-4 py-5">
       <div class="flex flex-col md:flex-row justify-between items-center gap-3">
         <p class="footer-text">
@@ -46,7 +46,8 @@ import CookieConsentBanner from './CookieConsentBanner.vue'
 import pkg from '../../package.json'
 
 const props = defineProps({
-  locale: { type: String, default: 'fr' }
+  locale: { type: String, default: 'fr' },
+  transparentOnLanding: { type: Boolean, default: false }
 })
 
 const currentYear = new Date().getFullYear()
@@ -95,6 +96,57 @@ function openConsent() {
 .dark .footer-martini {
   background: linear-gradient(135deg, rgba(34,31,26,0.8), rgba(26,24,20,0.9));
   border-color: var(--border-mid);
+}
+.footer-martini.footer-martini--landing,
+.dark .footer-martini.footer-martini--landing {
+  background: transparent;
+  border-color: transparent;
+}
+.landing-layout .footer-martini--landing {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.landing-layout .footer-martini--landing > div {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--landing-inline-padding, 1rem);
+  padding-right: var(--landing-inline-padding, 1rem);
+}
+.landing-layout .footer-martini--landing .footer-text,
+.landing-layout .footer-martini--landing .footer-brand,
+.landing-layout .footer-martini--landing .footer-link,
+.landing-layout .footer-martini--landing .footer-sep,
+.landing-layout .footer-martini--landing .footer-version,
+.landing-layout .footer-martini--landing .footer-sanitary,
+.dark .landing-layout .footer-martini--landing .footer-text,
+.dark .landing-layout .footer-martini--landing .footer-brand,
+.dark .landing-layout .footer-martini--landing .footer-link,
+.dark .landing-layout .footer-martini--landing .footer-sep,
+.dark .landing-layout .footer-martini--landing .footer-version,
+.dark .landing-layout .footer-martini--landing .footer-sanitary {
+  color: #fff;
+}
+@media (max-width: 520px) {
+  .landing-layout .footer-martini--landing {
+    position: static;
+  }
+
+  html:not(.dark) .landing-layout .footer-martini--landing .footer-text,
+  html:not(.dark) .landing-layout .footer-martini--landing .footer-brand,
+  html:not(.dark) .landing-layout .footer-martini--landing .footer-link,
+  html:not(.dark) .landing-layout .footer-martini--landing .footer-sep,
+  html:not(.dark) .landing-layout .footer-martini--landing .footer-version,
+  html:not(.dark) .landing-layout .footer-martini--landing .footer-sanitary {
+    color: #2f261a;
+  }
+
+  html:not(.dark) .landing-layout .footer-martini--landing .footer-sanitary {
+    border-color: var(--border);
+  }
 }
 .footer-brand {
   font-weight: 600;

@@ -242,37 +242,39 @@
         <p v-else-if="isLoggedIn" class="featured-menu-empty">{{ locale === 'fr' ? 'Sélectionnez une carte pour l’afficher avant le catalogue.' : 'Choose a menu to feature before the catalogue.' }}</p>
       </section>
 
-      <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
-      <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
-        <component :is="lucideIcons.cocktail" :size="48" class="empty-state-icon" aria-hidden="true" />
-        <h3 class="empty-state-title">{{ locale === 'fr' ? 'Aucun cocktail trouvé' : 'No cocktails found' }}</h3>
-        <p class="empty-state-message">{{ locale === 'fr' ? 'Essayez d\'ajuster vos filtres...' : 'Try adjusting your filters...' }}</p>
-        <div class="empty-state-actions">
-          <button v-if="hasActiveFilters" @click="$emit('clear-filters')" class="empty-state-btn empty-state-btn-primary">
-            {{ locale === 'fr' ? 'Effacer les filtres' : 'Clear filters' }}
-          </button>
-          <button v-if="isLoggedIn" @click="$emit('new-cocktail')" class="empty-state-btn empty-state-btn-primary">
-            {{ locale === 'fr' ? '+ Créer un cocktail' : '+ Create cocktail' }}
-          </button>
+      <section class="cocktail-list-section">
+        <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
+        <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
+          <component :is="lucideIcons.cocktail" :size="48" class="empty-state-icon" aria-hidden="true" />
+          <h3 class="empty-state-title">{{ locale === 'fr' ? 'Aucun cocktail trouvé' : 'No cocktails found' }}</h3>
+          <p class="empty-state-message">{{ locale === 'fr' ? 'Essayez d\'ajuster vos filtres...' : 'Try adjusting your filters...' }}</p>
+          <div class="empty-state-actions">
+            <button v-if="hasActiveFilters" @click="$emit('clear-filters')" class="empty-state-btn empty-state-btn-primary">
+              {{ locale === 'fr' ? 'Effacer les filtres' : 'Clear filters' }}
+            </button>
+            <button v-if="isLoggedIn" @click="$emit('new-cocktail')" class="empty-state-btn empty-state-btn-primary">
+              {{ locale === 'fr' ? '+ Créer un cocktail' : '+ Create cocktail' }}
+            </button>
+          </div>
         </div>
-      </div>
-      <div v-else-if="visibleCocktails.length" :class="['cocktails-grid', { 'cocktails-grid--standard': cardView === 'standard' }]">
-        <div v-for="cocktail in visibleCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
-          <CocktailCard
-            :cocktail="cocktail"
-            :isBartenderMode="isLoggedIn"
-            :locale="locale"
-            :unit="unit"
-            :bar-id="activeBarId"
-            :view-mode="cardView"
-            :is-cocktail-of-moment="cocktail.id === cocktailOfMoment?.id"
-            @edit="$emit('edit-cocktail', cocktail)"
-            @delete="$emit('delete-cocktail', cocktail.id)"
-            @open="handleOpenCocktail"
-          />
+        <div v-else-if="visibleCocktails.length" :class="['cocktails-grid', { 'cocktails-grid--standard': cardView === 'standard' }]">
+          <div v-for="cocktail in visibleCocktails" :key="cocktail.id" :id="`cocktail-${cocktail.id}`">
+            <CocktailCard
+              :cocktail="cocktail"
+              :isBartenderMode="isLoggedIn"
+              :locale="locale"
+              :unit="unit"
+              :bar-id="activeBarId"
+              :view-mode="cardView"
+              :is-cocktail-of-moment="cocktail.id === cocktailOfMoment?.id"
+              @edit="$emit('edit-cocktail', cocktail)"
+              @delete="$emit('delete-cocktail', cocktail.id)"
+              @open="handleOpenCocktail"
+            />
+          </div>
         </div>
-      </div>
-      <div ref="sentinelEl" style="height:1px" />
+        <div ref="sentinelEl" style="height:1px" />
+      </section>
     </div>
 
   </div>
