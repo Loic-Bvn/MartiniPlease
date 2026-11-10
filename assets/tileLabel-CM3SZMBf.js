@@ -1,0 +1,1 @@
+function E(i=""){const t=String(i).match(new RegExp("^((?:\\p{Regional_Indicator}{2}|\\p{Extended_Pictographic}(?:\\uFE0F|\\uFE0E)?\\p{Emoji_Modifier}?(?:\\u200D\\p{Extended_Pictographic}(?:\\uFE0F|\\uFE0E)?\\p{Emoji_Modifier}?)*(?:[\\u{E0020}-\\u{E007E}]+\\u{E007F})?))\\s*(.*)$","u"));return t?{icon:t[1],text:t[2].trimStart()}:{icon:"",text:String(i)}}export{E as s};
