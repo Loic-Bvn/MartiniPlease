@@ -911,6 +911,15 @@ onBeforeUnmount(() => {
     height: clamp(14rem, 34vh, 19rem);
   }
 
+  .landing-slide--contain .landing-photo {
+    object-fit: cover;
+    object-position: var(--focal, 50% 45%);
+  }
+
+  .landing-photo-backdrop {
+    display: none;
+  }
+
   .landing-shade {
     background: linear-gradient(
       0deg,
@@ -942,12 +951,12 @@ onBeforeUnmount(() => {
   }
 
   .landing-dots {
-    top: calc(clamp(14rem, 34vh, 19rem) - 4rem);
+    top: calc(clamp(14rem, 34vh, 19rem) - 4.5rem);
     bottom: auto;
   }
 
   .landing-caption {
-    top: calc(clamp(14rem, 34vh, 19rem) - 2.75rem);
+    top: calc(clamp(14rem, 34vh, 19rem) - 6.5rem);
     right: 1rem;
     bottom: auto;
     left: auto;

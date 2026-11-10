@@ -508,6 +508,9 @@ const publicBarsError   = ref(false)
 const featuredCocktails = ref([])
 const landingPhotos = ref([])
 const LANDING_PHOTOS_PATH = '423b7a57-d0e1-40cb-97d0-182bc2b51a04/_landing_page'
+const LANDING_FOCAL_OVERRIDES = {
+  'Penicilin__30-60.jpg': { x: 50, y: 60 },
+}
 const FEATURED_BAR_ID = import.meta.env.VITE_FEATURED_BAR_ID || 'd37d1296-9167-4694-a7fb-8e3878cecdb9'
 const FEATURED_MENU_CARD_ID = import.meta.env.VITE_FEATURED_MENU_CARD_ID
 const featuredBar = computed(() => publicBars.value.find(bar => bar.id === FEATURED_BAR_ID) || null)
@@ -537,9 +540,9 @@ async function fetchLandingPhotos() {
         const filename = file.name.replace(/\.[^.]+$/, '')
         const FOCAL_SUFFIX = /[\s_-]+(\d{1,3})[\s_x-](\d{1,3})$/
         const focalMatch = filename.match(FOCAL_SUFFIX)
-        const focal = focalMatch
+        const focal = LANDING_FOCAL_OVERRIDES[file.name] || (focalMatch
           ? { x: Math.min(100, +focalMatch[1]), y: Math.min(100, +focalMatch[2]) }
-          : null
+          : null)
         const label = filename.replace(FOCAL_SUFFIX, '')
         const caption = file.name.startsWith('_')
           ? ''
