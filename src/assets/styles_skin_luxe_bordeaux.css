@@ -1,0 +1,49 @@
+.menu-app.skin-luxe-bordeaux {
+  --font-body: 'Karla', sans-serif;
+  --font-subtitle: 'Josefin Sans', sans-serif;
+  --font-display: 'Gloock', serif;
+  --font-cocktail: 'Kalnia', serif;
+  --bg: #f5e8e8;
+  --bg-card: #fff8f7;
+  --bg-raised: #f0dddd;
+  --bg-input: #ecd4d5;
+  --gold: #875521;
+  --gold-button: #a5682b;
+  --gold-dim: #71431c;
+  --amber: #8f3543;
+  --amber-surface: #8f3543;
+  --text: #1a100c;
+  --text-muted: #70505a;
+  --text-dim: #806873;
+  --border: #dec2c7;
+  --border-mid: #d3aeb6;
+  --radius-control: 3px;
+  --radius-panel: 6px;
+  --radius-dialog: 8px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --shadow-sm: 0 1px 3px rgba(26, 16, 12, 0.08);
+  --shadow-md: 0 4px 12px rgba(26, 16, 12, 0.12);
+  --shadow-lg: 0 10px 28px rgba(26, 16, 12, 0.16);
+}
+
+.dark .menu-app.skin-luxe-bordeaux {
+  --bg: #1a100c;
+  --bg-card: #4a1420;
+  --bg-raised: #6b1f2e;
+  --bg-input: #4a1420;
+  --gold: #ebc070;
+  --gold-button: #d9a441;
+  --gold-dim: #ebc070;
+  --amber: #c45b6b;
+  --amber-surface: #c45b6b;
+  --text: #f4eadb;
+  --text-muted: #d4b8a2;
+  --text-dim: #b49a86;
+  --border: rgba(217, 164, 65, 0.34);
+  --border-mid: rgba(217, 164, 65, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.4);
+}

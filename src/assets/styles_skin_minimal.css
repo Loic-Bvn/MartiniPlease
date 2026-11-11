@@ -10,7 +10,6 @@
   --gold: #111111;
   --gold-dim: #555555;
   --amber: #333333;
-  --amber-surface: var(--amber);
   --text: #111111;
   --text-muted: #888888;
   --text-dim: #aaaaaa;
@@ -35,7 +34,6 @@
   --gold: #f0f0f0;
   --gold-dim: #888888;
   --amber: #cccccc;
-  --amber-surface: var(--amber);
   --text: #f0f0f0;
   --text-muted: #aaaaaa;
   --text-dim: #888888;

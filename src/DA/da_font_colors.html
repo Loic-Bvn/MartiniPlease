@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Direction Artistique — Palette Typographique</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+
+  <!-- Google Fonts Imports -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&amp;family=Josefin+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&amp;family=Kalnia:wght@300;400;600;700&amp;family=Karla:ital,wght@0,300;0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+brand: {
+  cream: '#F4EADB',        // crème chaud, papier ancien / fond clair
+  beige: '#E8D9C3',
+  card: '#EDE0CC',
+  dark: '#1A100C',         // brun presque noir (café / bois sombre)
+  emerald: '#4A1420',      // bordeaux profond → fond principal
+  emeraldLight: '#6B1F2E', // bordeaux hover (vin)
+  terracotta: '#B5582F',   // cuivre / orange brûlé (accent, CTA)
+  gold: '#D9A441',         // laiton ambré, plus chaud que #D4AF37
+  goldLight: '#EBC070',    // lumière d'ampoule filament
+  muted: '#7A6657'         // brun taupe pour le texte secondaire
+}
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --font-body: 'Karla', sans-serif;
+      --font-subtitle: 'Josefin Sans', sans-serif;
+      --font-display: 'Gloock', serif;
+      --font-cocktail: 'Kalnia', serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: #F9F6F0;
+      color: #111615;
+    }
+
+    .font-display { font-family: var(--font-display); }
+    .font-subtitle { font-family: var(--font-subtitle); }
+    .font-body-custom { font-family: var(--font-body); }
+    .font-cocktail { font-family: var(--font-cocktail); }
+
+    /* Custom subtle glass & borders */
+    .border-gold-subtle { border-color: rgba(212, 175, 55, 0.25); }
+    .bg-grid-pattern {
+      background-size: 30px 30px;
+      background-image: 
+        radial-gradient(circle, rgba(15, 44, 35, 0.07) 1px, transparent 1px);
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.-bottom-10{bottom:-2.5rem}.-left-10{left:-2.5rem}.-right-10{right:-2.5rem}.-top-10{top:-2.5rem}.bottom-6{bottom:1.5rem}.right-4{right:1rem}.right-6{right:1.5rem}.top-0{top:0px}.top-3{top:0.75rem}.z-10{z-index:10}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mr-1{margin-right:0.25rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.block{display:block}.inline-block{display:inline-block}.inline{display:inline}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.h-2{height:0.5rem}.h-3{height:0.75rem}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-48{height:12rem}.h-6{height:1.5rem}.h-7{height:1.75rem}.h-9{height:2.25rem}.min-h-\[220px\]{min-height:220px}.min-h-screen{min-height:100vh}.w-2{width:0.5rem}.w-3{width:0.75rem}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-48{width:12rem}.w-6{width:1.5rem}.w-7{width:1.75rem}.w-9{width:2.25rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-7xl{max-width:80rem}.translate-y-20{--tw-translate-y:5rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-16 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(4rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(4rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.space-y-8 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(2rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(2rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-brand-dark\/5 > :not([hidden]) ~ :not([hidden]){border-color:rgb(17 22 21 / 0.05)}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.scroll-smooth{scroll-behavior:smooth}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-brand-dark\/10{border-color:rgb(17 22 21 / 0.1)}.border-brand-dark\/20{border-color:rgb(17 22 21 / 0.2)}.border-brand-dark\/5{border-color:rgb(17 22 21 / 0.05)}.border-brand-emerald\/10{border-color:rgb(15 44 35 / 0.1)}.border-brand-emerald\/20{border-color:rgb(15 44 35 / 0.2)}.border-brand-gold\/30{border-color:rgb(212 175 55 / 0.3)}.border-transparent{border-color:transparent}.border-white\/10{border-color:rgb(255 255 255 / 0.1)}.border-white\/20{border-color:rgb(255 255 255 / 0.2)}.border-white\/5{border-color:rgb(255 255 255 / 0.05)}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-brand-beige{--tw-bg-opacity:1;background-color:rgb(239 236 230 / var(--tw-bg-opacity, 1))}.bg-brand-cream{--tw-bg-opacity:1;background-color:rgb(249 246 240 / var(--tw-bg-opacity, 1))}.bg-brand-cream\/50{background-color:rgb(249 246 240 / 0.5)}.bg-brand-cream\/80{background-color:rgb(249 246 240 / 0.8)}.bg-brand-dark{--tw-bg-opacity:1;background-color:rgb(17 22 21 / var(--tw-bg-opacity, 1))}.bg-brand-dark\/10{background-color:rgb(17 22 21 / 0.1)}.bg-brand-dark\/40{background-color:rgb(17 22 21 / 0.4)}.bg-brand-emerald{--tw-bg-opacity:1;background-color:rgb(15 44 35 / var(--tw-bg-opacity, 1))}.bg-brand-emerald\/10{background-color:rgb(15 44 35 / 0.1)}.bg-brand-emerald\/5{background-color:rgb(15 44 35 / 0.05)}.bg-brand-gold{--tw-bg-opacity:1;background-color:rgb(212 175 55 / var(--tw-bg-opacity, 1))}.bg-brand-gold\/10{background-color:rgb(212 175 55 / 0.1)}.bg-brand-terracotta{--tw-bg-opacity:1;background-color:rgb(200 109 81 / var(--tw-bg-opacity, 1))}.bg-brand-terracotta\/10{background-color:rgb(200 109 81 / 0.1)}.bg-brand-terracotta\/20{background-color:rgb(200 109 81 / 0.2)}.bg-emerald-300{--tw-bg-opacity:1;background-color:rgb(110 231 183 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/10{background-color:rgb(255 255 255 / 0.1)}.bg-white\/5{background-color:rgb(255 255 255 / 0.05)}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pb-16{padding-bottom:4rem}.pb-4{padding-bottom:1rem}.pb-6{padding-bottom:1.5rem}.pt-12{padding-top:3rem}.pt-2{padding-top:0.5rem}.pt-4{padding-top:1rem}.pt-6{padding-top:1.5rem}.text-left{text-align:left}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[10px\]{font-size:10px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-light{font-weight:300}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.normal-case{text-transform:none}.italic{font-style:italic}.leading-none{line-height:1}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-normal{letter-spacing:0em}.tracking-tight{letter-spacing:-0.025em}.tracking-wide{letter-spacing:0.025em}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-brand-cream{--tw-text-opacity:1;color:rgb(249 246 240 / var(--tw-text-opacity, 1))}.text-brand-cream\/70{color:rgb(249 246 240 / 0.7)}.text-brand-cream\/90{color:rgb(249 246 240 / 0.9)}.text-brand-dark{--tw-text-opacity:1;color:rgb(17 22 21 / var(--tw-text-opacity, 1))}.text-brand-dark\/60{color:rgb(17 22 21 / 0.6)}.text-brand-dark\/70{color:rgb(17 22 21 / 0.7)}.text-brand-dark\/80{color:rgb(17 22 21 / 0.8)}.text-brand-emerald{--tw-text-opacity:1;color:rgb(15 44 35 / var(--tw-text-opacity, 1))}.text-brand-emerald\/80{color:rgb(15 44 35 / 0.8)}.text-brand-gold{--tw-text-opacity:1;color:rgb(212 175 55 / var(--tw-text-opacity, 1))}.text-brand-gold\/90{color:rgb(212 175 55 / 0.9)}.text-brand-muted{--tw-text-opacity:1;color:rgb(110 119 115 / var(--tw-text-opacity, 1))}.text-brand-terracotta{--tw-text-opacity:1;color:rgb(200 109 81 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-white\/40{color:rgb(255 255 255 / 0.4)}.text-white\/50{color:rgb(255 255 255 / 0.5)}.text-white\/60{color:rgb(255 255 255 / 0.6)}.text-white\/80{color:rgb(255 255 255 / 0.8)}.accent-brand-gold{accent-color:#D4AF37}.opacity-0{opacity:0}.opacity-70{opacity:0.7}.opacity-80{opacity:0.8}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.blur-2xl{--tw-blur:blur(40px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.blur-3xl{--tw-blur:blur(64px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.selection\:bg-brand-terracotta *::selection{--tw-bg-opacity:1;background-color:rgb(200 109 81 / var(--tw-bg-opacity, 1))}.selection\:text-white *::selection{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.selection\:bg-brand-terracotta::selection{--tw-bg-opacity:1;background-color:rgb(200 109 81 / var(--tw-bg-opacity, 1))}.selection\:text-white::selection{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:border-brand-emerald\/30:hover{border-color:rgb(15 44 35 / 0.3)}.hover\:bg-brand-emeraldLight:hover{--tw-bg-opacity:1;background-color:rgb(22 62 50 / var(--tw-bg-opacity, 1))}.hover\:bg-brand-goldLight:hover{--tw-bg-opacity:1;background-color:rgb(230 202 101 / var(--tw-bg-opacity, 1))}.hover\:bg-white\/20:hover{background-color:rgb(255 255 255 / 0.2)}.hover\:text-brand-emerald:hover{--tw-text-opacity:1;color:rgb(15 44 35 / var(--tw-text-opacity, 1))}.focus\:border-brand-gold:focus{--tw-border-opacity:1;border-color:rgb(212 175 55 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-1:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-brand-gold\/50:focus{--tw-ring-color:rgb(212 175 55 / 0.5)}.group:hover .group-hover\:text-brand-gold{--tw-text-opacity:1;color:rgb(212 175 55 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:items-start{align-items:flex-start}.sm\:items-center{align-items:center}.sm\:gap-6{gap:1.5rem}.sm\:p-10{padding:2.5rem}.sm\:p-12{padding:3rem}.sm\:p-8{padding:2rem}.sm\:text-right{text-align:right}.sm\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-6xl{font-size:3.75rem;line-height:1}.sm\:text-7xl{font-size:4.5rem;line-height:1}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:col-span-5{grid-column:span 5 / span 5}.lg\:col-span-7{grid-column:span 7 / span 7}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}}</style></head>
+<body class="bg-brand-cream text-brand-dark min-h-screen selection:bg-brand-terracotta selection:text-white relative bg-grid-pattern">
+
+  <!-- Header Header / Branding -->
+  <header class="border-b border-brand-dark/10 bg-brand-cream/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-brand-emerald text-brand-gold flex items-center justify-center font-display text-xl font-bold shadow-sm">
+          DA
+        </div>
+        <div>
+          <h1 class="font-subtitle font-semibold uppercase tracking-widest text-xs text-brand-emerald">Specimen System v1.0</h1>
+          <p class="font-display text-lg leading-tight">Direction Artistique &amp; Typographie</p>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-2 sm:gap-6 text-sm font-subtitle tracking-wider uppercase text-brand-dark/70">
+        <a href="#overview" class="hover:text-brand-emerald transition-colors px-2 py-1">Aperçu</a>
+        <a href="#fonts-specimen" class="hover:text-brand-emerald transition-colors px-2 py-1">Polices</a>
+        <a href="#interactive-playground" class="hover:text-brand-emerald transition-colors px-2 py-1">Bac à sable</a>
+        <a href="#code-export" class="bg-brand-emerald text-brand-cream px-4 py-2 rounded-lg hover:bg-brand-emeraldLight transition-colors flex items-center gap-2 font-body-custom normal-case text-xs tracking-normal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="code" aria-hidden="true" class="lucide lucide-code w-4 h-4 text-brand-gold"><path d="m16 18 6-6-6-6"></path><path d="m8 6-6 6 6 6"></path></svg> Copier le CSS
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="overview" class="max-w-7xl mx-auto px-6 pt-12 pb-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-brand-emerald/20 bg-brand-emerald/5 text-brand-emerald text-xs font-subtitle uppercase tracking-widest">
+          <span class="w-2 h-2 rounded-full bg-brand-terracotta animate-pulse"></span> Guide de Style &amp; Intégrité Visuelle
+        </div>
+        <h2 class="font-display text-4xl sm:text-6xl text-brand-emerald leading-tight">
+          L'Harmonie du CONTRASTE &amp; de l'ÉLÉGANCE.
+        </h2>
+        <p class="font-body-custom text-lg text-brand-dark/80 max-w-2xl leading-relaxed">
+          Ce guide typographique associe des empattements à fort impact dramatique (<span class="font-display text-brand-emerald">Gloock</span> et <span class="font-cocktail text-brand-terracotta">Kalnia</span>) à des polices sans-serif épurées et ultra-lisibles (<span class="font-subtitle font-semibold">Josefin Sans</span> et <span class="font-body-custom font-semibold">Karla</span>).
+        </p>
+
+        <!-- Quick Specimen Grid Summary Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
+          <div class="bg-white/80 p-4 rounded-xl border border-brand-dark/5 shadow-sm hover:border-brand-emerald/30 transition-all">
+            <span class="text-xs uppercase font-subtitle text-brand-muted block">Display</span>
+            <span class="font-display text-2xl text-brand-emerald block mt-1">Gloock</span>
+            <span class="text-xs text-brand-dark/60 mt-2 block">Serif Équilibre &amp; Titres</span>
+          </div>
+          <div class="bg-white/80 p-4 rounded-xl border border-brand-dark/5 shadow-sm hover:border-brand-emerald/30 transition-all">
+            <span class="text-xs uppercase font-subtitle text-brand-muted block">Sous-titres</span>
+            <span class="font-subtitle text-xl font-bold text-brand-terracotta block mt-1 uppercase">Josefin</span>
+            <span class="text-xs text-brand-dark/60 mt-2 block">Sans Geométrique</span>
+          </div>
+          <div class="bg-white/80 p-4 rounded-xl border border-brand-dark/5 shadow-sm hover:border-brand-emerald/30 transition-all">
+            <span class="text-xs uppercase font-subtitle text-brand-muted block">Corps de texte</span>
+            <span class="font-body-custom text-xl font-bold block mt-1">Karla</span>
+            <span class="text-xs text-brand-dark/60 mt-2 block">Sans-Serif Grotesque</span>
+          </div>
+          <div class="bg-white/80 p-4 rounded-xl border border-brand-dark/5 shadow-sm hover:border-brand-emerald/30 transition-all">
+            <span class="text-xs uppercase font-subtitle text-brand-muted block">Accent &amp; Cocktail</span>
+            <span class="font-cocktail text-xl block mt-1 text-brand-emerald">Kalnia</span>
+            <span class="text-xs text-brand-dark/60 mt-2 block">Variable Modern Serif</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Artistic Typography Card Mosaic -->
+      <div class="lg:col-span-5">
+        <div class="bg-brand-emerald rounded-2xl p-8 text-brand-cream shadow-2xl relative overflow-hidden border border-brand-gold/30">
+          <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-brand-terracotta/20 rounded-full blur-3xl"></div>
+          <div class="absolute -left-10 -top-10 w-48 h-48 bg-brand-gold/10 rounded-full blur-2xl"></div>
+
+          <div class="relative z-10 space-y-6">
+            <div class="flex justify-between items-center border-b border-white/10 pb-4">
+              <span class="font-subtitle text-xs uppercase tracking-widest text-brand-gold">Moodboard Visuel</span>
+              <span class="text-xs text-white/50">DA 2026</span>
+            </div>
+
+            <div class="space-y-2">
+              <span class="font-subtitle uppercase text-xs tracking-widest text-brand-gold/90">01 / Grand Titre</span>
+              <h3 class="font-display text-4xl leading-tight">Maison de Création</h3>
+            </div>
+
+            <div class="space-y-1">
+              <span class="font-subtitle uppercase text-xs tracking-widest text-brand-terracotta">02 / Sous-titre &amp; Slogan</span>
+              <p class="font-subtitle text-sm uppercase tracking-wider text-brand-cream/90">Élégance Intemporelle &amp; Savoir-Faire</p>
+            </div>
+
+            <div class="space-y-2 bg-white/5 p-4 rounded-lg border border-white/10">
+              <span class="font-subtitle uppercase text-[10px] tracking-widest text-brand-gold">03 / Paragraphe de lecture (Karla)</span>
+              <p class="font-body-custom text-xs text-white/80 leading-relaxed">
+                Chaque détail typographique est pensé pour offrir une expérience de lecture fluide tout en affirmant une identité visuelle luxueuse et singulière.
+              </p>
+            </div>
+
+            <div class="pt-2 flex justify-between items-end">
+              <div>
+                <span class="font-cocktail text-2xl text-brand-gold block">Signature Cocktail</span>
+                <span class="font-subtitle text-[10px] uppercase tracking-widest text-white/60">Kalnia Regular</span>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="sparkles" aria-hidden="true" class="lucide lucide-sparkles w-6 h-6 text-brand-gold"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path><path d="M20 2v4"></path><path d="M22 4h-4"></path><circle cx="4" cy="20" r="2"></circle></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detailed Font Specimens -->
+  <section id="fonts-specimen" class="max-w-7xl mx-auto px-6 py-12 space-y-16">
+    
+    <div class="border-b border-brand-dark/10 pb-4 flex items-center justify-between">
+      <h3 class="font-subtitle uppercase text-sm font-semibold tracking-widest text-brand-emerald">
+        01. Spécimens Détillés des Polices
+      </h3>
+      <span class="text-xs text-brand-muted">Google Fonts Direct Import</span>
+    </div>
+
+    <!-- 1. GLOOCK SPECIMEN -->
+    <div class="bg-white rounded-2xl p-6 sm:p-10 border border-brand-dark/5 shadow-sm space-y-8">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-brand-dark/5 pb-6">
+        <div>
+          <span class="inline-block px-2.5 py-1 rounded bg-brand-emerald/10 text-brand-emerald text-xs font-subtitle uppercase tracking-wider font-semibold mb-2">
+            --font-display
+          </span>
+          <h2 class="font-display text-4xl sm:text-5xl text-brand-emerald">Gloock</h2>
+        </div>
+        <div class="text-left sm:text-right font-subtitle text-xs text-brand-muted space-y-1">
+          <p><strong class="text-brand-dark">Style:</strong> High Contrast Serif</p>
+          <p><strong class="text-brand-dark">Usage:</strong> Grands Titres, Une, Headlines</p>
+          <p><strong class="text-brand-dark">Caractère:</strong> Dramatique, Éditorial, Prestigieux</p>
+        </div>
+      </div>
+
+      <!-- Specimen Big Preview -->
+      <div class="space-y-4">
+        <p class="font-display text-4xl sm:text-7xl text-brand-dark leading-none tracking-tight">
+          L’Art du Titre Impactant
+        </p>
+        <p class="font-display text-2xl sm:text-4xl text-brand-emerald/80">
+          ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        </p>
+        <p class="font-display text-xl sm:text-2xl text-brand-muted">
+          abcdefghijklmnopqrstuvwxyz 0123456789 (?!&amp;€$)
+        </p>
+      </div>
+
+      <!-- Size Scale Showcase -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-brand-dark/5">
+        <div>
+          <span class="text-xs font-subtitle uppercase text-brand-muted block mb-1">Display XL (56pt)</span>
+          <p class="font-display text-4xl text-brand-dark truncate">Architecture</p>
+        </div>
+        <div>
+          <span class="text-xs font-subtitle uppercase text-brand-muted block mb-1">Display Large (36pt)</span>
+          <p class="font-display text-2xl text-brand-dark truncate">Exposition 2026</p>
+        </div>
+        <div>
+          <span class="text-xs font-subtitle uppercase text-brand-muted block mb-1">Display Medium (24pt)</span>
+          <p class="font-display text-xl text-brand-dark truncate">Collection Haute Couture</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. JOSEFIN SANS SPECIMEN -->
+    <div class="bg-white rounded-2xl p-6 sm:p-10 border border-brand-dark/5 shadow-sm space-y-8">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-brand-dark/5 pb-6">
+        <div>
+          <span class="inline-block px-2.5 py-1 rounded bg-brand-terracotta/10 text-brand-terracotta text-xs font-subtitle uppercase tracking-wider font-semibold mb-2">
+            --font-subtitle
+          </span>
+          <h2 class="font-subtitle text-4xl sm:text-5xl font-bold uppercase tracking-wide text-brand-terracotta">Josefin Sans</h2>
+        </div>
+        <div class="text-left sm:text-right font-subtitle text-xs text-brand-muted space-y-1">
+          <p><strong class="text-brand-dark">Style:</strong> Geometric Sans-Serif</p>
+          <p><strong class="text-brand-dark">Usage:</strong> Sous-titres, Navigation, Cartouches</p>
+          <p><strong class="text-brand-dark">Caractère:</strong> Vintage scandinave, Épuré, Structuré</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <p class="font-subtitle font-light text-2xl sm:text-5xl uppercase tracking-widest text-brand-dark">
+          Modernité Géométrique &amp; Clarté
+        </p>
+        <p class="font-subtitle font-semibold text-xl sm:text-3xl text-brand-terracotta uppercase tracking-wider">
+          ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        </p>
+        <p class="font-subtitle text-lg sm:text-xl text-brand-muted">
+          abcdefghijklmnopqrstuvwxyz 0123456789 (!@#$%^&amp;*)
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-brand-dark/5 font-subtitle">
+        <div>
+          <span class="text-xs uppercase text-brand-muted block mb-1">Bold Uppercase (Wide Track)</span>
+          <p class="font-bold uppercase tracking-widest text-brand-dark">Design System</p>
+        </div>
+        <div>
+          <span class="text-xs uppercase text-brand-muted block mb-1">Regular (Subheadline)</span>
+          <p class="font-normal text-brand-dark">Nouveaux Horizons Numériques</p>
+        </div>
+        <div>
+          <span class="text-xs uppercase text-brand-muted block mb-1">Light Italic</span>
+          <p class="font-light italic text-brand-dark">Subtle &amp; Elegant Details</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. KARLA SPECIMEN -->
+    <div class="bg-white rounded-2xl p-6 sm:p-10 border border-brand-dark/5 shadow-sm space-y-8">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-brand-dark/5 pb-6">
+        <div>
+          <span class="inline-block px-2.5 py-1 rounded bg-brand-dark/10 text-brand-dark text-xs font-subtitle uppercase tracking-wider font-semibold mb-2">
+            --font-body
+          </span>
+          <h2 class="font-body-custom text-4xl sm:text-5xl font-bold text-brand-dark">Karla</h2>
+        </div>
+        <div class="text-left sm:text-right font-subtitle text-xs text-brand-muted space-y-1">
+          <p><strong class="text-brand-dark">Style:</strong> Grotesque Sans-Serif</p>
+          <p><strong class="text-brand-dark">Usage:</strong> Corps de texte, Paragraphes, UI &amp; Formulaires</p>
+          <p><strong class="text-brand-dark">Caractère:</strong> Populaire, Très lisible, Équilibré</p>
+        </div>
+      </div>
+
+      <!-- Text Paragraph Readability Test -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div class="space-y-3 bg-brand-cream/50 p-6 rounded-xl border border-brand-dark/5">
+          <span class="font-subtitle text-xs uppercase tracking-wider text-brand-muted">Test de lecture longue (Karla Regular 16px / Interligne 1.6)</span>
+          <p class="font-body-custom text-base text-brand-dark leading-relaxed">
+            La typographie ne sert pas uniquement à rendre le texte lisible. Elle véhicule une voix, un ton, et insuffle une personnalité à l'ensemble du support. Karla se distingue par sa hauteur d'œil généreuse et ses proportions individuelles légèrement décalées qui apportent une grande chaleur visuelle à tout écran.
+          </p>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <span class="font-subtitle text-xs uppercase text-brand-muted block mb-1">Karla Bold (700)</span>
+            <p class="font-body-custom font-bold text-xl text-brand-dark">Un impact direct et sans équivoque</p>
+          </div>
+          <div>
+            <span class="font-subtitle text-xs uppercase text-brand-muted block mb-1">Karla Regular Italic (400)</span>
+            <p class="font-body-custom italic text-base text-brand-dark/80">Apport de nuances et de citations dans vos éditos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. KALNIA SPECIMEN -->
+    <div class="bg-white rounded-2xl p-6 sm:p-10 border border-brand-dark/5 shadow-sm space-y-8">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 border-b border-brand-dark/5 pb-6">
+        <div>
+          <span class="inline-block px-2.5 py-1 rounded bg-brand-emerald/10 text-brand-emerald text-xs font-subtitle uppercase tracking-wider font-semibold mb-2">
+            --font-cocktail
+          </span>
+          <h2 class="font-cocktail text-4xl sm:text-5xl text-brand-emerald">Kalnia</h2>
+        </div>
+        <div class="text-left sm:text-right font-subtitle text-xs text-brand-muted space-y-1">
+          <p><strong class="text-brand-dark">Style:</strong> Modern Variable Serif / Display</p>
+          <p><strong class="text-brand-dark">Usage:</strong> Accents Créatifs, Citations, Signatures</p>
+          <p><strong class="text-brand-dark">Caractère:</strong> Sculptural, Expressif, Sophistiqué</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <p class="font-cocktail text-3xl sm:text-6xl text-brand-emerald leading-tight">
+          "La poésie réside dans le détail."
+        </p>
+        <p class="font-cocktail text-xl sm:text-3xl text-brand-terracotta">
+          ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        </p>
+        <p class="font-cocktail text-lg sm:text-xl text-brand-muted">
+          abcdefghijklmnopqrstuvwxyz 0123456789
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-brand-dark/5">
+        <div class="bg-brand-emerald/5 p-4 rounded-xl border border-brand-emerald/10 flex items-center justify-between">
+          <div>
+            <span class="font-subtitle text-xs uppercase text-brand-muted block">Accent Note</span>
+            <span class="font-cocktail text-lg text-brand-emerald">Cocktail Typographique</span>
+          </div>
+          <span class="font-cocktail text-2xl text-brand-terracotta">300</span>
+        </div>
+        <div class="bg-brand-emerald/5 p-4 rounded-xl border border-brand-emerald/10 flex items-center justify-between">
+          <div>
+            <span class="font-subtitle text-xs uppercase text-brand-muted block">Bold Weight</span>
+            <span class="font-cocktail font-bold text-lg text-brand-emerald">Édition Limitée</span>
+          </div>
+          <span class="font-cocktail font-bold text-2xl text-brand-emerald">700</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Sandbox Section -->
+  <section id="interactive-playground" class="max-w-7xl mx-auto px-6 py-12">
+    <div class="bg-brand-emerald text-brand-cream rounded-3xl p-6 sm:p-12 shadow-2xl space-y-8 border border-brand-gold/30">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-6">
+        <div>
+          <span class="font-subtitle text-xs uppercase tracking-widest text-brand-gold">Bac à Sable Interactif</span>
+          <h3 class="font-display text-3xl sm:text-4xl">Testez vos propres textes</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="reset-text-btn" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-subtitle uppercase tracking-wider transition-colors flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="rotate-ccw" aria-hidden="true" class="lucide lucide-rotate-ccw w-3.5 h-3.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg> Réinitialiser
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label class="block font-subtitle text-xs uppercase text-brand-gold mb-2">Choisir la police</label>
+          <select id="font-selector" class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-brand-cream focus:outline-none focus:border-brand-gold">
+            <option value="font-display" class="bg-brand-emerald text-brand-cream">Gloock (--font-display)</option>
+            <option value="font-subtitle" class="bg-brand-emerald text-brand-cream">Josefin Sans (--font-subtitle)</option>
+            <option value="font-body-custom" selected="" class="bg-brand-emerald text-brand-cream">Karla (--font-body)</option>
+            <option value="font-cocktail" class="bg-brand-emerald text-brand-cream">Kalnia (--font-cocktail)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-subtitle text-xs uppercase text-brand-gold mb-2">Taille du texte (<span id="size-label">32px</span>)</label>
+          <input type="range" id="size-slider" min="14" max="80" value="32" class="w-full accent-brand-gold cursor-pointer mt-2">
+        </div>
+
+        <div>
+          <label class="block font-subtitle text-xs uppercase text-brand-gold mb-2">Interligne (<span id="lh-label">1.3</span>)</label>
+          <input type="range" id="lh-slider" min="0.9" max="2.2" step="0.1" value="1.3" class="w-full accent-brand-gold cursor-pointer mt-2">
+        </div>
+
+        <div>
+          <label class="block font-subtitle text-xs uppercase text-brand-gold mb-2">Couleur du texte</label>
+          <div class="flex items-center gap-2 mt-1">
+            <button class="color-picker-btn w-7 h-7 rounded-full bg-white border-2 border-transparent active-color" data-color="text-white"></button>
+            <button class="color-picker-btn w-7 h-7 rounded-full bg-brand-gold border-2 border-transparent" data-color="text-brand-gold"></button>
+            <button class="color-picker-btn w-7 h-7 rounded-full bg-brand-terracotta border-2 border-transparent" data-color="text-brand-terracotta"></button>
+            <button class="color-picker-btn w-7 h-7 rounded-full bg-emerald-300 border-2 border-transparent" data-color="text-emerald-300"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Editable Area -->
+      <div class="bg-brand-dark/40 rounded-2xl p-6 sm:p-8 border border-white/10 min-h-[220px] flex items-center justify-center relative group">
+        <span class="absolute top-3 right-4 font-subtitle text-[10px] uppercase tracking-widest text-white/40 group-hover:text-brand-gold transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="edit-3" aria-hidden="true" class="lucide lucide-edit-3 w-3 h-3 inline mr-1"><path d="M13 21h8"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg> Zone Éditable (cliquez pour taper)
+        </span>
+        <div id="interactive-text-target" contenteditable="true" class="font-body-custom text-white text-center w-full focus:outline-none focus:ring-1 focus:ring-brand-gold/50 rounded p-2 transition-all" style="font-size: 32px; line-height: 1.3;">Test</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hierarchy & Color System Matrix -->
+  <section class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Color Palette Specimen -->
+    <div class="lg:col-span-5 bg-white rounded-2xl p-6 sm:p-8 border border-brand-dark/5 shadow-sm space-y-6">
+      <div class="border-b border-brand-dark/5 pb-4">
+        <h4 class="font-subtitle text-xs font-semibold uppercase tracking-widest text-brand-emerald">Palette chromatique associée</h4>
+        <p class="font-display text-2xl text-brand-dark mt-1">Les Teintes DA</p>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-center justify-between p-3 rounded-xl bg-brand-emerald text-brand-cream shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-brand-emerald border border-white/20"></span>
+            <div>
+              <p class="font-subtitle text-xs font-semibold">Vert Émeraude Deep</p>
+              <p class="text-[10px] opacity-70">Fond principal / Luxe</p>
+            </div>
+          </div>
+          <code class="text-xs font-mono">#0F2C23</code>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl bg-brand-cream border border-brand-dark/10 text-brand-dark">
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-brand-cream border border-brand-dark/20"></span>
+            <div>
+              <p class="font-subtitle text-xs font-semibold">Champagne Cream</p>
+              <p class="text-[10px] text-brand-muted">Arrière-plan / Clarté</p>
+            </div>
+          </div>
+          <code class="text-xs font-mono">#F9F6F0</code>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl bg-brand-terracotta text-white shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-brand-terracotta border border-white/20"></span>
+            <div>
+              <p class="font-subtitle text-xs font-semibold">Terracotta Warm</p>
+              <p class="text-[10px] opacity-80">Accent sous-titres &amp; CTA</p>
+            </div>
+          </div>
+          <code class="text-xs font-mono">#C86D51</code>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl bg-brand-dark text-brand-gold shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-brand-gold border border-white/20"></span>
+            <div>
+              <p class="font-subtitle text-xs font-semibold">Or &amp; Laiton Subtle</p>
+              <p class="text-[10px] text-brand-cream/70">Détails de prestige</p>
+            </div>
+          </div>
+          <code class="text-xs font-mono">#D4AF37</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Font Usage Matrix Table -->
+    <div class="lg:col-span-7 bg-white rounded-2xl p-6 sm:p-8 border border-brand-dark/5 shadow-sm space-y-6">
+      <div class="border-b border-brand-dark/5 pb-4">
+        <h4 class="font-subtitle text-xs font-semibold uppercase tracking-widest text-brand-emerald">Matrice de hiérarchie</h4>
+        <p class="font-display text-2xl text-brand-dark mt-1">Règles d'Usage Typographique</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-brand-dark/10 font-subtitle text-xs uppercase text-brand-muted">
+              <th class="py-3 px-2">Rôle UI</th>
+              <th class="py-3 px-2">Variable CSS</th>
+              <th class="py-3 px-2">Police</th>
+              <th class="py-3 px-2">Recommandation</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-dark/5 text-xs">
+            <tr>
+              <td class="py-3.5 px-2 font-semibold">H1 / Cover Title</td>
+              <td class="py-3.5 px-2 font-mono text-brand-emerald">--font-display</td>
+              <td class="py-3.5 px-2 font-display text-sm">Gloock</td>
+              <td class="py-3.5 px-2 text-brand-muted">48px - 72px, Interligne serré (1.1)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-2 font-semibold">H2 / Section Title</td>
+              <td class="py-3.5 px-2 font-mono text-brand-terracotta">--font-subtitle</td>
+              <td class="py-3.5 px-2 font-subtitle font-bold uppercase">Josefin Sans</td>
+              <td class="py-3.5 px-2 text-brand-muted">20px - 28px, Letter-spacing broad (0.1em)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-2 font-semibold">Body / Paragraphs</td>
+              <td class="py-3.5 px-2 font-mono text-brand-dark">--font-body</td>
+              <td class="py-3.5 px-2 font-body-custom font-semibold">Karla</td>
+              <td class="py-3.5 px-2 text-brand-muted">15px - 18px, Interligne confortable (1.6)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-2 font-semibold">Quote &amp; Accent</td>
+              <td class="py-3.5 px-2 font-mono text-brand-emerald">--font-cocktail</td>
+              <td class="py-3.5 px-2 font-cocktail text-sm">Kalnia</td>
+              <td class="py-3.5 px-2 text-brand-muted">24px - 36px, Italic ou Regular sculpté</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- CSS Export Code Snippet Section -->
+  <section id="code-export" class="max-w-7xl mx-auto px-6 py-12">
+    <div class="bg-brand-dark text-brand-cream rounded-2xl p-6 sm:p-8 border border-white/10 shadow-xl space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <span class="font-subtitle text-xs uppercase text-brand-gold tracking-widest">Intégration Web</span>
+          <h4 class="font-display text-2xl">Variables &amp; Import Google Fonts</h4>
+        </div>
+        <button id="copy-code-btn" class="bg-brand-gold text-brand-dark px-4 py-2 rounded-lg font-subtitle text-xs font-bold uppercase tracking-wider hover:bg-brand-goldLight transition-colors flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="copy" aria-hidden="true" class="lucide lucide-copy w-4 h-4"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg> Copier le Code
+        </button>
+      </div>
+
+      <div class="relative">
+        <pre class="bg-black/60 rounded-xl p-5 font-mono text-xs text-emerald-300 overflow-x-auto leading-relaxed border border-white/5"><span class="text-white/40">&lt;!-- 1. Google Fonts Import --&gt;</span>
+&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Gloock&amp;family=Josefin+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&amp;family=Kalnia:wght@300;400;600;700&amp;family=Karla:ital,wght@0,300;0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"&gt;
+
+<span class="text-white/40">/* 2. Déclaration des variables CSS dans votre stylesheet */</span>
+:root {
+  --font-body: 'Karla', sans-serif;
+  --font-subtitle: 'Josefin Sans', sans-serif;
+  --font-display: 'Gloock', serif;
+  --font-cocktail: 'Kalnia', serif;
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-brand-dark/10 bg-brand-beige py-8 text-center text-xs font-subtitle text-brand-muted">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p>Direction Artistique — Présentation de la Palette Typographique</p>
+      <div class="flex items-center gap-4">
+        <span>Gloock</span> • <span>Josefin Sans</span> • <span>Karla</span> • <span>Kalnia</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-brand-emerald text-brand-gold px-4 py-3 rounded-xl shadow-2xl border border-brand-gold/30 text-xs font-subtitle uppercase tracking-wider flex items-center gap-2 translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle-2" aria-hidden="true" class="lucide lucide-check-circle-2 w-4 h-4 text-brand-gold"><circle cx="12" cy="12" r="10"></circle><path d="m16 9-5.5 5.5L8 12"></path></svg>
+    <span id="toast-message">Code CSS copié dans le presse-papier !</span>
+  </div>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // DOM Elements
+    const fontSelector = document.getElementById('font-selector');
+    const sizeSlider = document.getElementById('size-slider');
+    const sizeLabel = document.getElementById('size-label');
+    const lhSlider = document.getElementById('lh-slider');
+    const lhLabel = document.getElementById('lh-label');
+    const targetText = document.getElementById('interactive-text-target');
+    const resetBtn = document.getElementById('reset-text-btn');
+    const copyCodeBtn = document.getElementById('copy-code-btn');
+    const toast = document.getElementById('toast');
+    const colorBtns = document.querySelectorAll('.color-picker-btn');
+
+    // Font family switching
+    fontSelector.addEventListener('change', (e) => {
+      targetText.className = targetText.className.replace(/font-(display|subtitle|body-custom|cocktail)/g, '');
+      targetText.classList.add(e.target.value);
+    });
+
+    // Font size control
+    sizeSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      sizeLabel.textContent = `${val}px`;
+      targetText.style.fontSize = `${val}px`;
+    });
+
+    // Line height control
+    lhSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      lhLabel.textContent = val;
+      targetText.style.lineHeight = val;
+    });
+
+    // Text Color options
+    colorBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        colorBtns.forEach(b => b.classList.remove('border-brand-gold', 'scale-110'));
+        btn.classList.add('border-brand-gold', 'scale-110');
+        
+        // Remove previous text color utility classes
+        targetText.className = targetText.className.replace(/text-(white|brand-gold|brand-terracotta|emerald-300)/g, '');
+        targetText.classList.add(btn.getAttribute('data-color'));
+      });
+    });
+
+    // Reset button
+    const initialText = "Composez votre propre message ici avec nos vraies polices...";
+    resetBtn.addEventListener('click', () => {
+      targetText.textContent = initialText;
+      sizeSlider.value = 32;
+      sizeLabel.textContent = "32px";
+      targetText.style.fontSize = "32px";
+      lhSlider.value = 1.3;
+      lhLabel.textContent = "1.3";
+      targetText.style.lineHeight = "1.3";
+      fontSelector.value = "font-body-custom";
+      fontSelector.dispatchEvent(new Event('change'));
+    });
+
+    // Copy CSS Snippet functionality
+    copyCodeBtn.addEventListener('click', () => {
+      const codeSnippet = `<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Josefin+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Kalnia:wght@300;400;600;700&family=Karla:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+:root {
+  --font-body: 'Karla', sans-serif;
+  --font-subtitle: 'Josefin Sans', sans-serif;
+  --font-display: 'Gloock', serif;
+  --font-cocktail: 'Kalnia', serif;
+}`;
+
+      // Using standard execCommand fallback as requested for iframe support
+      const textArea = document.createElement("textarea");
+      textArea.value = codeSnippet;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast("Code CSS copié avec succès !");
+      } catch (err) {
+        showToast("Erreur lors de la copie.");
+      }
+      document.body.removeChild(textArea);
+    });
+
+    function showToast(message) {
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+
+</body></html>

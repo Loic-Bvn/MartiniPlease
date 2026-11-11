@@ -417,6 +417,8 @@ const activeBarSkin = computed(() => isLoggedIn.value ? features.value.skin : gu
 const activeSkinClass = computed(() => {
   const skins = [
     'luxe',
+    'luxe-emerald',
+    'luxe-bordeaux',
     'classic',
     'minimal'
     // 'color',

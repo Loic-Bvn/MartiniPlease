@@ -170,6 +170,8 @@
                   >
                     <option value="classic">{{ locale === 'fr' ? 'Classique' : 'Classic' }}</option>
                     <option value="luxe">{{ locale === 'fr' ? 'Luxe' : 'Luxe' }}</option>
+                    <option value="luxe-emerald">{{ locale === 'fr' ? 'Émeraude' : 'Emerald' }}</option>
+                    <option value="luxe-bordeaux">{{ locale === 'fr' ? 'Bordeaux' : 'Bordeaux' }}</option>
                     <option value="minimal">{{ locale === 'fr' ? 'Minimaliste' : 'Minimal' }}</option>
                     <!-- <option value="color">{{ locale === 'fr' ? 'Coloré' : 'Colorful' }}</option>
                     <option value="brasserie">{{ locale === 'fr' ? 'Brasserie' : 'Brasserie' }}</option>

@@ -22,7 +22,6 @@
   --gold-button: #a7782a;
   --gold-dim:    #735522;
   --amber:       #9e4f11;
-  --amber-surface: #b86318;
   --text:        #2f261a;
   --text-muted:  #6f5d47;
   --text-dim:    #756044;
@@ -63,7 +62,6 @@
   --gold-button: #d8b665;
   --gold-dim:  #c1a970;
   --amber:     #f3a343;
-  --amber-surface: #e18e29;
 
   --text:      #f4eddc;
   --text-muted:#c4b28b;
@@ -924,36 +922,36 @@ body {
   margin: 0.2rem 0 0 0;
 }
 
-.menu-app.skin-luxe h1,
-.menu-app.skin-luxe h2,
-.menu-app.skin-luxe h3,
-.menu-app.skin-luxe h4,
-.menu-app.skin-luxe h5,
-.menu-app.skin-luxe h6 {
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h1,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h2,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h3,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h4,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h5,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h6 {
   font-family: var(--font-display);
 }
 
-.menu-app.skin-luxe .section-title,
-.menu-app.skin-luxe .cocktails-header,
-.menu-app.skin-luxe .cocktail-moment-kicker,
-.menu-app.skin-luxe .featured-menu-heading h2,
-.menu-app.skin-luxe .form-section-title,
-.menu-app.skin-luxe .prep-section-title,
-.menu-app.skin-luxe .cv-group-title,
-.menu-app.skin-luxe .category-title,
-.menu-app.skin-luxe .recommendations-title,
-.menu-app.skin-luxe .similar-cocktails-title,
-.menu-app.skin-luxe .loyalty-panel-title,
-.menu-app.skin-luxe .shared-favorites-heading h2,
-.menu-app.skin-luxe .drinker-col-title {
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .section-title,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .cocktails-header,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .cocktail-moment-kicker,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .featured-menu-heading h2,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .form-section-title,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .prep-section-title,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .cv-group-title,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .category-title,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .recommendations-title,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .similar-cocktails-title,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .loyalty-panel-title,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .shared-favorites-heading h2,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .drinker-col-title {
   font-family: var(--font-subtitle, inherit);
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.menu-app.skin-luxe .surprise-button,
-.menu-app.skin-luxe .view-toggle-btn {
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .surprise-button,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .view-toggle-btn {
   font-family: var(--font-subtitle);
 }
 
@@ -1388,7 +1386,7 @@ body {
   margin: 0.75rem 0 1.25rem;
   padding: 0.9rem 1rem 1rem;
   border-radius: var(--radius-md);
-  background: var(--amber-surface);
+  background: var(--amber);
 }
 
 .featured-menu-heading {
@@ -5109,7 +5107,9 @@ body {
   font-family: var(--font-cocktail, var(--font-display));
 }
 
-.menu-app.skin-luxe .cocktail-title {
+.menu-app.skin-luxe .cocktail-title,
+.menu-app.skin-luxe-emerald .cocktail-title,
+.menu-app.skin-luxe-bordeaux .cocktail-title {
   font-family: var(--font-cocktail);
 }
 
