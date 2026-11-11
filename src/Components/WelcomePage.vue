@@ -1,5 +1,5 @@
 <template>
-  <div class="landing-page">
+  <div ref="rootEl" class="landing-page">
     <main class="landing-hero" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
       <div ref="mediaEl" class="landing-media" aria-hidden="true">
         <Transition name="landing-fade">
@@ -17,9 +17,6 @@
         <div v-if="!photoReady" class="landing-slide landing-slide--fallback"></div>
       </div>
       <div class="landing-shade" aria-hidden="true"></div>
-      <div v-if="activeSlide?.caption" class="landing-caption">
-        {{ activeSlide.caption }}
-      </div>
       <div v-if="slides.length > 1" class="landing-dots" role="group">
         <button type="button" class="landing-arrow" :aria-label="t.prevPhoto" @click.stop="showPreviousPhoto">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
@@ -40,62 +37,66 @@
       </div>
 
       <div class="landing-inner">
-      <div class="landing-copy">
-        <p class="landing-eyebrow">{{ t.eyebrow }}</p>
-        <h1>{{ t.title }}</h1>
-        <p class="landing-intro">{{ t.intro }}</p>
-      </div>
+        <div class="landing-copy">
+          <p class="landing-eyebrow">{{ t.eyebrow }}</p>
+          <h1>{{ t.title }}</h1>
+          <p class="landing-intro">{{ t.intro }}</p>
+        </div>
 
-      <div class="landing-actions">
-        <section class="landing-action landing-action--drinker" aria-labelledby="landing-drinker">
-          <div class="landing-action-heading">
-            <h2 id="landing-drinker">Drinker</h2>
-            <p>{{ t.drinkerText }}</p>
-          </div>
-          <form class="landing-join" @submit.prevent="emit('join-by-code')">
-            <input
-              :value="inviteCodeInput"
-              type="text"
-              :placeholder="t.codePlaceholder"
-              :aria-label="t.codeLabel"
-              autocomplete="off"
-              @input="emit('update:inviteCodeInput', $event.target.value)"
-            />
-            <button type="submit" class="landing-button">{{ t.join }}</button>
-          </form>
-          <p v-if="codeError" class="landing-error" role="alert">{{ codeError }}</p>
+        <div v-if="activeSlide?.caption" class="landing-caption">
+          {{ activeSlide.caption }}
+        </div>
 
-          <div id="landing-public-bars" class="landing-public-bars" aria-live="polite">
-            <p v-if="publicBarsLoading" class="landing-status">{{ t.loading }}</p>
-            <p v-else-if="publicBarsError" class="landing-status" role="alert">{{ t.loadError }}</p>
-            <p v-else-if="publicBars.length === 0" class="landing-status">{{ t.noBars }}</p>
-            <template v-else>
-              <h3 class="landing-list-title">{{ t.openBars }}</h3>
-              <button
-                v-for="bar in publicBars"
-                :key="bar.id"
-                type="button"
-                class="landing-bar"
-                :aria-label="bar.name"
-                @click="emit('join-public-bar', bar)"
-              >
-                <span class="landing-bar-name">{{ bar.name }}</span>
-                <span class="landing-bar-code">{{ bar.invite_code }}</span>
-              </button>
-            </template>
-          </div>
-        </section>
+        <div ref="actionsEl" class="landing-actions">
+          <section class="landing-action landing-action--drinker" aria-labelledby="landing-drinker">
+            <div class="landing-action-heading">
+              <h2 id="landing-drinker">Drinker</h2>
+              <p>{{ t.drinkerText }}</p>
+            </div>
+            <form class="landing-join" @submit.prevent="emit('join-by-code')">
+              <input
+                :value="inviteCodeInput"
+                type="text"
+                :placeholder="t.codePlaceholder"
+                :aria-label="t.codeLabel"
+                autocomplete="off"
+                @input="emit('update:inviteCodeInput', $event.target.value)"
+              />
+              <button type="submit" class="landing-button">{{ t.join }}</button>
+            </form>
+            <p v-if="codeError" class="landing-error" role="alert">{{ codeError }}</p>
 
-        <section class="landing-action landing-action--bartender" aria-labelledby="landing-bartender">
-          <div class="landing-action-heading">
-            <h2 id="landing-bartender">Bartender</h2>
-            <p>{{ t.bartenderText }}</p>
-          </div>
-          <button type="button" class="landing-button" @click="emit('open-auth')">
-            {{ t.bartenderCta }}
-          </button>
-        </section>
-      </div>
+            <div id="landing-public-bars" class="landing-public-bars" aria-live="polite">
+              <p v-if="publicBarsLoading" class="landing-status">{{ t.loading }}</p>
+              <p v-else-if="publicBarsError" class="landing-status" role="alert">{{ t.loadError }}</p>
+              <p v-else-if="publicBars.length === 0" class="landing-status">{{ t.noBars }}</p>
+              <template v-else>
+                <h3 class="landing-list-title">{{ t.openBars }}</h3>
+                <button
+                  v-for="bar in publicBars"
+                  :key="bar.id"
+                  type="button"
+                  class="landing-bar"
+                  :aria-label="bar.name"
+                  @click="emit('join-public-bar', bar)"
+                >
+                  <span class="landing-bar-name">{{ bar.name }}</span>
+                  <span class="landing-bar-code">{{ bar.invite_code }}</span>
+                </button>
+              </template>
+            </div>
+          </section>
+
+          <section class="landing-action landing-action--bartender" aria-labelledby="landing-bartender">
+            <div class="landing-action-heading">
+              <h2 id="landing-bartender">Bartender</h2>
+              <p>{{ t.bartenderText }}</p>
+            </div>
+            <button type="button" class="landing-button" @click="emit('open-auth')">
+              {{ t.bartenderCta }}
+            </button>
+          </section>
+        </div>
       </div>
     </main>
   </div>
@@ -294,7 +295,57 @@ function updateMediaRatio() {
   mediaRatio.value = height > 0 ? width / height : 0
 }
 
+// ── Hauteur mobile : tient exactement entre le header et le footer de l'app ──
+const rootEl = ref(null)
+let bodyObserver
+let lastFitHeight = 0
+
+function fitLandingHeight() {
+  const el = rootEl.value
+  if (!el) return
+  if (!window.matchMedia('(max-width: 520px)').matches) {
+    el.style.removeProperty('--landing-h')
+    el.style.removeProperty('--landing-footer-h')
+    el.style.removeProperty('--landing-media-h')
+    lastFitHeight = 0
+    return
+  }
+  // Footer transparent superposé à la photo : on réserve sa hauteur en bas du contenu
+  const footer = document.querySelector('.footer-martini--landing')
+  const overlaid = !!footer && getComputedStyle(footer).position === 'absolute'
+  el.style.setProperty('--landing-footer-h', overlaid ? `${footer.offsetHeight}px` : '0px')
+
+  const rect = el.getBoundingClientRect()
+  const top = rect.top + window.scrollY
+  const below = Math.max(0, document.documentElement.scrollHeight - (rect.bottom + window.scrollY))
+  const height = Math.round(Math.max(320, window.innerHeight - top - below))
+  if (height !== lastFitHeight) {
+    lastFitHeight = height
+    el.style.setProperty('--landing-h', `${height}px`)
+  }
+  fitMedia()
+}
+
+// La photo s'arrête au sommet du panneau d'actions : elle n'est plus masquée par lui
+const actionsEl = ref(null)
+function fitMedia() {
+  const el = rootEl.value
+  const panel = actionsEl.value
+  if (!el || !panel) return
+  const top = panel.getBoundingClientRect().top - el.getBoundingClientRect().top
+  el.style.setProperty('--landing-media-h', `${Math.max(0, Math.round(top))}px`)
+}
+
 onMounted(() => {
+  fitLandingHeight()
+  window.addEventListener('resize', fitLandingHeight)
+  if (typeof ResizeObserver !== 'undefined') {
+    bodyObserver = new ResizeObserver(fitLandingHeight)
+    bodyObserver.observe(document.body)
+    const footerEl = document.querySelector('.footer-martini--landing')
+    if (footerEl) bodyObserver.observe(footerEl)
+    if (actionsEl.value) bodyObserver.observe(actionsEl.value)
+  }
   updateMediaRatio()
   if (typeof ResizeObserver !== 'undefined' && mediaEl.value) {
     resizeObserver = new ResizeObserver(updateMediaRatio)
@@ -303,9 +354,13 @@ onMounted(() => {
 
   prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   startAutoplay()
+  document.documentElement.classList.add('landing-lock')
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', fitLandingHeight)
+  bodyObserver?.disconnect()
+  document.documentElement.classList.remove('landing-lock')
   stopAutoplay()
   resizeObserver?.disconnect()
 })
@@ -889,26 +944,58 @@ onBeforeUnmount(() => {
   }
 }
 
+/* ── Mobile : un écran, photo plein cadre, actions en bas ── */
 @media (max-width: 520px) {
-  .landing-page,
-  .landing-hero {
+  /* Hauteur figée = écran (moins un éventuel header de l'app) → pas de scroll */
+  .landing-page {
     flex: none;
+    height: var(--landing-h, calc(100dvh - var(--app-header-h, 0px) - var(--app-footer-h, 0px)));
+    overflow: hidden;
   }
 
   .landing-hero {
+    flex: 1;
+    height: 100%;
     min-height: 0;
     padding: 0;
+    overflow: hidden;
   }
 
   .landing-inner {
+    flex-direction: column;
     align-items: stretch;
+    justify-content: flex-start;
     gap: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    padding:
+      1rem
+      1rem
+      calc(env(safe-area-inset-bottom, 0px) + var(--landing-footer-h, 0px) + 2rem);
   }
 
+  /* Photo limitée à la zone au-dessus du panneau, fondu vers le fond en bas */
   .landing-media,
   .landing-shade {
     bottom: auto;
-    height: clamp(14rem, 34vh, 19rem);
+    /* La photo passe un peu sous le panneau au lieu de s'arrêter net à son bord */
+    height: calc(var(--landing-media-h, 60%) + 3rem);
+  }
+
+  .landing-shade {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--hero-veil) 80%, transparent) 0%,
+      transparent 36%,
+      transparent 62%,
+      var(--hero-veil) 100%
+    );
+  }
+
+  /* Léger zoom centré sur le point focal */
+  .landing-photo {
+    transform: translateY(3%) scale(1.1);
+    transform-origin: var(--focal, 50% 45%);
   }
 
   .landing-slide--contain .landing-photo {
@@ -920,104 +1007,164 @@ onBeforeUnmount(() => {
     display: none;
   }
 
-  .landing-shade {
-    background: linear-gradient(
-      0deg,
-      color-mix(in srgb, var(--hero-veil) 80%, transparent),
-      color-mix(in srgb, var(--hero-veil) 36%, transparent) 55%,
-      color-mix(in srgb, var(--hero-veil) 25%, transparent)
-    );
-  }
-
+  /* Titre */
   .landing-copy {
-    display: flex;
-    flex: 0 0 clamp(14rem, 34vh, 19rem);
-    flex-direction: column;
-    justify-content: flex-start;
+    flex: none;
     max-width: none;
-    padding: 2rem 1rem 2.5rem;
+    padding: 0;
   }
 
-  .landing-actions {
-    position: relative;
-    z-index: 1;
-    flex: 1 0 auto;
-    width: 100%;
-    max-width: none;
-    margin-top: -2.5rem;
-    padding: 1rem;
-    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
-    background: var(--bg);
-  }
-
-  .landing-dots {
-    top: calc(clamp(14rem, 34vh, 19rem) - 4.5rem);
-    bottom: auto;
-  }
-
-  .landing-caption {
-    top: calc(clamp(14rem, 34vh, 19rem) - 6.5rem);
-    right: 1rem;
-    bottom: auto;
-    left: auto;
-    width: fit-content;
-    max-width: calc(100% - 2rem);
-    padding: 0.35rem 0.65rem;
-    font-size: 0.7rem;
+  .landing-copy h1 {
+    margin: 0.6rem 0 0.5rem;
+    font-size: clamp(2rem, 9vw, 2.6rem);
   }
 
   .landing-intro {
     font-size: 0.9rem;
   }
 
-  .landing-copy h1 {
-    font-size: clamp(1.75rem, 8vw, 2.5rem);
-  }
-
   .landing-eyebrow {
     font-size: 0.65rem;
   }
 
-  .landing-action-heading h2 {
-    font-size: 0.72rem;
+  /* Pas de dots ni de flèches sur mobile (swipe uniquement) */
+  .landing-dots {
+    display: none;
   }
 
-  .landing-action-heading p,
-  .landing-status {
-    font-size: 0.72rem;
+  /* Légende juste au-dessus du panneau */
+  .landing-caption {
+    position: static;
+    align-self: flex-start;
+    margin: auto 0 0.75rem;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.7rem;
   }
 
-  .landing-button,
-  .landing-join input {
-    font-size: 0.8rem;
+  /* Panneau d'actions */
+  .landing-actions {
+    width: 100%;
+    max-width: none;
+    margin-top: auto;
+    gap: 0.9rem;
+    padding: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .landing-caption + .landing-actions {
+    margin-top: 0;
   }
 
   .landing-action {
-    padding: 0 0 1rem;
+    padding: 0;
     border: 0;
-    border-bottom: 1px solid var(--border);
     border-radius: 0;
     background: transparent;
     box-shadow: none;
     backdrop-filter: none;
+    gap: 0.6rem;
   }
 
-  .landing-action:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
+  .landing-action-heading p {
+    display: none;
+  }
+
+  /* Drinker = action principale */
+  .landing-join {
+    gap: 0.4rem;
+  }
+
+  .landing-button,
+  .landing-join input {
+    min-height: 2.6rem;
+    font-size: 0.85rem;
+  }
+
+  /* Bars ouverts : chips scrollables */
+  .landing-public-bars {
+    display: flex;
+    gap: 0.4rem;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .landing-public-bars::-webkit-scrollbar {
+    display: none;
+  }
+
+  .landing-list-title,
+  .landing-bar-code {
+    display: none;
+  }
+
+  .landing-bar {
+    flex: none;
+    width: auto;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+  }
+
+  .landing-status {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  /* Bartender = action secondaire (contour), séparée du bloc Drinker */
+  .landing-action--bartender {
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .landing-action--bartender .landing-action-heading {
+    display: none;
   }
 
   .landing-action--bartender > .landing-button {
+    width: 100%;
     min-width: 0;
-    width: auto;
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+  }
+}
+
+/* Pas de scroll de page derrière la landing (mobile) */
+@media (max-width: 520px) {
+  :global(html.landing-lock),
+  :global(html.landing-lock body) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+}
+
+/* Mobile peu haut (petits iPhone, barre d'URL visible) : on compacte */
+@media (max-width: 520px) and (max-height: 720px) {
+  .landing-eyebrow,
+  .landing-intro {
+    display: none;
   }
 
-  .landing-action > .landing-button {
-    width: auto;
+  .landing-copy h1 {
+    font-size: clamp(1.7rem, 8vw, 2.2rem);
   }
 
-  .landing-join {
-    gap: 0.4rem;
+  .landing-actions {
+    gap: 0.6rem;
+    padding: 0.7rem;
+  }
+
+  .landing-button,
+  .landing-join input {
+    min-height: 2.4rem;
   }
 }
 </style>
