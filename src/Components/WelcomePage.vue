@@ -93,7 +93,8 @@
               <p>{{ t.bartenderText }}</p>
             </div>
             <button type="button" class="landing-button" @click="emit('open-auth')">
-              {{ t.bartenderCta }}
+              <span class="landing-cta-full">{{ t.bartenderCta }}</span>
+              <span class="landing-cta-short">{{ t.bartenderCtaShort }}</span>
             </button>
           </section>
         </div>
@@ -131,6 +132,7 @@ const MESSAGES = {
     intro: 'Gère ton bar, partage ta carte. Tes invités n’ont plus qu’à choisir.',
     bartenderText: 'Gère ton stock et tes recettes.',
     bartenderCta: 'Créer ou accéder à mon bar',
+    bartenderCtaShort: 'Espace bartender',
     drinkerText: 'Explore la carte d’un bar avec son code.',
     codePlaceholder: 'Code du bar (ex : STAR-7514)',
     codeLabel: 'Code du bar',
@@ -148,6 +150,7 @@ const MESSAGES = {
     intro: 'Manage your bar and share your menu. Your guests just have to choose.',
     bartenderText: 'Manage your inventory and recipes.',
     bartenderCta: 'Create or access my bar',
+    bartenderCtaShort: 'Bartender area',
     drinkerText: 'Explore a bar menu with its code.',
     codePlaceholder: 'Bar code (e.g. STAR-7514)',
     codeLabel: 'Bar code',
@@ -225,8 +228,14 @@ const fit = computed(() => {
 })
 
 const focalStyle = computed(() => {
-  const focal = activeSlide.value?.focal || DEFAULT_FOCAL
-  return { '--focal': `${focal.x}% ${focal.y}%` }
+  const slide = activeSlide.value
+  const focal = slide?.focal || DEFAULT_FOCAL
+  const style = { '--focal': `${focal.x}% ${focal.y}%` }
+  // Point focal dédié mobile (optionnel) : le cadre y est vertical, il faut recentrer le sujet
+  if (slide?.focalMobile) {
+    style['--focal-mobile'] = `${slide.focalMobile.x}% ${slide.focalMobile.y}%`
+  }
+  return style
 })
 
 watch(activeSlide, (slide) => measure(slide), { immediate: true })
@@ -627,7 +636,7 @@ onBeforeUnmount(() => {
   min-width: 0;
   padding: clamp(0.85rem, 1.1vw, 1.25rem);
   border: 1px solid var(--border);
-  border-radius: var(--radius-panel);
+  border-radius: 0;
   background: color-mix(in srgb, var(--bg-card) 94%, transparent);
   color: var(--text);
   box-shadow: var(--shadow-sm);
@@ -732,6 +741,11 @@ onBeforeUnmount(() => {
   filter: brightness(1.12);
 }
 
+/* Libellé court du bouton bartender : mobile uniquement (le titre y est masqué) */
+.landing-cta-short {
+  display: none;
+}
+
 .landing-join {
   display: flex;
   gap: 0.6rem;
@@ -801,7 +815,7 @@ onBeforeUnmount(() => {
   width: 100%;
   padding: 0.45rem 0.6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-control);
+  border-radius: 2px;
   background: var(--bg);
   font-size: 0.75rem;
   color: var(--text);
@@ -995,12 +1009,12 @@ onBeforeUnmount(() => {
   /* Léger zoom centré sur le point focal */
   .landing-photo {
     transform: translateY(3%) scale(1.1);
-    transform-origin: var(--focal, 50% 45%);
+    transform-origin: var(--focal-mobile, var(--focal, 50% 45%));
   }
 
-  .landing-slide--contain .landing-photo {
+  .landing-slide .landing-photo {
     object-fit: cover;
-    object-position: var(--focal, 50% 45%);
+    object-position: var(--focal-mobile, var(--focal, 50% 45%));
   }
 
   .landing-photo-backdrop {
@@ -1049,7 +1063,7 @@ onBeforeUnmount(() => {
     gap: 0.9rem;
     padding: 0.9rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius-panel);
+    border-radius: 0;
     background: color-mix(in srgb, var(--bg) 82%, transparent);
     backdrop-filter: blur(14px);
     box-shadow: var(--shadow-sm);
@@ -1109,7 +1123,7 @@ onBeforeUnmount(() => {
     flex: none;
     width: auto;
     padding: 0.4rem 0.8rem;
-    border-radius: 999px;
+    border-radius: 2px;
     font-size: 0.78rem;
   }
 
@@ -1126,6 +1140,14 @@ onBeforeUnmount(() => {
 
   .landing-action--bartender .landing-action-heading {
     display: none;
+  }
+
+  .landing-cta-full {
+    display: none;
+  }
+
+  .landing-cta-short {
+    display: inline;
   }
 
   .landing-action--bartender > .landing-button {
