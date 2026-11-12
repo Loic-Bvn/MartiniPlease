@@ -950,7 +950,7 @@ body {
   text-transform: uppercase;
 }
 
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .surprise-button,
+:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .bar-tile-button,
 :is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .view-toggle-btn {
   font-family: var(--font-subtitle);
 }
@@ -1231,75 +1231,6 @@ body {
 .recommendation-reason {
   color: var(--text-dim);
   font-size: 0.72rem;
-}
-
-/* Même gabarit que l'en-tête d'un .section-card (cf. CardPanel) */
-.surprise-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  width: 100%;
-  margin: 0;
-  padding: calc(0.75rem + 1px) 1.25rem;
-  background: var(--bg-raised);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.surprise-button:hover {
-  background: var(--bg-card);
-  border-color: var(--gold-dim);
-  color: var(--text);
-}
-
-.surprise-button:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.surprise-icon {
-  flex-shrink: 0;
-  color: var(--gold);
-  transition: transform 0.4s ease;
-}
-
-.surprise-button:hover .surprise-icon { transform: rotate(180deg); }
-
-.surprise-title {
-  color: var(--text);
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  white-space: nowrap;
-}
-
-.surprise-sub {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-align: right;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text-dim);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .surprise-button, .surprise-icon { transition: none; }
-  .surprise-button:hover .surprise-icon { transform: none; }
 }
 
 .engagement-strip {
@@ -5838,35 +5769,43 @@ html {
 
 /* Panneaux repliables = rangée de tuiles icône + libellé.
       Drinker : Filtres, Cartes, Profil, Hasard
-      Bartender : Stock, Commandes, Filtres, Cartes */
+      Bartender : Filtres, Cartes, Stock, Commandes */
 /* 4 tuiles = 4 colonnes égales sur toute la largeur (drinker comme bartender) */
 .bar-main { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; align-items: stretch; }
 .bar-main > * { grid-column: 1 / -1; min-width: 0; order: 10; }
 .bar-main .side-by-side,
 .bar-main .side-col { display: contents; }
 .bar-main .section-card,
-.bar-main .surprise-button { margin: 0; min-width: 0; }
+.bar-main .bar-tile-button { margin: 0; min-width: 0; }
 
 /* Chaque panneau est « transparent » : son en-tête devient une tuile de la rangée
    (order 1-6) et son contenu une zone pleine largeur juste sous la rangée (order 9).
    Un seul panneau est ouvert à la fois, les tuiles ne bougent donc jamais. */
 .bar-main .section-card { display: contents; }
-.bar-main .tile-stock   > .expand-actions-btn { order: 1; }
-.bar-main .tile-orders  > .expand-actions-btn { order: 2; }
-.bar-main .tile-filters > .expand-actions-btn { order: 3; }
-.bar-main .tile-cards   > .expand-actions-btn { order: 4; }
+.bar-main .tile-filters > .expand-actions-btn { order: 1; }
+.bar-main .tile-cards   > .expand-actions-btn { order: 2; }
+.bar-main .tile-stock   > .expand-actions-btn { order: 3; }
+.bar-main .tile-orders  > .expand-actions-btn { order: 4; }
 .bar-main .tile-drinker { order: 5; }
 .bar-main .tile-drinker > .expand-actions-btn { order: 5; }
 .bar-main .tile-surprise { order: 6; }
 
-.bar-main .section-card > .expand-actions-btn {
+.bar-main .bar-tile-button {
   background: var(--bg-raised);
+  color: var(--text-muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
-.bar-main .section-card > .expand-actions-btn:hover { background: var(--bg-card); }
-.bar-main .tile-open > .expand-actions-btn { border-color: var(--gold-dim); background: var(--bg-card); }
+.bar-main .bar-tile-button:hover {
+  background: var(--bg-card);
+  color: var(--text);
+  border-color: var(--gold-dim);
+}
+.bar-main .bar-tile-button--open {
+  border-color: var(--gold-dim);
+  background: var(--bg-card);
+}
 
 .bar-main .section-card > :not(.expand-actions-btn) {
   grid-column: 1 / -1;
@@ -5937,34 +5876,17 @@ html {
 }
 .btn-logout-panel svg { width: 12px; height: 12px; }
 .btn-logout-panel:hover { color: var(--danger-text); border-color: var(--danger-text); }
-.bar-main .tile-login {
-  display: flex;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
+.bar-main .tile-surprise .tile-ico { transition: transform 0.4s ease; }
+.bar-main .tile-surprise:hover .tile-ico { transform: rotate(180deg); }
 
-.bar-main .surprise-button {
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.15rem;
-  padding: 0.55rem 0.25rem;
-  text-align: center;
+@media (prefers-reduced-motion: reduce) {
+  .bar-main .tile-surprise .tile-ico { transition: none; }
+  .bar-main .tile-surprise:hover .tile-ico { transform: none; }
 }
-.bar-main .surprise-icon { width: 20px; height: 20px; }
-.bar-main .surprise-title {
-  max-width: 100%;
-  overflow: hidden;
-  font-size: 0.62rem;
-  letter-spacing: 0.5px;
-  text-overflow: ellipsis;
-}
-.bar-main .surprise-sub { display: none; }
 
 /* Desktop : libellés un peu plus grands */
 @media (min-width: 861px) {
-  .bar-main .section-title,
-  .bar-main .surprise-title { font-size: 0.72rem; letter-spacing: 1px; }
+  .bar-main .section-title { font-size: 0.72rem; letter-spacing: 1px; }
   .tile-ico { font-size: 1.4rem; }
 }
 
@@ -6564,6 +6486,19 @@ html {
   .cards-content .menu-card-item:focus-visible { border-color: var(--gold-dim); }
   .cards-content .cards-grid > * { margin-bottom: 0.3rem; }
 }
+
+@media (max-width: 860px) {
+  .cards-content .menu-card-item {
+    background: var(--bg-raised);
+    border-color: var(--border);
+  }
+  .cards-content .menu-card-item:hover,
+  .cards-content .menu-card-item:focus-visible {
+    background: var(--bg-card);
+    border-color: var(--gold-dim);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cards-content .menu-card-item,
   .cards-content .menu-card-open { transition: none; }
