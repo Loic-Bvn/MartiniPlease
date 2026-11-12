@@ -1563,6 +1563,55 @@ body {
   gap: 0.75rem;
 }
 
+.search-box {
+  position: relative;
+  flex: 1 1 220px;
+}
+
+.search-box .search-icon {
+  position: absolute;
+  left: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+}
+
+.search-input {
+  width: 100%;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem 0.7rem 2.4rem;
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.inventory-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-chip {
+  appearance: none;
+  border: 1px solid var(--border-mid);
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  padding: 0.45rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.filter-chip--active {
+  background: rgba(201, 170, 92, 0.12);
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
 .inventory-controls {
   display: flex;
   gap: 0.5rem;
@@ -1685,6 +1734,22 @@ body {
   border-radius: 9999px;
   font-size: 0.7rem;
   font-weight: 600;
+}
+
+.category-progress {
+  width: min(120px, 25%);
+  height: 0.35rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 1px solid var(--border-mid);
+}
+
+.category-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), rgba(201,170,92,.65));
+  border-radius: inherit;
 }
 
 .btn-toggle-category {

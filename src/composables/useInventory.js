@@ -4,6 +4,7 @@ import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
+import { normalizeIngredientNameKey, toIngredientSlug } from '@/utils/ingredientSlug'
 
 const barInventory = ref(new Set())
 const ingredients  = ref([])
@@ -107,101 +108,31 @@ export function useInventory() {
     if (ing) Object.assign(ing, patch)
   }
 
-  async function toggleCategory(categoryKey, select) {
-    const categoryIngredients = ingredients.value.filter(i => i.category === categoryKey)
-    if (!categoryIngredients.length) return
-    try {
-      const rows = categoryIngredients.map(ing => ({
-        id: ing.id,
-        name: ing.name,
-        type: ing.type,
-        category: ing.category,
-        available: select,
-        references: (ing.references || []).map(r => ({ ...r, available: select })),
-      }))
-      const batchSize = 200
-      for (let i = 0; i < rows.length; i += batchSize) {
-        const { error } = await supabase.from('ingredients').upsert(rows.slice(i, i + batchSize))
-        if (error) throw error
-      }
-      categoryIngredients.forEach((ing, idx) => {
-        ing.available = select
-        ing.references = rows[idx].references
-        if (select) barInventory.value.add(ing.type)
-        else        barInventory.value.delete(ing.type)
-      })
-      barInventory.value = new Set(barInventory.value)
-    } catch (err) {
-      console.error('❌ Erreur toggleCategory:', err)
-      toastError('Impossible de mettre à jour la catégorie.')
-    }
-  }
-
-  async function selectAll() {
-    try {
-      const rows = ingredients.value.map(ing => ({
-        id: ing.id,
-        name: ing.name,
-        type: ing.type,
-        category: ing.category,
-        available: true,
-        references: (ing.references || []).map(r => ({ ...r, available: true })),
-      }))
-      if (!rows.length) return
-
-      const batchSize = 200
-      for (let i = 0; i < rows.length; i += batchSize) {
-        const { error } = await supabase.from('ingredients').upsert(rows.slice(i, i + batchSize))
-        if (error) throw error
-      }
-
-      ingredients.value.forEach((ing, idx) => {
-        ing.available = true
-        ing.references = rows[idx].references
-      })
-      barInventory.value = new Set(ingredients.value.map(i => i.type))
-    } catch (err) {
-      console.error('❌ Erreur selectAll:', err)
-      toastError('Impossible de tout sélectionner.')
-    }
-  }
-
-  async function deselectAll() {
-    try {
-      // Un seul aller-retour réseau (upsert par lot) plutôt qu'un update par
-      // ingrédient — sinon "Tout désélectionner" fait autant de requêtes
-      // séquentielles que d'ingrédients et devient très lent.
-      // L'upsert construit la ligne AVANT de résoudre le conflit : il faut donc
-      // fournir les colonnes NOT NULL sans défaut (name, type, category), sinon
-      // Postgres rejette avec une violation NOT NULL même si ça finit en UPDATE.
-      const rows = ingredients.value.map(ing => ({
-        id: ing.id,
-        name: ing.name,
-        type: ing.type,
-        category: ing.category,
-        available: false,
-        references: (ing.references || []).map(r => ({ ...r, available: false })),
-      }))
-      if (!rows.length) return
-
-      const batchSize = 200
-      for (let i = 0; i < rows.length; i += batchSize) {
-        const { error } = await supabase.from('ingredients').upsert(rows.slice(i, i + batchSize))
-        if (error) throw error
-      }
-
-      ingredients.value.forEach((ing, idx) => {
-        ing.available = false
-        ing.references = rows[idx].references
-      })
-      barInventory.value = new Set()
-    } catch (err) {
-      console.error('❌ Erreur deselectAll:', err)
-      toastError('Impossible de tout désélectionner.')
-    }
-  }
-
   function hasIngredient(type) { return barInventory.value.has(type) }
+
+  function matchesInventoryFilter(ingredient, filter = 'all') {
+    if (!ingredient) return false
+    const available = isIngredientAvailable(ingredient)
+    if (filter === 'in_stock') return available
+    if (filter === 'missing') return !available
+    return true
+  }
+
+  const inStockCount = computed(() => ingredients.value.filter(isIngredientAvailable).length)
+  const missingCount = computed(() => Math.max(ingredients.value.length - inStockCount.value, 0))
+  const countsByCategory = computed(() => {
+    const counts = {}
+    for (const ingredient of ingredients.value) {
+      const category = ingredient.category || 'others'
+      if (!counts[category]) {
+        counts[category] = { total: 0, in_stock: 0, missing: 0 }
+      }
+      counts[category].total += 1
+      if (isIngredientAvailable(ingredient)) counts[category].in_stock += 1
+      else counts[category].missing += 1
+    }
+    return counts
+  })
 
   // Map { type: ingredient } — utilisé pour résoudre le label des ingrédients
   // custom (non présents dans la table statique TYPE_LABELS) via getIngredientLabel().
@@ -348,14 +279,20 @@ export function useInventory() {
 
   async function addIngredient({ name, type: typeArg, category, family = null, abv = null, available = true }) {
     const barId = currentBarId.value
-    if (!barId || !name?.trim()) return
+    const cleanedName = String(name ?? '').trim()
+    if (!barId) throw new Error('barId is required')
+    if (!cleanedName) throw new Error('name is required')
 
-    const resolvedType = typeArg?.trim() ||
-      name.trim().toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
+    const resolvedType = toIngredientSlug(typeArg || cleanedName)
+    if (!resolvedType) throw new Error('slug is required')
 
-    if (ingredients.value.find(i => i.type === resolvedType)) {
+    const normalizedNameKey = normalizeIngredientNameKey(cleanedName)
+    const duplicate = ingredients.value.find(ingredient => {
+      if (!ingredient?.name) return false
+      return normalizeIngredientNameKey(ingredient.name) === normalizedNameKey
+    })
+
+    if (duplicate) {
       throw new Error('duplicate')
     }
 
@@ -363,7 +300,7 @@ export function useInventory() {
       .from('ingredients')
       .insert({
         bar_id:    barId,
-        name:      name.trim(),
+        name:      cleanedName,
         type:      resolvedType,
         category,
         family:    family || null,
@@ -414,10 +351,11 @@ export function useInventory() {
     fetchIngredients,
     toggleIngredient,
     updateIngredientPricing,
-    toggleCategory,
-    selectAll,
-    deselectAll,
     hasIngredient,
+    matchesInventoryFilter,
+    inStockCount,
+    missingCount,
+    countsByCategory,
     ingredientsByIngredient,
     addIngredient,
     deleteIngredient,

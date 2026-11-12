@@ -8,6 +8,7 @@
 
 import constantsData from '@/constants/cocktail-constants.json'
 import { getFamilyLabel } from '@/constants/typeLabels'
+import { getIngredientFamiliesForCategory } from '@/composables/useIngredientFamilies'
 
 // Cache pour éviter les re-imports
 let loadedConstants = null
@@ -207,6 +208,9 @@ export function getCocktailCategoriesAsOptions() {
  * @returns {Array<{key: string, label: string}>}
  */
 export function getFamilyOptions(category, locale = 'fr') {
+  const dbFamilies = getIngredientFamiliesForCategory(category, locale)
+  if (dbFamilies.length) return dbFamilies
+
   const constants = loadedConstants || loadConstants()
   const items = constants.ingredients?.[category] || {}
   // Pour les spirits, cocktail_categories est la source de vérité du label

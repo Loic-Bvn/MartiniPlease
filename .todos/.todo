@@ -24,7 +24,6 @@ TAG new version using "npm run release:patch"
 ## Valeur ajoutée pratique
 - [x] **Cocktail du moment** — mise en avant éditoriale par le bartender sur l'écran d'accueil drinker
 
-
 # Fix
 ## Type > Ingredient migration
 - Broken price computation in cocktailForm

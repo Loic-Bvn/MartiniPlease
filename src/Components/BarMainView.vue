@@ -7,7 +7,7 @@
         <h2 class="section-title"><component :is="lucideIcons.stock" :size="20" class="tile-ico" /><span class="tile-lbl"><span class="lbl-full">{{ t.stock }}</span><span class="lbl-short">Stock</span></span><span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
         <span></span>
       </button>
-      <InventoryManager v-if="openPanel === 'stock'" @close="togglePanel('stock')" />
+      <InventoryManager v-if="openPanel === 'stock'" :locale="locale" @close="togglePanel('stock')" />
     </div>
 
     <div v-if="isLoggedIn" :class="['section-card', 'tile-orders', { 'tile-open': openPanel === 'orders' }]">
@@ -150,11 +150,14 @@
           v-if="!isLoggedIn"
           type="button"
           class="surprise-button tile-surprise"
-          @click="$emit('surprise-me')"
+          @click="$emit('open-spirit-library')"
         >
-          <Dices :size="18" class="surprise-icon" />
-          <span class="surprise-title"><span class="lbl-full">{{ surpriseLabel.title }}</span><span class="lbl-short">{{ locale === 'fr' ? 'Hasard' : 'Random' }}</span></span>
-          <span class="surprise-sub">{{ surpriseLabel.sub }}</span>
+          <Wine :size="18" class="surprise-icon" />
+          <span class="surprise-title">
+            <span class="lbl-full">{{ locale === 'fr' ? 'Explorer les bouteilles' : 'Explore the bottles' }}</span>
+            <span class="lbl-short">{{ locale === 'fr' ? 'Bouteilles' : 'Bottles' }}</span>
+          </span>
+          <span class="surprise-sub">{{ locale === 'fr' ? 'Spiritueux et liqueurs du bar' : 'Bar spirits and liqueurs' }}</span>
         </button>
       </div>
 
@@ -282,7 +285,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
-import { ChevronDown, Rows3, GalleryVerticalEnd, Dices, Heart } from 'lucide-vue-next'
+import { ChevronDown, Rows3, GalleryVerticalEnd, Wine, Heart } from 'lucide-vue-next'
 import { lucideIcons } from '@/utils/lucideIcons'
 const InventoryManager = defineAsyncComponent(() => import('@/Components/Modals/InventoryManager.vue'))
 import OrdersPanel      from '@/Components/OrdersPanel.vue'
@@ -343,33 +346,12 @@ const props = defineProps({
   inviteCode:         { type: String, default: '' },
 })
 
-// ── Bouton « Surprise » : variantes de texte ──────────────────────────────────
-// Change SURPRISE_VARIANT pour tester un autre wording. `sub: ''` = pas de sous-titre.
-const SURPRISE_VARIANT = 'default'
-const SURPRISE_LABELS = {
-  default:  { fr: { title: 'Surprends-moi',         sub: 'Un cocktail au hasard' },
-              en: { title: 'Surprise Me',          sub: 'A random cocktail' } },
-  minimal:  { fr: { title: 'Surprends-moi',         sub: '' },
-              en: { title: 'Surprise Me',          sub: '' } },
-  bartender:{ fr: { title: 'Laisse-moi faire',     sub: 'Le barman choisit pour toi' },
-              en: { title: 'Bartender’s choice',   sub: 'Let the bar pick for you' } },
-  playful:  { fr: { title: 'Tente ta chance',      sub: 'Lance les dés' },
-              en: { title: 'Feeling lucky?',       sub: 'Roll the dice' } },
-  taste:    { fr: { title: 'Je ne sais pas quoi boire', sub: 'On choisit pour toi' },
-              en: { title: 'Can’t decide?',        sub: 'We’ll choose for you' } },
-}
-const surpriseLabel = computed(() => {
-  const v = SURPRISE_LABELS[SURPRISE_VARIANT] || SURPRISE_LABELS.default
-  return props.locale === 'fr' ? v.fr : v.en
-})
-
-
 const emit = defineEmits([
   'view-card', 'edit-card', 'delete-card', 'new-card', 'toggle-card-visibility',
   'toggle-favorite', 'edit-cocktail', 'delete-cocktail', 'new-cocktail', 'open-cocktail',
   'toggle-family', 'toggle-sub-spirit', 'toggle-profile', 'toggle-style',
   'toggle-makeable', 'toggle-favorites',
-  'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'surprise-me', 'open-drinker-login', 'drinker-sign-out',
+  'set-abv-filter', 'set-season', 'clear-filters', 'set-card-view', 'open-spirit-library', 'open-drinker-login', 'drinker-sign-out',
   'set-cocktail-of-moment', 'share-favorites',
   'set-featured-menu-card', 'update:searchTerm', 'scroll-to-cocktail',
 ])

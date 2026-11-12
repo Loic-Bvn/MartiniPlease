@@ -12,19 +12,25 @@ export function useCocktails() {
   const { currentBarId } = useAuth()
   const { toastError }   = useToast()
 
-  async function fetchCocktails(barId) {
+  async function fetchCocktails(barId, inviteCode = null) {
     const id = barId ?? currentBarId.value
     if (!id) return
     loading.value = true
     try {
-      const { data, error } = await supabase
-        .from('bar_cocktails') // DATABASE NAME FOR COCKTAILS
-        .select('*')
-        .eq('bar_id', id)
-        .order('name')
+      const result = inviteCode
+        ? await supabase.rpc('get_bar_cocktails_by_invite_code', {
+          p_invite_code: inviteCode,
+        })
+        : await supabase
+          .from('bar_cocktails')
+          .select('*')
+          .eq('bar_id', id)
+          .order('name')
+
+      const { data, error } = result
 
       if (error) throw error
-      cocktails.value = data
+      cocktails.value = Array.isArray(data) ? data : []
     } catch (err) {
       console.error('❌ Erreur fetchCocktails:', err)
       toastError('Impossible de charger les cocktails. Réessaie ou recharge la page.')

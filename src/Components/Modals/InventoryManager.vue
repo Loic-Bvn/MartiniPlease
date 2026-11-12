@@ -1,42 +1,40 @@
 <template>
   <div class="inventory-manager" @keydown.esc="handleInventoryEscape">
 
-    <!-- Contrôles globaux -->
+    <!-- Recherche + filtre -->
     <div class="inventory-header">
-      <div class="inventory-controls">
-        <button @click="selectAll" class="btn-control btn-select-all">
-          <CheckSquare :size="16" /> Tout sélectionner
-        </button>
-        <button @click="deselectAll" class="btn-control btn-deselect-all">
-          <Square :size="16" /> Tout désélectionner
+      <div class="search-box">
+        <Search :size="18" class="search-icon" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Rechercher un ingrédient..."
+          class="search-input"
+        />
+      </div>
+      <div class="inventory-filters" role="tablist" aria-label="Filtrer le stock">
+        <button
+          v-for="option in inventoryFilterOptions"
+          :key="option.value"
+          type="button"
+          class="filter-chip"
+          :class="{ 'filter-chip--active': inventoryFilter === option.value }"
+          @click="inventoryFilter = option.value"
+        >
+          {{ option.label }}
         </button>
       </div>
-    </div>
-
-    <!-- Recherche -->
-    <div class="search-box">
-      <Search :size="18" class="search-icon" />
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Rechercher un ingrédient..."
-        class="search-input"
-      />
     </div>
 
     <!-- Stats -->
     <div class="inventory-stats">
       <div class="stat">
-        <span class="stat-label">Ingrédients :</span>
-        <span class="stat-value">{{ selectedCount }} / {{ totalCount }}</span>
+        <span class="stat-label">Stock :</span>
+        <span class="stat-value">{{ inStockCount }} / {{ totalCount }} en stock</span>
       </div>
       <div class="stat">
-        <span class="stat-label">Références :</span>
-        <span class="stat-value">{{ selectedReferencesCount }}</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Total sélectionné :</span>
-        <span class="stat-value">{{ selectedTotalCount }}</span>
+        <span class="stat-label">Manquants :</span>
+        <span class="stat-value">{{ missingCount }}</span>
       </div>
     </div>
 
@@ -56,7 +54,7 @@
       >
         <input
           type="checkbox"
-          :checked="ing.available"
+          :checked="isIngredientAvailable(ing)"
           @change="toggleIngredient(ing.type)"
           class="ingredient-checkbox"
         />
@@ -78,17 +76,13 @@
               <component :is="category.icon" :size="16" class="category-icon" />
               {{ category.label }}
             </h3>
-            <span class="category-count" :title="`${category.selectedCount} ingrédient(s) + ${category.selectedReferencesCount} référence(s)`">
-              {{ category.selectedCount }} / {{ category.ingredients.length }}
-              <template v-if="category.selectedReferencesCount"> (+{{ category.selectedReferencesCount }} réf.)</template>
+            <span class="category-count" :title="`${category.inStockCount} en stock / ${category.totalCount} total`">
+              {{ category.inStockCount }} / {{ category.totalCount }}
             </span>
           </div>
-          <button
-            @click.stop="toggleCategory(category.key, !category.allSelected)"
-            class="btn-toggle-category"
-          >
-            {{ category.allSelected ? 'Tout désélectionner' : 'Tout sélectionner' }}
-          </button>
+          <div class="category-progress" aria-hidden="true">
+            <span :style="{ width: `${category.progress}%` }"></span>
+          </div>
         </div>
 
         <div class="category-body" v-show="isExpanded(category.key)">
@@ -102,7 +96,7 @@
               />
               <span class="ingredient-name" :title="ing.name">{{ ing.name }}</span>
               <button
-                v-if="(ing.references || []).length"
+                v-if="category.key !== 'garnish' && (ing.references || []).length"
                 type="button"
                 class="badge-references"
                 @click.stop="toggleReferencesExpanded(ing.type)"
@@ -111,7 +105,7 @@
                 {{ (ing.references || []).length }} réf.
               </button>
               <button
-                v-else
+                v-else-if="category.key !== 'garnish'"
                 type="button"
                 class="btn-manage-references"
                 @click.stop="toggleReferencesExpanded(ing.type)"
@@ -120,7 +114,7 @@
                 <BookPlus :size="14" />
               </button>
               <div class="ingredient-item-actions">
-                <div class="ingredient-pricing" :class="{ 'fields-disabled': !hasIngredient(ing.type) }">
+                <div v-if="category.key !== 'garnish'" class="ingredient-pricing" :class="{ 'fields-disabled': !hasIngredient(ing.type) }">
                   <span v-if="hasAbv(category.key)" class="field-unit field-unit--percent">
                     <input
                       type="number" step="0.5" min="0" max="100"
@@ -169,7 +163,7 @@
             </div>
 
             <!-- Références (mode expert, opt-in, replié par défaut) -->
-            <div class="references-panel" v-show="isReferencesExpanded(ing.type)">
+            <div v-if="category.key !== 'garnish' && isReferencesExpanded(ing.type)" class="references-panel">
               <div class="reference-row" v-for="ref in (ing.references || [])" :key="ref.id">
                 <input
                   type="checkbox"
@@ -287,22 +281,27 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
-import { CheckSquare, Square, Search, Plus, ChevronDown, ChevronRight, BookPlus, Trash2 } from 'lucide-vue-next'
+import { Search, Plus, ChevronDown, ChevronRight, BookPlus, Trash2 } from 'lucide-vue-next'
 import { categoryIcons } from '@/utils/lucideIcons'
 import { useInventory } from '@/composables/useInventory'
 import { useToast } from '@/composables/useToast'
 import ConfirmModal      from '@/Components/Modals/ConfirmModal.vue'
 import AddIngredientModal from '@/Components/Modals/AddIngredientModal.vue'
+
+const props = defineProps({
+  locale: { type: String, default: 'fr' },
+})
+
 const emit = defineEmits(['close'])
 const {
   ingredients,
   loading,
   toggleIngredient,
-  toggleCategory,
-  selectAll,
-  deselectAll,
   updateIngredientPricing,
   hasIngredient,
+  matchesInventoryFilter,
+  inStockCount,
+  missingCount,
   addReference,
   updateReference,
   removeReference,
@@ -317,6 +316,12 @@ function handleInventoryEscape(event) {
 
 const searchQuery    = ref('')
 const addModalTarget = ref(null)
+const inventoryFilter = ref('all')
+const inventoryFilterOptions = computed(() => [
+  { value: 'all', label: props.locale === 'fr' ? 'Tous' : 'All' },
+  { value: 'in_stock', label: props.locale === 'fr' ? 'En stock' : 'In stock' },
+  { value: 'missing', label: props.locale === 'fr' ? 'Manquants' : 'Missing' },
+])
 
 function openAddModal(category) {
   addModalTarget.value = category
@@ -441,19 +446,31 @@ function isIngredientAvailable(ing) {
   return (ing.references || []).some(r => r.available)
 }
 
-const selectedCount = computed(() =>
-  ingredients.value.filter(isIngredientAvailable).length
-)
-const selectedReferencesCount = computed(() =>
-  ingredients.value.reduce((sum, i) => sum + (i.references || []).filter(r => r.available).length, 0)
-)
-const selectedTotalCount = computed(() => selectedCount.value + selectedReferencesCount.value)
 const totalCount = computed(() => ingredients.value.length)
+const expandedCategories = ref(new Set())
+
+const filteredIngredients = computed(() =>
+  ingredients.value.filter(ing => matchesInventoryFilter(ing, inventoryFilter.value))
+)
+
+const defaultExpandedCategories = computed(() => {
+  const groups = {}
+  filteredIngredients.value.forEach(ing => {
+    if (!groups[ing.category]) groups[ing.category] = []
+    groups[ing.category].push(ing)
+  })
+
+  return new Set(
+    Object.entries(groups)
+      .filter(([, items]) => items.some(isIngredientAvailable))
+      .map(([key]) => key)
+  )
+})
 
 const categorizedIngredients = computed(() => {
   const groups = {}
 
-  ingredients.value.forEach(ing => {
+  filteredIngredients.value.forEach(ing => {
     if (!groups[ing.category]) groups[ing.category] = []
     groups[ing.category].push(ing)
   })
@@ -468,14 +485,16 @@ const categorizedIngredients = computed(() => {
     .map(key => {
       const ings = groups[key]
 
+      const inStockCount = ings.filter(isIngredientAvailable).length
+
       return {
         key,
         label: categoryMetadata[key]?.label || key,
         icon: categoryMetadata[key]?.icon || categoryIcons.others,
         ingredients: ings,
-        selectedCount: ings.filter(isIngredientAvailable).length,
-        selectedReferencesCount: ings.reduce((sum, i) => sum + (i.references || []).filter(r => r.available).length, 0),
-        allSelected: ings.every(isIngredientAvailable),
+        totalCount: ings.length,
+        inStockCount,
+        progress: ings.length ? (inStockCount / ings.length) * 100 : 0,
       }
     })
 })
@@ -483,13 +502,11 @@ const categorizedIngredients = computed(() => {
 const searchResults = computed(() => {
   const q = searchQuery.value.toLowerCase().trim()
   if (!q) return []
-  return ingredients.value.filter(i =>
+  return filteredIngredients.value.filter(i =>
     i.name.toLowerCase().includes(q) ||
     i.type.toLowerCase().includes(q)
   )
 })
-
-const expandedCategories = ref(new Set())
 
 function toggleExpanded(key) {
   const next = new Set(expandedCategories.value)
@@ -499,6 +516,6 @@ function toggleExpanded(key) {
 }
 
 function isExpanded(key) {
-  return expandedCategories.value.has(key)
+  return expandedCategories.value.has(key) || defaultExpandedCategories.value.has(key)
 }
 </script>

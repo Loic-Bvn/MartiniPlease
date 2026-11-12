@@ -1,6 +1,7 @@
 <template>
-  <div class="add-ing-overlay" @click.self="$emit('close')">
-    <div ref="dialogRef" class="add-ing-content" role="dialog" aria-modal="true" aria-labelledby="add-ing-title">
+  <Teleport to="body">
+    <div class="add-ing-overlay" @click.self="$emit('close')">
+      <div ref="dialogRef" class="add-ing-content" role="dialog" aria-modal="true" aria-labelledby="add-ing-title">
 
       <!-- Header -->
       <div class="add-ing-header">
@@ -87,14 +88,16 @@
 
     </div>
   </div>
+  </Teleport>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { X, Plus, Loader2, Package } from 'lucide-vue-next'
 import { useInventory } from '@/composables/useInventory'
-import { getFamilyOptions } from '@/lib/cocktail-constants'
+import { useIngredientFamilies } from '@/composables/useIngredientFamilies'
 import { useModalAccessibility } from '@/composables/useModalAccessibility'
+import { toIngredientSlug } from '@/utils/ingredientSlug'
 
 const props = defineProps({
   categoryKey:   { type: String, required: true },
@@ -105,11 +108,18 @@ const props = defineProps({
 
 // Famille n'a de sens que pour spirits/licors/modifiers/bitters — vide
 // (donc champ masqué) pour juices/syrups/mixers/garnish/others.
+const { getFamilyOptions, fetchIngredientFamilies } = useIngredientFamilies()
 const familyOptions = computed(() => getFamilyOptions(props.categoryKey, props.locale))
 
 const emit = defineEmits(['close', 'added'])
 
 const { addIngredient } = useInventory()
+
+onMounted(() => {
+  fetchIngredientFamilies().catch(err => {
+    console.error('❌ Impossible de charger les familles d’ingrédients:', err)
+  })
+})
 
 const nameInput = ref(null)
 const dialogRef = ref(null)
@@ -125,16 +135,8 @@ const form = ref({
   available: true,
 })
 
-function toSlug(str) {
-  return str
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // retire les accents
-    .replace(/\s+/g, '_')
-    .replace(/[^a-z0-9_]/g, '')
-}
-
 function autoSlug() {
-  form.value.type = toSlug(form.value.name)
+  form.value.type = toIngredientSlug(form.value.name)
 }
 
 async function handleSubmit() {
@@ -142,7 +144,12 @@ async function handleSubmit() {
   const name = form.value.name.trim()
   if (!name) { error.value = 'Le nom est obligatoire.'; return }
 
-  const type = form.value.type.trim() || toSlug(name)
+  const type = toIngredientSlug(form.value.type || name)
+  if (!type) {
+    error.value = 'Le nom est invalide pour créer un identifiant unique.'
+    return
+  }
+
   saving.value = true
   try {
     await addIngredient({
@@ -156,9 +163,20 @@ async function handleSubmit() {
     emit('added')
     emit('close')
   } catch (err) {
-    error.value = err?.message?.includes('duplicate')
-      ? 'Un ingrédient avec cet identifiant existe déjà.'
-      : 'Erreur lors de l\'ajout. Vérifie les champs.'
+    const message = String(err?.message || '')
+    console.error('❌ Erreur ajout ingrédient:', err)
+
+    if (message.includes('duplicate')) {
+      error.value = 'Un ingrédient avec ce nom existe déjà dans ce bar.'
+      return
+    }
+
+    if (message.includes('barId') || message.includes('empty') || message.includes('slug')) {
+      error.value = 'Les données envoyées sont incomplètes.'
+      return
+    }
+
+    error.value = 'Erreur lors de l’ajout. Vérifie les champs.'
   } finally {
     saving.value = false
   }

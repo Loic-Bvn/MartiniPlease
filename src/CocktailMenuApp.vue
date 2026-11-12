@@ -182,7 +182,7 @@
           @update:searchTerm="searchTerm = $event"
           @scroll-to-cocktail="scrollToCocktailCard"
           @set-card-view="setCardView"
-          @surprise-me="handleSurpriseMe"
+          @open-spirit-library="showSpiritLibrary = true"
           @open-drinker-login="showDrinkerLoginModal = true"
           @drinker-sign-out="handleDrinkerSignOut"
           @set-cocktail-of-moment="handleSetCocktailOfMoment"
@@ -267,6 +267,7 @@
         <Transition name="modal-fade">
           <CocktailDetailModal
             v-if="viewingCocktail"
+            :style="showSpiritLibrary ? { zIndex: 130 } : undefined"
             :cocktail="viewingCocktail"
             :locale="locale"
             :origin-rect="viewingCocktailRect"
@@ -280,6 +281,14 @@
             @open-cocktail="openCocktailFromCard"
           />
         </Transition>
+        <SpiritLibraryModal
+          v-if="showSpiritLibrary"
+          :ingredients="ingredients"
+          :cocktails="cocktails"
+          :locale="locale"
+          @close="showSpiritLibrary = false"
+          @open-cocktail="openSpiritCocktail"
+        />
         <PreparationStatsModal
           v-if="showPreparationStatsModal && isLoggedIn && preparationCounterEnabled && activeBarId"
           :bar-id="activeBarId"
@@ -358,9 +367,11 @@ const PrivacyPolicy     = defineAsyncComponent(() => import('@/views/PrivacyPoli
 const TermsOfUse        = defineAsyncComponent(() => import('@/views/TermsOfUse.vue'))
 const CookiesPolicy     = defineAsyncComponent(() => import('@/views/CookiesPolicy.vue'))
 const PreparationStatsModal = defineAsyncComponent(() => import('@/Components/Modals/PreparationStatsModal.vue'))
+const SpiritLibraryModal = defineAsyncComponent(() => import('@/Components/Modals/SpiritLibraryModal.vue'))
 const cocktailToDelete = ref(null)
 const cardToDelete = ref(null)
 const showPreparationStatsModal = ref(false)
+const showSpiritLibrary = ref(false)
 const preparationCardId = ref(null)
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -485,10 +496,8 @@ const { recommendations } = useCocktailRecommendations({ cocktails, favorites, h
 // ── Commandes temps réel ──────────────────────────────────────────────────────
 const { pendingOrdersCount, initOrdersListener, stopOrdersListener } = useOrders()
 
-function handleSurpriseMe() {
-  const pool = filteredCocktails.value.length ? filteredCocktails.value : cocktails.value
-  if (!pool.length) return
-  openCocktailFromCard(pool[Math.floor(Math.random() * pool.length)])
+function openSpiritCocktail(cocktail) {
+  openCocktailFromCard(cocktail)
 }
 
 // ── Logo aléatoire ────────────────────────────────────────────────────────────
@@ -629,7 +638,7 @@ async function joinByCode() {
 
   guestBar.value = data
   await Promise.all([
-    loadBarData(data.id),
+    loadBarData(data.id, data.invite_code),
     initDrinker(data.id),
   ])
 
@@ -638,9 +647,9 @@ async function joinByCode() {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-async function loadBarData(barId) {
+async function loadBarData(barId, accessCode = null) {
   await Promise.all([
-    fetchCocktails(barId),
+    fetchCocktails(barId, accessCode),
     fetchIngredients(barId),
     fetchMenuCards(barId),
   ])
