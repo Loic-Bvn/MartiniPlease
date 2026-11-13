@@ -123,6 +123,7 @@ body {
 @media (max-width: 520px) {
   .landing-layout {
     --landing-inline-padding: 1rem;
+    min-height: 100dvh;
   }
 }
 

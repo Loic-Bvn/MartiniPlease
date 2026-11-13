@@ -105,7 +105,7 @@ function openConsent() {
 .landing-layout .footer-martini--landing {
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
   left: 0;
 }
 .landing-layout .footer-martini--landing > div {
