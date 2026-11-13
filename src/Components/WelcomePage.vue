@@ -646,6 +646,7 @@ onBeforeUnmount(() => {
 .landing-action--bartender,
 .landing-action--drinker {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(0.7rem, 0.9vw, 1rem);
 }
 
@@ -781,6 +782,7 @@ onBeforeUnmount(() => {
 /* ── Liste des bars ───────────────────────────────── */
 .landing-public-bars {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* prevent long names from widening the column */
   gap: 0.35rem;
   max-height: min(20rem, 45vh);
   margin-top: 0.65rem;
@@ -1060,8 +1062,8 @@ onBeforeUnmount(() => {
     width: 100%;
     max-width: none;
     margin-top: auto;
-    gap: 0.9rem;
-    padding: 0.9rem;
+    gap: 0.6rem;
+    padding: 0.65rem;
     border: 1px solid var(--border);
     border-radius: 0;
     background: color-mix(in srgb, var(--bg) 82%, transparent);
@@ -1080,11 +1082,15 @@ onBeforeUnmount(() => {
     background: transparent;
     box-shadow: none;
     backdrop-filter: none;
-    gap: 0.6rem;
+    gap: 0.4rem;
   }
 
   .landing-action-heading p {
     display: none;
+  }
+
+  .landing-action-heading h2 {
+    font-size: 0.68rem;
   }
 
   /* Drinker = action principale */
@@ -1094,47 +1100,60 @@ onBeforeUnmount(() => {
 
   .landing-button,
   .landing-join input {
-    min-height: 2.6rem;
-    font-size: 0.85rem;
+    min-height: 2.2rem;
+    font-size: 0.8rem;
   }
 
-  /* Bars ouverts : chips scrollables */
+  .landing-button {
+    padding: 0 0.8rem;
+  }
+
+  .landing-join input {
+    padding: 0 0.7rem;
+  }
+
+  .landing-error {
+    margin: 0;
+    font-size: 0.75rem;
+  }
+
+  /* Open bars: compact vertical list, scrollable when too tall */
   .landing-public-bars {
-    display: flex;
-    gap: 0.4rem;
-    max-height: none;
+    display: grid;
+    gap: 0.25rem;
+    max-height: min(11rem, 30vh); /* ~5 rows, then scroll; panel grows upward */
     margin: 0;
     padding: 0;
     border: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
 
-  .landing-public-bars::-webkit-scrollbar {
-    display: none;
-  }
-
-  .landing-list-title,
-  .landing-bar-code {
-    display: none;
+  .landing-list-title {
+    padding: 0 0 0.2rem;
+    font-size: 0.62rem;
   }
 
   .landing-bar {
-    flex: none;
-    width: auto;
-    padding: 0.4rem 0.8rem;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0.3rem 0.6rem;
     border-radius: 2px;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
+  }
+
+  .landing-bar-code {
+    font-size: 0.65rem;
   }
 
   .landing-status {
     font-size: 0.75rem;
-    white-space: nowrap;
   }
 
   /* Bartender = action secondaire (contour), séparée du bloc Drinker */
   .landing-action--bartender {
-    padding-top: 0.9rem;
+    padding-top: 0.6rem;
     border-top: 1px solid var(--border);
   }
 
@@ -1180,13 +1199,17 @@ onBeforeUnmount(() => {
   }
 
   .landing-actions {
-    gap: 0.6rem;
-    padding: 0.7rem;
+    gap: 0.5rem;
+    padding: 0.55rem;
   }
 
   .landing-button,
   .landing-join input {
-    min-height: 2.4rem;
+    min-height: 2.1rem;
+  }
+
+  .landing-public-bars {
+    max-height: min(7.5rem, 26vh); /* ~3-4 rows on short screens */
   }
 }
 </style>
