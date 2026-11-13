@@ -12,79 +12,29 @@
         <span class="cv-meta">{{ cardCocktails.length }} cocktail{{ cardCocktails.length > 1 ? 's' : '' }}</span>
       </div>
       <div class="cv-header-actions">
-        <div
-          class="settings-switch cv-lang-switch"
-          role="group"
+        <SegmentedSwitch
+          class="cv-lang-switch"
+          :model-value="locale"
+          :options="localeOptions"
           aria-label="Language switch"
-          @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
-        >
-          <button
-            type="button"
-            class="view-toggle-btn"
-            :class="{ 'view-toggle-btn--active': locale === 'fr' }"
-            :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
-          >
-            <span>FR</span>
-          </button>
-          <button
-            type="button"
-            class="view-toggle-btn"
-            :class="{ 'view-toggle-btn--active': locale === 'en' }"
-            :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
-          >
-            <span>EN</span>
-          </button>
-        </div>
+          @update:model-value="$emit('set-locale', $event)"
+        />
 
-        <div
-          class="settings-switch cv-unit-switch"
-          role="group"
+        <SegmentedSwitch
+          class="cv-unit-switch"
+          :model-value="unit"
+          :options="unitOptions"
           aria-label="Unit switch"
-          @click="$emit('set-unit', unit === 'oz' ? 'ml' : 'oz')"
-        >
-          <button
-            type="button"
-            class="view-toggle-btn"
-            :class="{ 'view-toggle-btn--active': unit === 'oz' }"
-            :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
-          >
-            <span>oz</span>
-          </button>
-          <button
-            type="button"
-            class="view-toggle-btn"
-            :class="{ 'view-toggle-btn--active': unit === 'ml' }"
-            :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
-          >
-            <span>ml</span>
-          </button>
-        </div>
+          @update:model-value="$emit('set-unit', $event)"
+        />
 
-        <div
-          class="settings-switch cv-view-toggle"
-          role="group"
+        <SegmentedSwitch
+          class="cv-view-toggle"
+          :model-value="cardView"
+          :options="cardViewOptions"
           aria-label="Card view switch"
-          @click="$emit('set-card-view', cardView === 'compact' ? 'standard' : 'compact')"
-        >
-          <button
-            type="button"
-            class="view-toggle-btn"
-            :class="{ 'view-toggle-btn--active': cardView === 'compact' }"
-            :title="locale === 'fr' ? 'Vue compacte' : 'Compact view'"
-          >
-            <Rows3 :size="16" />
-            <span class="view-toggle-label">{{ locale === 'fr' ? 'Compacte' : 'Compact' }}</span>
-          </button>
-          <button
-            type="button"
-            class="view-toggle-btn"
-            :class="{ 'view-toggle-btn--active': cardView === 'standard' }"
-            :title="locale === 'fr' ? 'Vue standard' : 'Standard view'"
-          >
-            <GalleryVerticalEnd :size="16" />
-            <span class="view-toggle-label">{{ locale === 'fr' ? 'Standard' : 'Standard' }}</span>
-          </button>
-        </div>
+          @update:model-value="$emit('set-card-view', $event)"
+        />
 
         <ThemeToggle />
       </div>
@@ -144,6 +94,7 @@ import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
 import CocktailCard from '@/Components/CocktailCard.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
+import SegmentedSwitch from '@/Components/SegmentedSwitch.vue'
 import { getCocktailCategory, isMocktail } from '@/lib/cocktail-constants'
 
 const props = defineProps({
@@ -165,6 +116,25 @@ const emit = defineEmits([
   'edit-cocktail',
   'delete-cocktail'
 ])
+
+// Options des SegmentedSwitch du header (title = action déclenchée par le clic)
+const localeTitle = computed(() => props.locale === 'fr' ? 'Switch to English' : 'Passer en français')
+const localeOptions = computed(() => [
+  { value: 'fr', label: 'FR', title: localeTitle.value },
+  { value: 'en', label: 'EN', title: localeTitle.value },
+])
+const unitTitle = computed(() => props.unit === 'oz' ? 'Passer en ml' : 'Switch to oz')
+const unitOptions = computed(() => [
+  { value: 'oz', label: 'oz', title: unitTitle.value },
+  { value: 'ml', label: 'ml', title: unitTitle.value },
+])
+const cardViewOptions = computed(() => [
+  { value: 'compact',  icon: Rows3,              label: props.locale === 'fr' ? 'Compacte' : 'Compact',
+    title: props.locale === 'fr' ? 'Vue compacte' : 'Compact view' },
+  { value: 'standard', icon: GalleryVerticalEnd, label: 'Standard',
+    title: props.locale === 'fr' ? 'Vue standard' : 'Standard view' },
+])
+
 const t = computed(() => ({
   back:    props.locale === 'fr' ? 'Retour'                          : 'Back',
   empty:   props.locale === 'fr' ? 'Aucun cocktail dans cette carte.' : 'No cocktail in this card.',
