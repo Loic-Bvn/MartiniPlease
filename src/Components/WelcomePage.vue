@@ -326,7 +326,9 @@ function fitLandingHeight() {
 
   const rect = el.getBoundingClientRect()
   const top = rect.top + window.scrollY
-  const below = Math.max(0, document.documentElement.scrollHeight - (rect.bottom + window.scrollY))
+  const below = overlaid
+    ? 0
+    : Math.max(0, document.documentElement.scrollHeight - (rect.bottom + window.scrollY))
   const height = Math.round(Math.max(320, window.innerHeight - top - below))
   if (height !== lastFitHeight) {
     lastFitHeight = height
