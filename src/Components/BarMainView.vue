@@ -248,6 +248,9 @@
       </section>
 
       <section :class="['cocktail-list-section', { 'cocktail-list-section--empty': !filteredCocktails.length }]">
+        <div class="featured-menu-heading rest-of-cocktails-header">
+          <h2>{{ locale === 'fr' ? 'Tous les cocktails' : 'More cocktails' }}</h2>
+        </div>
         <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
         <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
           <component :is="lucideIcons.cocktail" :size="48" class="empty-state-icon" aria-hidden="true" />

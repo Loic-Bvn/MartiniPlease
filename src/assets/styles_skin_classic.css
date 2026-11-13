@@ -49,3 +49,7 @@
 .menu-app.skin-classic .cocktail-title-name-group > span:first-child {
   font-family: 'Lora', serif;
 }
+
+.menu-app.skin-classic .rest-of-cocktails-header h2 {
+  color: var(--gold);
+}
