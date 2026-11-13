@@ -5945,14 +5945,14 @@ html {
 /* ══════════════════════════════════════════════════════════════
    Filtres — listes à cases à cocher (remplacent les chips)
    ══════════════════════════════════════════════════════════════ */
-.filter-list { display: flex; flex-direction: column; gap: 0.1rem; }
+.filter-list { display: flex; flex-direction: column; gap: 0; }
 .filter-list--cols { column-gap: 1.25rem; }
 
 .filter-option {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  padding: 0.3rem 0.35rem;
+  padding: 0.15rem 0.35rem;
   border-radius: var(--radius-md);
   font-size: 0.82rem;
   color: var(--text-muted);
@@ -5960,7 +5960,7 @@ html {
   user-select: none;
   transition: background 0.15s, color 0.15s;
 }
-.filter-option:hover { background: rgba(201, 168, 76, 0.07); color: var(--text); }
+.filter-option:hover { color: var(--text); }
 /* Case native masquée (reste accessible au clavier / lecteur d'écran) */
 .filter-option input {
   position: absolute;
@@ -5971,23 +5971,21 @@ html {
   pointer-events: none;
 }
 
-/* Effet surligneur fluo : le trait « balaie » le libellé quand il est sélectionné */
+/* Sélection : pastille pleine dans la couleur « or » du skin (--gold).
+   Le texte prend --bg pour rester lisible en clair comme en sombre. */
 .filter-option > span {
-  --hl: rgba(250, 225, 60, 0.6);
   display: inline-block;
-  padding: 0.05rem 0.4rem;
-  border-radius: 0.3rem 0.7rem 0.35rem 0.6rem;
-  background-image: linear-gradient(100deg, var(--hl) 0%, var(--hl) 100%);
-  background-repeat: no-repeat;
-  background-position: 0 75%;
-  background-size: 0% 80%;
-  transition: background-size 0.28s ease, color 0.15s;
+  padding: 0.06rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
-.dark .filter-option > span { --hl: rgba(250, 225, 60, 0.34); }
 
 .filter-option input:checked + span {
-  background-size: 100% 80%;
-  color: var(--text);
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg);
   font-weight: 600;
 }
 .filter-option input:focus-visible + span {
@@ -5998,11 +5996,11 @@ html {
 /* sous-spiritueux : indentés sous leur famille */
 .filter-family { break-inside: avoid; }
 .filter-sublist {
-  margin: 0.1rem 0 0.35rem 0.55rem;
+  margin: 0 0 0.2rem 0.55rem;
   padding-left: 0.75rem;
   border-left: 2px solid var(--gold-dim);
 }
-.filter-option--sub { font-size: 0.78rem; padding: 0.2rem 0.35rem; }
+.filter-option--sub { font-size: 0.78rem; padding: 0.05rem 0.35rem; }
 
 /* « Tout effacer » : réservé en permanence, simplement grisé quand inactif */
 .clear-all-btn:disabled {

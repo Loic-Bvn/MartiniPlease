@@ -1,10 +1,12 @@
 <template>
   <div class="section-card">
-    <button @click="$emit('toggle')" class="expand-actions-btn">
-      <ChevronDown :size="18" :class="{ rotated: open }" />
-      <h2 class="section-title"><component :is="lucideIcons.profile" :size="20" class="tile-ico" /><span class="tile-lbl">{{ drinkerPseudo }}</span></h2>
-      <span></span>
-    </button>
+    <BarTileButton
+      :icon="lucideIcons.profile"
+      :label="drinkerPseudo"
+      toggle
+      :open="open"
+      @activate="$emit('toggle')"
+    />
     <div v-if="open" class="filters-dropdown-content">
 
       <div class="auth-tabs drinker-tabs" style="margin-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary);">
@@ -94,7 +96,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { ChevronDown, Heart, Share2, LogOut } from 'lucide-vue-next'
+import { Heart, Share2, LogOut } from 'lucide-vue-next'
+import BarTileButton from '@/Components/BarTileButton.vue'
 import { lucideIcons } from '@/utils/lucideIcons'
 import { getIngredientLabel, getProfileLabel } from '../constants/typeLabels.js'
 
