@@ -927,17 +927,27 @@ onBeforeUnmount(() => {
   .landing-action--drinker {
     gap: clamp(0.6rem, 0.8vw, 0.9rem);
   }
+}
 
+@media (min-width: 901px) {
   .landing-action-heading h2,
   .landing-action-heading p {
-    font-size: clamp(0.78rem, 0.8vw, 0.9rem);
+    font-size: clamp(0.72rem, 0.78vw, 0.9rem);
   }
 
   .landing-button,
   .landing-join input {
-    min-height: clamp(2rem, 2.25vw, 2.35rem);
-    font-size: clamp(0.82rem, 0.8vw, 0.9rem);
+    min-height: clamp(1.8rem, 1.9vw, 2.1rem);
+    font-size: clamp(0.76rem, 0.75vw, 0.84rem);
   }
+
+  .landing-list-title { font-size: 0.65rem; }
+  .landing-status { font-size: 0.78rem; }
+  .landing-bar {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.68rem;
+  }
+  .landing-bar-code { font-size: 0.62rem; }
 }
 
 @media (min-width: 901px) and (max-height: 800px) {
