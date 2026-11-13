@@ -2250,6 +2250,40 @@ body {
   border-radius: var(--radius-panel);
 }
 
+.cv-add-toolbar {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.cv-menu-lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cv-menu-lock--locked {
+  border-color: var(--gold-dim);
+  background: var(--bg-raised);
+  color: var(--gold);
+}
+
+.cv-menu-lock:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
 .cv-add-toggle,
 .cv-add-option {
   display: inline-flex;
@@ -2265,7 +2299,8 @@ body {
 }
 
 .cv-add-toggle {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
   justify-content: flex-start;
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--border);
@@ -2286,10 +2321,15 @@ body {
   transition: transform 0.15s ease;
 }
 
-.cv-add-toggle:hover,
+.cv-add-toggle:hover:not(:disabled),
 .cv-add-option:hover:not(:disabled) {
   border-color: var(--gold-dim);
   background: var(--bg-raised);
+}
+
+.cv-add-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .cv-add-toggle-icon--open {
@@ -3788,7 +3828,7 @@ body {
   flex-direction: column;
   gap: 12px;
   padding: 12px;
-  background: var(--color-bg-secondary);
+  background: var(--bg-card);
   border-radius: 8px;
 }
 .edit-field-group {
@@ -3799,16 +3839,20 @@ body {
 .edit-field-label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--text-muted);
 }
 .edit-field-input {
   padding: 8px 12px;
-  border: 1px solid var(--color-border-secondary);
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--color-bg-input, white);
-  color: var(--color-text);
+  background: var(--bg-input, var(--bg));
+  color: var(--text);
   font-size: 0.9rem;
   transition: all 0.15s ease;
+}
+.edit-field-input::placeholder {
+  color: var(--text-dim);
+  opacity: 1;
 }
 .edit-field-input:focus {
   outline: none;
@@ -3833,19 +3877,19 @@ body {
   flex: 1;
 }
 .bar-edit-actions .btn-confirm {
-  background: var(--gold-button);
-  color: #14110b;
+  background: var(--gold);
+  color: var(--bg-card);
 }
 .bar-edit-actions .btn-confirm:hover:not(:disabled) {
-  background: #e0bb60;
+  background: var(--gold-dim);
 }
 .bar-edit-actions .btn-cancel {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text);
-  border: 1px solid var(--color-border-secondary);
+  background: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 .bar-edit-actions .btn-cancel:hover:not(:disabled) {
-  background: var(--color-bg-hover);
+  background: var(--bg);
 }
 .bar-edit-actions button:disabled {
   opacity: 0.6;
@@ -5556,14 +5600,14 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   background: var(--gold);
-  color: white;
+  color: var(--bg-card);
   width: 100%;
 }
 
 .btn-select-bar-large:hover {
-  background: #d4a737;
+  background: var(--gold-dim);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 .bar-actions-small {

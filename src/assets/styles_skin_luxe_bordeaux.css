@@ -10,7 +10,8 @@
   --gold: #875521;
   --gold-button: #a5682b;
   --gold-dim: #71431c;
-  --amber: #8f3543;
+  --amber: #dfc0c0;
+  --cocktail-list-bg: color-mix(in srgb, var(--bg) 70%, var(--bg-card));
   --amber-surface: #8f3543;
   --text: #1a100c;
   --text-muted: #70505a;
@@ -41,7 +42,7 @@
   --gold: #ebc070;
   --gold-button: #d9a441;
   --gold-dim: #ebc070;
-  --amber: #c45b6b;
+  --amber: #6b1f2e;
   --amber-surface: #c45b6b;
   --text: #f4eadb;
   --text-muted: #d4b8a2;
@@ -56,4 +57,8 @@
     radial-gradient(ellipse 75% 55% at 0% 0%, rgba(196, 91, 107, 0.36), transparent 72%),
     radial-gradient(ellipse 70% 55% at 100% 15%, rgba(217, 164, 65, 0.18), transparent 72%),
     radial-gradient(ellipse 85% 55% at 50% 100%, rgba(107, 31, 46, 0.5), transparent 72%);
+}
+
+.menu-app.skin-luxe-bordeaux .featured-menu-heading h2 {
+  color: var(--text);
 }

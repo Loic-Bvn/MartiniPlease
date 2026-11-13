@@ -3,7 +3,6 @@
     ref="btnEl"
     type="button"
     class="btn-icon btn-icon--add-to-menu"
-    :class="{ 'btn-icon--add-to-menu-active': isInAnyMenu }"
     :title="t.title"
     :aria-label="t.title"
     aria-haspopup="menu"
@@ -94,7 +93,6 @@ const t = computed(() => props.locale === 'fr'
 )
 
 const isIn = card => (card.cocktail_ids || []).includes(props.cocktailId)
-const isInAnyMenu = computed(() => menuCards.value.some(isIn))
 
 // ── Positionnement ────────────────────────────────────────────────────────────
 const POP_WIDTH = 240
@@ -184,9 +182,6 @@ onBeforeUnmount(unbind)
 </script>
 
 <style scoped>
-.btn-icon--add-to-menu:hover { color: var(--gold); }
-.btn-icon--add-to-menu-active { color: var(--gold-dim); }
-
 .atm-popover {
   position: fixed;
   z-index: 300; /* > modal-overlay (50) et burger-dropdown (200) */

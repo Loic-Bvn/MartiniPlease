@@ -44,17 +44,33 @@
       v-if="isLoggedIn"
       :class="['cv-add-cocktails', { 'cv-add-cocktails--open': showAddCocktails }]"
     >
-      <button
-        type="button"
-        class="cv-add-toggle"
-        :aria-expanded="showAddCocktails"
-        aria-controls="cv-add-cocktail-list"
-        @click="showAddCocktails = !showAddCocktails"
-      >
-        <Plus :size="16" />
-        {{ showAddCocktails ? t.closeAddCocktails : t.addCocktail }}
-        <ChevronDown :size="15" :class="{ 'cv-add-toggle-icon--open': showAddCocktails }" />
-      </button>
+      <div class="cv-add-toolbar">
+        <button
+          type="button"
+          role="switch"
+          class="cv-menu-lock"
+          :class="{ 'cv-menu-lock--locked': isMenuLocked }"
+          :aria-checked="isMenuLocked"
+          :aria-label="isMenuLocked ? t.unlockMenu : t.lockMenu"
+          :title="isMenuLocked ? t.unlockMenu : t.lockMenu"
+          @click="toggleMenuLock"
+        >
+          <component :is="isMenuLocked ? Lock : Unlock" :size="15" />
+          <span>{{ isMenuLocked ? t.locked : t.unlocked }}</span>
+        </button>
+        <button
+          type="button"
+          class="cv-add-toggle"
+          :disabled="isMenuLocked"
+          :aria-expanded="showAddCocktails"
+          aria-controls="cv-add-cocktail-list"
+          @click="showAddCocktails = !showAddCocktails"
+        >
+          <Plus :size="16" />
+          {{ showAddCocktails ? t.closeAddCocktails : t.addCocktail }}
+          <ChevronDown :size="15" :class="{ 'cv-add-toggle-icon--open': showAddCocktails }" />
+        </button>
+      </div>
 
       <div v-if="showAddCocktails" id="cv-add-cocktail-list" class="cv-add-panel">
         <label class="cv-add-search">
@@ -105,7 +121,7 @@
           <div
             v-for="cocktail in group.cocktails"
             :key="cocktail.id"
-            :class="['cv-cocktail-item', { 'cv-cocktail-item--editable': isLoggedIn }]"
+            :class="['cv-cocktail-item', { 'cv-cocktail-item--editable': isLoggedIn && !isMenuLocked }]"
           >
           <CocktailCard
             :cocktail="cocktail"
@@ -122,7 +138,7 @@
             @open="handleOpenCocktail"
           />
           <button
-            v-if="isLoggedIn"
+            v-if="isLoggedIn && !isMenuLocked"
             type="button"
             class="cv-remove-cocktail"
             :disabled="Boolean(updatingCocktailId)"
@@ -146,7 +162,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { ArrowLeft, Rows3, GalleryVerticalEnd, X, Plus, Search, ChevronDown } from 'lucide-vue-next'
+import { ArrowLeft, Rows3, GalleryVerticalEnd, X, Plus, Search, ChevronDown, Lock, Unlock } from 'lucide-vue-next'
 import { spiritIcons } from '@/utils/lucideIcons'
 import { useToast } from '@/composables/useToast'
 import { useAuth } from '@/composables/useAuth'
@@ -204,6 +220,10 @@ const t = computed(() => ({
   searchCocktails: props.locale === 'fr' ? 'Rechercher un cocktail...' : 'Search cocktails...',
   allCocktailsAdded: props.locale === 'fr' ? 'Tous les cocktails sont déjà dans cette carte.' : 'All cocktails are already in this menu.',
   noCocktailMatch: props.locale === 'fr' ? 'Aucun cocktail correspondant.' : 'No matching cocktails.',
+  lockMenu: props.locale === 'fr' ? 'Verrouiller les modifications' : 'Lock menu editing',
+  unlockMenu: props.locale === 'fr' ? 'Déverrouiller les modifications' : 'Unlock menu editing',
+  locked: props.locale === 'fr' ? 'Verrouillé' : 'Locked',
+  unlocked: props.locale === 'fr' ? 'Déverrouillé' : 'Unlocked',
   garnish: props.locale === 'fr' ? 'garniture'                      : 'garnish',
   others:  props.locale === 'fr' ? 'Autres'                         : 'Others',
   mocktails: props.locale === 'fr' ? 'Mocktails (sans alcool)' : 'Mocktails (alcohol-free)',
@@ -230,6 +250,7 @@ const cardCocktails = computed(() =>
 )
 const showAddCocktails = ref(false)
 const addCocktailSearch = ref('')
+const isMenuLocked = ref(true)
 const availableCocktails = computed(() => {
   const includedIds = new Set(props.card.cocktail_ids || [])
   const search = addCocktailSearch.value.trim().toLocaleLowerCase()
@@ -264,6 +285,11 @@ const groupedCocktails = computed(() => {
 
 const { isLoggedIn } = useAuth()
 const { toastMessage } = useToast()
+
+function toggleMenuLock() {
+  isMenuLocked.value = !isMenuLocked.value
+  if (isMenuLocked.value) showAddCocktails.value = false
+}
 
 function handleOpenCocktail(cocktail, rect, cardId = props.card.id) {
   emit('open-cocktail', cocktail, rect, cardId)
