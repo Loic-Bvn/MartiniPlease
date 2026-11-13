@@ -28,7 +28,7 @@
   --shadow-lg: 0 8px 24px rgba(38, 1, 1, 0.12);
 }
 
-.menu-app.skin-luxe {
+.menu-app.skin-mocka {
   background-color: var(--bg);
   background-image:
     radial-gradient(ellipse 36% 30% at 0% 0%, rgba(147, 114, 83, 0.2), transparent 72%),
@@ -36,7 +36,7 @@
     radial-gradient(ellipse 40% 32% at 48% 100%, rgba(225, 210, 181, 0.3), transparent 72%);
 }
 
-.dark .menu-app.skin-luxe {
+.dark .menu-app.skin-mocka {
   background-color: var(--bg);
   background-image:
     radial-gradient(ellipse 36% 30% at 0% 0%, rgba(225, 210, 181, 0.2), transparent 72%),
@@ -76,22 +76,22 @@
    et --border-mid valent tous #e3dccc, donc les champs se fondent dans la modal.
    Fond = --bg (plus clair que la modal) + bordure dorée = --border.
    Sur la WelcomePage, .menu-app n'a pas de classe skin-* (pas de bar actif) :
-   les variables luxe s'appliquent via :root, d'où le second sélecteur. */
-.menu-app.skin-luxe .password-form-input,
+   les variables Mocka s'appliquent via :root, d'où le second sélecteur. */
+.menu-app.skin-mocka .password-form-input,
 .menu-app:not([class*="skin-"]) .password-form-input {
   background: var(--bg);
   border-color: var(--border);
 }
 
-.menu-app.skin-luxe .password-form-input:focus,
+.menu-app.skin-mocka .password-form-input:focus,
 .menu-app:not([class*="skin-"]) .password-form-input:focus {
   border-color: var(--amber);
 }
 
 :root:not(.dark) :is(
-  .menu-app.skin-luxe,
-  .menu-app.skin-luxe-emerald,
-  .menu-app.skin-luxe-bordeaux,
+  .menu-app.skin-mocka,
+  .menu-app.skin-emerald,
+  .menu-app.skin-bordeaux,
   .menu-app:not([class*="skin-"])
 ) :is(.modal-overlay, .password-modal-overlay) :is(
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
@@ -102,31 +102,31 @@
 }
 
 :root:not(.dark) :is(
-  .menu-app.skin-luxe,
-  .menu-app.skin-luxe-emerald,
-  .menu-app.skin-luxe-bordeaux,
+  .menu-app.skin-mocka,
+  .menu-app.skin-emerald,
+  .menu-app.skin-bordeaux,
   .menu-app:not([class*="skin-"])
 ) .burger-dropdown .skin-select-row select {
   border-color: var(--gold-dim);
 }
 
 :is(
-  .menu-app.skin-luxe,
-  .menu-app.skin-luxe-emerald,
-  .menu-app.skin-luxe-bordeaux
+  .menu-app.skin-mocka,
+  .menu-app.skin-emerald,
+  .menu-app.skin-bordeaux
 ) .burger-dropdown .burger-item {
   font-family: var(--font-subtitle, var(--font-body, sans-serif));
   font-weight: 400;
 }
 
-/* Mobile (≤600px): burger button uses the gold accent in luxe skins
+/* Mobile (≤600px): burger button uses the gold accent in Mocka skins
    (default muted text color blends into the header). Keep the breakpoint
    in sync with NARROW_QUERY in AppHeader.vue. */
   :is(
-  .menu-app.skin-luxe,
-  .menu-app.skin-luxe-emerald,
-  .menu-app.skin-luxe-bordeaux,
-  .menu-app:not([class*="skin-"]) /* landing page: no bar, so no skin class (luxe vars come from :root) */
+  .menu-app.skin-mocka,
+  .menu-app.skin-emerald,
+  .menu-app.skin-bordeaux,
+  .menu-app:not([class*="skin-"]) /* landing page: no bar, so no skin class (Mocka vars come from :root) */
 ) .burger-button {
   color: var(--gold);
   border-color: var(--gold-dim);

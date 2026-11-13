@@ -929,36 +929,36 @@ body {
   margin: 0.2rem 0 0 0;
 }
 
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h1,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h2,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h3,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h4,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h5,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) h6 {
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) h1,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) h2,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) h3,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) h4,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) h5,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) h6 {
   font-family: var(--font-display);
 }
 
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .section-title,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .cocktails-header,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .cocktail-moment-kicker,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .featured-menu-heading h2,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .form-section-title,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .prep-section-title,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .cv-group-title,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .category-title,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .recommendations-title,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .similar-cocktails-title,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .loyalty-panel-title,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .shared-favorites-heading h2,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .drinker-col-title {
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .section-title,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .cocktails-header,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .cocktail-moment-kicker,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .featured-menu-heading h2,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .form-section-title,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .prep-section-title,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .cv-group-title,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .category-title,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .recommendations-title,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .similar-cocktails-title,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .loyalty-panel-title,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .shared-favorites-heading h2,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .drinker-col-title {
   font-family: var(--font-subtitle, inherit);
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .bar-tile-button,
-:is(.menu-app.skin-luxe, .menu-app.skin-luxe-emerald, .menu-app.skin-luxe-bordeaux) .view-toggle-btn {
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .bar-tile-button,
+:is(.menu-app.skin-mocka, .menu-app.skin-emerald, .menu-app.skin-bordeaux) .view-toggle-btn {
   font-family: var(--font-subtitle);
 }
 
@@ -5259,9 +5259,9 @@ body {
   font-family: var(--font-cocktail, var(--font-display));
 }
 
-.menu-app.skin-luxe .cocktail-title,
-.menu-app.skin-luxe-emerald .cocktail-title,
-.menu-app.skin-luxe-bordeaux .cocktail-title {
+.menu-app.skin-mocka .cocktail-title,
+.menu-app.skin-emerald .cocktail-title,
+.menu-app.skin-bordeaux .cocktail-title {
   font-family: var(--font-cocktail);
 }
 

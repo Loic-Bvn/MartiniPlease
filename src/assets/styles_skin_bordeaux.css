@@ -1,4 +1,4 @@
-.menu-app.skin-luxe-bordeaux {
+.menu-app.skin-bordeaux {
   --font-body: 'Karla', sans-serif;
   --font-subtitle: 'Josefin Sans', sans-serif;
   --font-display: 'Gloock', serif;
@@ -34,7 +34,7 @@
     radial-gradient(ellipse 85% 55% at 50% 100%, rgba(196, 91, 107, 0.2), transparent 72%);
 }
 
-.dark .menu-app.skin-luxe-bordeaux {
+.dark .menu-app.skin-bordeaux {
   --bg: #1a100c;
   --bg-card: #4a1420;
   --bg-raised: #6b1f2e;
@@ -59,6 +59,6 @@
     radial-gradient(ellipse 85% 55% at 50% 100%, rgba(107, 31, 46, 0.5), transparent 72%);
 }
 
-.menu-app.skin-luxe-bordeaux .featured-menu-heading h2 {
+.menu-app.skin-bordeaux .featured-menu-heading h2 {
   color: var(--text);
 }

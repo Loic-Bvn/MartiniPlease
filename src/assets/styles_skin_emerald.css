@@ -1,4 +1,4 @@
-.menu-app.skin-luxe-emerald {
+.menu-app.skin-emerald {
   --font-body: 'Karla', sans-serif;
   --font-subtitle: 'Josefin Sans', sans-serif;
   --font-display: 'Gloock', serif;
@@ -33,7 +33,7 @@
     radial-gradient(ellipse 40% 32% at 48% 100%, rgba(196, 213, 199, 0.36), transparent 72%);
 }
 
-.dark .menu-app.skin-luxe-emerald {
+.dark .menu-app.skin-emerald {
   --bg: #08110e;
   --bg-card: #0e2820;
   --bg-raised: #0b211a;
@@ -57,6 +57,6 @@
     radial-gradient(ellipse 40% 32% at 48% 100%, rgba(14, 40, 32, 0.48), transparent 72%);
 }
 
-.menu-app.skin-luxe-emerald .featured-menu-heading h2 {
+.menu-app.skin-emerald .featured-menu-heading h2 {
   color: var(--text);
 }

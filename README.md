@@ -123,7 +123,7 @@ pour le carrousel de la landing page. Le bar doit être public et la carte
 visible pour ses visiteurs.
 
 Chaque bar peut également choisir son skin dans le menu du bartender :
-Luxe, Classique, Coloré, Brasserie, Artisanal ou Minimal. Le choix est enregistré dans
+Mocka, Émeraude, Bordeaux, Classique ou Minimal. Le choix est enregistré dans
 les options du bar et s'applique aussi aux visiteurs de ce bar.
 
 ### Développement

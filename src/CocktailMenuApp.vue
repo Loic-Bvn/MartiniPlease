@@ -26,7 +26,7 @@
           :bars="bars"
           :showBarsSelection="showBarsSelection"
           :locale="locale"
-          :skin="features.skin || 'luxe'"
+          :skin="activeBarSkin || 'mocka'"
           :unit="unit"
           :toastMessage="toastMessage"
           :toastType="toastType"
@@ -426,19 +426,27 @@ const accessibleMenuCards = computed(() =>
 const { hasDrinker, drinkerPseudo, initDrinker, createDrinker, reconnectDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { toastMessage, toastType, showToast } = useToast()
 const { features, setFeature } = useBarFeatures()
-const activeBarSkin = computed(() => isLoggedIn.value ? features.value.skin : guestBar.value?.features?.skin)
+const LEGACY_SKINS = {
+  luxe: 'mocka',
+  'luxe-emerald': 'emerald',
+  'luxe-bordeaux': 'bordeaux',
+}
+const activeBarSkin = computed(() => {
+  const storedSkin = isLoggedIn.value ? features.value.skin : guestBar.value?.features?.skin
+  return LEGACY_SKINS[storedSkin] || storedSkin
+})
 const activeSkinClass = computed(() => {
   const skins = [
-    'luxe',
-    'luxe-emerald',
-    'luxe-bordeaux',
+    'mocka',
+    'emerald',
+    'bordeaux',
     'classic',
     'minimal'
     // 'color',
     // 'brasserie',
     // 'craft',
   ]
-  const skin = skins.includes(activeBarSkin.value) ? activeBarSkin.value : 'luxe'
+  const skin = skins.includes(activeBarSkin.value) ? activeBarSkin.value : 'mocka'
   return activeBarId.value ? `skin-${skin}` : null
 })
 const preparationCounterEnabled = computed(() => features.value.preparationCounter === true)
