@@ -299,6 +299,7 @@
 
     <!-- Footer -->
     <Footer
+      :class="[activeSkinClass, { 'menu-app': !!activeSkinClass, 'bartender-mode': isLoggedIn && !!activeSkinClass }]"
       :locale="locale"
       :transparent-on-landing="!isLoggedIn && !activeBarId"
       @navigate-to-legal="openLegalPage"

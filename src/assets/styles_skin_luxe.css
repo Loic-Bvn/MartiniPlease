@@ -88,6 +88,37 @@
   border-color: var(--amber);
 }
 
+:root:not(.dark) :is(
+  .menu-app.skin-luxe,
+  .menu-app.skin-luxe-emerald,
+  .menu-app.skin-luxe-bordeaux,
+  .menu-app:not([class*="skin-"])
+) :is(.modal-overlay, .password-modal-overlay) :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+  select,
+  textarea
+) {
+  border: 1px solid var(--gold-dim);
+}
+
+:root:not(.dark) :is(
+  .menu-app.skin-luxe,
+  .menu-app.skin-luxe-emerald,
+  .menu-app.skin-luxe-bordeaux,
+  .menu-app:not([class*="skin-"])
+) .burger-dropdown .skin-select-row select {
+  border-color: var(--gold-dim);
+}
+
+:is(
+  .menu-app.skin-luxe,
+  .menu-app.skin-luxe-emerald,
+  .menu-app.skin-luxe-bordeaux
+) .burger-dropdown .burger-item {
+  font-family: var(--font-subtitle, var(--font-body, sans-serif));
+  font-weight: 400;
+}
+
 /* Mobile (≤600px): burger button uses the gold accent in luxe skins
    (default muted text color blends into the header). Keep the breakpoint
    in sync with NARROW_QUERY in AppHeader.vue. */

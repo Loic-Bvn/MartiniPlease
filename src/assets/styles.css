@@ -718,6 +718,11 @@ body {
   background: var(--cocktail-list-bg, transparent);
 }
 
+.cocktail-list-section.cocktail-list-section--empty,
+.featured-menu-section.featured-menu-section--empty {
+  background: transparent;
+}
+
 /* Vue "standard" : cartes plus larges (photo + texte côte à côte) => 2 par ligne sur desktop */
 .cocktails-grid--standard {
   grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -209,7 +209,10 @@
         </div>
         <span class="engagement-hint">{{ locale === 'fr' ? 'cocktails essayés' : 'cocktails tried' }}</span>
       </div> -->
-      <section v-if="isLoggedIn || featuredMenuCocktails.length" class="featured-menu-section">
+      <section
+        v-if="isLoggedIn || featuredMenuCocktails.length"
+        :class="['featured-menu-section', { 'featured-menu-section--empty': !featuredMenuCocktails.length }]"
+      >
         <div class="featured-menu-heading">
           <h2>{{ locale === 'fr' ? 'Carte du moment' : 'Featured menu' }}<template v-if="featuredMenuCardName">  - {{ featuredMenuCardName }}</template></h2>
           <select
@@ -244,7 +247,7 @@
         <p v-else-if="isLoggedIn" class="featured-menu-empty">{{ locale === 'fr' ? 'Sélectionnez une carte pour l’afficher avant le catalogue.' : 'Choose a menu to feature before the catalogue.' }}</p>
       </section>
 
-      <section class="cocktail-list-section">
+      <section :class="['cocktail-list-section', { 'cocktail-list-section--empty': !filteredCocktails.length }]">
         <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
         <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
           <component :is="lucideIcons.cocktail" :size="48" class="empty-state-icon" aria-hidden="true" />

@@ -94,7 +94,7 @@ function openConsent() {
   border-top: 1px solid var(--border);
 }
 .dark .footer-martini {
-  background: linear-gradient(135deg, rgba(34,31,26,0.8), rgba(26,24,20,0.9));
+  background: linear-gradient(to bottom, var(--bg), var(--bg-raised));
   border-color: var(--border-mid);
 }
 .footer-martini.footer-martini--landing,
