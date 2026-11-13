@@ -114,7 +114,11 @@
                   <Check :size="18" /> {{ locale === 'fr' ? 'Sélectionner' : 'Select' }}
                 </button>
                 <button @click="$emit('start-edit-bar', b)" class="btn-action-small"><Pencil :size="14" /></button>
-                <button @click="viewingTrendsFor = b.id" class="btn-action-small" :title="locale === 'fr' ? 'Tendances' : 'Trends'">
+                <button
+                  @click="$emit('open-preparation-stats', b.id)"
+                  class="btn-action-small"
+                  :title="locale === 'fr' ? 'Statistiques des préparations' : 'Preparation statistics'"
+                >
                   <component :is="lucideIcons.trends" :size="16" aria-hidden="true" />
                 </button>
                 <button @click="$emit('start-delete-bar', b)" class="btn-action-small btn-action-small--danger"><Trash2 :size="14" /></button>
@@ -176,23 +180,13 @@
           </div>
         </div>
       </transition>
-      <TrendsModal
-        v-if="viewingTrendsFor"
-        :bar-id="viewingTrendsFor"
-        :locale="locale"
-        @close="viewingTrendsFor = null"
-      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { X, Plus, Pencil, Trash2, Check } from 'lucide-vue-next'
 import { lucideIcons } from '@/utils/lucideIcons'
-import TrendsModal from './Modals/TrendsModal.vue'
-
-const viewingTrendsFor = ref(null)
 
 const props = defineProps({
   randomLogo: String,
@@ -216,6 +210,7 @@ const emit = defineEmits([
   'save-bar-edits',
   'cancel-edit-bar',
   'start-delete-bar',
+  'open-preparation-stats',
   'close-delete-modal',
   'delete-bar',
   'update:newBarName',

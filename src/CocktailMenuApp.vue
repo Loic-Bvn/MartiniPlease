@@ -26,7 +26,7 @@
           :bars="bars"
           :showBarsSelection="showBarsSelection"
           :locale="locale"
-          :skin="features.skin || 'luxe'"
+          :skin="activeBarSkin || 'mocka'"
           :unit="unit"
           :toastMessage="toastMessage"
           :toastType="toastType"
@@ -43,7 +43,7 @@
           @open-bars-selection="handleOpenBarsSelection"
           @toggle-public="handleTogglePublic"
           @open-catalog="showCatalogModal = true"
-          @open-preparation-stats="showPreparationStatsModal = true"
+          @open-preparation-stats="openPreparationStats"
           @sign-out="handleSignOut"
         />
 
@@ -98,6 +98,7 @@
           :showNewBarInput="showNewBarInput"
           :barToDelete="barToDelete"
           :deleteConfirmationInput="deleteConfirmationInput"
+          @open-preparation-stats="openPreparationStats"
           @create-new-bar="handleCreateNewBar"
           @select-bar="handleSelectBar"
           @start-edit-bar="startEditBar"
@@ -258,11 +259,14 @@
           :card-view="cardView"
           :bar-id="activeBarId"
           :cocktail-of-moment-id="cocktailOfMomentId"
+          :updating-cocktail-id="updatingCardCocktailId"
           @close="closeCardView"
           @set-locale="setLocale"
           @set-unit="setUnit"
           @set-card-view="setCardView"
           @open-cocktail="openCocktailFromCard"
+          @remove-cocktail-from-card="(id) => handleCardCocktailChange(id, false)"
+          @add-cocktail-to-card="(id) => handleCardCocktailChange(id, true)"
         />
         <Transition name="modal-fade">
           <CocktailDetailModal
@@ -281,12 +285,12 @@
           />
         </Transition>
         <PreparationStatsModal
-          v-if="showPreparationStatsModal && isLoggedIn && preparationCounterEnabled && activeBarId"
-          :bar-id="activeBarId"
+          v-if="preparationStatsBarId && isLoggedIn"
+          :bar-id="preparationStatsBarId"
           :locale="locale"
           :menu-cards="menuCards"
           :cocktails="cocktails"
-          @close="showPreparationStatsModal = false"
+          @close="preparationStatsBarId = null"
           @set-locale="setLocale"
         />
         <PreparationUndoToast v-if="isLoggedIn && preparationCounterEnabled" :locale="locale" />
@@ -295,6 +299,7 @@
 
     <!-- Footer -->
     <Footer
+      :class="[activeSkinClass, { 'menu-app': !!activeSkinClass, 'bartender-mode': isLoggedIn && !!activeSkinClass }]"
       :locale="locale"
       :transparent-on-landing="!isLoggedIn && !activeBarId"
       @navigate-to-legal="openLegalPage"
@@ -360,8 +365,9 @@ const CookiesPolicy     = defineAsyncComponent(() => import('@/views/CookiesPoli
 const PreparationStatsModal = defineAsyncComponent(() => import('@/Components/Modals/PreparationStatsModal.vue'))
 const cocktailToDelete = ref(null)
 const cardToDelete = ref(null)
-const showPreparationStatsModal = ref(false)
+const preparationStatsBarId = ref(null)
 const preparationCardId = ref(null)
+const updatingCardCocktailId = ref(null)
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 const {
@@ -404,7 +410,14 @@ const activeBarName = computed(() => currentBarName.value || guestBar.value?.nam
 // ── Données ───────────────────────────────────────────────────────────────────
 const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, updateCocktail, deleteCocktail } = useCocktails()
 const { barInventory, ingredients, fetchIngredients, initializeDefaultIngredients } = useInventory()
-const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCard } = useMenuCards()
+const {
+  menuCards,
+  fetchMenuCards,
+  createMenuCard,
+  updateMenuCard,
+  toggleCocktailInMenuCard,
+  deleteMenuCard,
+} = useMenuCards()
 const accessibleMenuCards = computed(() =>
   isLoggedIn.value
     ? menuCards.value
@@ -413,17 +426,27 @@ const accessibleMenuCards = computed(() =>
 const { hasDrinker, drinkerPseudo, initDrinker, createDrinker, reconnectDrinker, favorites, history, toggleFavorite, clearDrinker } = useDrinker()
 const { toastMessage, toastType, showToast } = useToast()
 const { features, setFeature } = useBarFeatures()
-const activeBarSkin = computed(() => isLoggedIn.value ? features.value.skin : guestBar.value?.features?.skin)
+const LEGACY_SKINS = {
+  luxe: 'mocka',
+  'luxe-emerald': 'emerald',
+  'luxe-bordeaux': 'bordeaux',
+}
+const activeBarSkin = computed(() => {
+  const storedSkin = isLoggedIn.value ? features.value.skin : guestBar.value?.features?.skin
+  return LEGACY_SKINS[storedSkin] || storedSkin
+})
 const activeSkinClass = computed(() => {
   const skins = [
-    'luxe',
+    'mocka',
+    'emerald',
+    'bordeaux',
     'classic',
     'minimal'
     // 'color',
     // 'brasserie',
     // 'craft',
   ]
-  const skin = skins.includes(activeBarSkin.value) ? activeBarSkin.value : 'luxe'
+  const skin = skins.includes(activeBarSkin.value) ? activeBarSkin.value : 'mocka'
   return activeBarId.value ? `skin-${skin}` : null
 })
 const preparationCounterEnabled = computed(() => features.value.preparationCounter === true)
@@ -508,6 +531,9 @@ const publicBarsError   = ref(false)
 const featuredCocktails = ref([])
 const landingPhotos = ref([])
 const LANDING_PHOTOS_PATH = '423b7a57-d0e1-40cb-97d0-182bc2b51a04/_landing_page'
+const LANDING_FOCAL_OVERRIDES = {
+  'Penicilin__30-60.jpg': { x: 50, y: 60 },
+}
 const FEATURED_BAR_ID = import.meta.env.VITE_FEATURED_BAR_ID || 'd37d1296-9167-4694-a7fb-8e3878cecdb9'
 const FEATURED_MENU_CARD_ID = import.meta.env.VITE_FEATURED_MENU_CARD_ID
 const featuredBar = computed(() => publicBars.value.find(bar => bar.id === FEATURED_BAR_ID) || null)
@@ -537,9 +563,9 @@ async function fetchLandingPhotos() {
         const filename = file.name.replace(/\.[^.]+$/, '')
         const FOCAL_SUFFIX = /[\s_-]+(\d{1,3})[\s_x-](\d{1,3})$/
         const focalMatch = filename.match(FOCAL_SUFFIX)
-        const focal = focalMatch
+        const focal = LANDING_FOCAL_OVERRIDES[file.name] || (focalMatch
           ? { x: Math.min(100, +focalMatch[1]), y: Math.min(100, +focalMatch[2]) }
-          : null
+          : null)
         const label = filename.replace(FOCAL_SUFFIX, '')
         const caption = file.name.startsWith('_')
           ? ''
@@ -645,6 +671,19 @@ async function loadBarData(barId) {
     fetchMenuCards(barId),
   ])
   clearFilters()
+}
+
+async function openPreparationStats(barId = activeBarId.value) {
+  if (!barId) return
+
+  if (barId !== currentBarId.value) {
+    await Promise.all([
+      fetchCocktails(barId),
+      fetchMenuCards(barId),
+    ])
+  }
+
+  preparationStatsBarId.value = barId
 }
 
 function handleLogoClick() {
@@ -806,6 +845,29 @@ async function confirmDeleteCard() {
   if (!id) return
   const result = await deleteMenuCard(id)
   if (!result.success) showToast(`❌ ${result.error}`, 'error')
+}
+
+async function handleCardCocktailChange(cocktailId, shouldAdd) {
+  const card = viewingCard.value
+  if (!card || updatingCardCocktailId.value) return
+  const isIncluded = (card.cocktail_ids || []).includes(cocktailId)
+  if (isIncluded === shouldAdd) return
+
+  updatingCardCocktailId.value = cocktailId
+  try {
+    const result = await toggleCocktailInMenuCard(card.id, cocktailId)
+    if (!result.success) {
+      showToast(`❌ ${result.error?.message || result.error}`, 'error')
+      return
+    }
+
+    if (viewingCard.value?.id === card.id) viewingCard.value = result.data
+    showToast(locale.value === 'fr'
+      ? `🍸 Cocktail ${shouldAdd ? 'ajouté à' : 'retiré de'} la carte`
+      : shouldAdd ? '🍸 Cocktail added to the menu' : '🍸 Cocktail removed from the menu')
+  } finally {
+    updatingCardCocktailId.value = null
+  }
 }
 
 // ── CRUD cartes ───────────────────────────────────────────────────────────────

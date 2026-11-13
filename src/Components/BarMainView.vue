@@ -2,23 +2,29 @@
   <div class="main-content bar-main">
 
     <div v-if="isLoggedIn" :class="['section-card', 'tile-stock', { 'tile-open': openPanel === 'stock' }]">
-      <button @click="togglePanel('stock')" class="expand-actions-btn">
-        <ChevronDown :size="18" :class="{ rotated: openPanel === 'stock' }" />
-        <h2 class="section-title"><component :is="lucideIcons.stock" :size="20" class="tile-ico" /><span class="tile-lbl"><span class="lbl-full">{{ t.stock }}</span><span class="lbl-short">Stock</span></span><span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></h2>
-        <span></span>
-      </button>
+      <BarTileButton
+        :icon="lucideIcons.stock"
+        :label="t.stock"
+        toggle
+        :open="openPanel === 'stock'"
+        @activate="togglePanel('stock')"
+      >
+        <template #label><span class="lbl-full">{{ t.stock }}</span><span class="lbl-short">Stock</span></template>
+        <template #badge><span class="count-badge">{{ selectedCount }} / {{ totalCount }}</span></template>
+      </BarTileButton>
       <InventoryManager v-if="openPanel === 'stock'" @close="togglePanel('stock')" />
     </div>
 
     <div v-if="isLoggedIn" :class="['section-card', 'tile-orders', { 'tile-open': openPanel === 'orders' }]">
-      <button @click="togglePanel('orders')" class="expand-actions-btn">
-        <ChevronDown :size="18" :class="{ rotated: openPanel === 'orders' }" />
-        <h2 class="section-title">
-          <component :is="lucideIcons.orders" :size="20" class="tile-ico" /><span class="tile-lbl">{{ locale === 'fr' ? 'Commandes' : 'Orders' }}</span>
-          <span v-if="pendingOrdersCount > 0" class="count-badge pending-badge">{{ pendingOrdersCount }}</span>
-        </h2>
-        <span></span>
-      </button>
+      <BarTileButton
+        :icon="lucideIcons.orders"
+        :label="locale === 'fr' ? 'Commandes' : 'Orders'"
+        toggle
+        :open="openPanel === 'orders'"
+        @activate="togglePanel('orders')"
+      >
+        <template #badge><span v-if="pendingOrdersCount > 0" class="count-badge pending-badge">{{ pendingOrdersCount }}</span></template>
+      </BarTileButton>
       <div v-if="openPanel === 'orders'" class="filters-dropdown-content">
         <OrdersPanel :locale="locale" :unit="unit" />
       </div>
@@ -99,14 +105,13 @@
           @clear-filters="$emit('clear-filters')"
         />
 
-        <button
+        <BarTileButton
           v-if="!isLoggedIn && !hasDrinker"
-          type="button"
-          class="expand-actions-btn tile-drinker tile-login"
-          @click="$emit('open-drinker-login')"
-        >
-          <span class="section-title"><component :is="lucideIcons.login" :size="20" class="tile-ico" /><span class="tile-lbl">{{ locale === 'fr' ? 'Connexion' : 'Sign in' }}</span></span>
-        </button>
+          class="tile-drinker tile-login"
+          :icon="lucideIcons.login"
+          :label="locale === 'fr' ? 'Connexion' : 'Sign in'"
+          @activate="$emit('open-drinker-login')"
+        />
 
         <DrinkerPanel
           v-if="hasDrinker"
@@ -146,16 +151,13 @@
           @toggle-card-visibility="$emit('toggle-card-visibility', $event)"
         />
 
-        <button
+        <BarTileButton
           v-if="!isLoggedIn"
-          type="button"
-          class="surprise-button tile-surprise"
-          @click="$emit('surprise-me')"
-        >
-          <Dices :size="18" class="surprise-icon" />
-          <span class="surprise-title"><span class="lbl-full">{{ surpriseLabel.title }}</span><span class="lbl-short">{{ locale === 'fr' ? 'Hasard' : 'Random' }}</span></span>
-          <span class="surprise-sub">{{ surpriseLabel.sub }}</span>
-        </button>
+          class="tile-surprise"
+          :icon="Dices"
+          :label="locale === 'fr' ? 'Hasard' : 'Random'"
+          @activate="$emit('surprise-me')"
+        />
       </div>
 
     </div>
@@ -207,7 +209,10 @@
         </div>
         <span class="engagement-hint">{{ locale === 'fr' ? 'cocktails essayés' : 'cocktails tried' }}</span>
       </div> -->
-      <section v-if="isLoggedIn || featuredMenuCocktails.length" class="featured-menu-section">
+      <section
+        v-if="isLoggedIn || featuredMenuCocktails.length"
+        :class="['featured-menu-section', { 'featured-menu-section--empty': !featuredMenuCocktails.length }]"
+      >
         <div class="featured-menu-heading">
           <h2>{{ locale === 'fr' ? 'Carte du moment' : 'Featured menu' }}<template v-if="featuredMenuCardName">  - {{ featuredMenuCardName }}</template></h2>
           <select
@@ -242,7 +247,7 @@
         <p v-else-if="isLoggedIn" class="featured-menu-empty">{{ locale === 'fr' ? 'Sélectionnez une carte pour l’afficher avant le catalogue.' : 'Choose a menu to feature before the catalogue.' }}</p>
       </section>
 
-      <section class="cocktail-list-section">
+      <section :class="['cocktail-list-section', { 'cocktail-list-section--empty': !filteredCocktails.length }]">
         <div v-if="cocktailsLoading" class="loading-state">{{ t.loading }}</div>
         <div v-else-if="filteredCocktails.length === 0" class="empty-state-enhanced">
           <component :is="lucideIcons.cocktail" :size="48" class="empty-state-icon" aria-hidden="true" />
@@ -282,10 +287,11 @@
 
 <script setup>
 import { ref, computed, watch, nextTick, defineAsyncComponent, onMounted, onBeforeUnmount } from 'vue'
-import { ChevronDown, Rows3, GalleryVerticalEnd, Dices, Heart } from 'lucide-vue-next'
+import { Rows3, GalleryVerticalEnd, Dices, Heart } from 'lucide-vue-next'
 import { lucideIcons } from '@/utils/lucideIcons'
 const InventoryManager = defineAsyncComponent(() => import('@/Components/Modals/InventoryManager.vue'))
 import OrdersPanel      from '@/Components/OrdersPanel.vue'
+import BarTileButton from '@/Components/BarTileButton.vue'
 import FilterPanel      from '@/Components/FilterPanel.vue'
 import DrinkerPanel     from '@/Components/DrinkerPanel.vue'
 import CardPanel        from '@/Components/CardPanel.vue'
@@ -342,27 +348,6 @@ const props = defineProps({
   sharedFavoriteCocktails: { type: Array, default: () => [] },
   inviteCode:         { type: String, default: '' },
 })
-
-// ── Bouton « Surprise » : variantes de texte ──────────────────────────────────
-// Change SURPRISE_VARIANT pour tester un autre wording. `sub: ''` = pas de sous-titre.
-const SURPRISE_VARIANT = 'default'
-const SURPRISE_LABELS = {
-  default:  { fr: { title: 'Surprends-moi',         sub: 'Un cocktail au hasard' },
-              en: { title: 'Surprise Me',          sub: 'A random cocktail' } },
-  minimal:  { fr: { title: 'Surprends-moi',         sub: '' },
-              en: { title: 'Surprise Me',          sub: '' } },
-  bartender:{ fr: { title: 'Laisse-moi faire',     sub: 'Le barman choisit pour toi' },
-              en: { title: 'Bartender’s choice',   sub: 'Let the bar pick for you' } },
-  playful:  { fr: { title: 'Tente ta chance',      sub: 'Lance les dés' },
-              en: { title: 'Feeling lucky?',       sub: 'Roll the dice' } },
-  taste:    { fr: { title: 'Je ne sais pas quoi boire', sub: 'On choisit pour toi' },
-              en: { title: 'Can’t decide?',        sub: 'We’ll choose for you' } },
-}
-const surpriseLabel = computed(() => {
-  const v = SURPRISE_LABELS[SURPRISE_VARIANT] || SURPRISE_LABELS.default
-  return props.locale === 'fr' ? v.fr : v.en
-})
-
 
 const emit = defineEmits([
   'view-card', 'edit-card', 'delete-card', 'new-card', 'toggle-card-visibility',

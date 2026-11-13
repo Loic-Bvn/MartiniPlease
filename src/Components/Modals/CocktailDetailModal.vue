@@ -101,12 +101,9 @@
       <div class="modal-body cv-modal-body">
         <div class="cocktail-view-layout">
 
-          <div class="cv-image-col">
-            <div v-if="cocktail.image && !imageError" class="image-preview-large">
+          <div v-if="cocktail.image && !imageError" class="cv-image-col">
+            <div class="image-preview-large">
               <img :src="cocktail.image" :crossorigin="isSupabasePublicImage(cocktail.image) ? 'anonymous' : undefined" alt="cocktail image" loading="lazy" @error="imageError = true" />
-            </div>
-            <div v-else class="image-missing">
-              <Martini :size="40" />
             </div>
           </div>
 
@@ -282,16 +279,14 @@
                   <ul v-if="similarCocktails.length" class="cv-similar-list">
                     <li v-for="c in similarCocktails" :key="c.id">
                       <button type="button" class="cv-similar-item" @click="$emit('open-cocktail', c, null, preparationCardId)">
-                        <span class="cv-similar-thumb">
+                        <span v-if="c.image && !failedThumbs.has(c.id)" class="cv-similar-thumb">
                           <img
-                            v-if="c.image && !failedThumbs.has(c.id)"
                             :src="c.image"
                             :crossorigin="isSupabasePublicImage(c.image) ? 'anonymous' : undefined"
                             alt=""
                             loading="lazy"
                             @error="onThumbError(c.id)"
                           />
-                          <Martini v-else :size="18" />
                         </span>
                         <span class="cv-similar-text">
                           <span class="cv-similar-name">{{ c.name }}</span>
@@ -359,6 +354,7 @@ import AddToMenuButton from '@/Components/AddToMenuButton.vue'
 import PrepareButton from '@/Components/PrepareButton.vue'
 import { isSupabasePublicImage } from '@/lib/supabase'
 import { useModalAccessibility } from '@/composables/useModalAccessibility'
+import { formatOz } from '@/utils/formatters'
 
 const { isFeatureEnabled } = useBarFeatures()
 const showPrices = computed(() => isFeatureEnabled('showPrices'))
@@ -491,7 +487,7 @@ function formatQty(ing) {
     if (ing.Dashes) return `${ing.Dashes} dash${ing.Dashes > 1 ? 'es' : ''}`
     return ''
   }
-  if (ing.Oz) return `${ing.Oz}oz`
+  if (ing.Oz) return `${formatOz(ing.Oz)}oz`
   if (ing.Dashes) return `${ing.Dashes} dash${ing.Dashes > 1 ? 'es' : ''}`
   return ''
 }
@@ -829,8 +825,7 @@ onBeforeUnmount(() => {
   overflow-x: hidden;
 }
 
-.image-preview-large,
-.image-missing {
+.image-preview-large {
   flex: 1;
   min-height: 0;
   height: 100%;
@@ -844,14 +839,6 @@ onBeforeUnmount(() => {
   object-fit: cover;
   object-position: center 40%;
   display: block;
-}
-
-.image-missing {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--bg-raised), var(--bg-input));
-  color: var(--gold-dim);
 }
 
 .cv-prep-block {
@@ -1202,8 +1189,7 @@ onBeforeUnmount(() => {
   /* image carrée qui remplit toute la largeur dispo (pas de marges
      latérales) ; la hauteur suit via aspect-ratio, avec un plafond
      généreux pour ne pas manger tout l'écran sur les téléphones larges */
-  .image-preview-large,
-  .image-missing {
+  .image-preview-large {
     flex: none;
     width: 100%;
     height: auto;
@@ -1222,8 +1208,7 @@ onBeforeUnmount(() => {
 /* Écrans courts (petits téléphones, mode paysage) : on rogne l'image
    en priorité pour garder de la place pour le contenu scrollable */
 @media (max-width: 768px) and (max-height: 700px) {
-  .image-preview-large,
-  .image-missing {
+  .image-preview-large {
     max-height: min(24dvh, 150px);
   }
 

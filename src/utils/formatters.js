@@ -1,5 +1,36 @@
 // utils/formatters.js
 
+const OZ_FRACTIONS = new Map([
+  [1, '1/8'],
+  [2, '1/4'],
+  [3, '3/8'],
+  [4, '1/2'],
+  [5, '5/8'],
+  [6, '3/4'],
+  [7, '7/8'],
+])
+
+export function formatOz(amount) {
+  const value = Number(amount)
+  if (!Number.isFinite(value)) return String(amount ?? '')
+
+  const absoluteValue = Math.abs(value)
+  if (absoluteValue >= 1) return String(amount)
+
+  const whole = Math.floor(absoluteValue)
+  const eighths = Math.round((absoluteValue - whole) * 8)
+  if (Math.abs(absoluteValue - whole - eighths / 8) > 1e-6) {
+    return String(amount)
+  }
+
+  const fraction = OZ_FRACTIONS.get(eighths)
+  const formatted = fraction
+    ? (whole ? `${whole} ${fraction}` : fraction)
+    : String(whole + (eighths === 8 ? 1 : 0))
+
+  return value < 0 ? `-${formatted}` : formatted
+}
+
 /**
  * Formate une date ISO en string lisible
  */

@@ -2,17 +2,15 @@
   <div class="section-card">
 
     <!-- HEADER TOGGLE -->
-    <div @click="$emit('toggle')" class="expand-actions-btn" role="button" tabindex="0" @keydown.enter="$emit('toggle')">
-      <ChevronDown :size="18" :class="{ rotated: open }" />
-      <h2 class="section-title">
-        <component :is="lucideIcons.filters" :size="20" class="tile-ico" /><span class="tile-lbl">{{ t.filterTitle }}</span>
-        <span v-if="activeCount > 0" class="count-badge">{{ activeCount }}</span>
-      </h2>
-      <button class="clear-all-btn" v-if="hasActiveFilters" @click.stop="$emit('clear-filters')">
-        {{ t.clearAll }}
-      </button>
-      <span v-else></span>
-    </div>
+    <BarTileButton
+      :icon="lucideIcons.filters"
+      :label="t.filterTitle"
+      toggle
+      :open="open"
+      @activate="$emit('toggle')"
+    >
+      <template #badge><span v-if="activeCount > 0" class="count-badge">{{ activeCount }}</span></template>
+    </BarTileButton>
 
     <!-- CONTENT -->
     <div v-if="open" class="filters-dropdown-content filters-grid">
@@ -165,6 +163,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { ChevronDown, Search, Martini } from 'lucide-vue-next'
 import { lucideIcons } from '@/utils/lucideIcons'
+import BarTileButton from '@/Components/BarTileButton.vue'
 import { splitLabel } from '@/utils/tileLabel'
 
 const showSuggestions = ref(false)

@@ -2,6 +2,7 @@ import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
 
 const modalStack = []
 let originalBodyOverflow = ''
+let originalBodyPaddingRight = ''
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',
@@ -85,7 +86,13 @@ export function useModalAccessibility(dialog, onClose, active = true, initialFoc
     }
     if (!modalStack.length) {
       originalBodyOverflow = document.body.style.overflow
+      originalBodyPaddingRight = document.body.style.paddingRight
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+      const bodyPaddingRight = Number.parseFloat(getComputedStyle(document.body).paddingRight) || 0
       document.body.style.overflow = 'hidden'
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${bodyPaddingRight + scrollbarWidth}px`
+      }
       document.addEventListener('keydown', handleModalKeydown)
     }
     modalStack.push(entry)
@@ -103,6 +110,7 @@ export function useModalAccessibility(dialog, onClose, active = true, initialFoc
     if (!modalStack.length) {
       document.removeEventListener('keydown', handleModalKeydown)
       document.body.style.overflow = originalBodyOverflow
+      document.body.style.paddingRight = originalBodyPaddingRight
     }
 
     const restoreTarget = entry.restoreFocus

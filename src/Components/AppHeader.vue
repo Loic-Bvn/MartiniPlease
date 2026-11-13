@@ -164,12 +164,14 @@
                   <Palette :size="15" />
                   <span>{{ locale === 'fr' ? 'Style du bar' : 'Bar style' }}</span>
                   <select
-                    :value="skin || 'luxe'"
+                    :value="skin || 'mocka'"
                     :aria-label="locale === 'fr' ? 'Style du bar' : 'Bar style'"
                     @change="$emit('set-skin', $event.target.value)"
                   >
                     <option value="classic">{{ locale === 'fr' ? 'Classique' : 'Classic' }}</option>
-                    <option value="luxe">{{ locale === 'fr' ? 'Luxe' : 'Luxe' }}</option>
+                    <option value="mocka">Mocka</option>
+                    <option value="emerald">{{ locale === 'fr' ? 'Émeraude' : 'Emerald' }}</option>
+                    <option value="bordeaux">Bordeaux</option>
                     <option value="minimal">{{ locale === 'fr' ? 'Minimaliste' : 'Minimal' }}</option>
                     <!-- <option value="color">{{ locale === 'fr' ? 'Coloré' : 'Colorful' }}</option>
                     <option value="brasserie">{{ locale === 'fr' ? 'Brasserie' : 'Brasserie' }}</option>
@@ -267,7 +269,7 @@ const props = defineProps({
   bars: Array,
   showBarsSelection: Boolean,
   locale: String,
-  skin: { type: String, default: 'luxe' },
+  skin: { type: String, default: 'mocka' },
   unit: String,
   toastMessage: String,
   randomLogo: String,
@@ -314,10 +316,10 @@ const t = computed(() => ({
 <style>
 /* Menu burger : version compacte une fois déployé */
 .header .burger-dropdown {
-  width: min(240px, calc(100vw - 24px));
+  width: min(280px, calc(100vw - 24px));
   min-width: 0;
   padding: 4px;
-  border-radius: 10px;
+  border-radius: 0;
 }
 .header .burger-dropdown .burger-item {
   gap: 7px;

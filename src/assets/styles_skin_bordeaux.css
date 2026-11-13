@@ -1,0 +1,64 @@
+.menu-app.skin-bordeaux {
+  --font-body: 'Karla', sans-serif;
+  --font-subtitle: 'Josefin Sans', sans-serif;
+  --font-display: 'Gloock', serif;
+  --font-cocktail: 'Kalnia', serif;
+  --bg: #f5e8e8;
+  --bg-card: #fff8f7;
+  --bg-raised: #f0dddd;
+  --bg-input: #ecd4d5;
+  --gold: #875521;
+  --gold-button: #a5682b;
+  --gold-dim: #71431c;
+  --amber: #dfc0c0;
+  --cocktail-list-bg: color-mix(in srgb, var(--bg) 70%, var(--bg-card));
+  --amber-surface: #8f3543;
+  --text: #1a100c;
+  --text-muted: #70505a;
+  --text-dim: #806873;
+  --border: #dec2c7;
+  --border-mid: #d3aeb6;
+  --radius-control: 3px;
+  --radius-panel: 6px;
+  --radius-dialog: 8px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --shadow-sm: 0 1px 3px rgba(26, 16, 12, 0.08);
+  --shadow-md: 0 4px 12px rgba(26, 16, 12, 0.12);
+  --shadow-lg: 0 10px 28px rgba(26, 16, 12, 0.16);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 75% 55% at 0% 0%, rgba(143, 53, 67, 0.24), transparent 72%),
+    radial-gradient(ellipse 70% 55% at 100% 15%, rgba(211, 174, 182, 0.36), transparent 72%),
+    radial-gradient(ellipse 85% 55% at 50% 100%, rgba(196, 91, 107, 0.2), transparent 72%);
+}
+
+.dark .menu-app.skin-bordeaux {
+  --bg: #1a100c;
+  --bg-card: #4a1420;
+  --bg-raised: #6b1f2e;
+  --bg-input: #4a1420;
+  --gold: #ebc070;
+  --gold-button: #d9a441;
+  --gold-dim: #ebc070;
+  --amber: #6b1f2e;
+  --amber-surface: #c45b6b;
+  --text: #f4eadb;
+  --text-muted: #d4b8a2;
+  --text-dim: #b49a86;
+  --border: rgba(217, 164, 65, 0.34);
+  --border-mid: rgba(217, 164, 65, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.4);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 75% 55% at 0% 0%, rgba(196, 91, 107, 0.36), transparent 72%),
+    radial-gradient(ellipse 70% 55% at 100% 15%, rgba(217, 164, 65, 0.18), transparent 72%),
+    radial-gradient(ellipse 85% 55% at 50% 100%, rgba(107, 31, 46, 0.5), transparent 72%);
+}
+
+.menu-app.skin-bordeaux .featured-menu-heading h2 {
+  color: var(--text);
+}

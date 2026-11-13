@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direction Artistique - Oberthür Cocktail Club</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Josefin+Sans:ital,wght@0,300;0,400;0,600;1,400&family=Kalnia:wght@400;600&family=Karla:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-body: 'Karla', sans-serif;
+            --font-subtitle: 'Josefin Sans', sans-serif;
+            --font-display: 'Gloock', serif;
+            --font-cocktail: 'Kalnia', serif;
+            --bg: #f8f2da;
+            --bg-card: #e3dccc;
+            --cocktail-list-bg: #e1d2b5;
+            --bg-raised: #e1d2b5;
+            --bg-input: #e3dccc;
+            --gold: #937253;
+            --gold-dim: #937253;
+            --amber: #260101;
+            --recipe-leader: #937253;
+            --text: #260101;
+            --text-muted: #260101;
+            --text-dim: #260101;
+            --border: #937253;
+            --border-mid: #e3dccc;
+            --radius-control: 3px;
+            --radius-panel: 6px;
+            --radius-dialog: 8px;
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 8px;
+            --shadow-sm: 0 1px 2px rgba(38, 1, 1, 0.06);
+            --shadow-md: 0 3px 10px rgba(38, 1, 1, 0.08);
+            --shadow-lg: 0 8px 24px rgba(38, 1, 1, 0.12);
+        }
+
+        .dark {
+            --bg: #211b15;
+            --bg-card: #2d251d;
+            --cocktail-list-bg: #382d23;
+            --bg-raised: #382d23;
+            --bg-input: #2d251d;
+            --gold: #f8f2da;
+            --gold-dim: #e1d2b5;
+            --amber: #e1d2b5;
+            --recipe-leader: #e1d2b5;
+            --text: #f8f2da;
+            --text-muted: #e1d2b5;
+            --text-dim: #e1d2b5;
+            --border: #937253;
+            --border-mid: #937253;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 3px 10px rgba(0, 0, 0, 0.26);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.34);
+        }
+
+        .menu-app.skin-luxe {
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(ellipse 36% 30% at 0% 0%, rgba(147, 114, 83, 0.2), transparent 72%),
+                radial-gradient(ellipse 36% 30% at 100% 8%, rgba(147, 114, 83, 0.16), transparent 72%),
+                radial-gradient(ellipse 40% 32% at 48% 100%, rgba(225, 210, 181, 0.3), transparent 72%);
+        }
+
+        .dark .menu-app.skin-luxe {
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(ellipse 36% 30% at 0% 0%, rgba(225, 210, 181, 0.2), transparent 72%),
+                radial-gradient(ellipse 36% 30% at 100% 8%, rgba(88, 65, 46, 0.34), transparent 72%),
+                radial-gradient(ellipse 40% 32% at 48% 100%, rgba(56, 45, 35, 0.45), transparent 72%);
+        }
+
+        .bartender-mode {
+            --bg: #f8f2da;
+        }
+
+        .dark .bartender-mode {
+            --bg: #211b15;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-body);
+            min-height: 100vh;
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .menu-app {
+            width: 100%;
+            min-height: 100vh;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-top {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .theme-toggle-btn {
+            background: var(--bg-raised);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-panel);
+            cursor: pointer;
+            font-family: var(--font-subtitle);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* LOGO ALIGNÉ BORD À BORD */
+        .brand-header-container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: center;
+            padding: 4rem 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-dialog);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 4rem;
+        }
+
+        .brand-block {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: stretch;
+            width: max-content;
+        }
+
+        .brand-title {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 7.5vw, 6rem);
+            font-weight: 400;
+            line-height: 0.95;
+            color: var(--text);
+            text-transform: uppercase;
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+        }
+
+        .brand-subtitle-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.6rem;
+        }
+
+        .brand-subtitle-wrapper span {
+            font-family: var(--font-subtitle);
+            font-weight: 600;
+            font-size: clamp(0.75rem, 1.8vw, 1.45rem);
+            text-transform: uppercase;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .section-title {
+            font-family: var(--font-subtitle);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+
+        /* PALETTE DE COULEURS */
+        .color-palette-section {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-dialog);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 4rem;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .color-card {
+            background: var(--bg-raised);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-panel);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .color-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold);
+        }
+
+        .color-swatch {
+            width: 100%;
+            height: 64px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .color-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .color-name {
+            font-family: var(--font-subtitle);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .color-var {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .color-hex {
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-top: 0.2rem;
+        }
+
+        /* SPECIMENS TYPO */
+        .grid-specimens {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        @media (max-width: 550px) {
+            .grid-specimens { grid-template-columns: 1fr; }
+        }
+
+        .font-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-dialog);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .font-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-mid);
+            padding-bottom: 0.8rem;
+        }
+
+        .var-tag {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--gold);
+            background: var(--bg-raised);
+            padding: 0.3rem 0.6rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .font-role {
+            font-family: var(--font-subtitle);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+        }
+
+        .font-preview {
+            color: var(--text);
+            margin: 0.5rem 0;
+        }
+
+        .font-alphabet {
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+            word-break: break-all;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        /* BAC À SABLE */
+        .sandbox-section {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-dialog);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .sandbox-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-mid);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-family: var(--font-subtitle);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        .control-group select, .control-group input {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 0.8rem;
+            border-radius: var(--radius-control);
+            font-family: var(--font-body);
+        }
+
+        .sandbox-output {
+            min-height: 120px;
+            outline: none;
+            padding: 1rem;
+            background: var(--bg-raised);
+            border-radius: var(--radius-panel);
+            border: 1px dashed var(--border-mid);
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-app skin-luxe">
+        
+        <header class="header-top">
+            <div style="font-family: var(--font-subtitle); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.9rem; color: var(--gold);">
+                Direction Artistique Typographique & Chromatique
+            </div>
+            <button class="theme-toggle-btn" onclick="toggleTheme()">Basculer Mode Clair / Sombre</button>
+        </header>
+
+        <!-- LOGO ALIGNÉ BORD À BORD -->
+        <div class="brand-header-container">
+            <header class="brand-block">
+                <h1 class="brand-title">Oberthür</h1>
+                <div class="brand-subtitle-wrapper">
+                    <span>C</span><span>O</span><span>C</span><span>K</span><span>T</span><span>A</span><span>I</span><span>L</span>
+                    <span>&nbsp;</span>
+                    <span>C</span><span>L</span><span>U</span><span>B</span>
+                </div>
+            </header>
+        </div>
+
+        <!-- PALETTE DE COULEURS -->
+        <section class="color-palette-section">
+            <h2 class="section-title">Palette Chromatique — Skin Luxe</h2>
+            
+            <div class="color-grid">
+                <div class="color-card" onclick="copyColor('--bg', this)">
+                    <div class="color-swatch" style="background: var(--bg);"></div>
+                    <div class="color-info">
+                        <span class="color-name">Fond Principal</span>
+                        <span class="color-var">--bg</span>
+                        <span class="color-hex">#f8f2da / #211b15</span>
+                    </div>
+                </div>
+
+                <div class="color-card" onclick="copyColor('--bg-card', this)">
+                    <div class="color-swatch" style="background: var(--bg-card);"></div>
+                    <div class="color-info">
+                        <span class="color-name">Carte & Surface</span>
+                        <span class="color-var">--bg-card</span>
+                        <span class="color-hex">#e3dccc / #2d251d</span>
+                    </div>
+                </div>
+
+                <div class="color-card" onclick="copyColor('--bg-raised', this)">
+                    <div class="color-swatch" style="background: var(--bg-raised);"></div>
+                    <div class="color-info">
+                        <span class="color-name">Surface Élevée</span>
+                        <span class="color-var">--bg-raised</span>
+                        <span class="color-hex">#e1d2b5 / #382d23</span>
+                    </div>
+                </div>
+
+                <div class="color-card" onclick="copyColor('--gold', this)">
+                    <div class="color-swatch" style="background: var(--gold);"></div>
+                    <div class="color-info">
+                        <span class="color-name">Or Primaire</span>
+                        <span class="color-var">--gold</span>
+                        <span class="color-hex">#937253 / #f8f2da</span>
+                    </div>
+                </div>
+
+                <div class="color-card" onclick="copyColor('--amber', this)">
+                    <div class="color-swatch" style="background: var(--amber);"></div>
+                    <div class="color-info">
+                        <span class="color-name">Ambre / Accent</span>
+                        <span class="color-var">--amber</span>
+                        <span class="color-hex">#260101 / #e1d2b5</span>
+                    </div>
+                </div>
+
+                <div class="color-card" onclick="copyColor('--text', this)">
+                    <div class="color-swatch" style="background: var(--text);"></div>
+                    <div class="color-info">
+                        <span class="color-name">Texte Principal</span>
+                        <span class="color-var">--text</span>
+                        <span class="color-hex">#260101 / #f8f2da</span>
+                    </div>
+                </div>
+
+                <div class="color-card" onclick="copyColor('--border', this)">
+                    <div class="color-swatch" style="background: var(--border);"></div>
+                    <div class="color-info">
+                        <span class="color-name">Bordure</span>
+                        <span class="color-var">--border</span>
+                        <span class="color-hex">#937253</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SPECIMENS DES POLICES -->
+        <div class="grid-specimens">
+            <div class="font-card">
+                <div class="font-card-header">
+                    <span class="var-tag">--font-display</span>
+                    <span class="font-role">Titres & Affichage</span>
+                </div>
+                <div class="font-preview" style="font-family: var(--font-display); font-size: 2.4rem;">
+                    Gloock Regular
+                </div>
+                <div class="font-alphabet" style="font-family: var(--font-display);">
+                    ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+                    abcdefghijklmnopqrstuvwxyz<br>
+                    0123456789 (.,;!?&€)
+                </div>
+            </div>
+
+            <div class="font-card">
+                <div class="font-card-header">
+                    <span class="var-tag">--font-subtitle</span>
+                    <span class="font-role">Sous-titres & Accents</span>
+                </div>
+                <div class="font-preview" style="font-family: var(--font-subtitle); font-size: 2.2rem; font-weight: 600; letter-spacing: 0.05em;">
+                    Josefin Sans SemiBold
+                </div>
+                <div class="font-alphabet" style="font-family: var(--font-subtitle);">
+                    ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+                    abcdefghijklmnopqrstuvwxyz<br>
+                    0123456789 (.,;!?&€)
+                </div>
+            </div>
+
+            <div class="font-card">
+                <div class="font-card-header">
+                    <span class="var-tag">--font-body</span>
+                    <span class="font-role">Corps de texte</span>
+                </div>
+                <div class="font-preview" style="font-family: var(--font-body); font-size: 1.8rem;">
+                    Karla Regular
+                </div>
+                <div class="font-alphabet" style="font-family: var(--font-body);">
+                    ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+                    abcdefghijklmnopqrstuvwxyz<br>
+                    0123456789 (.,;!?&€)
+                </div>
+            </div>
+
+            <div class="font-card">
+                <div class="font-card-header">
+                    <span class="var-tag">--font-cocktail</span>
+                    <span class="font-role">Cocktail & Éléments Signature</span>
+                </div>
+                <div class="font-preview" style="font-family: var(--font-cocktail); font-size: 2.2rem;">
+                    Kalnia Serif
+                </div>
+                <div class="font-alphabet" style="font-family: var(--font-cocktail);">
+                    ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+                    abcdefghijklmnopqrstuvwxyz<br>
+                    0123456789 (.,;!?&€)
+                </div>
+            </div>
+        </div>
+
+        <!-- BAC À SABLE -->
+        <section class="sandbox-section">
+            <h2 class="section-title">Bac à Sable Typographique</h2>
+            
+            <div class="sandbox-controls">
+                <div class="control-group">
+                    <label>Police</label>
+                    <select id="fontSelect" onchange="updateSandbox()">
+                        <option value="var(--font-display)">Gloock (--font-display)</option>
+                        <option value="var(--font-subtitle)" selected>Josefin Sans (--font-subtitle)</option>
+                        <option value="var(--font-body)">Karla (--font-body)</option>
+                        <option value="var(--font-cocktail)">Kalnia (--font-cocktail)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Taille (px)</label>
+                    <input type="number" id="sizeInput" value="32" min="12" max="100" oninput="updateSandbox()">
+                </div>
+
+                <div class="control-group">
+                    <label>Espacement (px)</label>
+                    <input type="number" id="spacingInput" value="2" min="-2" max="20" oninput="updateSandbox()">
+                </div>
+            </div>
+
+            <div id="sandboxOutput" class="sandbox-output" contenteditable="true" style="font-family: var(--font-subtitle); font-size: 32px; letter-spacing: 2px;">
+                Oberthür Cocktail Club — Saisissez votre texte...
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function copyColor(varName, element) {
+            const hexSpan = element.querySelector('.color-hex');
+            const originalText = hexSpan.textContent;
+            
+            navigator.clipboard.writeText(varName).then(() => {
+                hexSpan.textContent = 'Copié !';
+                setTimeout(() => { hexSpan.textContent = originalText; }, 1500);
+            }).catch(() => {
+                hexSpan.textContent = varName;
+            });
+        }
+
+        function updateSandbox() {
+            const font = document.getElementById('fontSelect').value;
+            const size = document.getElementById('sizeInput').value + 'px';
+            const spacing = document.getElementById('spacingInput').value + 'px';
+            const output = document.getElementById('sandboxOutput');
+
+            output.style.fontFamily = font;
+            output.style.fontSize = size;
+            output.style.letterSpacing = spacing;
+        }
+    </script>
+</body>
+</html>

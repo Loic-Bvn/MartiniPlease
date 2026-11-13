@@ -22,57 +22,33 @@
 
   <!-- Header : switches segmentés côte à côte (mise en page inchangée) -->
   <div v-else class="settings-switches settings-switches--inline">
-    <div
-      class="settings-switch"
-      role="group"
+    <SegmentedSwitch
+      :model-value="locale"
+      :options="localeOptions"
       aria-label="Language switch"
-      @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
-    >
-      <button
-        type="button"
-        class="view-toggle-btn"
-        :class="{ 'view-toggle-btn--active': locale === 'fr' }"
-        :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
-      ><span>FR</span></button>
-      <button
-        type="button"
-        class="view-toggle-btn"
-        :class="{ 'view-toggle-btn--active': locale === 'en' }"
-        :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
-      ><span>EN</span></button>
-    </div>
+      @update:model-value="$emit('set-locale', $event)"
+    />
 
-    <div
+    <SegmentedSwitch
       v-if="showUnit"
-      class="settings-switch"
-      role="group"
+      :model-value="unit"
+      :options="unitOptions"
       aria-label="Unit switch"
-      @click="$emit('set-unit', unit === 'oz' ? 'ml' : 'oz')"
-    >
-      <button
-        type="button"
-        class="view-toggle-btn"
-        :class="{ 'view-toggle-btn--active': unit === 'oz' }"
-        :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
-      ><span>oz</span></button>
-      <button
-        type="button"
-        class="view-toggle-btn"
-        :class="{ 'view-toggle-btn--active': unit === 'ml' }"
-        :title="unit === 'oz' ? 'Passer en ml' : 'Switch to oz'"
-      ><span>ml</span></button>
-    </div>
+      @update:model-value="$emit('set-unit', $event)"
+    />
 
     <ThemeToggle />
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { Languages, Ruler, Sun, Moon } from 'lucide-vue-next'
+import SegmentedSwitch from '@/Components/SegmentedSwitch.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
 import { useTheme } from '@/composables/useTheme'
 
-defineProps({
+const props = defineProps({
   locale: String,
   unit: String,
   showUnit: Boolean,
@@ -83,6 +59,18 @@ defineProps({
 defineEmits(['set-locale', 'set-unit'])
 
 const { isDark, setTheme } = useTheme()
+
+const localeTitle = computed(() => props.locale === 'fr' ? 'Switch to English' : 'Passer en français')
+const localeOptions = computed(() => [
+  { value: 'fr', label: 'FR', title: localeTitle.value },
+  { value: 'en', label: 'EN', title: localeTitle.value },
+])
+
+const unitTitle = computed(() => props.unit === 'oz' ? 'Passer en ml' : 'Switch to oz')
+const unitOptions = computed(() => [
+  { value: 'oz', label: 'oz', title: unitTitle.value },
+  { value: 'ml', label: 'ml', title: unitTitle.value },
+])
 </script>
 
 <style scoped>

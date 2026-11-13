@@ -1,10 +1,8 @@
 <template>
   <div class="section-card">
-    <button @click="$emit('toggle')" class="expand-actions-btn">
-      <ChevronDown :size="18" :class="{ rotated: open }" />
-      <h2 class="section-title"><component :is="lucideIcons.cards" :size="20" class="tile-ico" /><span class="tile-lbl">{{ t.cardsTitle }}</span><span class="count-badge">{{ menuCards.length }}</span></h2>
-      <span></span>
-    </button>
+    <BarTileButton :icon="lucideIcons.cards" :label="t.cardsTitle" toggle :open="open" @activate="$emit('toggle')">
+      <template #badge><span class="count-badge">{{ menuCards.length }}</span></template>
+    </BarTileButton>
     <div v-if="open" class="cards-content">
       <div v-if="menuCards.length === 0 && !isLoggedIn" class="cards-empty">{{ t.noCard }}</div>
       <div v-else class="cards-grid">
@@ -60,7 +58,8 @@
 <script setup>
 import { ref } from 'vue'
 import { lucideIcons } from '@/utils/lucideIcons'
-import { ChevronDown, BookOpen, Eye, EyeOff, Pencil, Trash2, Plus } from 'lucide-vue-next'
+import BarTileButton from '@/Components/BarTileButton.vue'
+import { BookOpen, Eye, EyeOff, Pencil, Trash2, Plus } from 'lucide-vue-next'
 
 defineProps({ open: { type: Boolean, default: false }, isLoggedIn: Boolean, menuCards: Array, locale: String, t: Object })
 defineEmits(['toggle', 'view-card', 'edit-card', 'delete-card', 'new-card', 'toggle-card-visibility'])

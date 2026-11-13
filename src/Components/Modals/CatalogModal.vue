@@ -159,6 +159,7 @@ import { useInventory } from '@/composables/useInventory'
 import { getCocktailStyleLabel, getIngredientLabel } from '../../constants/typeLabels.js'
 import { getBaseSpiritGroups, getCocktailStyles, getProfileOptions } from '@/lib/cocktail-constants'
 import { useModalAccessibility } from '@/composables/useModalAccessibility'
+import { formatOz } from '@/utils/formatters'
 
 const props = defineProps({
   locale: { type: String, default: 'fr' },
@@ -267,7 +268,7 @@ function formatQty(ing) {
     if (ing.Dashes) return `${ing.Dashes} dash${ing.Dashes > 1 ? 'es' : ''}`
     return ''
   }
-  if (ing.Oz) return `${ing.Oz}oz`
+  if (ing.Oz) return `${formatOz(ing.Oz)}oz`
   if (ing.Dashes) return `${ing.Dashes} dash${ing.Dashes > 1 ? 'es' : ''}`
   return ''
 }

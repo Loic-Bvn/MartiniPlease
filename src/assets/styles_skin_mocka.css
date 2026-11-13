@@ -1,0 +1,133 @@
+:root {
+  --font-body: 'Karla', sans-serif;
+  --font-subtitle: 'Josefin Sans', sans-serif;
+  --font-display: 'Gloock', serif;
+  --font-cocktail: 'Kalnia', serif;
+  --bg: #f8f2da;
+  --bg-card: #e3dccc;
+  --cocktail-list-bg: #e1d2b5;
+  --bg-raised: #e1d2b5;
+  --bg-input: #e3dccc;
+  --gold: #937253;
+  --gold-dim: #937253;
+  --amber: #260101;
+  --recipe-leader: #937253;
+  --text: #260101;
+  --text-muted: #260101;
+  --text-dim: #260101;
+  --border: #937253;
+  --border-mid: #e3dccc;
+  --radius-control: 3px;
+  --radius-panel: 6px;
+  --radius-dialog: 8px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --shadow-sm: 0 1px 2px rgba(38, 1, 1, 0.06);
+  --shadow-md: 0 3px 10px rgba(38, 1, 1, 0.08);
+  --shadow-lg: 0 8px 24px rgba(38, 1, 1, 0.12);
+}
+
+.menu-app.skin-mocka {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 36% 30% at 0% 0%, rgba(147, 114, 83, 0.2), transparent 72%),
+    radial-gradient(ellipse 36% 30% at 100% 8%, rgba(147, 114, 83, 0.16), transparent 72%),
+    radial-gradient(ellipse 40% 32% at 48% 100%, rgba(225, 210, 181, 0.3), transparent 72%);
+}
+
+.dark .menu-app.skin-mocka {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 36% 30% at 0% 0%, rgba(225, 210, 181, 0.2), transparent 72%),
+    radial-gradient(ellipse 36% 30% at 100% 8%, rgba(88, 65, 46, 0.34), transparent 72%),
+    radial-gradient(ellipse 40% 32% at 48% 100%, rgba(56, 45, 35, 0.45), transparent 72%);
+}
+
+.dark {
+  --bg: #211b15;
+  --bg-card: #2d251d;
+  --cocktail-list-bg: #382d23;
+  --bg-raised: #382d23;
+  --bg-input: #2d251d;
+  --gold: #f8f2da;
+  --gold-dim: #e1d2b5;
+  --amber: #e1d2b5;
+  --recipe-leader: #e1d2b5;
+  --text: #f8f2da;
+  --text-muted: #e1d2b5;
+  --text-dim: #e1d2b5;
+  --border: #937253;
+  --border-mid: #937253;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 3px 10px rgba(0, 0, 0, 0.26);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.34);
+}
+
+.bartender-mode {
+  --bg: #f8f2da;
+}
+
+.dark .bartender-mode {
+  --bg: #211b15;
+}
+
+/* Modals de connexion (bartender + drinker) : en clair, --bg-input, --bg-card
+   et --border-mid valent tous #e3dccc, donc les champs se fondent dans la modal.
+   Fond = --bg (plus clair que la modal) + bordure dorée = --border.
+   Sur la WelcomePage, .menu-app n'a pas de classe skin-* (pas de bar actif) :
+   les variables Mocka s'appliquent via :root, d'où le second sélecteur. */
+.menu-app.skin-mocka .password-form-input,
+.menu-app:not([class*="skin-"]) .password-form-input {
+  background: var(--bg);
+  border-color: var(--border);
+}
+
+.menu-app.skin-mocka .password-form-input:focus,
+.menu-app:not([class*="skin-"]) .password-form-input:focus {
+  border-color: var(--amber);
+}
+
+:root:not(.dark) :is(
+  .menu-app.skin-mocka,
+  .menu-app.skin-emerald,
+  .menu-app.skin-bordeaux,
+  .menu-app:not([class*="skin-"])
+) :is(.modal-overlay, .password-modal-overlay) :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+  select,
+  textarea
+) {
+  border: 1px solid var(--gold-dim);
+}
+
+:root:not(.dark) :is(
+  .menu-app.skin-mocka,
+  .menu-app.skin-emerald,
+  .menu-app.skin-bordeaux,
+  .menu-app:not([class*="skin-"])
+) .burger-dropdown .skin-select-row select {
+  border-color: var(--gold-dim);
+}
+
+:is(
+  .menu-app.skin-mocka,
+  .menu-app.skin-emerald,
+  .menu-app.skin-bordeaux
+) .burger-dropdown .burger-item {
+  font-family: var(--font-subtitle, var(--font-body, sans-serif));
+  font-weight: 400;
+}
+
+/* Mobile (≤600px): burger button uses the gold accent in Mocka skins
+   (default muted text color blends into the header). Keep the breakpoint
+   in sync with NARROW_QUERY in AppHeader.vue. */
+  :is(
+  .menu-app.skin-mocka,
+  .menu-app.skin-emerald,
+  .menu-app.skin-bordeaux,
+  .menu-app:not([class*="skin-"]) /* landing page: no bar, so no skin class (Mocka vars come from :root) */
+) .burger-button {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+}

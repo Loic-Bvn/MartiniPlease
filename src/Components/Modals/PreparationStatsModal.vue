@@ -5,25 +5,12 @@
       <div class="modal-header">
         <h2 class="modal-title" id="prep-modal-title">🍸 {{ t.title }}</h2>
         <div class="prep-header-actions">
-          <div
-            class="settings-switch"
-            role="group"
+          <SegmentedSwitch
+            :model-value="locale"
+            :options="localeOptions"
             :aria-label="locale === 'fr' ? 'Changer la langue' : 'Change language'"
-            @click="$emit('set-locale', locale === 'fr' ? 'en' : 'fr')"
-          >
-            <button
-              type="button"
-              class="view-toggle-btn"
-              :class="{ 'view-toggle-btn--active': locale === 'fr' }"
-              :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
-            ><span>FR</span></button>
-            <button
-              type="button"
-              class="view-toggle-btn"
-              :class="{ 'view-toggle-btn--active': locale === 'en' }"
-              :title="locale === 'fr' ? 'Switch to English' : 'Passer en français'"
-            ><span>EN</span></button>
-          </div>
+            @update:model-value="$emit('set-locale', $event)"
+          />
           <ThemeToggle />
           <button @click="$emit('close')" class="btn-icon btn-icon--close" :aria-label="t.close">
             <X :size="20" />
@@ -272,6 +259,7 @@ import { usePreparations } from '@/composables/usePreparations'
 import { getIngredientLabel, getProfileLabel } from '@/constants/typeLabels.js'
 import { getBaseSpiritGroups } from '@/lib/cocktail-constants'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
+import SegmentedSwitch from '@/Components/SegmentedSwitch.vue'
 import { useModalAccessibility } from '@/composables/useModalAccessibility'
 
 const props = defineProps({
@@ -288,6 +276,10 @@ const { getStats, getRecent, deleteEntry } = usePreparations()
 
 // ── Libellés ─────────────────────────────────────────────────────────────────
 const fr = computed(() => props.locale === 'fr')
+const localeOptions = computed(() => [
+  { value: 'fr', label: 'FR', title: fr.value ? 'Switch to English' : 'Passer en français' },
+  { value: 'en', label: 'EN', title: fr.value ? 'Switch to English' : 'Passer en français' },
+])
 const t = computed(() => ({
   title:    fr.value ? 'Compteur' : 'Counter',
   close:    fr.value ? 'Fermer' : 'Close',
