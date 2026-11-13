@@ -91,14 +91,12 @@
 /* Mobile (≤600px): burger button uses the gold accent in luxe skins
    (default muted text color blends into the header). Keep the breakpoint
    in sync with NARROW_QUERY in AppHeader.vue. */
-@media (max-width: 600px) {
   :is(
-    .menu-app.skin-luxe,
-    .menu-app.skin-luxe-emerald,
-    .menu-app.skin-luxe-bordeaux,
-    .menu-app:not([class*="skin-"]) /* landing page: no bar, so no skin class (luxe vars come from :root) */
-  ) .burger-button {
-    color: var(--gold);
-    border-color: var(--gold-dim);
-  }
+  .menu-app.skin-luxe,
+  .menu-app.skin-luxe-emerald,
+  .menu-app.skin-luxe-bordeaux,
+  .menu-app:not([class*="skin-"]) /* landing page: no bar, so no skin class (luxe vars come from :root) */
+) .burger-button {
+  color: var(--gold);
+  border-color: var(--gold-dim);
 }

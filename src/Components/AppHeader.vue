@@ -316,10 +316,10 @@ const t = computed(() => ({
 <style>
 /* Menu burger : version compacte une fois déployé */
 .header .burger-dropdown {
-  width: min(240px, calc(100vw - 24px));
+  width: min(280px, calc(100vw - 24px));
   min-width: 0;
   padding: 4px;
-  border-radius: 10px;
+  border-radius: 0;
 }
 .header .burger-dropdown .burger-item {
   gap: 7px;

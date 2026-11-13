@@ -43,7 +43,7 @@
           @open-bars-selection="handleOpenBarsSelection"
           @toggle-public="handleTogglePublic"
           @open-catalog="showCatalogModal = true"
-          @open-preparation-stats="showPreparationStatsModal = true"
+          @open-preparation-stats="openPreparationStats"
           @sign-out="handleSignOut"
         />
 
@@ -98,6 +98,7 @@
           :showNewBarInput="showNewBarInput"
           :barToDelete="barToDelete"
           :deleteConfirmationInput="deleteConfirmationInput"
+          @open-preparation-stats="openPreparationStats"
           @create-new-bar="handleCreateNewBar"
           @select-bar="handleSelectBar"
           @start-edit-bar="startEditBar"
@@ -258,11 +259,14 @@
           :card-view="cardView"
           :bar-id="activeBarId"
           :cocktail-of-moment-id="cocktailOfMomentId"
+          :updating-cocktail-id="updatingCardCocktailId"
           @close="closeCardView"
           @set-locale="setLocale"
           @set-unit="setUnit"
           @set-card-view="setCardView"
           @open-cocktail="openCocktailFromCard"
+          @remove-cocktail-from-card="(id) => handleCardCocktailChange(id, false)"
+          @add-cocktail-to-card="(id) => handleCardCocktailChange(id, true)"
         />
         <Transition name="modal-fade">
           <CocktailDetailModal
@@ -281,12 +285,12 @@
           />
         </Transition>
         <PreparationStatsModal
-          v-if="showPreparationStatsModal && isLoggedIn && preparationCounterEnabled && activeBarId"
-          :bar-id="activeBarId"
+          v-if="preparationStatsBarId && isLoggedIn"
+          :bar-id="preparationStatsBarId"
           :locale="locale"
           :menu-cards="menuCards"
           :cocktails="cocktails"
-          @close="showPreparationStatsModal = false"
+          @close="preparationStatsBarId = null"
           @set-locale="setLocale"
         />
         <PreparationUndoToast v-if="isLoggedIn && preparationCounterEnabled" :locale="locale" />
@@ -360,8 +364,9 @@ const CookiesPolicy     = defineAsyncComponent(() => import('@/views/CookiesPoli
 const PreparationStatsModal = defineAsyncComponent(() => import('@/Components/Modals/PreparationStatsModal.vue'))
 const cocktailToDelete = ref(null)
 const cardToDelete = ref(null)
-const showPreparationStatsModal = ref(false)
+const preparationStatsBarId = ref(null)
 const preparationCardId = ref(null)
+const updatingCardCocktailId = ref(null)
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 const {
@@ -404,7 +409,14 @@ const activeBarName = computed(() => currentBarName.value || guestBar.value?.nam
 // ── Données ───────────────────────────────────────────────────────────────────
 const { cocktails, loading: cocktailsLoading, fetchCocktails, createCocktail, updateCocktail, deleteCocktail } = useCocktails()
 const { barInventory, ingredients, fetchIngredients, initializeDefaultIngredients } = useInventory()
-const { menuCards, fetchMenuCards, createMenuCard, updateMenuCard, deleteMenuCard } = useMenuCards()
+const {
+  menuCards,
+  fetchMenuCards,
+  createMenuCard,
+  updateMenuCard,
+  toggleCocktailInMenuCard,
+  deleteMenuCard,
+} = useMenuCards()
 const accessibleMenuCards = computed(() =>
   isLoggedIn.value
     ? menuCards.value
@@ -652,6 +664,19 @@ async function loadBarData(barId) {
   clearFilters()
 }
 
+async function openPreparationStats(barId = activeBarId.value) {
+  if (!barId) return
+
+  if (barId !== currentBarId.value) {
+    await Promise.all([
+      fetchCocktails(barId),
+      fetchMenuCards(barId),
+    ])
+  }
+
+  preparationStatsBarId.value = barId
+}
+
 function handleLogoClick() {
   if (isLoggedIn.value) {
     handleSignOut()
@@ -811,6 +836,29 @@ async function confirmDeleteCard() {
   if (!id) return
   const result = await deleteMenuCard(id)
   if (!result.success) showToast(`❌ ${result.error}`, 'error')
+}
+
+async function handleCardCocktailChange(cocktailId, shouldAdd) {
+  const card = viewingCard.value
+  if (!card || updatingCardCocktailId.value) return
+  const isIncluded = (card.cocktail_ids || []).includes(cocktailId)
+  if (isIncluded === shouldAdd) return
+
+  updatingCardCocktailId.value = cocktailId
+  try {
+    const result = await toggleCocktailInMenuCard(card.id, cocktailId)
+    if (!result.success) {
+      showToast(`❌ ${result.error?.message || result.error}`, 'error')
+      return
+    }
+
+    if (viewingCard.value?.id === card.id) viewingCard.value = result.data
+    showToast(locale.value === 'fr'
+      ? `🍸 Cocktail ${shouldAdd ? 'ajouté à' : 'retiré de'} la carte`
+      : shouldAdd ? '🍸 Cocktail added to the menu' : '🍸 Cocktail removed from the menu')
+  } finally {
+    updatingCardCocktailId.value = null
+  }
 }
 
 // ── CRUD cartes ───────────────────────────────────────────────────────────────
